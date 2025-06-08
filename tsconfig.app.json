@@ -26,5 +26,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "**/*.cy.ts", "cypress.d.ts", "src/pages/MatureContent"]
+  "include": ["src", "src/pages/MatureContent"]
 }
