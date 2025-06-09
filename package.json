@@ -7,11 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "cy-open": "cypress open",
-    "cy-open-unit": "vite --mode test & cypress open --component --browser chrome",
-    "cy-run-unit": "cross-env MODE=test cypress run --component",
     "preview": "vite preview",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:smoke": "playwright test --grep \"@smoke\"",
+    "test:smoke:ci": "playwright test --grep \"@smoke\" --project=chromium",
+    "test:regression": "playwright test tests/regression",
+    "test:regression:ci": "playwright test tests/regression --project=chromium",
+    "test:report": "playwright show-report",
     "format": "prettier --write ."
+
   },
   "prepare": "husky",
   "lint-staged": {
@@ -137,6 +142,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@playwright/test": "^1.52.0",
     "@swc/core": "^1.11.13",
     "@swc/helpers": "^0.5.15",
     "@types/file-saver": "^2.0.7",
