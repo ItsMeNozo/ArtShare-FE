@@ -1,4 +1,5 @@
 import BlogItem from "@/components/lists/BlogItem";
+import { useUser } from "@/contexts/UserProvider";
 import { fetchBlogsByUsername } from "@/features/blog-details/api/blog";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -9,6 +10,7 @@ const PAGE_SIZE = 12;
 
 const UserBlogs = () => {
   const { username } = useParams<{ username: string }>();
+  const { user } = useUser();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -110,33 +112,38 @@ const UserBlogs = () => {
       ref={scrollContainerRef}
       className="flex flex-col gap-4 w-full max-h-[600px] overflow-y-auto"
     >
-      {blogs.map((blog) => (
-        <BlogItem
-          key={blog.id}
-          blogId={String(blog.id)}
-          title={blog.title}
-          content={blog.content}
-          thumbnail={
-            Array.isArray(blog.pictures) && blog.pictures[0]
-              ? blog.pictures[0]
-              : "https://placehold.co/600x400"
-          }
-          author={{
-            username: blog.user.username,
-            avatar:
-              blog.user.profile_picture_url &&
-              blog.user.profile_picture_url.trim() !== ""
-                ? blog.user.profile_picture_url
-                : "",
-          }}
-          category={blog.categories?.[0]?.name ?? "Uncategorized"}
-          timeReading={`${Math.ceil((blog.content ? blog.content.split(/\s+/).length : 0) / 200)}m reading`}
-          dateCreated={blog.created_at}
-          like_count={blog.like_count}
-          comment_count={blog.comment_count}
-          view_count={blog.view_count}
-        />
-      ))}
+      {blogs.map((blog) => {
+        const isOwner = user?.username === blog.user?.username;
+
+        return (
+          <BlogItem
+            key={blog.id}
+            blogId={String(blog.id)}
+            title={blog.title}
+            content={blog.content}
+            thumbnail={
+              Array.isArray(blog.pictures) && blog.pictures[0]
+                ? blog.pictures[0]
+                : "https://placehold.co/600x400"
+            }
+            author={{
+              username: blog.user.username,
+              avatar:
+                blog.user.profile_picture_url &&
+                blog.user.profile_picture_url.trim() !== ""
+                  ? blog.user.profile_picture_url
+                  : "",
+            }}
+            category={blog.categories?.[0]?.name ?? "Uncategorized"}
+            timeReading={`${Math.ceil((blog.content ? blog.content.split(/\s+/).length : 0) / 200)}m reading`}
+            dateCreated={blog.created_at}
+            like_count={blog.like_count}
+            comment_count={blog.comment_count}
+            view_count={blog.view_count}
+            isOwner={isOwner}
+          />
+        );
+      })}
 
       {/* Loading more indicator */}
       {isFetchingNextPage && (
