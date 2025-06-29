@@ -160,7 +160,7 @@ const PostCard: React.FC<PostCardProps> = ({
   onPostDeleted,
 }) => {
   return (
-    <div className="group relative hover:shadow-[0_8px_12px_-4px_rgba(0,0,0,0.4)] aspect-h-1 aspect-w-1 min-h-[160px] overflow-hidden transition-shadow duration-300">
+    <div className="group relative aspect-square overflow-hidden">
       <Link
         component={RouterLink}
         to={`/posts/${post.id}`}
@@ -170,7 +170,7 @@ const PostCard: React.FC<PostCardProps> = ({
         <img
           src={post.thumbnail_url}
           alt={post.title}
-          className="w-full h-full object-cover transition-transform duration-300"
+          className="w-full h-full object-cover"
         />
 
         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-b from-transparent via-transparent to-black/70 opacity-0 group-hover:opacity-100 p-3 text-white transition-opacity duration-300">

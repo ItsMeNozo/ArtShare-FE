@@ -1,10 +1,10 @@
+import { Button, IconButton, Tooltip } from "@mui/material";
+import Avatar from "boring-avatars";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button, Tooltip, IconButton } from "@mui/material";
 import { AiOutlineLike } from "react-icons/ai";
 import { BiComment } from "react-icons/bi";
 import { LuLink } from "react-icons/lu";
-import Avatar from "boring-avatars";
+import { useNavigate } from "react-router-dom";
 // import { MdBookmarkBorder } from "react-icons/md";
 // Remove the Share import since we're replacing it
 // import Share from "../dialogs/Share";
@@ -73,7 +73,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
         <img
           src={thumbnail}
           alt={title}
-          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300 ease-in-out"
+          className="w-full h-full object-cover"
         />
       </div>
 

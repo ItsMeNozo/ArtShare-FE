@@ -105,7 +105,7 @@ const BlogItem: React.FC<BlogItemProps> = ({
       >
         <img
           src={thumbnail}
-          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300 ease-in-out transform"
+          className="w-full h-full object-cover"
           alt={title}
         />
       </div>
@@ -119,7 +119,7 @@ const BlogItem: React.FC<BlogItemProps> = ({
             </div>
           </div>
           <p
-            className="font-medium text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 text-lg line-clamp-1 duration-300 ease-in-out cursor-pointer transform"
+            className="font-medium text-gray-900 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 text-lg line-clamp-1 duration-300 ease-in-out cursor-pointer"
             onClick={handleCardClick}
           >
             {title}

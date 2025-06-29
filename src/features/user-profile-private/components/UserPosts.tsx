@@ -63,7 +63,7 @@ const UserPosts = () => {
   }
 
   return (
-    <div className="gap-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 3xl:grid-cols-8 4xl:grid-cols-10 p-1 w-full">
+    <div className="gap-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 p-1 w-full">
       {posts.map((post) => {
         const isOwner = user?.username === post.user?.username;
 
