@@ -12,9 +12,8 @@ import { BiComment } from "react-icons/bi";
 import { MdBookmarkBorder } from "react-icons/md";
 
 //Components
-import Share from "../dialogs/Share";
-import ReactTimeAgo from "react-time-ago";
 import { getPlainTextPreview } from "@/features/blog-details/utils/blog";
+import ReactTimeAgo from "react-time-ago";
 
 //Style
 type Author = {
@@ -107,12 +106,6 @@ const BlogItem: React.FC<BlogItemProps> = ({
                   <MdBookmarkBorder className="mr-1 size-5" />
                 </div>
               </Tooltip>
-              <Share
-                className="font-normal text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100"
-                iconClassName="mr-1 size-4"
-                link={`http://localhost:5173/blogs/${blogId}`}
-                tooltipDirection="bottom"
-              />
             </div>
           </div>
           <p

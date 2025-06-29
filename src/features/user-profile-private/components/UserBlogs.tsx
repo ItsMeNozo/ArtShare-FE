@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { Box, CircularProgress, Typography } from "@mui/material";
 import BlogItem from "@/components/lists/BlogItem";
 import { fetchBlogsByUsername } from "@/features/blog-details/api/blog";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 
 const PAGE_SIZE = 12;
 
@@ -39,8 +39,8 @@ const UserBlogs = () => {
     },
   });
 
-  // Flatten the pages into a single array
-  const blogs = data?.pages.flat() ?? [];
+  // Flatten the pages into a single array and filter for published blogs only
+  const blogs = data?.pages.flat().filter((blog) => blog.is_published) ?? [];
 
   // Infinite scroll handler
   useEffect(() => {
@@ -99,7 +99,7 @@ const UserBlogs = () => {
         height={200}
       >
         <Typography variant="body2" color="textSecondary">
-          No blogs available.
+          No blogs have been published yet.
         </Typography>
       </Box>
     );
