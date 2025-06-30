@@ -1,3 +1,5 @@
+import { InfiniteScroll } from "@/components/InfiniteScroll";
+import Loading from "@/components/loading/Loading";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { RowsPhotoAlbum } from "react-photo-album";
@@ -5,8 +7,6 @@ import { useSearchUsers } from "../../hooks/useSearchUsers";
 import { UserPhoto } from "../../types";
 import { transformUserToPhoto } from "../../utils/transformUserToPhoto";
 import { UserPhotoRenderer } from "./UserPhotoRenderer";
-import Loading from "@/components/loading/Loading";
-import { InfiniteScroll } from "@/components/InfiniteScroll";
 
 interface UserSearchResultsProps {
   searchQuery: string | null;
@@ -33,6 +33,7 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
 
     const processNewUsers = async () => {
       const lastPage = data.pages[data.pages.length - 1];
+      // If the last page is empty or undefined, return early
       if (!lastPage || !lastPage.data) return;
       const photoPromises = lastPage.data.map(transformUserToPhoto);
       const newPhotos = await Promise.all(photoPromises);
