@@ -1,6 +1,6 @@
-import { useDeletePost } from "@/features/post/hooks/useDeletePost";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { Post } from "@/types";
+import { useDeletePost } from '@/features/post/hooks/useDeletePost';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { Post } from '@/types';
 import {
   Button,
   Dialog,
@@ -11,14 +11,14 @@ import {
   Menu,
   MenuItem,
   Typography,
-} from "@mui/material";
-import Link from "@mui/material/Link";
-import { MoreHorizontal } from "lucide-react";
-import React, { useState } from "react";
-import { AiOutlineLike } from "react-icons/ai";
-import { BiCommentDetail } from "react-icons/bi";
-import { HiOutlineEye } from "react-icons/hi";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+} from '@mui/material';
+import Link from '@mui/material/Link';
+import { MoreHorizontal } from 'lucide-react';
+import React, { useState } from 'react';
+import { AiOutlineLike } from 'react-icons/ai';
+import { BiCommentDetail } from 'react-icons/bi';
+import { HiOutlineEye } from 'react-icons/hi';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 interface PostCardProps {
   post: Post;
@@ -47,10 +47,10 @@ const PostMenu: React.FC<PostMenuProps> = ({
   const { mutate: deletePostMutation } = useDeletePost({
     onSuccess: () => {
       onPostDeleted(post.id);
-      showSnackbar("Post successfully deleted!", "success");
+      showSnackbar('Post successfully deleted!', 'success');
     },
     onError: (errorMessage) => {
-      showSnackbar(errorMessage, "error");
+      showSnackbar(errorMessage, 'error');
     },
   });
 
@@ -89,14 +89,14 @@ const PostMenu: React.FC<PostMenuProps> = ({
     <>
       <IconButton
         aria-label="post options"
-        aria-controls={open ? "post-menu" : undefined}
+        aria-controls={open ? 'post-menu' : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
+        aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
         size="small"
-        className="text-white hover:text-white p-1.5 rounded-full bg-black/40 hover:bg-black/60 transition-all duration-200 opacity-0 group-hover:opacity-100"
+        className="rounded-full bg-black/40 p-1.5 text-white opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-black/60 hover:text-white"
         sx={{
-          position: "absolute",
+          position: 'absolute',
           top: 8,
           right: 8,
           zIndex: 20,
@@ -106,24 +106,24 @@ const PostMenu: React.FC<PostMenuProps> = ({
       </IconButton>
 
       <Menu
-        id="post-menu"
+        id={`post-menu-${post.id}`}
         anchorEl={anchorEl}
         open={open}
         onClose={handleCloseMenu}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
+          vertical: 'bottom',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
       >
         <MenuItem onClick={handleEdit}>
           <Typography variant="body2">Edit</Typography>
         </MenuItem>
         <MenuItem onClick={handleDelete}>
-          <Typography variant="body2" sx={{ color: "error.main" }}>
+          <Typography variant="body2" sx={{ color: 'error.main' }}>
             Delete
           </Typography>
         </MenuItem>
@@ -133,7 +133,7 @@ const PostMenu: React.FC<PostMenuProps> = ({
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete "{post.title || "this post"}"? This
+            Are you sure you want to delete "{post.title || 'this post'}"? This
             action cannot be undone.
           </Typography>
         </DialogContent>
@@ -164,20 +164,20 @@ const PostCard: React.FC<PostCardProps> = ({
       <Link
         component={RouterLink}
         to={`/posts/${post.id}`}
-        className="block w-full h-full"
+        className="block h-full w-full"
         underline="none"
       >
         <img
           src={post.thumbnail_url}
           alt={post.title}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-b from-transparent via-transparent to-black/70 opacity-0 group-hover:opacity-100 p-3 text-white transition-opacity duration-300">
-          <div className="flex justify-between items-end w-full">
+        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-b from-transparent via-transparent to-black/70 p-3 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="flex w-full items-end justify-between">
             <div>
-              <p className="font-medium truncate">{post.title || "Untitled"}</p>
-              <p className="text-gray-300 text-xs break-words whitespace-normal">
+              <p className="truncate font-medium">{post.title || 'Untitled'}</p>
+              <p className="text-xs break-words whitespace-normal text-gray-300">
                 @{username}
               </p>
             </div>
