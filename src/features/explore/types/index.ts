@@ -1,1 +1,1 @@
-export type ExploreTab = "Trending" | "Folllowing";
+export type ExploreTab = 'Trending' | 'Following';
