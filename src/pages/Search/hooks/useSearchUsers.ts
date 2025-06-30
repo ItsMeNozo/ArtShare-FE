@@ -10,7 +10,7 @@ export const useSearchUsers = (params: UserSearchUsersParams) => {
   const { searchQuery, enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ["postSearch", searchQuery],
+    queryKey: ["userSearch", searchQuery],
 
     queryFn: ({ pageParam = 1 }) =>
       searchUsers({ search: searchQuery, page: pageParam }),
