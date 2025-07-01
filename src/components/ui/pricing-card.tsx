@@ -143,7 +143,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       {/* Tier Name and Popular Badge */}
       <h2
         className={cn(
-          "flex items-center gap-3 font-medium text-xl capitalize",
+          "flex items-center gap-3 text-xl capitalize",
           isHighlighted ? "text-white" : "text-slate-900 dark:text-slate-50",
         )}
       >
@@ -179,7 +179,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
                 minimumFractionDigits: 0,
               }}
               value={price}
-              className="font-medium text-4xl" // Text color inherited from parent
+              className="text-4xl" // Text color inherited from parent
             />
             <p
               className={cn(
@@ -193,7 +193,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
             </p>
           </>
         ) : (
-          <h1 className="font-medium text-4xl">{price}</h1> // Text color inherited
+          <h1 className="text-4xl">{price}</h1> // Text color inherited
         )}
       </div>
 
@@ -201,7 +201,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       <div className="flex-1 space-y-2">
         <h3
           className={cn(
-            "font-medium text-sm",
+            "text-xs",
             isHighlighted
               ? "text-purple-100"
               : "text-slate-700 dark:text-slate-300",
@@ -214,7 +214,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
             <li
               key={index}
               className={cn(
-                "flex items-center gap-2 text-sm font-medium",
+                "flex items-center gap-2 text-xs",
                 isHighlighted
                   ? "text-mountain-200 dark:text-purple-200"
                   : "text-muted-foreground dark:text-slate-400",
@@ -257,7 +257,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
               href={ctaProps.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center"
+              className="flex justify-center items-center"
             >
               {ctaProps.icon && <ctaProps.icon className="mr-2 w-4 h-4" />}
               {ctaProps.text}

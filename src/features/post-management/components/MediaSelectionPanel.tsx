@@ -1,15 +1,16 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
-import { Avatar, Box, Button, IconButton, Tooltip } from "@mui/material";
-import { MdAdd, MdClose } from "react-icons/md";
-import { MEDIA_TYPE } from "@/utils/constants";
-import TabValue from "../enum/media-tab-value";
-import MediaUploadTab from "./media-upload-tab";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { RiImageCircleAiLine } from "react-icons/ri";
-import { TbDeviceDesktop } from "react-icons/tb";
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { MEDIA_TYPE } from '@/utils/constants';
+import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { MdAdd, MdClose } from 'react-icons/md';
+import { RiImageCircleAiLine } from 'react-icons/ri';
+import { TbDeviceDesktop } from 'react-icons/tb';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import TabValue from '../enum/media-tab-value';
+import MediaUploadTab from './media-upload-tab';
 
 //Components
+import Loading from '@/components/loading/Loading';
 import {
   Dialog,
   DialogContent,
@@ -17,22 +18,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { LuImageOff } from "react-icons/lu";
-import MediaPreview from "./media-preview";
-import UploadFromDevice from "./UploadFromDevice";
-import { IoSparkles } from "react-icons/io5";
-import InfoMediaRemaining from "./InfoMediaRemaining";
-import { PostMedia } from "../types/post-media";
-import PostAiImages from "./post-ai-images";
-import useIsMature from "../hooks/useIsMature";
+} from '@/components/ui/dialog';
+import { IoSparkles } from 'react-icons/io5';
+import { LuImageOff } from 'react-icons/lu';
 import {
   MAX_IMAGES,
   MAX_VIDEO,
   validateVideoDuration,
   VIDEO_THUMBNAIL_DEFAULT_URL,
-} from "../helpers/media-upload.helper";
-import Loading from "@/pages/Loading";
+} from '../helpers/media-upload.helper';
+import useIsMature from '../hooks/useIsMature';
+import { PostMedia } from '../types/post-media';
+import InfoMediaRemaining from './InfoMediaRemaining';
+import MediaPreview from './media-preview';
+import PostAiImages from './post-ai-images';
+import UploadFromDevice from './UploadFromDevice';
 
 interface MediaSelectorPanelProps {
   postMedias: PostMedia[];
@@ -90,7 +90,7 @@ export default function MediaSelectorPanel({
     const isMatureDetected = postMedias.some((media) => media.isMature);
     if (isMatureDetected && !isMatureAutoDetected) {
       console.log(
-        "Mature content detected in post medias",
+        'Mature content detected in post medias',
         isMatureDetected,
         isMatureAutoDetected,
       );
@@ -110,13 +110,13 @@ export default function MediaSelectorPanel({
   } = useIsMature();
 
   const captureThumbnailFromVideo = (videoElement: HTMLVideoElement) => {
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
 
-    const ctx = canvas.getContext("2d", { alpha: true });
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) {
-      console.error("Failed to get canvas context");
+      console.error('Failed to get canvas context');
       return;
     }
 
@@ -126,14 +126,14 @@ export default function MediaSelectorPanel({
     canvas.toBlob((blob) => {
       if (blob) {
         onThumbnailAddedOrRemoved(
-          new File([blob], "thumbnailFromVideo.png", {
-            type: "image/png",
+          new File([blob], 'thumbnailFromVideo.png', {
+            type: 'image/png',
           }),
         );
       } else {
-        console.error("Failed to create blob from canvas");
+        console.error('Failed to create blob from canvas');
       }
-    }, "image/png");
+    }, 'image/png');
   };
 
   const handleImagesAdded = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -153,14 +153,14 @@ export default function MediaSelectorPanel({
     // combine with existing files
     const combinedMedias = [...postMedias, ...matureProcessedImageMedias];
 
-    console.log("Combined Medias:", combinedMedias);
+    console.log('Combined Medias:', combinedMedias);
 
     // image count
     const imageCount = combinedMedias.filter(
       (media) => media.type === MEDIA_TYPE.IMAGE,
     ).length;
     if (imageCount > MAX_IMAGES) {
-      showSnackbar(`You can only upload up to ${MAX_IMAGES} images.`, "error");
+      showSnackbar(`You can only upload up to ${MAX_IMAGES} images.`, 'error');
       return;
     }
     setPostMedias(combinedMedias);
@@ -176,14 +176,14 @@ export default function MediaSelectorPanel({
     const videoFiles = event.target.files;
     if (!videoFiles || videoFiles.length === 0) return;
     if (videoFiles.length > MAX_VIDEO) {
-      showSnackbar(`You can only upload up to ${MAX_VIDEO} video.`, "error");
+      showSnackbar(`You can only upload up to ${MAX_VIDEO} video.`, 'error');
       return;
     }
     const file = videoFiles[0];
 
     const isValidDuration = await validateVideoDuration(file, 60);
     if (!isValidDuration) {
-      showSnackbar("Video length cannot exceed 1 minute.", "error");
+      showSnackbar('Video length cannot exceed 1 minute.', 'error');
       return;
     }
 
@@ -201,10 +201,10 @@ export default function MediaSelectorPanel({
 
     // auto-thumbnail logic
     if (postMedias.length === 0) {
-      const video = document.createElement("video");
-      video.preload = "metadata";
+      const video = document.createElement('video');
+      video.preload = 'metadata';
       video.src = previewUrl;
-      video.crossOrigin = "anonymous";
+      video.crossOrigin = 'anonymous';
 
       video.onloadeddata = () => {
         video.currentTime = 0; // Go to the first frame
@@ -215,7 +215,7 @@ export default function MediaSelectorPanel({
       };
 
       video.onerror = () => {
-        console.error("Invalid video file.");
+        console.error('Invalid video file.');
         URL.revokeObjectURL(previewUrl);
       };
     }
@@ -225,7 +225,7 @@ export default function MediaSelectorPanel({
     const { url, file } = media;
     setPostMedias((prev) => prev.filter((media) => media.file !== file));
 
-    if (url?.startsWith("blob:")) {
+    if (url?.startsWith('blob:')) {
       URL.revokeObjectURL(url);
     }
     if (selectedPreviewMedia === media) {
@@ -280,14 +280,14 @@ export default function MediaSelectorPanel({
           return (
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 width,
                 height: adjustedHeight,
-                flexDirection: "column",
-                alignItems: "center",
-                overflow: "hidden",
+                flexDirection: 'column',
+                alignItems: 'center',
+                overflow: 'hidden',
                 minHeight: 0,
-                position: "relative",
+                position: 'relative',
               }}
             >
               <Box
@@ -303,7 +303,7 @@ export default function MediaSelectorPanel({
                 />
                 <Tooltip title="Marked as an AI Post. Its prompt may appear in trending suggestions for others to reuse.">
                   <div
-                    className={`${imageCount > 0 && hasArtNovaImages ? "flex" : "hidden"} hover:cursor-pointer text-base items-center space-x-2 px-4 py-1 bg-white shadow rounded-full`}
+                    className={`${imageCount > 0 && hasArtNovaImages ? 'flex' : 'hidden'} hover:cursor-pointer text-base items-center space-x-2 px-4 py-1 bg-white shadow rounded-full`}
                   >
                     <IoSparkles className="mr-2 text-amber-300" />
                     <p>Generated by ArtNova</p>
@@ -312,13 +312,13 @@ export default function MediaSelectorPanel({
               </Box>
               <Box
                 sx={{
-                  height: "100%",
+                  height: '100%',
                   minHeight: 0,
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
                 }}
                 className="flex flex-col justify-center items-center bg-mountain-100 border border-gray-500 border-dashed rounded-lg w-full h-full"
               >
@@ -336,7 +336,7 @@ export default function MediaSelectorPanel({
               {/* Carousel */}
               <Box
                 className="flex space-x-2 pt-3 h-fit custom-scrollbar"
-                sx={{ flexShrink: 0, overflowX: "hidden" }}
+                sx={{ flexShrink: 0, overflowX: 'hidden' }}
               >
                 {postMedias.map((media, i) => (
                   <Box
@@ -345,8 +345,8 @@ export default function MediaSelectorPanel({
                     sx={{
                       borderColor:
                         selectedPreviewMedia?.file === media.file
-                          ? "primary.main"
-                          : "transparent",
+                          ? 'primary.main'
+                          : 'transparent',
                     }}
                     onClick={() => setSelectedPreviewMedia(media)}
                   >

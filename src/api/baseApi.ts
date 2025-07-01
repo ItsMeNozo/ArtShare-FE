@@ -13,6 +13,8 @@ api.interceptors.request.use(
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
+    } else {
+      console.warn("No access token found in localStorage");
     }
 
     return config;

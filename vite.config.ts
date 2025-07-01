@@ -13,6 +13,13 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173, // fixed port for the admin app
       open: true, // (optional) auto‑open browser
+      headers: {
+        "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+        // Use unsafe-none for development to allow Firebase popups
+        // In production, consider using "require-corp" for better security
+        "Cross-Origin-Embedder-Policy":
+          mode === "development" ? "unsafe-none" : "require-corp",
+      },
     },
     plugins: [
       react(),

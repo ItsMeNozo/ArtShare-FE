@@ -1,10 +1,8 @@
-import React from "react";
-
-import { Photo, RowsPhotoAlbum, RenderPhotoContext } from "react-photo-album";
-import "react-photo-album/rows.css";
-
-import { ImageRenderer } from "./ImageRenderer";
 import { CircularProgress } from "@mui/material";
+import React from "react";
+import { Photo, RenderPhotoContext, RowsPhotoAlbum } from "react-photo-album";
+import "react-photo-album/rows.css";
+import { ImageRenderer } from "./ImageRenderer";
 
 export interface GalleryPhoto extends Photo {
   key: string;

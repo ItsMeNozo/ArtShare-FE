@@ -42,7 +42,6 @@ export interface NotificationsContextType {
   markAllAsRead: () => void;
   loading: boolean;
   isConnected: boolean;
-  refreshNotifications: () => Promise<void>;
 }
 
 export const NotificationsContext = createContext<

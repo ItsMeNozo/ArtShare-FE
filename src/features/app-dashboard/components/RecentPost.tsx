@@ -1,53 +1,51 @@
-import { useEffect, useState } from "react";
-import { fetchPosts } from "../../explore/api/get-post";
-import { Post } from "@/types";
-import { HorizontalSlider } from "@/components/sliders/HorizontalSlider";
+import { HorizontalSlider } from '@/components/sliders/HorizontalSlider';
+import { getPosts } from '@/features/explore/api/get-post';
+import { Post } from '@/types';
+import { useEffect, useState } from 'react';
 
 const RecentPost = () => {
-    const [posts, setPosts] = useState<Post[] | null>([]);
-    const getCurentPosts = async () => {
-        const posts: Post[] = await fetchPosts(
-            1,
-            "for-you",
-            "",
-            [],
-        );
-        setPosts(posts);
-    }
-    useEffect(() => {
-        getCurentPosts();
-    }, []);
-    const getPostId = (post: Post) => {
-        return post.id;
-    };
-    const renderPostItem = (post: Post) => {
-        return (
-            <div
-                className={`flex flex-col relative w-72 h-86 justify-center items-center cursor-pointer rounded-lg"}`}
-                title={post.title}
-            >
-                {post.thumbnail_url && (
-                    <img
-                        src={post.thumbnail_url}
-                        alt={post.title}
-                        className="border dark:border-mountain-700 rounded-lg w-fit h-full object-center object-cover aspect-[1/1]"
-                        loading="lazy"
-                    />
-                )}
-                <span className="bottom-2 left-2 z-50 absolute font-medium text-mountain-50 dark:text-mountain-200 text-sm line-clamp-2">
-                    {post.user.username}
-                </span>
-            </div>
-        );
-    };
-    return (
-        <HorizontalSlider
-            data={posts!}
-            renderItem={renderPostItem}
-            getItemId={getPostId}
-            variant="overlay"
-        />
-    )
-}
+  const [posts, setPosts] = useState<Post[] | null>([]);
+  const getCurentPosts = async () => {
+    const posts = await getPosts('trending', {
+      page: 1,
+    });
 
-export default RecentPost
+    setPosts(posts.data);
+  };
+  useEffect(() => {
+    getCurentPosts();
+  }, []);
+  const getPostId = (post: Post) => {
+    return post.id;
+  };
+  const renderPostItem = (post: Post) => {
+    return (
+      <div
+        className={`rounded-lg"} relative flex h-86 w-72 cursor-pointer flex-col items-center justify-center`}
+        title={post.title}
+      >
+        {post.thumbnail_url && (
+          <img
+            src={post.thumbnail_url}
+            alt={post.title}
+            className="dark:border-mountain-700 aspect-[1/1] h-full w-fit rounded-lg border object-cover object-center"
+            loading="lazy"
+          />
+        )}
+        <span className="text-mountain-50 dark:text-mountain-200 absolute bottom-2 left-2 z-50 line-clamp-2 text-sm font-medium">
+          {post.user.username}
+        </span>
+      </div>
+    );
+  };
+  return (
+    <HorizontalSlider
+      data={posts!}
+      renderItem={renderPostItem}
+      getItemId={getPostId}
+      variant="overlay"
+    />
+  );
+};
+
+export default RecentPost;

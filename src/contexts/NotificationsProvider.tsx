@@ -1,20 +1,20 @@
+import api from "@/api/baseApi";
+import { connectToNotifications } from "@/api/sockets/socket";
 import React, {
+  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
-  useMemo,
-  useCallback,
 } from "react";
 import type { Socket } from "socket.io-client";
-import { connectToNotifications } from "@/api/sockets/socket";
-import api from "@/api/baseApi";
-import { useUser } from "./UserProvider";
 import {
-  NotificationsContext,
   Notification,
-  ReportResolvedPayload,
+  NotificationsContext,
   NotificationsContextType,
+  ReportResolvedPayload,
 } from "./NotificationsContext";
+import { useUser } from "./UserProvider";
 
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -27,36 +27,39 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const backgroundRefreshRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Polling fallback for when socket connection fails
+  // Helper function to start polling only when absolutely necessary
   const startPollingFallback = useCallback(() => {
     if (pollingIntervalRef.current) {
       clearInterval(pollingIntervalRef.current);
     }
 
-    // Immediate check for new notifications when starting polling
+    console.log(
+      "[NotificationsProvider] Starting polling fallback (every 5 minutes)",
+    );
+
     const checkForNotifications = async () => {
       try {
         const res = await api.get("/notifications");
         if (res.status === 200 || res.status === 201) {
           const freshNotifications: Notification<ReportResolvedPayload>[] =
-            res.data;
+            res.data.filter(
+              (notification: Notification<ReportResolvedPayload>) =>
+                notification.type !== "report_created",
+            );
+
           setNotifications((prev) => {
-            // Compare by IDs and timestamps to detect actual changes
-            const currentIds = prev.map((n) => n.id).sort();
-            const freshIds = freshNotifications.map((n) => n.id).sort();
+            const currentIds = new Set(prev.map((n) => n.id));
+            const freshIds = new Set(freshNotifications.map((n) => n.id));
 
-            // Check if there are different notifications or different counts
-            const hasChanges =
+            // Only update if there are actually new notifications
+            if (
               freshNotifications.length !== prev.length ||
-              JSON.stringify(currentIds) !== JSON.stringify(freshIds) ||
-              freshNotifications.some((fresh) => {
-                const existing = prev.find((p) => p.id === fresh.id);
-                return !existing || existing.isRead !== fresh.isRead;
-              });
-
-            if (hasChanges) {
+              !Array.from(freshIds).every((id) => currentIds.has(id))
+            ) {
+              console.log(
+                "[NotificationsProvider] Found new notifications via polling",
+              );
               return freshNotifications;
             }
             return prev;
@@ -67,58 +70,17 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    // Check immediately
-    checkForNotifications();
-
-    // Then poll every 2 seconds for faster responsiveness
-    pollingIntervalRef.current = setInterval(checkForNotifications, 2000);
+    // Poll every 5 minutes (300000ms) instead of every 30 seconds
+    pollingIntervalRef.current = setInterval(checkForNotifications, 300000);
   }, []);
 
   const stopPollingFallback = useCallback(() => {
     if (pollingIntervalRef.current) {
+      console.log("[NotificationsProvider] Stopping polling fallback");
       clearInterval(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
   }, []);
-
-  const stopBackgroundRefresh = useCallback(() => {
-    if (backgroundRefreshRef.current) {
-      clearInterval(backgroundRefreshRef.current);
-      backgroundRefreshRef.current = null;
-    }
-  }, []);
-
-  const refreshNotifications = useCallback(async () => {
-    try {
-      const res = await api.get("/notifications");
-      if (res.status === 200 || res.status === 201) {
-        const freshNotifications: Notification<ReportResolvedPayload>[] =
-          res.data;
-        const filteredNotifications = freshNotifications.filter(
-            (notification) => notification.type !== "report_created",
-        );
-        setNotifications(filteredNotifications);
-      }
-    } catch (error) {
-      console.error(
-        "[NotificationsProvider] Failed to refresh notifications:",
-        error,
-      );
-    }
-  }, []);
-
-  const startBackgroundRefresh = useCallback(() => {
-    if (backgroundRefreshRef.current) {
-      clearInterval(backgroundRefreshRef.current);
-    }
-
-    // Refresh notifications every 15 seconds as a safety net
-    backgroundRefreshRef.current = setInterval(() => {
-      if (isConnected) {
-        refreshNotifications();
-      }
-    }, 15000);
-  }, [isConnected, refreshNotifications]);
   // Only establish one socket connection per user
   useEffect(() => {
     if (!user?.id) {
@@ -135,8 +97,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     // Stop any existing polling
-    stopPollingFallback();
-    stopBackgroundRefresh();
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
 
     // Establish new connection
     setLoading(true);
@@ -194,8 +158,8 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       socketRef.current.on("reportResolved", reportResolvedHandler);
       socketRef.current.on("report-resolved", reportResolvedHandler);
 
-      // Listen for common event patterns to debug
-      socketRef.current.onAny((eventName: string) => {
+      // Listen for common event patterns to debug (but don't auto-refresh)
+      socketRef.current.onAny((eventName: string, ...args) => {
         if (
           ![
             "connect",
@@ -209,29 +173,33 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
             "pong",
           ].includes(eventName)
         ) {
-          // Handle any notification-related events we might have missed
-          if (
-            eventName.toLowerCase().includes("notification") ||
-            eventName.toLowerCase().includes("report")
-          ) {
-            refreshNotifications();
-          }
+          console.log(
+            `[NotificationsProvider] Received socket event: ${eventName}`,
+            args,
+          );
+          // Don't auto-refresh here - let the specific handlers deal with new notifications
         }
       });
 
       // Also listen for connection events to ensure we're ready
       socketRef.current.on("connect", () => {
+        console.log("[NotificationsProvider] Socket connected successfully");
         setIsConnected(true);
-        stopPollingFallback(); // Stop polling when socket connects
-        startBackgroundRefresh(); // Start background refresh as safety net
-        // Immediately refresh notifications to catch any missed while disconnected
-        refreshNotifications();
+        stopPollingFallback();
       });
 
       socketRef.current.on("disconnect", () => {
+        console.log("[NotificationsProvider] Socket disconnected");
         setIsConnected(false);
-        // Start polling immediately when socket disconnects
-        startPollingFallback();
+        // Start polling only after a longer delay to allow for reconnection
+        setTimeout(() => {
+          if (!socketRef.current?.connected && user?.id) {
+            console.log(
+              "[NotificationsProvider] Socket still disconnected, starting polling fallback",
+            );
+            startPollingFallback();
+          }
+        }, 30000); // Wait 30 seconds before falling back to polling
       });
 
       socketRef.current.on("connect_error", (error) => {
@@ -243,7 +211,15 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           "[NotificationsProvider] Make sure the backend server is running!",
         );
         setIsConnected(false);
-        startPollingFallback();
+        // Start polling fallback on connection error, but wait longer
+        setTimeout(() => {
+          if (!socketRef.current?.connected && user?.id) {
+            console.log(
+              "[NotificationsProvider] Starting polling fallback due to connection error",
+            );
+            startPollingFallback();
+          }
+        }, 60000); // Wait 1 minute before falling back to polling
       });
 
       socketRef.current.on("error", (error) => {
@@ -252,7 +228,9 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Add additional debugging for socket connection
       socketRef.current.on("reconnect", () => {
-        stopPollingFallback(); // Stop polling when socket reconnects
+        console.log("[NotificationsProvider] Socket reconnected successfully");
+        setIsConnected(true);
+        stopPollingFallback();
       });
 
       socketRef.current.on("reconnect_attempt", () => {
@@ -270,7 +248,15 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error(
           "[NotificationsProvider] Socket reconnection failed permanently - backend may be down",
         );
-        startPollingFallback();
+        // Start polling as last resort
+        setTimeout(() => {
+          if (!socketRef.current?.connected && user?.id) {
+            console.log(
+              "[NotificationsProvider] Starting polling fallback due to permanent reconnection failure",
+            );
+            startPollingFallback();
+          }
+        }, 10000); // Wait 10 seconds before falling back to polling
       });
     }
 
@@ -302,8 +288,11 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         // Don't clear socket notifications if API fails
         setNotifications((prev) => prev);
-        // Start polling if initial load fails
+        // Start polling if initial load fails AND socket isn't connected
         if (!socketRef.current?.connected) {
+          console.log(
+            "[NotificationsProvider] Initial load failed and socket not connected, starting polling",
+          );
           startPollingFallback();
         }
       } finally {
@@ -315,7 +304,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       stopPollingFallback();
       if (socketRef.current) {
-        socketRef.current.off("notification", handler);
+        socketRef.current.off("new-notification", handler);
         socketRef.current.off("report_resolved", reportResolvedHandler);
         socketRef.current.off("reportResolved", reportResolvedHandler);
         socketRef.current.off("report-resolved", reportResolvedHandler);
@@ -328,7 +317,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         socketRef.current = null;
       }
     };
-  }, [user?.id]);
+  }, [user?.id, startPollingFallback, stopPollingFallback]);
   const markAsRead = async (notificationId: string) => {
     // Optimistic update - immediately update the UI
     setNotifications((prev) => {
@@ -393,7 +382,6 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     markAllAsRead,
     loading,
     isConnected,
-    refreshNotifications,
   };
 
   return (

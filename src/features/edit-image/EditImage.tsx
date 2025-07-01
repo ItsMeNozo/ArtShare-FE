@@ -372,9 +372,9 @@ const EditImage: React.FC = () => {
                       width: layer.width,
                       height: layer.height,
                       transform: `
-                                            translate(${layer.x}px, ${layer.y}px)
-                                            rotate(${layer.rotation}deg)
-                                            `,
+                      translate(${layer.x}px, ${layer.y}px)
+                      rotate(${layer.rotation}deg)
+                      `,
                       transformOrigin: "center",
                       position: "absolute",
                       zIndex: layer.id,
@@ -395,17 +395,17 @@ const EditImage: React.FC = () => {
                           height: "100%",
                           pointerEvents: "none",
                           filter: `
-                                                    saturate(${layer.saturation}%)
-                                                    hue-rotate(${layer.hue}deg)
-                                                    brightness(${layer.brightness}%)
-                                                    contrast(${layer.contrast}%)
-                                                    opacity(${layer.opacity})
-                                                    sepia(${layer.sepia}%)
-                                                    `,
+                            saturate(${layer.saturation}%)
+                            hue-rotate(${layer.hue}deg)
+                            brightness(${layer.brightness}%)
+                            contrast(${layer.contrast}%)
+                            opacity(${layer.opacity})
+                            sepia(${layer.sepia}%)
+                            `,
                           transform: `
-                                                    scaleX(${layer.flipH ? -1 : 1})
-                                                    scaleY(${layer.flipV ? -1 : 1})
-                                                    `,
+                            scaleX(${layer.flipH ? -1 : 1})
+                            scaleY(${layer.flipV ? -1 : 1})
+                            `,
                         }}
                         draggable={false}
                       />
@@ -422,9 +422,9 @@ const EditImage: React.FC = () => {
                           whiteSpace: "pre-wrap",
                           userSelect: "none",
                           transform: `
-                                                    scaleX(${layer.flipH ? -1 : 1})
-                                                    scaleY(${layer.flipV ? -1 : 1})
-                                                    `,
+                            scaleX(${layer.flipH ? -1 : 1})
+                            scaleY(${layer.flipV ? -1 : 1})
+                            `,
                           opacity: layer.opacity,
                         }}
                       >

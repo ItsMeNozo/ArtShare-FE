@@ -1,31 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-
-//Icons
-import { FiLogIn } from "react-icons/fi";
-import { BsPen } from "react-icons/bs";
-import { BiSolidCoinStack } from "react-icons/bi";
-import { FaBell } from "react-icons/fa6";
-import {
-  FaExclamationTriangle,
-  FaCheckCircle,
-  FaInfoCircle,
-} from "react-icons/fa";
-
-//Components
-import { Skeleton } from "../ui/skeleton";
-
-//Types
-import { User } from "@/types";
 import {
   Notification,
   NotificationPayload,
   PostNotificationPayload,
-} from "@/contexts/NotificationsContext";
-import PurchaseButton from "../buttons/PurchaseButton";
-import { Button } from "@mui/material";
-import { useNotifications } from "@/contexts/NotificationsContext";
-import { formatDaysAgo } from "@/lib/utils";
+  useNotifications,
+} from '@/contexts/NotificationsContext';
+import TokenPopover from '@/features/gen-art/components/TokenPopover';
+import { formatDaysAgo } from '@/lib/utils';
+import { User } from '@/types';
+import { Button } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { BsPen } from 'react-icons/bs';
+import {
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaInfoCircle,
+} from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa6';
+import { FiLogIn } from 'react-icons/fi';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import PurchaseButton from '../buttons/PurchaseButton';
+import { Skeleton } from '../ui/skeleton';
 
 // Enhanced highlighting functions to overcome MUI theme conflicts
 const enhancedHighlightComment = (element: HTMLElement) => {
@@ -40,37 +34,37 @@ const enhancedHighlightComment = (element: HTMLElement) => {
   };
 
   // Store original styles in a data attribute for restoration
-  element.setAttribute("data-original-styles", JSON.stringify(originalStyles));
+  element.setAttribute('data-original-styles', JSON.stringify(originalStyles));
 
   // Add CSS class first (for browsers where CSS works)
-  element.classList.add("highlight-comment");
+  element.classList.add('highlight-comment');
 
   // Apply direct styles as backup (to override MUI theme conflicts)
   const isDarkMode =
-    document.documentElement.classList.contains("dark") ||
-    document.body.classList.contains("dark") ||
-    window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.contains('dark') ||
+    document.body.classList.contains('dark') ||
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
 
   if (isDarkMode) {
     // Dark mode styles
-    element.style.backgroundColor = "rgba(99, 102, 241, 0.25)";
-    element.style.borderLeft = "4px solid rgb(129, 140, 248)";
-    element.style.boxShadow = "0 0 0 1px rgba(129, 140, 248, 0.2)";
+    element.style.backgroundColor = 'rgba(99, 102, 241, 0.25)';
+    element.style.borderLeft = '4px solid rgb(129, 140, 248)';
+    element.style.boxShadow = '0 0 0 1px rgba(129, 140, 248, 0.2)';
   } else {
     // Light mode styles
-    element.style.backgroundColor = "rgba(99, 102, 241, 0.15)";
-    element.style.borderLeft = "4px solid rgb(99, 102, 241)";
-    element.style.boxShadow = "0 0 0 1px rgba(99, 102, 241, 0.1)";
+    element.style.backgroundColor = 'rgba(99, 102, 241, 0.15)';
+    element.style.borderLeft = '4px solid rgb(99, 102, 241)';
+    element.style.boxShadow = '0 0 0 1px rgba(99, 102, 241, 0.1)';
   }
 
   // Common styles
-  element.style.borderRadius = "0.5rem";
-  element.style.transition = "all 0.3s ease-in-out";
+  element.style.borderRadius = '0.5rem';
+  element.style.transition = 'all 0.3s ease-in-out';
 
   // Add pulse animation using JavaScript
-  element.style.animation = "highlight-pulse 0.6s ease-in-out";
+  element.style.animation = 'highlight-pulse 0.6s ease-in-out';
 
-  console.log("[UserButton] Enhanced highlighting applied to element:", {
+  console.log('[UserButton] Enhanced highlighting applied to element:', {
     id: element.id,
     appliedStyles: {
       backgroundColor: element.style.backgroundColor,
@@ -84,18 +78,18 @@ const enhancedHighlightComment = (element: HTMLElement) => {
 
 const removeEnhancedHighlight = (element: HTMLElement) => {
   // Remove CSS class
-  element.classList.remove("highlight-comment");
+  element.classList.remove('highlight-comment');
 
   // Restore original styles
   try {
-    const originalStylesStr = element.getAttribute("data-original-styles");
+    const originalStylesStr = element.getAttribute('data-original-styles');
     if (originalStylesStr) {
       const originalStyles = JSON.parse(originalStylesStr);
 
       // Restore each style property using setProperty
       Object.keys(originalStyles).forEach((property) => {
         const value = originalStyles[property];
-        const cssProperty = property.replace(/([A-Z])/g, "-$1").toLowerCase();
+        const cssProperty = property.replace(/([A-Z])/g, '-$1').toLowerCase();
         if (value) {
           element.style.setProperty(cssProperty, value);
         } else {
@@ -104,29 +98,29 @@ const removeEnhancedHighlight = (element: HTMLElement) => {
       });
 
       // Remove the data attribute
-      element.removeAttribute("data-original-styles");
+      element.removeAttribute('data-original-styles');
     } else {
       // Fallback: reset to empty strings if no original styles stored
-      element.style.backgroundColor = "";
-      element.style.borderLeft = "";
-      element.style.borderRadius = "";
-      element.style.transition = "";
-      element.style.boxShadow = "";
-      element.style.animation = "";
+      element.style.backgroundColor = '';
+      element.style.borderLeft = '';
+      element.style.borderRadius = '';
+      element.style.transition = '';
+      element.style.boxShadow = '';
+      element.style.animation = '';
     }
   } catch (error) {
-    console.warn("[UserButton] Error restoring original styles:", error);
+    console.warn('[UserButton] Error restoring original styles:', error);
     // Fallback: reset to empty strings
-    element.style.backgroundColor = "";
-    element.style.borderLeft = "";
-    element.style.borderRadius = "";
-    element.style.transition = "";
-    element.style.boxShadow = "";
-    element.style.animation = "";
+    element.style.backgroundColor = '';
+    element.style.borderLeft = '';
+    element.style.borderRadius = '';
+    element.style.transition = '';
+    element.style.boxShadow = '';
+    element.style.animation = '';
   }
 
   console.log(
-    "[UserButton] Enhanced highlighting removed from element:",
+    '[UserButton] Enhanced highlighting removed from element:',
     element.id,
   );
 };
@@ -135,24 +129,24 @@ const removeEnhancedHighlight = (element: HTMLElement) => {
 const formatNotificationMessage = (
   notif: Notification<NotificationPayload>,
 ) => {
-  const message = notif?.payload?.message || "";
+  const message = notif?.payload?.message || '';
 
   // Enhanced message formatting with post names
   if (
-    message.includes("liked your artwork") ||
-    message.includes("liked your post")
+    message.includes('liked your artwork') ||
+    message.includes('liked your post')
   ) {
     // Try to extract post title if available in the message
     const parts = message.split(/ liked your (?:artwork|post)/);
     if (parts.length > 0 && parts[0]) {
-      const userName = parts[0].trim().replace(/^"|"$/g, ""); // Remove quotes if present
+      const userName = parts[0].trim().replace(/^"|"$/g, ''); // Remove quotes if present
 
       // Check if we have post title in payload
       const postPayload = notif.payload as PostNotificationPayload;
       if (postPayload?.postTitle) {
         return (
           <>
-            <span className="font-bold">{userName}</span> liked your post:{" "}
+            <span className="font-bold">{userName}</span> liked your post:{' '}
             <span className="font-semibold">{postPayload.postTitle}</span>
           </>
         );
@@ -167,12 +161,12 @@ const formatNotificationMessage = (
   }
 
   if (
-    message.includes("commented on your artwork") ||
-    message.includes("commented on your post")
+    message.includes('commented on your artwork') ||
+    message.includes('commented on your post')
   ) {
     const parts = message.split(/ commented on your (?:artwork|post)/);
     if (parts.length > 0 && parts[0]) {
-      const userName = parts[0].trim().replace(/^"|"$/g, "");
+      const userName = parts[0].trim().replace(/^"|"$/g, '');
 
       // Check if we have post title in payload
       const postPayload = notif.payload as PostNotificationPayload;
@@ -194,7 +188,7 @@ const formatNotificationMessage = (
   }
 
   // Handle the new backend template format: "username published new post: "title""
-  if (message.includes("published new post:")) {
+  if (message.includes('published new post:')) {
     const publishPattern =
       /^([^.\s]+(?:\s+[^.\s]+)*?)\s+published new post:\s*"?([^"]+)"?$/i;
     const publishMatch = message.match(publishPattern);
@@ -204,7 +198,7 @@ const formatNotificationMessage = (
       const postTitle = publishMatch[2].trim();
       return (
         <>
-          <span className="font-bold">{userName}</span> published new post:{" "}
+          <span className="font-bold">{userName}</span> published new post:{' '}
           <span className="font-semibold">{postTitle}</span>
         </>
       );
@@ -213,8 +207,8 @@ const formatNotificationMessage = (
 
   // Handle legacy formats or when post title is in payload
   if (
-    message.includes("published new artwork") ||
-    message.includes("published a new post")
+    message.includes('published new artwork') ||
+    message.includes('published a new post')
   ) {
     // Handle the "published new post" format with post title
     const postPayload = notif.payload as PostNotificationPayload;
@@ -225,13 +219,13 @@ const formatNotificationMessage = (
     const publishMatch = message.match(publishPattern);
 
     if (publishMatch && publishMatch[1]) {
-      const userName = publishMatch[1].trim().replace(/^"|"$/g, "");
+      const userName = publishMatch[1].trim().replace(/^"|"$/g, '');
 
       // Always show with post title if available, otherwise use generic format
       if (postPayload?.postTitle) {
         return (
           <>
-            <span className="font-bold">{userName}</span> published new post:{" "}
+            <span className="font-bold">{userName}</span> published new post:{' '}
             <span className="font-semibold">{postPayload.postTitle}</span>
           </>
         );
@@ -246,14 +240,14 @@ const formatNotificationMessage = (
   }
 
   // Check if the message already contains "published new post:" format
-  if (message.includes("published new post:")) {
-    const parts = message.split(" published new post:");
+  if (message.includes('published new post:')) {
+    const parts = message.split(' published new post:');
     if (parts.length >= 2 && parts[0] && parts[1]) {
-      const userName = parts[0].trim().replace(/^"|"$/g, "");
+      const userName = parts[0].trim().replace(/^"|"$/g, '');
       const postTitle = parts[1].trim();
       return (
         <>
-          <span className="font-bold">{userName}</span> published new post:{" "}
+          <span className="font-bold">{userName}</span> published new post:{' '}
           <span className="font-semibold">{postTitle}</span>
         </>
       );
@@ -277,7 +271,7 @@ const formatMessageWithBoldNames = (message: string) => {
     const restOfMessage = reportMatch[2].trim();
     return (
       <>
-        Your report regarding <span className="font-bold">{reportedName}</span>{" "}
+        Your report regarding <span className="font-bold">{reportedName}</span>{' '}
         {restOfMessage}
       </>
     );
@@ -288,7 +282,7 @@ const formatMessageWithBoldNames = (message: string) => {
     /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+started following you)/i;
   const followingMatch = message.match(followingPattern);
   if (followingMatch) {
-    const userName = followingMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = followingMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -302,7 +296,7 @@ const formatMessageWithBoldNames = (message: string) => {
   const followedPattern = /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+followed you)/i;
   const followedMatch = message.match(followedPattern);
   if (followedMatch) {
-    const userName = followedMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = followedMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -317,7 +311,7 @@ const formatMessageWithBoldNames = (message: string) => {
     /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+replied to your comment)/i;
   const replyMatch = message.match(replyPattern);
   if (replyMatch) {
-    const userName = replyMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = replyMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -331,7 +325,7 @@ const formatMessageWithBoldNames = (message: string) => {
   const mentionPattern = /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+mentioned you)/i;
   const mentionMatch = message.match(mentionPattern);
   if (mentionMatch) {
-    const userName = mentionMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = mentionMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -346,7 +340,7 @@ const formatMessageWithBoldNames = (message: string) => {
     /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+shared your (?:post|artwork))/i;
   const shareMatch = message.match(sharePattern);
   if (shareMatch) {
-    const userName = shareMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = shareMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -361,7 +355,7 @@ const formatMessageWithBoldNames = (message: string) => {
     /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+added your (?:post|artwork) to)/i;
   const collectionMatch = message.match(collectionPattern);
   if (collectionMatch) {
-    const userName = collectionMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = collectionMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -376,7 +370,7 @@ const formatMessageWithBoldNames = (message: string) => {
     /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+(?:published|liked|commented|followed|reported|updated|created|deleted|edited|voted|rated|reviewed|subscribed|unsubscribed|joined|left))/i;
   const generalMatch = message.match(generalPattern);
   if (generalMatch) {
-    const userName = generalMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = generalMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     const action = message.substring(userName.length);
     return (
       <>
@@ -390,11 +384,11 @@ const formatMessageWithBoldNames = (message: string) => {
   const anyVerbPattern = /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+\w+)/i;
   const anyVerbMatch = message.match(anyVerbPattern);
   if (anyVerbMatch) {
-    const userName = anyVerbMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes
+    const userName = anyVerbMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes
     // Only apply bold if the username looks like a valid username (not just a single word like "The" or "A")
     if (
       userName.length >= 2 &&
-      !["the", "a", "an", "your", "their", "our"].includes(
+      !['the', 'a', 'an', 'your', 'their', 'our'].includes(
         userName.toLowerCase(),
       )
     ) {
@@ -418,7 +412,7 @@ const handleNotificationClick = (
   navigate: ReturnType<typeof useNavigate>,
   markAsRead: (id: string) => void,
 ) => {
-  console.log("[UserButton] Notification clicked:", notif);
+  console.log('[UserButton] Notification clicked:', notif);
 
   // Mark the notification as read
   if (!notif.isRead) {
@@ -426,61 +420,61 @@ const handleNotificationClick = (
   }
 
   // Navigate based on notification type and content
-  const message = notif?.payload?.message || "";
+  const message = notif?.payload?.message || '';
   const payload = notif?.payload;
 
   console.log(
-    "[UserButton] Notification type:",
+    '[UserButton] Notification type:',
     notif.type,
-    "Message:",
+    'Message:',
     message,
-    "Payload:",
+    'Payload:',
     payload,
   );
 
   // Use notification type for better routing
   switch (notif.type) {
-    case "report_resolved":
-    case "REPORT_RESOLVED": {
+    case 'report_resolved':
+    case 'REPORT_RESOLVED': {
       return;
     }
 
-    case "artwork_published": {
+    case 'artwork_published': {
       // For post publishing notifications - navigate to the specific post
       const publishPayload = payload as PostNotificationPayload;
       console.log(
-        "[UserButton] Post published notification, postId:",
+        '[UserButton] Post published notification, postId:',
         publishPayload?.postId,
       );
       if (publishPayload?.postId) {
         navigate(`/posts/${publishPayload.postId}`);
       } else {
-        navigate("/explore");
+        navigate('/explore');
       }
       return;
     }
 
-    case "artwork_liked": {
+    case 'artwork_liked': {
       // For like notifications - navigate directly to the liked post
       const likePayload = payload as PostNotificationPayload;
       console.log(
-        "[UserButton] Post liked notification, postId:",
+        '[UserButton] Post liked notification, postId:',
         likePayload?.postId,
       );
       if (likePayload?.postId) {
         navigate(`/posts/${likePayload.postId}`);
       } else {
-        navigate("/explore");
+        navigate('/explore');
       }
       return;
     }
 
-    case "artwork_commented": {
+    case 'artwork_commented': {
       const commentPayload = payload as PostNotificationPayload;
       console.log(
-        "[UserButton] Comment notification, postId:",
+        '[UserButton] Comment notification, postId:',
         commentPayload?.postId,
-        "commentId:",
+        'commentId:',
         commentPayload?.commentId,
       );
 
@@ -495,90 +489,90 @@ const handleNotificationClick = (
       } else if (commentPayload?.postId) {
         // If we have post ID but no comment ID, just navigate to the post
         console.log(
-          "[UserButton] Comment notification without commentId, navigating to post",
+          '[UserButton] Comment notification without commentId, navigating to post',
         );
         navigate(`/posts/${commentPayload.postId}`);
       } else {
         console.log(
-          "[UserButton] Comment notification without postId, fallback to profile",
+          '[UserButton] Comment notification without postId, fallback to profile',
         );
-        navigate("/profile");
+        navigate('/profile');
       }
       return;
     }
 
-    case "user_followed": {
+    case 'user_followed': {
       // For follow notifications - navigate to the profile of the person who followed
       const followPattern =
         /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+(?:followed you|started following you))/i;
       const followMatch = message.match(followPattern);
 
       if (followMatch && followMatch[1]) {
-        const username = followMatch[1].trim().replace(/^"|"$/g, ""); // Remove quotes if present
+        const username = followMatch[1].trim().replace(/^"|"$/g, ''); // Remove quotes if present
         console.log(
-          "[UserButton] Follow notification, navigating to username:",
+          '[UserButton] Follow notification, navigating to username:',
           username,
         );
         navigate(`/${username}`);
       } else {
-        console.log("[UserButton] Follow notification, fallback to profile");
-        navigate("/profile");
+        console.log('[UserButton] Follow notification, fallback to profile');
+        navigate('/profile');
       }
       return;
     }
 
     default: {
       console.log(
-        "[UserButton] Unknown notification type, using fallback logic",
+        '[UserButton] Unknown notification type, using fallback logic',
       );
       // Fallback logic for legacy notifications or unknown types
       // For post-related notifications - navigate to the specific post
       if (
-        message.includes("published a new post") ||
-        message.includes("published new post:") ||
-        message.includes("published new artwork")
+        message.includes('published a new post') ||
+        message.includes('published new post:') ||
+        message.includes('published new artwork')
       ) {
         const postPayload = payload as PostNotificationPayload;
         console.log(
-          "[UserButton] Fallback: Post published, postId:",
+          '[UserButton] Fallback: Post published, postId:',
           postPayload?.postId,
         );
         if (postPayload?.postId) {
           navigate(`/posts/${postPayload.postId}`);
         } else {
-          navigate("/explore");
+          navigate('/explore');
         }
         return;
       }
 
       // For like notifications - navigate directly to the liked post
       if (
-        message.includes("liked your post") ||
-        message.includes("liked your artwork")
+        message.includes('liked your post') ||
+        message.includes('liked your artwork')
       ) {
         const postPayload = payload as PostNotificationPayload;
         console.log(
-          "[UserButton] Fallback: Post liked, postId:",
+          '[UserButton] Fallback: Post liked, postId:',
           postPayload?.postId,
         );
         if (postPayload?.postId) {
           navigate(`/posts/${postPayload.postId}`);
         } else {
-          navigate("/explore");
+          navigate('/explore');
         }
         return;
       }
 
       // For comment notifications - navigate to the post and scroll to the comment with highlighting
       if (
-        message.includes("commented on your post") ||
-        message.includes("commented on your artwork")
+        message.includes('commented on your post') ||
+        message.includes('commented on your artwork')
       ) {
         const postPayload = payload as PostNotificationPayload;
         console.log(
-          "[UserButton] Fallback: Comment, postId:",
+          '[UserButton] Fallback: Comment, postId:',
           postPayload?.postId,
-          "commentId:",
+          'commentId:',
           postPayload?.commentId,
         );
         if (postPayload?.postId && postPayload?.commentId) {
@@ -596,14 +590,14 @@ const handleNotificationClick = (
             console.log(
               `[UserButton] Fallback Attempt ${retryCount + 1} - Looking for comment element:`,
               `comment-${postPayload.commentId}`,
-              "Found:",
+              'Found:',
               !!commentElement,
             );
 
             if (commentElement) {
               commentElement.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
+                behavior: 'smooth',
+                block: 'center',
               });
 
               // Enhanced highlighting with both CSS class and direct style application
@@ -617,9 +611,9 @@ const handleNotificationClick = (
               setTimeout(tryToFindComment, checkInterval);
             } else {
               console.log(
-                "[UserButton] Fallback: Could not find comment element after",
+                '[UserButton] Fallback: Could not find comment element after',
                 maxRetries,
-                "attempts",
+                'attempts',
               );
             }
           };
@@ -628,36 +622,36 @@ const handleNotificationClick = (
         } else if (postPayload?.postId) {
           navigate(`/posts/${postPayload.postId}`);
         } else {
-          navigate("/profile");
+          navigate('/profile');
         }
         return;
       }
 
       // For follow notifications - navigate to the profile of the person who followed
       if (
-        message.includes("followed you") ||
-        message.includes("started following you")
+        message.includes('followed you') ||
+        message.includes('started following you')
       ) {
         const followPattern =
           /^([^.\s]+(?:\s+[^.\s]+)*?)(\s+(?:followed you|started following you))/i;
         const followMatch = message.match(followPattern);
 
         if (followMatch && followMatch[1]) {
-          const username = followMatch[1].trim().replace(/^"|"$/g, "");
+          const username = followMatch[1].trim().replace(/^"|"$/g, '');
           console.log(
-            "[UserButton] Fallback: Follow notification, username:",
+            '[UserButton] Fallback: Follow notification, username:',
             username,
           );
           navigate(`/${username}`);
         } else {
-          navigate("/profile");
+          navigate('/profile');
         }
         return;
       }
 
       // Default fallback - navigate to explore
-      console.log("[UserButton] Using default fallback, navigating to explore");
-      navigate("/explore");
+      console.log('[UserButton] Using default fallback, navigating to explore');
+      navigate('/explore');
     }
   }
 };
@@ -689,9 +683,9 @@ const UserButton: React.FC<{
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -734,19 +728,19 @@ const UserButton: React.FC<{
         <Button
           onClick={toggleNotifications}
           className={`flex bg-white dark:bg-slate-700 items-center border-[0.5px] border-mountain-200 dark:border-slate-600 mr-2 h-8 w-8 rounded-full justify-center hover:bg-gray-100 dark:hover:bg-slate-600 ${
-            location.pathname === "/messages"
-              ? "dark:text-mountain-50 text-mountain-950" // Active: light text on dark, dark text on light
-              : "dark:text-mountain-500 text-mountain-700" // Inactive: lighter text on dark, darker text on light
+            location.pathname === '/messages'
+              ? 'dark:text-mountain-50 text-mountain-950' // Active: light text on dark, dark text on light
+              : 'dark:text-mountain-500 text-mountain-700' // Inactive: lighter text on dark, darker text on light
           }`}
         >
-          {" "}
+          {' '}
           <FaBell />
           {unreadCount > 0 && (
             <span
               className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white"
-              style={{ minWidth: "1rem", lineHeight: "1rem" }}
+              style={{ minWidth: '1rem', lineHeight: '1rem' }}
             >
-              {unreadCount > 9 ? "9+" : unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </Button>
@@ -754,15 +748,15 @@ const UserButton: React.FC<{
         <div
           ref={notificationRef}
           className={`${
-            isNotificationOpen ? "visible opacity-100" : "invisible opacity-0"
+            isNotificationOpen ? 'visible opacity-100' : 'invisible opacity-0'
           } transition-all duration-300 ease-out absolute top-full mt-2 max-h-96 bg-white dark:bg-slate-700 rounded-xl shadow-2xl border border-mountain-200 dark:border-slate-600 z-50 overflow-hidden w-[calc(100vw-2rem)] xs:w-80 right-[-150px] xs:right-0`}
         >
-          {" "}
+          {' '}
           {/* Header */}
           <div className="sticky top-0 bg-white dark:bg-slate-700 border-b border-mountain-200 dark:border-slate-600 px-4 py-3 z-10">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <FaBell className="text-indigo-600 dark:text-indigo-400" />{" "}
+                <FaBell className="text-indigo-600 dark:text-indigo-400" />{' '}
                 <h4 className="text-sm font-semibold text-mountain-950 dark:text-mountain-50">
                   Notifications
                 </h4>
@@ -804,9 +798,9 @@ const UserButton: React.FC<{
                   const getNotificationIcon = () => {
                     // You can enhance this based on notification type
                     switch (notif.type) {
-                      case "report_resolved":
+                      case 'report_resolved':
                         return <FaCheckCircle className="text-green-500" />;
-                      case "warning":
+                      case 'warning':
                         return (
                           <FaExclamationTriangle className="text-yellow-500" />
                         );
@@ -817,22 +811,22 @@ const UserButton: React.FC<{
 
                   const getNotificationBg = () => {
                     if (!notif.isRead) {
-                      return "bg-indigo-50 dark:bg-indigo-950/30 border-l-4 border-indigo-500";
+                      return 'bg-indigo-50 dark:bg-indigo-950/30 border-l-4 border-indigo-500';
                     }
-                    return "bg-white dark:bg-slate-700";
+                    return 'bg-white dark:bg-slate-700';
                   };
 
                   const isReportResolved =
-                    notif.type === "report_resolved" ||
-                    notif.type === "REPORT_RESOLVED";
+                    notif.type === 'report_resolved' ||
+                    notif.type === 'REPORT_RESOLVED';
 
                   return (
                     <div
                       key={notif.id}
                       className={`relative px-4 py-3 transition-all duration-200 ${getNotificationBg()} ${
                         isReportResolved
-                          ? "cursor-default opacity-90"
-                          : "hover:bg-mountain-50 dark:hover:bg-slate-600/50 cursor-pointer"
+                          ? 'cursor-default opacity-90'
+                          : 'hover:bg-mountain-50 dark:hover:bg-slate-600/50 cursor-pointer'
                       }`}
                       onClick={() =>
                         !isReportResolved &&
@@ -864,14 +858,14 @@ const UserButton: React.FC<{
                                   </span>
                                 )}
                               </div>
-                            </div>{" "}
+                            </div>{' '}
                             {/* Action Button */}
                             {!notif.isRead && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   console.log(
-                                    "[UserButton] Marking notification as read:",
+                                    '[UserButton] Marking notification as read:',
                                     notif.id,
                                   );
                                   markAsRead(notif.id);
@@ -894,10 +888,7 @@ const UserButton: React.FC<{
         </div>
       </div>
       <div className="flex justify-between items-center bg-white dark:bg-slate-700 p-[2px] border-[0.5px] border-mountain-200 dark:border-slate-600 rounded-full w-42 h-10">
-        <div className="flex items-center space-x-1 px-2">
-          <BiSolidCoinStack className="text-indigo-600 dark:text-indigo-400" />
-          <span className="text-gray-800 dark:text-gray-100">50</span>
-        </div>
+        <TokenPopover />
         <PurchaseButton />
       </div>
     </div>

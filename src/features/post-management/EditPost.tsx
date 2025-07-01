@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Box } from "@mui/material";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { useNavigate, useParams } from "react-router-dom";
-import { PostMedia } from "./types/post-media";
-import PostForm from "./PostForm";
-import Loading from "@/pages/Loading";
-import { FormikHelpers } from "formik";
-import { MEDIA_TYPE } from "@/utils/constants";
-import { PostFormValues } from "./types/post-form-values.type";
-import { useUpdatePost } from "./hooks/useUpdatePost";
-import { useGetPostDetails } from "../post/hooks/useGetPostDetails";
+import Loading from '@/components/loading/Loading';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { MEDIA_TYPE } from '@/utils/constants';
+import { Box } from '@mui/material';
+import { FormikHelpers } from 'formik';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useGetPostDetails } from '../post/hooks/useGetPostDetails';
+import { useUpdatePost } from './hooks/useUpdatePost';
+import PostForm from './PostForm';
+import { PostFormValues } from './types/post-form-values.type';
+import { PostMedia } from './types/post-media';
 
 /**
  * EditPostPage – fully‑screen page that reuses UploadPost components
@@ -45,19 +45,19 @@ const EditPost: React.FC = () => {
     setThumbnail({
       url: fetchedPost.thumbnail_url,
       type: MEDIA_TYPE.IMAGE,
-      file: new File([], "template file for thumbnail"),
+      file: new File([], 'template file for thumbnail'),
     });
     setOriginalThumbnail({
       url: fetchedPost.thumbnail_crop_meta.initialThumbnail,
       type: MEDIA_TYPE.IMAGE,
-      file: new File([], "template file for thumbnail"),
+      file: new File([], 'template file for thumbnail'),
     });
 
     // build postMedias from postData.medias
     const initialMedias = fetchedPost.medias.map((media) => ({
       url: media.url,
       type: media.media_type,
-      file: new File([], "template file for existing media"),
+      file: new File([], 'template file for existing media'),
     }));
 
     setPostMedias(initialMedias);
@@ -65,8 +65,8 @@ const EditPost: React.FC = () => {
 
   const initialFormValues = useMemo((): PostFormValues => {
     if (!fetchedPost) {
-      console.error("Fetched post data is not available");
-      throw new Error("Fetched post data is not available");
+      console.error('Fetched post data is not available');
+      throw new Error('Fetched post data is not available');
     }
     return {
       title: fetchedPost.title,
@@ -84,7 +84,7 @@ const EditPost: React.FC = () => {
       navigate(`/posts/${updatedPost.id}`);
     },
     onError: (errorMessage) => {
-      showSnackbar(errorMessage, "error");
+      showSnackbar(errorMessage, 'error');
     },
   });
 
@@ -93,13 +93,13 @@ const EditPost: React.FC = () => {
     formikActions: FormikHelpers<PostFormValues>,
   ) => {
     if (postMedias.length === 0) {
-      showSnackbar("At least one image or video is required.", "error");
+      showSnackbar('At least one image or video is required.', 'error');
       formikActions.setSubmitting(false);
       return;
     }
 
     if (!thumbnail || !originalThumbnail) {
-      showSnackbar("Thumbnail is required.", "error");
+      showSnackbar('Thumbnail is required.', 'error');
       formikActions.setSubmitting(false);
       return;
     }
@@ -128,8 +128,8 @@ const EditPost: React.FC = () => {
     return (
       <Box className="flex justify-center items-center h-full text-red-500">
         <p>
-          Error loading post:{" "}
-          {postError instanceof Error ? postError.message : "Unknown error"}
+          Error loading post:{' '}
+          {postError instanceof Error ? postError.message : 'Unknown error'}
         </p>
       </Box>
     );

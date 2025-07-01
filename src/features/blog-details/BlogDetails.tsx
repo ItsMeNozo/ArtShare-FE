@@ -2,39 +2,42 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 //Components
-import { Button, CircularProgress, IconButton, Tooltip } from "@mui/material";
 import type { Blog } from "@/types/blog";
+import { Button, CircularProgress, IconButton, Tooltip } from "@mui/material";
 import Avatar from "boring-avatars";
 //Icons
+import { LikesDialog } from "@/components/like/LikesDialog";
+import { useUser } from "@/contexts/UserProvider";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import { TargetType } from "@/utils/constants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { formatDistanceToNow } from "date-fns";
+import { AiFillLike, AiOutlineLike } from "react-icons/ai";
+import { BiComment } from "react-icons/bi";
+import { FiTrash2 } from "react-icons/fi";
 import { IoPersonAddOutline } from "react-icons/io5";
 import { LuLink, LuPencil } from "react-icons/lu";
-import RelatedBlogs from "./components/RelatedBlogs";
-import { BiComment } from "react-icons/bi";
-import { AiOutlineLike, AiFillLike } from "react-icons/ai";
 import { MdOutlineFlag } from "react-icons/md"; // Report Icon
-import { LikesDialog } from "@/components/like/LikesDialog";
-import { fetchBlogDetails } from "./api/blog";
+import { fetchBlogComments } from "../post/api/comment.api";
 import CommentSection, {
   CommentSectionRef,
 } from "../post/components/CommentSection";
-import { fetchBlogComments } from "../post/api/comment.api";
-import { formatDistanceToNow } from "date-fns";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useUser } from "@/contexts/UserProvider";
-import { useSnackbar } from "@/hooks/useSnackbar";
 import {
   followUser,
   unfollowUser,
 } from "../user-profile-public/api/follow.api";
-import { AxiosError } from "axios";
+import { fetchBlogDetails } from "./api/blog";
 import { createLike, removeLike } from "./api/like-blog";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { TargetType } from "@/utils/constants";
+import RelatedBlogs from "./components/RelatedBlogs";
 
 // Import your ReportDialog and the reporting hook
+import { ReportTargetType } from "../user-profile-public/api/report.api";
 import ReportDialog from "../user-profile-public/components/ReportDialog";
 import { useReport } from "../user-profile-public/hooks/useReport";
-import { ReportTargetType } from "../user-profile-public/api/report.api";
+import { BlogDeleteConfirmDialog } from "../user-writing/components/BlogDeleteConfirmDialog";
+import { useDeleteBlog } from "../user-writing/hooks/useDeleteBlog";
 
 import "./BlogDetails.css";
 interface BlogError {
@@ -48,6 +51,7 @@ const BlogDetails = () => {
   const [showAuthorBadge, setShowAuthorBadge] = useState(false);
   const [likesDialogOpen, setLikesDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false); // Add delete confirmation state
   const { user } = useUser();
   const { showSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
@@ -73,6 +77,18 @@ const BlogDetails = () => {
   });
   const navigate = useNavigate();
   const commentSectionRef = useRef<CommentSectionRef>(null);
+
+  // Delete blog mutation
+  const { mutate: deleteBlogMutation, isPending: isDeletingBlog } =
+    useDeleteBlog({
+      onSuccess: () => {
+        navigate("/blogs");
+        showSnackbar("Blog deleted successfully!", "success");
+      },
+      onError: (errorMessage) => {
+        showSnackbar(errorMessage, "error");
+      },
+    });
 
   // Reporting Hook
   const { mutate: reportBlogContent, isPending: isLoadingReport } = useReport();
@@ -207,6 +223,18 @@ const BlogDetails = () => {
     setReportDialogOpen(true);
   };
   const handleCloseReportDialog = () => setReportDialogOpen(false);
+
+  // Delete blog handlers
+  const handleOpenDeleteDialog = () => {
+    setDeleteConfirmOpen(true);
+  };
+  const handleCloseDeleteDialog = () => setDeleteConfirmOpen(false);
+  const handleConfirmDelete = () => {
+    if (blog) {
+      deleteBlogMutation(blog.id);
+      setDeleteConfirmOpen(false);
+    }
+  };
 
   const handleReportSubmit = (reason: string) => {
     if (!blog) return;
@@ -466,14 +494,24 @@ const BlogDetails = () => {
           </Tooltip>
         )}
         {isOwnBlog && (
-          <Tooltip title="Edit" arrow>
-            <IconButton
-              onClick={() => navigate(`/docs/${blog.id}`)}
-              className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:cursor-pointer bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-800/40 transition-all duration-200"
-            >
-              <LuPencil className="size-4" />
-            </IconButton>
-          </Tooltip>
+          <>
+            <Tooltip title="Edit" arrow>
+              <IconButton
+                onClick={() => navigate(`/docs/${blog.id}`)}
+                className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:cursor-pointer bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-800/40 transition-all duration-200"
+              >
+                <LuPencil className="size-4" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete" arrow>
+              <IconButton
+                onClick={handleOpenDeleteDialog}
+                className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:cursor-pointer bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/40 transition-all duration-200"
+              >
+                <FiTrash2 className="size-4" />
+              </IconButton>
+            </Tooltip>
+          </>
         )}
       </div>
     </div>
@@ -706,6 +744,17 @@ const BlogDetails = () => {
           submitting={isLoadingReport}
           itemName={blog.title}
           itemType="blog"
+        />
+      )}
+
+      {/* Delete Confirmation Dialog - only for blog owners */}
+      {blog && isOwnBlog && (
+        <BlogDeleteConfirmDialog
+          open={deleteConfirmOpen}
+          onClose={handleCloseDeleteDialog}
+          onConfirm={handleConfirmDelete}
+          submitting={isDeletingBlog}
+          blogTitle={blog.title}
         />
       )}
     </div>

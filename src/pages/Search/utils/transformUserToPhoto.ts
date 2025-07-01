@@ -1,4 +1,4 @@
-import { PublicUserSearchDto, UserPhoto } from "../types";
+import { PublicUserSearchDto, UserPhoto } from '../types';
 
 export const transformUserToPhoto = (
   user: PublicUserSearchDto,
@@ -6,7 +6,7 @@ export const transformUserToPhoto = (
   return new Promise((resolve) => {
     const profilePictureUrl =
       user.profilePictureUrl ||
-      "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg";
+      'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg';
     const image = new Image();
     image.src = profilePictureUrl;
 

@@ -1,24 +1,11 @@
-import { RenderPhotoContext } from "react-photo-album";
-import { Link } from "react-router-dom";
-import { GalleryPhoto } from "./Gallery";
+import { formatCount } from "@/utils/common";
 import { Images } from "lucide-react";
-
 import { AiOutlineLike } from "react-icons/ai";
 import { BiCommentDetail } from "react-icons/bi";
 import { HiOutlineEye } from "react-icons/hi";
-
-const formatCount = (count: number | undefined): string => {
-  if (count === undefined || count === null) return "0";
-  if (count < 1000) return count.toString();
-  if (count < 1000000) {
-    const thousands = count / 1000;
-    return (
-      (Math.floor(thousands * 10) / 10).toString().replace(/\.0$/, "") + "k"
-    );
-  }
-  const millions = count / 1000000;
-  return (Math.floor(millions * 10) / 10).toString().replace(/\.0$/, "") + "M";
-};
+import { RenderPhotoContext } from "react-photo-album";
+import { Link } from "react-router-dom";
+import { GalleryPhoto } from "./Gallery";
 
 export const ImageRenderer = (
   _: unknown,

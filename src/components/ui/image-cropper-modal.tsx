@@ -1,18 +1,18 @@
-import React, { memo, useEffect, useState } from "react";
-import Cropper, { Area, Point } from "react-easy-crop";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { ThumbnailMeta } from '@/features/post-management/types/crop-meta.type';
+import getCroppedImg from '@/utils/cropImage';
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  Typography,
+  DialogContent,
+  DialogTitle,
   IconButton,
-} from "@mui/material";
-import { MdClose } from "react-icons/md";
-import MuiButton from "@mui/material/Button";
-import { ThumbnailMeta } from "@/features/post-management/types/crop-meta.type";
-import getCroppedImg from "@/utils/cropImage";
+  Typography,
+} from '@mui/material';
+import MuiButton from '@mui/material/Button';
+import React, { memo, useEffect, useState } from 'react';
+import Cropper, { Area, Point } from 'react-easy-crop';
+import { MdClose } from 'react-icons/md';
 
 interface Props {
   originalThumbnailUrl: string;
@@ -34,12 +34,12 @@ const ImageCropperModal: React.FC<Props> = ({
   const [aspect, setAspect] = useState<number | undefined>(undefined);
   const [selectedAspect, setSelectedAspect] = useState(DEFAULT_ASPECT_LABEL);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  console.log("ImageCropperModal rendered with thumbnailMeta:", thumbnailMeta);
-  console.log("originalThumbnailUrl:", originalThumbnailUrl);
+  console.log('ImageCropperModal rendered with thumbnailMeta:', thumbnailMeta);
+  console.log('originalThumbnailUrl:', originalThumbnailUrl);
 
   useEffect(() => {
     if (!open) return;
-    console.log("ImageCropperModal opened with thumbnailMeta:", thumbnailMeta);
+    console.log('ImageCropperModal opened with thumbnailMeta:', thumbnailMeta);
     setCrop(thumbnailMeta.crop ?? DEFAULT_CROP);
     setZoom(thumbnailMeta.zoom ?? DEFAULT_ZOOM);
     setSelectedAspect(thumbnailMeta.selectedAspect ?? DEFAULT_ASPECT_LABEL);
@@ -84,10 +84,10 @@ const ImageCropperModal: React.FC<Props> = ({
       open={open}
       onClose={onClose}
       sx={{
-        "& .MuiDialog-paper": {
-          width: "50vw",
-          maxWidth: "50vw",
-          margin: "auto",
+        '& .MuiDialog-paper': {
+          width: '50vw',
+          maxWidth: '50vw',
+          margin: 'auto',
         },
       }}
     >
@@ -103,8 +103,8 @@ const ImageCropperModal: React.FC<Props> = ({
         className="flex flex-col gap-4"
         sx={{
           padding: 0,
-          maxHeight: "calc(100vh - 150px)",
-          overflow: "auto",
+          maxHeight: 'calc(100vh - 150px)',
+          overflow: 'auto',
         }}
       >
         <div
@@ -130,9 +130,9 @@ const ImageCropperModal: React.FC<Props> = ({
         <div className="text-sm px-6 pb-4 flex flex-col gap-3 dark:text-white">
           <div>
             <label className="block mb-1 font-medium">
-              {" "}
+              {' '}
               {/* Added block and margin for better label spacing */}
-              Zoom: {zoom.toFixed(1)}x{" "}
+              Zoom: {zoom.toFixed(1)}x{' '}
               {/* Display current zoom next to label */}
             </label>
             <input
@@ -158,7 +158,7 @@ const ImageCropperModal: React.FC<Props> = ({
               <Button
                 key={option.label}
                 variant={
-                  selectedAspect === option.label ? "default" : "outline"
+                  selectedAspect === option.label ? 'default' : 'outline'
                 }
                 onClick={() => handleAspectChange(option)}
                 className="cursor-pointer"
@@ -176,12 +176,12 @@ const ImageCropperModal: React.FC<Props> = ({
           onClick={onClose}
           className="dark:text-white"
           sx={{
-            border: "none",
-            color: "#000", // black text
+            border: 'none',
+            color: '#000', // black text
             fontWeight: 500,
-            "&:hover": {
-              backgroundColor: "#f3f4f6", // subtle gray background on hover (optional)
-              border: "none",
+            '&:hover': {
+              backgroundColor: '#f3f4f6', // subtle gray background on hover (optional)
+              border: 'none',
             },
           }}
         >
@@ -209,12 +209,12 @@ interface AspectOption {
 }
 
 const aspectOptions: AspectOption[] = [
-  { label: "1:1", value: 1 },
-  { label: "3:2", value: 3 / 2 },
-  { label: "2:3", value: 2 / 3 },
-  { label: "9:16", value: 9 / 16 },
+  { label: '1:1', value: 1 },
+  { label: '3:2', value: 3 / 2 },
+  { label: '2:3', value: 2 / 3 },
+  { label: '9:16', value: 9 / 16 },
 ];
 
 const DEFAULT_CROP = { x: 0, y: 0 };
 const DEFAULT_ZOOM = 1;
-const DEFAULT_ASPECT_LABEL = "Original";
+const DEFAULT_ASPECT_LABEL = 'Original';

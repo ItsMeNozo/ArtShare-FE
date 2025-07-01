@@ -13,7 +13,7 @@ export function LanguageSwitcher() {
                     <p className="text-sm">{language}</p>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="dark:bg-mountain-900 border dark:border-mountain-700">
+            <DropdownMenuContent className="dark:bg-mountain-900 border border-mountain-200 dark:border-mountain-700">
                 <DropdownMenuItem onClick={() => setLanguage("en")}>🇺🇸 English</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setLanguage("vi")}>🇻🇳 Tiếng Việt</DropdownMenuItem>
             </DropdownMenuContent>

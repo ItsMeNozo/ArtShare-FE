@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useUser } from "@/contexts/UserProvider";
 
 // Icons
-import { MdDarkMode, MdMoreVert } from "react-icons/md";
+import { MdDarkMode, MdMailOutline, MdMoreVert } from "react-icons/md";
 import { MdLightMode } from "react-icons/md";
 import { useTheme } from "@/hooks/useTheme";
 // Components
@@ -22,9 +22,12 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { TbChessQueen } from "react-icons/tb";
+import { LuSettings } from "react-icons/lu";
 
 const UserInAppConfigs = () => {
-  const { user, loading, logout } = useUser(); // Get user and logout function from UserProvider
+  const { user, loading, logout } = useUser();
   const [open, setOpen] = useState(false);
   const { toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -151,19 +154,26 @@ const UserInAppConfigs = () => {
             <hr className="my-2 border-mountain-100 dark:border-mountain-800" />
             <Link
               to={`/${user.username}`}
-              className="block hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
+              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
             >
-              <p className="text-sm">User Profile</p>
+              <FaRegCircleUser className="text-mountain-600"/>
+              <p className="text-sm">My Profile</p>
             </Link>
             <div className="xs:hidden flex hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
-              <p className="text-sm">Message</p>
+              <MdMailOutline className=""/>
+              <p className="text-sm">Messages</p>
             </div>
-            <div className="xs:hidden flex hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
-              <p className="text-sm">Update</p>
-            </div>
-            <div className="flex hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
+            <div className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
+              <LuSettings className="text-mountain-600"/>
               <p className="text-sm">Settings</p>
             </div>
+            <Link
+              to={'/app-subscription'}
+              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
+            >
+              <TbChessQueen className="text-mountain-600"/>
+              <p className="text-sm">App Subscription</p>
+            </Link>
             <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
           </>
         )}

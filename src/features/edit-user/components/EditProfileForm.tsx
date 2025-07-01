@@ -104,13 +104,13 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
       {/* Full Name */}
       <Box className="mb-4">
         <Typography className="mb-1 font-medium text-foreground">
-          Display Name <span className="text-rose-500">*</span>
+          Full Name <span className="text-rose-500">*</span>
         </Typography>
         <Input
           id="full_name"
           placeholder="Your Fullname"
           {...register("full_name", {
-            required: "Display name is required",
+            required: "Full Name is required",
             maxLength: 80,
           })}
           className={customInputClassName}

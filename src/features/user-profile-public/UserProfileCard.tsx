@@ -17,7 +17,7 @@ import { followUser, unfollowUser } from "./api/follow.api";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { AxiosError } from "axios";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState, useMemo } from "react";
 import { useReportUser } from "./hooks/useReportUser";
 import ReportDialog from "./components/ReportDialog";
 
@@ -29,6 +29,14 @@ export const UserProfileCard = () => {
   const [isHoveringFollowBtn, setIsHoveringFollowBtn] = useState(false);
   const [unfollowInFlight, setUnfollowInFlight] = useState(false);
 
+  console.log("🎭 UserProfileCard rendered with username:", username);
+
+  // Memoize the query function to prevent unnecessary re-renders
+  const queryFn = useMemo(() => {
+    console.log("🏗️ Creating query function for username:", username);
+    return () => getUserProfileByUsername(username);
+  }, [username]);
+
   const {
     data: profileData,
     isLoading,
@@ -36,10 +44,20 @@ export const UserProfileCard = () => {
     error,
   } = useQuery<UserProfile, Error>({
     queryKey: ["userProfile", username],
-    queryFn: () => getUserProfileByUsername(username),
-    enabled: !!username,
+    queryFn,
+    enabled: !!username && username.trim() !== "", // Ensure username is not empty
+    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    retry: (failureCount, error) => {
+      // Don't retry on 404 (user not found)
+      if (error && "status" in error && error.status === 404) {
+        return false;
+      }
+      // Retry up to 2 times for other errors
+      return failureCount < 2;
+    },
   });
-
 
   useEffect(() => {
     // Once the profile refetch shows isFollowing === false, drop the flag

@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
-  Typography,
-  TextField,
-  IconButton,
-  Tooltip,
   CircularProgress,
+  IconButton,
   Stack,
+  TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  FiX as CancelIcon,
   FiEdit as EditIcon,
   FiCheck as SaveIcon,
-  FiX as CancelIcon,
 } from "react-icons/fi";
 
 interface CollectionTitleProps {
@@ -135,8 +135,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
             {/* Save Button */}
             <Tooltip title="Save Changes">
               <span>
-                {" "}
-                {/* Span needed for tooltip on disabled button */}
                 <IconButton
                   size="small"
                   onClick={handleSave}
@@ -158,8 +156,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
             {/* Cancel Button */}
             <Tooltip title="Cancel Edit">
               <span>
-                {" "}
-                {/* Span needed for tooltip on disabled button */}
                 <IconButton
                   size="small"
                   onClick={cancelEditMode}
@@ -174,10 +170,8 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
           <>
             {/* Display Mode */}
             <Typography variant="h6" component="h2" fontWeight="normal" noWrap>
-              {/* Show parent loading state if provided */}
               {isLoading ? "Loading Title..." : title}
             </Typography>
-            {/* Item Count (only show if not loading) */}
             {!isLoading && (
               <Typography
                 variant="body1"
@@ -187,7 +181,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
                 ({itemCountText})
               </Typography>
             )}
-            {/* Edit Button (only show if editable and not loading) */}
             {isEditable && !isLoading && (
               <Tooltip title="Rename Collection">
                 <IconButton
@@ -206,7 +199,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
         )}
       </Stack>
 
-      {/* Error Display Area - shows combined error */}
       {displayError && (
         <Typography color="error" variant="body2" sx={{ mt: 1 }}>
           {displayError}

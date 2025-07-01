@@ -1,20 +1,17 @@
-// Core
-import React, { useState } from "react";
-
-// Components
-import Sidebar from "@/components/sidebar/app-sidebar";
-import Header from "@/components/header/app-header";
+import Header from '@/components/header/app-header';
+import Sidebar from '@/components/sidebar/app-sidebar';
+import React, { useState } from 'react';
 
 const InAppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [expandSideBar, setExpandSideBar] = useState(true);
   return (
-    <div className={`relative flex flex-row w-full h-full`}>
+    <div className={`relative flex h-screen min-h-0 w-full flex-row`}>
       <Sidebar expand={expandSideBar} setExpand={setExpandSideBar} />
       <div
-        className={`flex flex-col z-50 flex-1 flex-shrink px-2 w-[calc(100vw-16rem)] h-full`}
+        className={`z-50 flex h-full min-h-0 w-[calc(100vw-16rem)] flex-1 flex-col px-2`}
       >
         <Header />
-        <div className="bg-white shadow-[-4px_-4px_16px_rgba(0,0,0,0.12)] rounded-t-3xl h-full transition-shadow duration-300 dark:bg-mountain-1000">
+        <div className="dark:bg-mountain-1000 min-h-0 flex-1 rounded-t-3xl bg-white shadow-[-4px_-4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-300">
           {children}
         </div>
       </div>

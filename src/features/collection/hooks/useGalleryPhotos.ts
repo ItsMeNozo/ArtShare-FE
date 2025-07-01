@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { Post } from "@/types";
 import { GalleryPhoto } from "@/components/gallery/Gallery";
+import { Post } from "@/types";
 import { getMediaDimensions } from "@/utils/helpers/gallery.helper";
+import { useEffect, useState } from "react";
 
 export interface UseGalleryPhotosResult {
   galleryPhotos: GalleryPhoto[];

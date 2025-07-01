@@ -1,21 +1,21 @@
-import React, { useState } from "react";
 import {
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import React, { useState } from "react";
 import {
-  FiMoreVertical,
-  FiEdit2,
-  FiTrash2,
   FiAlertTriangle,
+  FiEdit2,
+  FiMoreVertical,
+  FiTrash2,
 } from "react-icons/fi";
 
 interface PostMenuProps {
@@ -110,7 +110,6 @@ export const PostMenu: React.FC<PostMenuProps> = ({
             },
           },
           list: {
-            // Use slotProps.list instead of MenuListProps
             "aria-labelledby": "post-options-button",
           },
         }}
@@ -124,7 +123,6 @@ export const PostMenu: React.FC<PostMenuProps> = ({
               <ListItemText
                 slotProps={{
                   primary: {
-                    // Use slotProps.primary instead of primaryTypographyProps
                     sx: { fontSize: "0.9rem" },
                   },
                 }}
@@ -148,7 +146,6 @@ export const PostMenu: React.FC<PostMenuProps> = ({
               <ListItemText
                 slotProps={{
                   primary: {
-                    // Use slotProps.primary
                     sx: { fontSize: "0.9rem" },
                   },
                 }}
@@ -165,7 +162,6 @@ export const PostMenu: React.FC<PostMenuProps> = ({
             <ListItemText
               slotProps={{
                 primary: {
-                  // Use slotProps.primary
                   sx: { fontSize: "0.9rem" },
                 },
               }}

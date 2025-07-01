@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import Input from "@mui/material/Input";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import { X } from "lucide-react";
-import { Alert, CircularProgress, Paper } from "@mui/material";
-import { createCollection } from "../api/collection.api";
 import { Collection } from "@/types";
+import { Alert, CircularProgress, Paper } from "@mui/material";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
+import Input from "@mui/material/Input";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createCollection } from "../api/collection.api";
 
 export interface CreateCollectionFormData {
   name: string;

@@ -1,23 +1,22 @@
+import { Button } from "@mui/material";
 import React, { useContext } from "react";
-import {
-  FiChevronRight as RightArrowIcon,
-  FiChevronLeft as LeftArrowIcon,
-} from "react-icons/fi";
 import {
   ScrollMenu,
   VisibilityContext,
   type publicApiType,
 } from "react-horizontal-scrolling-menu";
-import { Button } from "@mui/material";
-
 import "react-horizontal-scrolling-menu/dist/styles.css";
+import {
+  FiChevronLeft as LeftArrowIcon,
+  FiChevronRight as RightArrowIcon,
+} from "react-icons/fi";
 
 const DefaultLeftArrow: React.FC = () => {
   const visibility = useContext<publicApiType>(VisibilityContext);
   const isFirstItemVisible = visibility.useIsVisible("first", true);
 
   return (
-    <div className="react-horizontal-scrolling-menu--arrow-left z-50 flex justify-center items-center mr-2">
+    <div className="z-50 flex items-center justify-center mr-2 react-horizontal-scrolling-menu--arrow-left">
       <Button
         variant="contained"
         color="primary"
@@ -39,7 +38,7 @@ const DefaultRightArrow: React.FC = () => {
   const isLastItemVisible = visibility.useIsVisible("last", false);
 
   return (
-    <div className="react-horizontal-scrolling-menu--arrow-right z-50 flex justify-center items-center ml-2">
+    <div className="z-50 flex items-center justify-center ml-2 react-horizontal-scrolling-menu--arrow-right">
       <Button
         variant="contained"
         color="primary"
@@ -81,8 +80,8 @@ const OverlayLeftArrow: React.FC = () => {
 
   return (
     <>
-      <div className="-left-4 z-10 absolute flex bg-gradient-to-r from-black/60 to-transparent opacity-0 group-hover:opacity-100 w-20 h-full transition duration-300 ease-in-out pointer-events-none" />
-      <div className="top-1/2 left-2 z-20 absolute opacity-0 group-hover:opacity-100 transition-opacity -translate-y-1/2">
+      <div className="absolute z-10 flex w-20 h-full transition duration-300 ease-in-out opacity-0 pointer-events-none -left-4 bg-gradient-to-r from-black/60 to-transparent group-hover:opacity-100" />
+      <div className="absolute z-20 transition-opacity -translate-y-1/2 opacity-0 top-1/2 left-2 group-hover:opacity-100">
         <DefaultLeftArrow />
       </div>
     </>
@@ -95,8 +94,8 @@ const OverlayRightArrow: React.FC = () => {
   if (isLastItemVisible) return null;
   return (
     <>
-      <div className="-right-4 z-10 absolute flex bg-gradient-to-l from-black/60 to-transparent opacity-0 group-hover:opacity-100 w-20 h-full transition duration-300 ease-in-out pointer-events-none" />
-      <div className="top-1/2 right-2 z-20 absolute opacity-0 group-hover:opacity-100 transition-opacity -translate-y-1/2">
+      <div className="absolute z-10 flex w-20 h-full transition duration-300 ease-in-out opacity-0 pointer-events-none -right-4 bg-gradient-to-l from-black/60 to-transparent group-hover:opacity-100" />
+      <div className="absolute z-20 transition-opacity -translate-y-1/2 opacity-0 top-1/2 right-2 group-hover:opacity-100">
         <DefaultRightArrow />
       </div>
     </>
@@ -124,22 +123,21 @@ export const HorizontalSlider = <T extends object>({
       <ScrollMenu
         LeftArrow={isOverlay ? OverlayLeftArrow : LeftArrowComponent}
         RightArrow={isOverlay ? OverlayRightArrow : RightArrowComponent}
-        itemClassName={itemClassName}>
-        {
-          data.map((item, index) => {
-            const itemId = getItemId(item);
-            return (
-              <div
-                key={itemId}
-                data-testid={`slider-item-${itemId}`}
-                className="h-full"
-              >
-                {renderItem(item, index)}
-              </div>
-            );
-          })
-        }
-      </ScrollMenu >
-    </div >
+        itemClassName={itemClassName}
+      >
+        {data.map((item, index) => {
+          const itemId = getItemId(item);
+          return (
+            <div
+              key={itemId}
+              data-testid={`slider-item-${itemId}`}
+              className="h-full"
+            >
+              {renderItem(item, index)}
+            </div>
+          );
+        })}
+      </ScrollMenu>
+    </div>
   );
 };

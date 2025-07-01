@@ -87,7 +87,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
       <div className="flex flex-col justify-between bg-white border border-mountain-200 rounded-lg rounded-r-none w-28 h-full">
         <div className="flex flex-col space-y-2">
           {/* Layers Header */}
-          <div className="flex justify-center items-center bg-gradient-to-r from-blue-200 via-indigo-200 to-purple-200 h-10 font-medium text-mountain-800">
+          <div className="flex justify-center items-center bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
             Layers
           </div>
           <Tooltip title="Add Layer" arrow placement="right">

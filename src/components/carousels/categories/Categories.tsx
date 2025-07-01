@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
+import { cn } from "@/lib/utils";
+import { Category } from "@/types";
 import {
   Button,
   Fade,
@@ -7,18 +9,14 @@ import {
   Popper,
   PopperPlacementType,
 } from "@mui/material";
-
+import { LoaderPinwheel } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import "react-horizontal-scrolling-menu/dist/styles.css";
-import "./Categories.css";
 import { FiSearch } from "react-icons/fi";
 import { TiDeleteOutline } from "react-icons/ti";
 import { HorizontalSlider } from "../../sliders/HorizontalSlider";
-import { cn } from "@/lib/utils";
-import { Category } from "@/types";
-import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
-import { LoaderPinwheel } from "lucide-react";
+import "./Categories.css";
 
-// ... (CategoriesScrollerProps and Categories component remain the same) ...
 export interface CategoriesScrollerProps {
   onSelectCategory: (categoryName: string | null) => void;
   selectedCategory: string | null;
@@ -113,10 +111,9 @@ interface DataPopperProps {
   placement?: PopperPlacementType;
   className?: string;
   selectionMode?: "single" | "multiple";
-  showClearAllButton?: boolean; // Added prop
+  showClearAllButton?: boolean;
 }
 
-// ... (renderCategoryItemForPopper and renderPropItemForPopper remain the same) ...
 const renderCategoryItemForPopper = (
   item: Category,
   isSelected: boolean,
@@ -154,7 +151,7 @@ const renderPropItemForPopper = (
   onClick: () => void,
 ) => (
   <div
-    className="flex items-center gap-2 p-2 rounded-lg cursor-pointer hover:bg-mountain-100 dark:hover:bg-mountain-900" // Added dark hover
+    className="flex items-center gap-2 p-2 rounded-lg cursor-pointer hover:bg-mountain-100 dark:hover:bg-mountain-900"
     onClick={onClick}
   >
     <input
@@ -166,7 +163,7 @@ const renderPropItemForPopper = (
     />
     <label
       htmlFor={`prop-${item.id}-${item.name}`}
-      className="w-full text-sm text-gray-800 pointer-events-none dark:text-mountain-200" // Added dark text
+      className="w-full text-sm text-gray-800 pointer-events-none dark:text-mountain-200"
     >
       {item.name}
     </label>
@@ -184,7 +181,7 @@ export const DataPopper: React.FC<DataPopperProps> = ({
   placement,
   className,
   selectionMode = "multiple",
-  showClearAllButton = false, // Added default
+  showClearAllButton = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [internalSelectedData, setInternalSelectedData] = useState<
@@ -194,9 +191,6 @@ export const DataPopper: React.FC<DataPopperProps> = ({
   useEffect(() => {
     if (open) {
       setInternalSelectedData(selectedDataProp);
-    } else {
-      // Optionally reset search query when popper closes
-      // setSearchQuery("");
     }
   }, [selectedDataProp, open]);
 
@@ -297,8 +291,8 @@ export const DataPopper: React.FC<DataPopperProps> = ({
                 {/* Wrapper to push Clear All to the left */}
                 {canClearAll && (
                   <Button
-                    variant="text" // Or "outlined" if you prefer
-                    color="error" // Or "primary" / "secondary"
+                    variant="text"
+                    color="error"
                     onClick={handleClearAll}
                     size="small"
                     className="normal-case"

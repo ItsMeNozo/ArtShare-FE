@@ -96,7 +96,7 @@ const ArtGenAI = () => {
   useEffect(() => {
     if (!location.state) return;
     const { prompt, modelKey, aspectRatio, lighting, camera, style } =
-      location.state as any;
+      location.state;
 
     if (prompt) setUserPrompt(prompt);
 

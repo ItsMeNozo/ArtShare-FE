@@ -21,7 +21,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   },
 );
 
-// Add display name for better debugging
+// Add Full Name for better debugging
 Input.displayName = "Input";
 
 export { Input };

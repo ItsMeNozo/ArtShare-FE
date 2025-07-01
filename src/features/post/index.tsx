@@ -1,34 +1,32 @@
-import PostInfo from "./components/PostInfo";
-import PostAssets from "./components/PostAssets";
-import PostArtist from "./components/PostArtist";
+import { TargetType } from "@/utils/constants.ts";
+import { CircularProgress } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { fetchComments } from "./api/comment.api.ts";
 import CommentSection, {
   CommentSectionRef,
 } from "./components/CommentSection.tsx";
-import { fetchComments } from "./api/comment.api.ts";
-import { useQuery } from "@tanstack/react-query";
-import { useLocation, useParams } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { TargetType } from "@/utils/constants.ts";
 import MatureContentWarning from "./components/MatureContentWarning.tsx";
+import PostArtist from "./components/PostArtist";
+import PostAssets from "./components/PostAssets";
+import PostInfo from "./components/PostInfo";
 import { useGetPostDetails } from "./hooks/useGetPostDetails.tsx";
 
 const Post: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const commentSectionRef = useRef<CommentSectionRef>(null);
   const location = useLocation();
-  // Effect to control body overflow
+
   useEffect(() => {
-    // Store the original body overflow style
     const originalBodyOverflow = document.body.style.overflow;
-    // Hide the main scrollbar
+
     document.body.style.overflow = "hidden";
 
-    // Cleanup function to restore original body overflow when component unmounts
     return () => {
       document.body.style.overflow = originalBodyOverflow;
     };
-  }, []); // Empty dependency array ensures this effect runs only on mount and unmount
+  }, []);
   const [showMatureContent, setShowMatureContent] = useState<boolean>(false);
 
   const numericPostId = postId ? parseInt(postId, 10) : NaN;
@@ -79,7 +77,6 @@ const Post: React.FC = () => {
     const rawHighlightIdFromState = location.state?.highlightCommentId;
     const shouldScroll = location.state?.scrollToComment;
 
-    // Reset scroll attempted when we have new navigation state
     if (rawHighlightIdFromState && shouldScroll) {
       console.log(
         "[Post] Resetting scrollAttemptedRef due to new navigation state",
@@ -98,28 +95,19 @@ const Post: React.FC = () => {
       highlightId = rawHighlightIdFromState;
     }
 
-    // Reset scrollAttempted when navigating to a new comment
-    if (!scrollAttemptedRef.current) {
-      // nothing
-    }
-
-    // --- Guards to ensure we run this only once and at the right time ---
     if (
-      highlightId === undefined || // Ensures highlightId is a valid number
+      highlightId === undefined ||
       !shouldScroll ||
-      isCommentsLoading || // Don't run while comments are loading
-      !comments || // Don't run if there are no comments
-      !commentSectionRef.current || // Ensure ref is populated
-      scrollAttemptedRef.current // Don't run if we already scrolled
+      isCommentsLoading ||
+      !comments ||
+      !commentSectionRef.current ||
+      scrollAttemptedRef.current
     ) {
       return;
     }
 
-    // We have everything we need, let's try to highlight and scroll.
-    // Set the ref to true to prevent this from running again.
     scrollAttemptedRef.current = true;
 
-    // Clear only the relevant parts of the location state
     window.history.replaceState(
       {
         ...window.history.state,
@@ -129,9 +117,7 @@ const Post: React.FC = () => {
       document.title,
     );
 
-    // Give React a moment to render the comments after the data has loaded
     const timer = setTimeout(() => {
-      // Highlight the comment first (highlightId is confirmed to be a number here)
       console.log("[Post] About to call highlightComment with:", highlightId);
       console.log(
         "[Post] commentSectionRef.current:",
@@ -140,8 +126,6 @@ const Post: React.FC = () => {
       commentSectionRef.current?.highlightComment(highlightId!);
       console.log("[Post] Called highlightComment");
 
-      // Now, scroll
-      // Wait a bit more for the highlight animation and potential thread expansion
       setTimeout(async () => {
         console.log(
           "[Post] Looking for element with ID:",
@@ -167,14 +151,12 @@ const Post: React.FC = () => {
             clientWidth: document.documentElement.clientWidth,
           });
 
-          // Check if element has zero dimensions (hidden/collapsed)
           const rect = element.getBoundingClientRect();
           if (rect.width === 0 && rect.height === 0) {
             console.log(
               "[Post] Element appears to be hidden/collapsed, trying to expand parent thread",
             );
 
-            // Use the new expandToComment function to find and expand the specific parent
             try {
               const wasExpanded =
                 await commentSectionRef.current?.expandToComment(highlightId);
@@ -183,7 +165,7 @@ const Post: React.FC = () => {
                 console.log(
                   "[Post] Successfully expanded parent thread, scrolling to comment",
                 );
-                // Wait a bit more for the final DOM updates and then scroll
+
                 setTimeout(() => {
                   const updatedRect = element.getBoundingClientRect();
                   console.log(
@@ -198,7 +180,7 @@ const Post: React.FC = () => {
                     commentSectionRef.current?.scrollToComment(
                       highlightId,
                       false,
-                    ); // Don't double-highlight
+                    );
                   } else {
                     console.warn(
                       "[Post] Element still not visible after expansion",
@@ -222,13 +204,12 @@ const Post: React.FC = () => {
               position: window.getComputedStyle(element).position,
             });
 
-            // Use the new scrollToComment method instead of scrollIntoView
             try {
               const scrollSuccess =
                 await commentSectionRef.current?.scrollToComment(
                   highlightId,
                   false,
-                ); // Don't double-highlight
+                );
               console.log("[Post] scrollToComment result:", scrollSuccess);
 
               if (!scrollSuccess) {
@@ -261,7 +242,6 @@ const Post: React.FC = () => {
             }
           }
 
-          // Check position after a delay
           setTimeout(() => {
             console.log(
               "[Post] Element position after scroll:",
@@ -271,18 +251,18 @@ const Post: React.FC = () => {
               scrollX: window.scrollX,
               scrollY: window.scrollY,
             });
-          }, 2000); // Increased delay to allow smooth scroll to complete
+          }, 2000);
         } else {
           console.warn(
             "[Post] Could not find comment element with ID:",
             `comment-${highlightId}`,
           );
         }
-      }, 300); // Short delay for UI to update after expansion/highlight
-    }, 100); // Short delay to ensure DOM is ready after data load
+      }, 300);
+    }, 100);
 
     return () => clearTimeout(timer);
-  }, [location.state, comments, isCommentsLoading]); // Removed commentSectionRef.current dependency
+  }, [location.state, comments, isCommentsLoading]);
 
   useEffect(() => {
     if (postData) {
@@ -292,19 +272,17 @@ const Post: React.FC = () => {
   }, [postData]);
 
   const handleCommentAdded = () => {
-    setCommentCount((prev) => prev + 1); // Increment comment count when a comment is added
+    setCommentCount((prev) => prev + 1);
     if (postData) {
-      // Directly update postData.comment_count
       postData.comment_count += 1;
       refetchPostData();
     }
   };
   const handleCommentDeleted = () => {
-    setCommentCount((prev) => Math.max(prev - 1, 0)); // Decrement comment count when a comment is deleted
+    setCommentCount((prev) => Math.max(prev - 1, 0));
     if (postData) {
-      // Directly update postData.comment_count
-      postData.comment_count -= 1; // This ensures that postData.comment_count is updated
-      refetchPostData; // Refetch the post data to trigger a re-render of PostInfo
+      postData.comment_count -= 1;
+      refetchPostData();
     }
   };
 
@@ -314,7 +292,7 @@ const Post: React.FC = () => {
 
   if (!postId || isNaN(numericPostId)) {
     return (
-      <div className="flex items-center justify-center m-4">
+      <div className="flex justify-center items-center m-4">
         Invalid Post ID.
       </div>
     );
@@ -322,7 +300,7 @@ const Post: React.FC = () => {
 
   if (isPostLoading || isCommentsLoading) {
     return (
-      <div className="flex items-center justify-center h-screen m-4 text-center">
+      <div className="flex justify-center items-center m-4 h-screen text-center">
         <CircularProgress size={36} />
         <p className="ml-2">Loading...</p>
       </div>
@@ -331,7 +309,7 @@ const Post: React.FC = () => {
 
   if (postError) {
     return (
-      <div className="flex items-center justify-center m-4">
+      <div className="flex justify-center items-center m-4">
         Error loading post:{" "}
         {(postError as Error).message || "Failed to fetch post."}
       </div>
@@ -340,7 +318,7 @@ const Post: React.FC = () => {
 
   if (commentsError && postData) {
     return (
-      <div className="flex items-center justify-center m-4">
+      <div className="flex justify-center items-center m-4">
         Error loading comments:{" "}
         {(commentsError as Error).message || "Failed to fetch comments."}
       </div>
@@ -349,7 +327,7 @@ const Post: React.FC = () => {
 
   if (!postData) {
     return (
-      <div className="flex items-center justify-center m-4">
+      <div className="flex justify-center items-center m-4">
         Post not found or data is unavailable.
       </div>
     );
@@ -357,7 +335,7 @@ const Post: React.FC = () => {
 
   if (!comments) {
     return (
-      <div className="flex items-center justify-center m-4">
+      <div className="flex justify-center items-center m-4">
         Comments not found or data is unavailable.
       </div>
     );
@@ -366,7 +344,7 @@ const Post: React.FC = () => {
   const displayAssets = !postData.is_mature || showMatureContent;
 
   return (
-    <div className="relative flex-grow bg-mountain-50 dark:bg-gradient-to-b dark:from-mountain-1000 dark:to-mountain-950 px-4 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar dark:bg-mountain-950">
+    <div className="relative flex-grow bg-mountain-50 dark:bg-mountain-950 dark:bg-gradient-to-b dark:from-mountain-1000 dark:to-mountain-950 px-4 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar">
       <div className="md:hidden relative flex flex-col bg-white shadow p-4 rounded-2xl h-full">
         <div className="rounded-2xl h-full overflow-y-auto">
           <PostArtist artist={postData!.user} postData={postData!} />
@@ -383,7 +361,7 @@ const Post: React.FC = () => {
           <CommentSection
             ref={commentSectionRef}
             comments={comments!}
-            targetId={postData!.id} // Changed from postId to targetId
+            targetId={postData!.id}
             targetType={TargetType.POST}
             onCommentAdded={handleCommentAdded}
             onCommentDeleted={handleCommentDeleted}
@@ -392,16 +370,16 @@ const Post: React.FC = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="flex-row hidden h-full gap-4 md:flex">
-        <div className="flex items-center justify-center flex-grow h-full">
+      <div className="hidden md:flex flex-row gap-4 h-full">
+        <div className="flex flex-grow justify-center items-center h-full overflow-hidden sidebar">
           {displayAssets ? (
             <PostAssets medias={postData.medias} />
           ) : (
             <MatureContentWarning onShow={handleShowMatureContent} />
           )}
         </div>
-        <div className="relative flex-shrink-0 bg-white dark:bg-mountain-950 shadow py-0 pl-4 rounded-2xl sm:w-[256px] md:w-[384px] lg:w-[448px]">
-          <div className="flex flex-col h-full gap-4 sidebar">
+        <div className="relative flex-shrink-0 bg-white shadow py-0 pl-4 rounded-t-3xl sm:w-[256px] md:w-[384px] lg:w-[448px] overflow-hidden">
+          <div className="flex flex-col gap-4 h-full sidebar">
             <PostArtist artist={postData!.user} postData={postData!} />
             <PostInfo
               postData={postData}

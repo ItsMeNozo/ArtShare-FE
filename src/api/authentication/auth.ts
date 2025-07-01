@@ -20,6 +20,7 @@ export const signup = async (
   password: string,
   username: string,
 ) => {
+  console.log("🔐 API: Starting signup for user:", { userId, email, username });
   try {
     const response = await axios.post(`${API_BASE_URL}/register`, {
       userId,
@@ -27,9 +28,10 @@ export const signup = async (
       password,
       username,
     });
+    console.log("🔐 API: Signup successful");
     return response.data;
   } catch (error) {
-    console.error("Error signing up:", error);
+    console.error("🔐 API: Signup error:", error);
     throw error; // Handle error accordingly
   }
 };

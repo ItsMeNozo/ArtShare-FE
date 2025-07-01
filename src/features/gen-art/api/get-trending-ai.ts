@@ -1,8 +1,4 @@
-import api from "@/api/baseApi";
-// Assets (example thumbnail — remove if no longer needed)
-// =====================================================
-// Types
-// =====================================================
+import api from '@/api/baseApi';
 interface TrendingItem {
   image: string;
   prompt: string;
@@ -15,28 +11,23 @@ interface TrendingItem {
 
 export const getTrendingAiPosts = async (): Promise<TrendingItem[]> => {
   try {
-    const response = await api.get("/posts/ai-trending");
+    const response = await api.get('/posts/ai-trending');
     const data = response.data;
-
-    // 1️⃣ Giữ lại những post có art_generation hợp lệ
     const withArt = data.filter((item: any) => item.art_generation);
-
-    // 2️⃣ Chuyển thành TrendingItem[]
     return withArt.map((item: any): TrendingItem => {
-      const art = item.art_generation; // chắc chắn khác null ở đây
-
+      const art = item.art_generation;
       return {
-        image: art.image_urls?.[0] ?? "https://placehold.co/512?text=No+Image",
-        prompt: art.final_prompt ?? art.user_prompt ?? "",
-        style: art.style ?? "Default",
-        lighting: art.lighting ?? "Default",
-        camera: art.camera ?? "Default",
-        aspect_ratio: art.aspect_ratio ?? "Default",
-        model_key: art.model_key ?? "Unknown",
+        image: art.image_urls?.[0] ?? 'https://placehold.co/512?text=No+Image',
+        prompt: art.final_prompt ?? art.user_prompt ?? '',
+        style: art.style ?? 'Default',
+        lighting: art.lighting ?? 'Default',
+        camera: art.camera ?? 'Default',
+        aspect_ratio: art.aspect_ratio ?? 'Default',
+        model_key: art.model_key ?? 'Unknown',
       };
     });
   } catch (error) {
-    console.error("Error fetching trending AI posts:", error);
+    console.error('Error fetching trending AI posts:', error);
     throw error;
   }
 };

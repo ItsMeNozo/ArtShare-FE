@@ -1,17 +1,17 @@
-import { Box, CardContent, CardHeader, IconButton } from "@mui/material";
-import { X } from "lucide-react";
-import Avatar from "boring-avatars";
-import { User, Post } from "@/types";
-import { Link, useNavigate } from "react-router-dom";
-import { PostMenu } from "./PostMenu";
+import { ReportTargetType } from "@/features/user-profile-public/api/report.api";
+import ReportDialog from "@/features/user-profile-public/components/ReportDialog";
+import { useReport } from "@/features/user-profile-public/hooks/useReport";
 import { auth } from "@/firebase";
 import { useSnackbar } from "@/hooks/useSnackbar";
-import { useReport } from "@/features/user-profile-public/hooks/useReport";
-import ReportDialog from "@/features/user-profile-public/components/ReportDialog"; // This file will not be changed
-import { useState } from "react";
-import { ReportTargetType } from "@/features/user-profile-public/api/report.api";
-import { useDeletePost } from "../hooks/useDeletePost";
+import { Post, User } from "@/types";
 import { extractReportErrorMessage } from "@/utils/error.util";
+import { Box, CardContent, CardHeader, IconButton } from "@mui/material";
+import Avatar from "boring-avatars";
+import { X } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDeletePost } from "../hooks/useDeletePost";
+import { PostMenu } from "./PostMenu";
 
 const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
   const navigate = useNavigate();
@@ -44,7 +44,12 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
 
   const handleReport = (reason: string) => {
     reportPost(
-      { targetId: postData?.id, reason, targetType: ReportTargetType.POST, targetTitle: postData?.title },
+      {
+        targetId: postData?.id,
+        reason,
+        targetType: ReportTargetType.POST,
+        targetTitle: postData?.title,
+      },
       {
         onSuccess: () => {
           setDialogOpen(false);
@@ -73,7 +78,7 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-mountain-950 shadow p-4 md:border-b md:border-b-mountain-200 rounded-2xl md:rounded-b-none overflow-none">
+    <div className="p-4 bg-white shadow dark:bg-mountain-950 md:border-b md:border-b-mountain-200 rounded-2xl md:rounded-b-none overflow-none">
       <CardHeader
         className="p-0"
         action={
@@ -93,15 +98,15 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
         }
       />
       <CardContent
-        className="flex flex-col gap-4 p-0 cursor-pointer group hover:bg-gray-50 dark:hover:bg-mountain-800/50 rounded-lg p-2 transition-colors duration-200"
+        className="flex flex-col gap-4 p-2 transition-colors duration-200 rounded-lg cursor-pointer group hover:bg-gray-50 dark:hover:bg-mountain-800/50"
         onClick={() => navigate(`/${artist.username}`)}
       >
         <div className="flex gap-4 cursor-pointer">
-          <div className="flex-shrink-0 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-blue-500/30 transition-all duration-200">
+          <div className="flex-shrink-0 overflow-hidden transition-all duration-200 rounded-full ring-2 ring-transparent group-hover:ring-blue-500/30">
             {artist.profile_picture_url ? (
               <img
                 src={artist.profile_picture_url}
-                className="w-20 h-20 object-cover"
+                className="object-cover w-20 h-20"
                 alt={`${artist.username}'s profile`}
               />
             ) : (
@@ -109,15 +114,15 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
                 name={artist.username || "Unknown"}
                 colors={["#84bfc3", "#ff9b62", "#d96153"]}
                 variant="beam"
-                size={80} // Fixed size to match the image dimensions
+                size={80}
               />
             )}
           </div>
           <div className="flex flex-col pt-0.5">
-            <div className="font-bold text-xl group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+            <div className="text-xl font-bold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
               {artist.full_name || "Unknown fullname"}
             </div>
-            <div className="text-sm line-clamp-1 group-hover:text-blue-500 dark:group-hover:text-blue-300 transition-colors duration-200">
+            <div className="text-sm transition-colors duration-200 line-clamp-1 group-hover:text-blue-500 dark:group-hover:text-blue-300">
               @{artist.username}
             </div>
           </div>
@@ -128,7 +133,6 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
         onClose={() => setDialogOpen(false)}
         onSubmit={handleReport}
         submitting={isLoadingReportUser}
-        // No changes here, ReportDialog remains unaware of this API error.
       />
     </div>
   );

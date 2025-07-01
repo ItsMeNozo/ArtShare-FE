@@ -160,7 +160,7 @@ body {
 }
 
 .bounce-item {
-  @apply transition-transform hover:-translate-y-1 duration-500 transform;
+  @apply transition-transform duration-500 transform hover:-translate-y-1;
 }
 
 .sidebar {
@@ -186,9 +186,8 @@ body {
     linear-gradient(to left, transparent 17px, black 17px);
   mask-size: 100% 20000px;
   mask-position: left bottom;
-  -webkit-mask-image:
-    linear-gradient(to top, transparent, black),
-    linear-gradient(to left, transparent 17px, black 17px);
+  -webkit-mask-image: linear-gradient(to top, transparent, black),
+  linear-gradient(to left, transparent 17px, black 17px);
   -webkit-mask-size: 100% 20000px;
   -webkit-mask-position: left bottom;
   transition:
@@ -208,11 +207,13 @@ body {
 }
 
 @layer utilities {
+
   /* only in dark mode: invert the built-in calendar icon */
   .dark input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(0.8);
     cursor: pointer;
   }
+
   /* Firefox uses a different pseudo */
   .dark input[type="date"]::-moz-calendar-picker-indicator {
     filter: invert(1) brightness(0.8);
@@ -281,4 +282,26 @@ body {
       transform: none !important;
     }
   }
+}
+
+/* In your global CSS file or a CSS module */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #999;
+  /* Adjust color as needed */
+  border-radius: 3px;
+}
+
+/* For Firefox (scrollbar-width only supports thin or auto) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #999 transparent;
 }

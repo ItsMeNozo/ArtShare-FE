@@ -1,18 +1,18 @@
-import React from "react";
+import { HorizontalSlider } from "@/components/sliders/HorizontalSlider";
 import {
   Box,
-  Typography,
   Card,
-  CardMedia,
-  CardContent,
-  CircularProgress,
   CardActionArea,
+  CardContent,
+  CardMedia,
+  CircularProgress,
+  IconButton,
   Paper,
   Tooltip,
-  IconButton,
+  Typography,
 } from "@mui/material";
+import React from "react";
 import { FiPlus as AddIcon, FiX as DeleteIcon } from "react-icons/fi";
-import { HorizontalSlider } from "@/components/sliders/HorizontalSlider";
 import { SelectedCollectionId, SliderItem } from "../types/collection";
 
 const CARD_MIN_WIDTH = 256;

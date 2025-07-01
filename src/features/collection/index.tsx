@@ -1,40 +1,39 @@
-import React, { useState, useMemo, useCallback } from "react";
 import {
   Box,
+  Button,
   Container,
-  Typography,
-  Stack,
-  CircularProgress,
-  DialogTitle,
+  Dialog,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
-  Dialog,
+  DialogTitle,
+  Stack,
   ToggleButton,
   Tooltip,
+  Typography,
 } from "@mui/material";
+import React, { useCallback, useMemo, useState } from "react";
 
+import { SearchInput } from "@/components/SearchInput";
 import { Collection, Post } from "@/types";
+import { FiGlobe as AllIcon, FiLock as LockIcon } from "react-icons/fi";
+import {
+  deleteCollection,
+  removePostFromCollection,
+  updateCollection,
+} from "./api/collection.api";
+import { CollectionGallery } from "./components/CollectionGallery";
+import { CollectionSlider } from "./components/CollectionSlider";
+import { CollectionTitle } from "./components/CollectionTitle";
+import { CreateCollectionDialog } from "./components/CreateCollectionDialog";
+import { useCollectionsData } from "./hooks/useCollectionsData";
+import { useGalleryPhotos } from "./hooks/useGalleryPhotos";
 import {
   CollectionDisplayInfo,
   SelectedCollectionId,
   SliderItem,
   SliderItemCollection,
 } from "./types/collection";
-import { useCollectionsData } from "./hooks/useCollectionsData";
-import { useGalleryPhotos } from "./hooks/useGalleryPhotos";
-import {
-  deleteCollection,
-  removePostFromCollection,
-  updateCollection,
-} from "./api/collection.api";
-import { CollectionSlider } from "./components/CollectionSlider";
-import { CollectionTitle } from "./components/CollectionTitle";
-import { CollectionGallery } from "./components/CollectionGallery";
-import { CreateCollectionDialog } from "./components/CreateCollectionDialog";
-import { SearchInput } from "@/components/SearchInput";
-import { FiGlobe as AllIcon, FiLock as LockIcon } from "react-icons/fi";
 
 const CollectionPage: React.FC = () => {
   const [selectedCollectionId, setSelectedCollectionId] =
@@ -573,17 +572,6 @@ const CollectionPage: React.FC = () => {
         selectedCollectionId={selectedCollectionId}
       />
 
-      {/* Fallback loading indicator if gallery is empty during load */}
-      {isGalleryLoading && galleryPhotos.length === 0 && (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          sx={{ minHeight: 200 }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
       <CreateCollectionDialog
         open={isCreateDialogOpen}
         onClose={handleCloseCreateDialog}

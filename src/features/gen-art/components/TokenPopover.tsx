@@ -1,18 +1,13 @@
-// Core
-import { useState } from "react";
-
-// Components
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
+import { useState } from 'react';
 
-//Icons
-import { PiStarFourFill } from "react-icons/pi";
-import { Button } from "@/components/ui/button";
-import { useSubscriptionInfo } from "@/hooks/useSubscription";
-import AsyncWrapper from "@/components/AsyncWrapper";
+import AsyncWrapper from '@/components/AsyncWrapper';
+import { useSubscriptionInfo } from '@/hooks/useSubscription';
+import { BiSolidCoinStack } from 'react-icons/bi';
 
 const TokenPopover: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -31,18 +26,18 @@ const TokenPopover: React.FC = () => {
     <Popover open={open}>
       <PopoverTrigger asChild>
         <div
+          className="flex items-center space-x-1 px-2"
           onMouseEnter={() => isPopOverVisible && setOpen(true)}
-          className="flex px-2 border-mountain-100 border-r-2 border-l-2 h-full"
         >
-          <div className="flex justify-center items-center space-x-2 bg-mountain-100 px-2 rounded-lg w-fit h-full font-normal">
-            <AsyncWrapper
-              loading={loadingSubscriptionInfo}
-              error={isSubscriptionError}
-            >
-              <p>{tokenNumber}</p>
-            </AsyncWrapper>
-            <PiStarFourFill className="size-5" />
-          </div>
+          <AsyncWrapper
+            loading={loadingSubscriptionInfo}
+            error={isSubscriptionError}
+          >
+            <BiSolidCoinStack className="text-indigo-600 dark:text-indigo-400" />
+            <span className="text-gray-800 dark:text-gray-100">
+              {tokenNumber}
+            </span>
+          </AsyncWrapper>
         </div>
       </PopoverTrigger>
       <PopoverContent
@@ -55,7 +50,7 @@ const TokenPopover: React.FC = () => {
             {tokenNumber}
           </p>
           <p>credits remaining, get more with</p>
-          <Button>Upgrade</Button>
+          {/* <Button>Upgrade</Button> */}
         </div>
         <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
         <div className="flex flex-col space-y-2">
@@ -66,8 +61,8 @@ const TokenPopover: React.FC = () => {
             <p className="flex w-1/2">
               ~
               {Math.floor(tokenNumber / 5) > 1
-                ? Math.floor(tokenNumber / 5) + " Images"
-                : Math.floor(tokenNumber / 5) + " Image"}
+                ? Math.floor(tokenNumber / 5) + ' Images'
+                : Math.floor(tokenNumber / 5) + ' Image'}
             </p>
           </div>
         </div>

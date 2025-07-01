@@ -1,23 +1,19 @@
-import React from "react";
-
 import IGallery, { GalleryPhoto } from "@/components/gallery/Gallery";
-
+import React from "react";
+import { RenderPhotoContext } from "react-photo-album";
+import { SelectedCollectionId } from "../types/collection";
 import {
   CollectionImageRenderer,
   CollectionImageRendererOptions,
 } from "./CollectionImageRenderer";
-
-import { RenderPhotoContext } from "react-photo-album";
-import { SelectedCollectionId } from "../types/collection";
 
 interface CollectionGalleryProps {
   photos: GalleryPhoto[];
   isLoading: boolean;
   isError: boolean;
   error: string | null;
-
-  onRemovePost: (postId: number) => void;
   selectedCollectionId: SelectedCollectionId;
+  onRemovePost: (postId: number) => void;
 }
 
 export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
@@ -25,7 +21,6 @@ export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
   isLoading,
   isError,
   error,
-
   onRemovePost,
   selectedCollectionId,
 }) => {

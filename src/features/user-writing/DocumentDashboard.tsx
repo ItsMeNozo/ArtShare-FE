@@ -1,18 +1,20 @@
-import { IoBookOutline, IoFilter } from "react-icons/io5";
-import { MdOutlineAdd } from "react-icons/md";
+import { TUTORIAL_TEMPLATE_HTML } from "@/constants/template";
+import { useUser } from "@/contexts/UserProvider";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import { Blog } from "@/types/blog";
+import { CircularProgress, IconButton, Menu } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import React, { useEffect, useState } from "react";
-import MenuItem from "@mui/material/MenuItem";
-import { useNavigate } from "react-router-dom";
-import { CircularProgress, IconButton, Menu } from "@mui/material";
 import { IoMdMore } from "react-icons/io";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { CreateBlogPayload, createNewBlog, deleteBlog } from "./api/blog.api";
+import { IoBookOutline, IoFilter } from "react-icons/io5";
+import { MdOutlineAdd } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import { fetchBlogsByUsername } from "../blog-details/api/blog";
-import { useUser } from "@/contexts/UserProvider";
-import { Blog } from "@/types/blog";
-import { TUTORIAL_TEMPLATE_HTML } from "@/constants/template";
+import { CreateBlogPayload, createNewBlog } from "./api/blog.api";
+import { BlogDeleteConfirmDialog } from "./components/BlogDeleteConfirmDialog";
+import { useDeleteBlog } from "./hooks/useDeleteBlog";
 
 // Define a type for the sort order
 type BlogSortOrder = "latest" | "oldest" | "last7days" | "last30days";
@@ -32,6 +34,28 @@ const DocumentDashboard = () => {
     anchorEl: null | HTMLElement;
     currentBlogId: null | number;
   }>({ anchorEl: null, currentBlogId: null });
+
+  const [deleteConfirmState, setDeleteConfirmState] = useState<{
+    open: boolean;
+    blogId: number | null;
+    blogTitle: string | null;
+  }>({ open: false, blogId: null, blogTitle: null });
+
+  const { mutate: deleteBlogMutation, isPending: isDeletingBlog } =
+    useDeleteBlog({
+      onSuccess: (blogId) => {
+        setUserBlogs((prev) => prev.filter((blog) => blog.id !== blogId));
+        showSnackbar("Document deleted successfully", "success", undefined, {
+          vertical: "top",
+          horizontal: "center",
+        });
+        setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
+      },
+      onError: (errorMessage) => {
+        showSnackbar(errorMessage, "error");
+        setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
+      },
+    });
 
   // Function to get thumbnail image from blog
   const getThumbnail = (blog: Blog): string => {
@@ -184,16 +208,22 @@ const DocumentDashboard = () => {
 
   const onDeleteMenuClick = async (blogId: number) => {
     handleMenuClose(); // Close menu first
-    try {
-      await deleteBlog(blogId);
-      setUserBlogs((prev) => prev.filter((blog) => blog.id !== blogId));
-      showSnackbar("Document deleted successfully", "success", undefined, {
-        vertical: "top",
-        horizontal: "center",
-      });
-    } catch {
-      showSnackbar("Failed to delete document", "error");
+    const blog = userBlogs.find((b) => b.id === blogId);
+    setDeleteConfirmState({
+      open: true,
+      blogId,
+      blogTitle: blog?.title || null,
+    });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmState.blogId) {
+      deleteBlogMutation(deleteConfirmState.blogId);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
   };
 
   return (
@@ -438,6 +468,15 @@ const DocumentDashboard = () => {
           --loader-color: rgb(129 140 248) !important;
         }
       `}</style>
+
+      {/* Delete Confirmation Dialog */}
+      <BlogDeleteConfirmDialog
+        open={deleteConfirmState.open}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        submitting={isDeletingBlog}
+        blogTitle={deleteConfirmState.blogTitle || undefined}
+      />
     </div>
   );
 };

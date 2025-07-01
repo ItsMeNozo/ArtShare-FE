@@ -1,8 +1,7 @@
-// In a file like 'hooks/useDeletePost.js'
-import { deletePost } from "@/api/post/post";
-import { useLoading } from "@/contexts/Loading/useLoading";
-import { extractApiErrorMessage } from "@/utils/error.util";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deletePost } from '@/api/post/post';
+import { useLoading } from '@/contexts/Loading/useLoading';
+import { extractApiErrorMessage } from '@/utils/error.util';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 type UseDeletePostOptions = {
   onSuccess?: (postId: number) => void;
@@ -17,7 +16,7 @@ export const useDeletePost = (options: UseDeletePostOptions) => {
     mutationFn: deletePost,
 
     onMutate: () => {
-      showLoading("Deleting post...");
+      showLoading('Deleting post...');
     },
 
     onSettled: () => {
@@ -25,20 +24,20 @@ export const useDeletePost = (options: UseDeletePostOptions) => {
     },
 
     onSuccess: (_, postId) => {
-      console.log("Post deleted successfully!");
+      console.log('Post deleted successfully!');
 
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.removeQueries({ queryKey: ["postDetails", postId] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.removeQueries({ queryKey: ['postDetails', postId] });
 
       options.onSuccess?.(postId);
     },
 
     onError: (error) => {
-      console.error("Error deleting post:", error);
+      console.error('Error deleting post:', error);
       if (options.onError) {
         const displayMessage = extractApiErrorMessage(
           error,
-          "Failed to delete post. Please try again.",
+          'Failed to delete post. Please try again.',
         );
         options.onError(displayMessage);
       }

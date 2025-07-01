@@ -1,50 +1,50 @@
+import api from "@/api/baseApi";
+import { useFocusContext } from "@/contexts/focus/useFocusText";
+import { useUser } from "@/contexts/UserProvider";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import { isTemporaryCommentId } from "@/lib/utils";
+import { User } from "@/types";
+import { CommentUI, CreateCommentDto } from "@/types/comment";
+import { TargetType } from "@/utils/constants";
 import {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-  useEffect,
-  MouseEvent,
-  useCallback,
-} from "react";
-import {
+  Box,
   Button,
+  CircularProgress,
   IconButton,
   Menu,
   MenuItem,
   TextareaAutosize,
-  CircularProgress,
   Typography,
-  Box,
 } from "@mui/material";
+import MuiLink from "@mui/material/Link";
+import Avatar from "boring-avatars";
 import {
   ChevronDown,
   ChevronUp,
-  SendHorizontal,
   Heart,
   MoreVertical,
+  SendHorizontal,
 } from "lucide-react";
-import Avatar from "boring-avatars";
-import { useFocusContext } from "@/contexts/focus/useFocusText";
-import api from "@/api/baseApi";
 import {
-  likeComment,
+  forwardRef,
+  MouseEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import ReactTimeAgo from "react-time-ago";
+import {
   createComment,
   fetchComments,
+  likeComment,
   unlikeComment,
 } from "../api/comment.api";
-import { CommentUI, CreateCommentDto } from "@/types/comment";
-import { useUser } from "@/contexts/UserProvider";
-import { User } from "@/types";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import MuiLink from "@mui/material/Link";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { useContext } from "react";
 import { FreshRepliesCtx } from "./FreshReplies";
-import { isTemporaryCommentId } from "@/lib/utils";
-import { TargetType } from "@/utils/constants";
-import ReactTimeAgo from "react-time-ago";
 /* ------------------------------------------------------------------ */
 /* Constants & helpers                                                */
 /* ------------------------------------------------------------------ */
@@ -306,7 +306,7 @@ const CommentRow = ({
             to={`/${username}`}
             color="primary"
             underline="hover"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+            className="font-medium transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
           >
             @{username}
           </MuiLink>
@@ -327,7 +327,7 @@ const CommentRow = ({
             <img
               src={comment.user.profile_picture_url}
               alt={comment.user.username}
-              className="object-cover w-8 h-8 rounded-full ring-2 ring-transparent hover:ring-blue-500/30 transition-all duration-200 cursor-pointer"
+              className="object-cover w-8 h-8 transition-all duration-200 rounded-full cursor-pointer ring-2 ring-transparent hover:ring-blue-500/30"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/${comment.user.username}`);
@@ -335,7 +335,7 @@ const CommentRow = ({
             />
           ) : (
             <div
-              className="ring-2 ring-transparent hover:ring-blue-500/30 transition-all duration-200 cursor-pointer rounded-full"
+              className="transition-all duration-200 rounded-full cursor-pointer ring-2 ring-transparent hover:ring-blue-500/30"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/${comment.user.username}`);
@@ -352,7 +352,7 @@ const CommentRow = ({
           <div className="flex flex-col flex-grow">
             <div className="flex items-center gap-2 text-sm">
               <span
-                className="font-bold hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors duration-200"
+                className="font-bold transition-colors duration-200 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/${comment.user.username}`);
@@ -361,7 +361,7 @@ const CommentRow = ({
                 @{comment.user.username}
               </span>
               <span
-                className="text-neutral-500 dark:text-neutral-400 text-xs"
+                className="text-xs text-neutral-500 dark:text-neutral-400"
                 title={
                   new Date(comment.updated_at).getTime() !==
                   new Date(comment.created_at).getTime()
@@ -1570,7 +1570,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
         className={
           inputPosition === "bottom"
             ? // Fixed bottom: absolute positioning, ensure dark mode
-              "sticky bottom-0  inset-x-0 bottom-0 flex items-center gap-2 bg-white dark:bg-mountain-950 p-4 border-t border-mountain-200 dark:border-mountain-700"
+              "sticky bottom-0 inset-x-0 flex items-center gap-2 bg-white dark:bg-mountain-950 p-4 border-t border-mountain-200 dark:border-mountain-700"
             : // top version, but if hideWrapper remove border & rounding
               hideWrapper
               ? "flex items-center gap-2 bg-white dark:bg-mountain-950 mb-4 px-4 mt-3" // blog comments
@@ -1604,7 +1604,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                   : "Add a comment"
                 : "Login to add a comment"
             }
-            className="w-full p-3 border rounded-lg resize-none border-neutral-300 dark:border-neutral-600 bg-white dark:bg-mountain-900 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full p-3 bg-white border rounded-lg resize-none border-neutral-300 dark:border-neutral-600 dark:bg-mountain-900 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={isPosting || !user}

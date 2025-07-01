@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserProvider";
-import Loading from "@/pages/Loading";
+import Loading from "../loading/Loading";
 
 interface Props {
   children: React.ReactNode;

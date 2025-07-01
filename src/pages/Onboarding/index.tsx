@@ -151,13 +151,13 @@ const OnboardingProfile: React.FC = () => {
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Display Name */}
+          {/* Full Name */}
           <div className="space-y-1">
             <label
               className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
               htmlFor="full_name"
             >
-              Display Name <span className="text-rose-500">*</span>
+              Full Name <span className="text-rose-500">*</span>
             </label>
             <Input
               id="full_name"
@@ -166,7 +166,7 @@ const OnboardingProfile: React.FC = () => {
               className="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-neutral-400 dark:placeholder:text-neutral-500 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-800"
             />
             {errors.full_name && (
-              <p className="text-xs text-rose-500">Display name is required</p>
+              <p className="text-xs text-rose-500">Full Name is required</p>
             )}
           </div>
 

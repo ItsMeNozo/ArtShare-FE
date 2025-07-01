@@ -10,6 +10,11 @@ import { IoCopyOutline } from "react-icons/io5";
 import { LuImagePlus } from "react-icons/lu";
 import { getTrendingAiPosts } from "../../api/get-trending-ai";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getUserProfile,
+  UserProfile,
+} from "@/features/user-profile-public/api/user-profile.api";
 interface TrendingItem {
   image: string;
   prompt: string;
@@ -61,6 +66,20 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
   const scrollAccumulator = useRef(0);
 
   const [trending, setTrending] = useState<TrendingItem[]>([]);
+
+  const { data: profileData } = useQuery<UserProfile, Error>({
+    queryKey: ["userProfile"],
+    queryFn: () => getUserProfile(),
+  });
+
+  // formData is used for AvatarSection's immediate display and updates
+  const [formData, setFormData] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    if (profileData) {
+      setFormData(profileData);
+    }
+  }, [profileData]);
 
   // -----------------------------------------------------
   // Fetch trending AI posts
@@ -163,13 +182,18 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
           <div className="flex justify-between items-end p-4 border-mountain-100 border-b w-full h-28">
             <div className="flex items-center space-x-2">
               <Avatar className="size-12">
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>CN</AvatarFallback>
+                {formData?.profile_picture_url ? (
+                  <AvatarImage
+                    src={formData.profile_picture_url}
+                    alt={formData.username || "User"}
+                  />
+                ) : (
+                  <AvatarFallback>
+                    {formData?.username?.slice(0, 3).toUpperCase() || "US"}
+                  </AvatarFallback>
+                )}
               </Avatar>
-              <p className="font-medium">Nguyễn Minh Thông</p>
+              <p className="font-medium">{formData?.username}</p>
             </div>
           </div>
 
@@ -195,9 +219,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
               <div className="flex items-center space-x-2">
                 {/* Replace example_1 if you have distinct icons per model */}
                 <img src={example_1} className="rounded-xs w-5 h-5" />
-                <p className="text-mountain-600 line-clamp-1">
-                  {trending[selectedImageIndex]?.model_key}
-                </p>
+                <p className="text-mountain-600 line-clamp-1">GPT</p>
               </div>
             </div>
 
@@ -251,9 +273,9 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
       {/* Thumbnail column */}
       <div className="relative flex flex-col rounded-xl w-[10%] h-full overflow-hidden">
         {/* top blur */}
-        <div className="top-0 z-10 absolute flex bg-white/60 blur-sm w-full h-10" />
+
         <div
-          className="flex flex-col items-end space-y-2 pr-2 w-full h-[2000px]"
+          className="flex flex-col items-end space-y-2 pr-3 w-full h-[2000px] mt-10"
           style={{ transform: `translateY(${translateY}px)` }}
         >
           {trending.map((item, index) => (

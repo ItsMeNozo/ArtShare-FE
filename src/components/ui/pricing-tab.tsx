@@ -20,7 +20,7 @@ export function Tab({
     <button
       onClick={() => setSelected(text)}
       className={cn(
-        "relative w-fit px-4 py-2 text-sm font-semibold capitalize cursor-pointer",
+        "relative w-fit px-4 py-2 text-sm font-medium capitalize cursor-pointer",
         "text-foreground transition-colors",
         discount && "flex items-center justify-center gap-2.5"
       )}
@@ -36,8 +36,8 @@ export function Tab({
         <Badge
           variant="secondary"
           className={cn(
-            "relative z-10 whitespace-nowrap shadow-none",
-            selected && "bg-muted"
+            "relative z-10 bg-muted text-mountain-400 whitespace-nowrap shadow-none",
+            selected && "text-mountain-600"
           )}
         >
           Save 20%

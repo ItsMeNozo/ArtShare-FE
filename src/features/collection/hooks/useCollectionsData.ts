@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
 import { Collection, Post } from "@/types";
+import { useEffect, useMemo, useState } from "react";
 import { fetchCollectionsWithPosts } from "../api/collection.api";
 
 export interface UseCollectionsDataResult {

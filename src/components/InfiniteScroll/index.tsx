@@ -1,7 +1,7 @@
-import { ReactNode, useEffect } from "react";
-import { useInView } from "react-intersection-observer";
-import { Alert, Box, CircularProgress, Typography } from "@mui/material";
-import Loading from "@/components/loading/Loading";
+import Loading from '@/components/loading/Loading';
+import { Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { ReactNode, useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 export interface InfiniteScrollProps {
   data: unknown[];
@@ -11,7 +11,7 @@ export interface InfiniteScrollProps {
   error: Error | null;
   hasNextPage: boolean;
   fetchNextPage: () => void;
-  children: ReactNode; // This will be our "render prop"
+  children: ReactNode;
 }
 
 export const InfiniteScroll = ({
@@ -26,7 +26,7 @@ export const InfiniteScroll = ({
 }: InfiniteScrollProps) => {
   const { ref, inView } = useInView({
     threshold: 0, // Trigger as soon as 1px of the element is visible
-    rootMargin: "400px", // Start fetching 400px *before* the user reaches the end
+    rootMargin: '400px', // Start fetching 400px *before* the user reaches the end
     // Tell the hook to completely ignore intersection events while we are fetching.
     // This is the key to breaking the rapid-fire loop.
     skip: isFetchingNextPage,
@@ -45,7 +45,7 @@ export const InfiniteScroll = ({
 
   // Handle a critical error on the initial load
   if (isError && data.length === 0) {
-    console.error("Initial load error:", error);
+    console.error('Initial load error:', error);
     return (
       <Alert severity="error" sx={{ m: 2 }}>
         Failed to load data. Please try again later.
@@ -54,7 +54,7 @@ export const InfiniteScroll = ({
   }
 
   return (
-    <Box className="flex-1 overflow-y-auto sidebar">
+    <Box className="flex-1 overflow-y-auto">
       {children}
 
       {data.length === 0 && (
@@ -64,16 +64,16 @@ export const InfiniteScroll = ({
       )}
 
       {hasNextPage && (
-        <div ref={ref} style={{ height: "1px", width: "100%" }} />
+        <div ref={ref} style={{ height: '1px', width: '100%' }} />
       )}
 
       {/* Inline loading spinner for subsequent page fetches */}
       {isFetchingNextPage && (
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             my: 4,
             gap: 2,
           }}
@@ -84,7 +84,7 @@ export const InfiniteScroll = ({
       )}
 
       {!isLoading && !hasNextPage && data.length > 0 && (
-        <Box sx={{ my: 4, textAlign: "center" }}>
+        <Box className="my-2 text-center text-lg">
           <Typography variant="body2" color="text.secondary">
             You have reached the end.
           </Typography>

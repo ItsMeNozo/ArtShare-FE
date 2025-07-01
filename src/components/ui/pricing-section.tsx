@@ -16,7 +16,7 @@ export function PricingSection({ tiers, frequencies }: PricingSectionProps) {
     <section className="flex flex-col items-center space-y-4 w-full">
       <div className="text-center">
         <div
-          className="flex bg-muted mx-auto p-1 rounded-full w-fit">
+          className="flex bg-indigo-50 mx-auto p-1 rounded-full w-fit">
           {frequencies.map((freq) => (
             <Tab
               key={freq}
