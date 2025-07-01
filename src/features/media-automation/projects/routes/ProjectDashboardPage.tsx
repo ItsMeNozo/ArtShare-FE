@@ -42,24 +42,24 @@ const ProjectDashboardPage = () => {
         </div>
         <div className="flex flex-col space-y-1">
           <p className="text-muted-foreground text-sm">Status</p>
-          <div className="flex items-center space-x-4 bg-mountain-50 px-2 py-1 border-[1px] border-mountain-200 rounded-lg h-9 text-sm">
+          <div className="flex items-center space-x-4 bg-white px-2 py-1 border-[1px] border-mountain-200 rounded-lg h-9 text-sm">
             <div
               className={`w-2 h-2 rounded-full ${getStatusChipProps(projectDetails.status)}`}
             />
-            <span className="font-medium text-lg capitalize">
-              {projectDetails.status}
+            <span className="font-medium text-lg">
+              {projectDetails.status.charAt(0).toUpperCase() + projectDetails.status.slice(1).toLowerCase()}
             </span>
           </div>
         </div>
         <div className="flex items-center space-x-2 ml-auto">
           <Button
-            className="flex px-4 py-2 border-1 border-mountain-200 font-normal"
+            className="flex bg-white px-4 py-2 border-1 border-mountain-200 font-normal"
             onClick={() => navigate(`/auto/projects/${projectId}/edit`)}
           >
             <BiEdit className="mr-2 size-6" />
             <span>Edit Project</span>
           </Button>
-          <Button className="flex px-4 py-2 border-1 border-mountain-200 font-normal">
+          <Button className="flex bg-white px-4 py-2 border-1 border-mountain-200 font-normal">
             <PauseIcon className="mr-2 size-6" />
             <span>Pause</span>
           </Button>

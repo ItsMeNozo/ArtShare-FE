@@ -6,14 +6,8 @@ import { Button, CircularProgress, TextareaAutosize } from "@mui/material";
 import PromptResult from "./components/PromptResult";
 import SettingsPanel from "./components/SettingsPanel/SettingsPanel";
 import AIBot from "./components/AI/AIBot";
-import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import {
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 //Icons
-import { IoMdArrowDropdown } from "react-icons/io";
 import { BiInfoCircle } from "react-icons/bi";
 
 //Css files
@@ -24,7 +18,6 @@ import "slick-carousel/slick/slick-theme.css";
 import {
   aspectOptions,
   cameraOptions,
-  HistoryFilter,
   lightingOptions,
   ModelKey,
 } from "./enum";
@@ -44,6 +37,7 @@ import { buildTempPromptResult } from "./helper/image-gen.helper";
 import { useScrollBottom } from "@/hooks/useScrollBottom";
 import { usePromptHistory } from "@/hooks/usePromptHistory";
 import { useLocation } from "react-router-dom";
+import AIHeader from "@/features/gen-art/components/AIHeader";
 
 {
   /*
@@ -200,74 +194,31 @@ const ArtGenAI = () => {
     };
   }, [promptExpanded]);
 
-  // const handleDeleteSingleResult = (resultId: string, imageId: string) => {
-  //     setPromptResults((prev) => {
-  //         const updated = prev.map((result) =>
-  //             result.id === resultId
-  //                 ? {
-  //                     ...result,
-  //                     images: result.images.filter((img: { id: string; }) => img.id !== imageId),
-  //                 }
-  //                 : result
-  //         );
-  //         return updated.filter((result) => result.images.length > 0);
-  //     });
-  // };
-
   return (
-    <div className="flex p-4 pr-0 pb-0 w-full h-[calc(100vh-4rem)]">
-      <div className="relative flex flex-col space-y-4 w-full h-full overflow-y-hidden">
-        <SettingsPanel
-          isExpanded={expanded}
-          setIsExpanded={setExpanded}
-          numberOfImages={numberOfImages}
-          setNumberOfImages={setNumberOfImages}
-          aspectRatio={aspectRatio}
-          setAspectRatio={setAspectRatio}
-          lighting={lighting}
-          setLighting={setLighting}
-          camera={camera}
-          setCamera={setCamera}
-          style={style}
-          setStyle={setStyle}
-        />
-        <div className="flex justify-end pr-4 w-full h-fit">
-          <div className="flex items-center space-x-2 bg-white shadow-md p-2 rounded-xl w-48 h-13">
-            <div className="flex w-full h-full">
-              <div className="flex justify-start items-center bg-mountain-100 hover:bg-mountain-200/80 px-2 rounded-lg w-full h-full font-normal">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="justify-start outline-none w-full hover:cursor-pointer">
-                    <div className="flex items-center space-x-2">
-                      <p>
-                        Show{" "}
-                        <span className="font-medium">
-                          {historyFilter.label}
-                        </span>
-                      </p>
-                      <IoMdArrowDropdown />
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="flex flex-col mt-4 border-mountain-200 min-w-48 select-none">
-                    {Object.values(HistoryFilter).map((filter, index) => (
-                      <div
-                        key={index}
-                        onClick={() => setHistoryFilter(filter)}
-                        className={`${loading && "pointer-events-none"} flex p-1.5 hover:bg-mountain-100 hover:cursor-pointer ${
-                          historyFilter.value == filter.value
-                            ? "bg-indigo-50 font-medium text-mountain-800"
-                            : ""
-                        }`}
-                      >
-                        {filter.label}
-                      </div>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </div>
+    <div className="flex p-4 pr-0 w-full h-screen">
+      <SettingsPanel
+        isExpanded={expanded}
+        setIsExpanded={setExpanded}
+        numberOfImages={numberOfImages}
+        setNumberOfImages={setNumberOfImages}
+        aspectRatio={aspectRatio}
+        setAspectRatio={setAspectRatio}
+        lighting={lighting}
+        setLighting={setLighting}
+        camera={camera}
+        setCamera={setCamera}
+        style={style}
+        setStyle={setStyle}
+      />
+      <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col items-end pr-4 border-mountain-200 border-b-1">
+          <AIHeader
+            historyFilter={historyFilter}
+            setHistoryFilter={setHistoryFilter}
+            loading={loading}
+          />
         </div>
-        <div className="relative flex justify-end w-full h-full">
+        <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div
             className={`flex relative h-full custom-scrollbar flex-col ${expanded ? "w-[78%]" : "w-full delay-300"} items-start transition-all duration-200 ease-in-out`}
           >
@@ -280,14 +231,14 @@ const ArtGenAI = () => {
             ) : (
               <div
                 ref={scrollRef}
-                className="flex flex-col space-y-10 pr-4 w-full h-full overflow-y-auto custom-scrollbar"
+                className="flex flex-col space-y-10 p-4 w-full h-full overflow-y-auto custom-scrollbar"
               >
                 {displayedResults && displayedResults.length > 0 ? (
                   displayedResults.map((result) => (
                     <PromptResult key={result.id} result={result} />
                   ))
                 ) : (
-                  <div className="flex justify-center items-center h-full text-mountain-600">
+                  <div className="flex justify-center items-center w-full h-full text-mountain-600">
                     <BiInfoCircle className="mr-2 size-5" />
                     <p className="">
                       There is no prompt result. What's on your mind?
@@ -310,7 +261,7 @@ const ArtGenAI = () => {
             className={`flex flex-col bg-white border ${promptExpanded ? "border-indigo-600 shadow-lg" : "border-mountain-300 shadow-md"} rounded-xl w-[720px] relative`}
           >
             <div
-              className={`flex bg-white rounded-xl w-[719px] border-0 rounded-b-none overflow-hidden transition-all duration-400 ease-in-out transform
+              className={`flex bg-white rounded-xl w-[718px] border-0 rounded-b-none overflow-hidden transition-all duration-400 ease-in-out transform
                             ${promptExpanded ? "h-24 scale-y-100 opacity-100 py-2" : "h-0 opacity-0"} 
                             overflow-y-auto`}
             >
@@ -324,9 +275,8 @@ const ArtGenAI = () => {
             </div>
             <div
               onClick={() => handlePrompt()}
-              className={`${
-                promptExpanded && "rounded-t-none pointer-events-none"
-              } items-center text-sm flex bg-white px-2 py-4 rounded-xl w-[719px] h-15 line-clamp-1 hover:cursor-pointer overflow-y-auto`}
+              className={`${promptExpanded && "rounded-t-none pointer-events-none"
+                } items-center text-sm flex bg-white px-2 py-4 rounded-xl w-[718px] h-15 line-clamp-1 hover:cursor-pointer overflow-y-auto`}
             >
               {userPrompt ? (
                 <p

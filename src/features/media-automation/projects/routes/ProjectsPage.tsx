@@ -90,7 +90,7 @@ const ProjectsPage = () => {
       <div className="flex gap-x-12 w-full">
         <div
           onClick={navigateToCreateProject}
-          className="flex justify-center items-center space-x-2 bg-mountain-50 hover:bg-mountain-50/80 shadow-md p-4 rounded-3xl w-1/3 h-28 cursor-pointer"
+          className="flex justify-center items-center space-x-2 bg-white hover:bg-mountain-50/80 shadow-md p-4 rounded-3xl w-1/3 h-28 cursor-pointer"
         >
           <MdOutlineAddBox className="size-8" />
           <p className="font-medium text-lg">Create New Project</p>

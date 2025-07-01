@@ -19,37 +19,37 @@ import CameraOptions from "./CameraOptions";
 import StyleOptions from "./StyleOptions";
 
 const SettingsPanel: React.FC<PanelProps> = ({
-  isExpanded,
-  setIsExpanded,
-  numberOfImages,
-  setNumberOfImages,
-  aspectRatio,
-  setAspectRatio,
-  lighting,
-  setLighting,
-  camera,
-  setCamera,
-  style,
-  setStyle,
+    isExpanded,
+    setIsExpanded,
+    numberOfImages,
+    setNumberOfImages,
+    aspectRatio,
+    setAspectRatio,
+    lighting,
+    setLighting,
+    camera,
+    setCamera,
+    style,
+    setStyle,
 }) => {
-  const handleParentToggle = (
-    _event: React.SyntheticEvent,
-    isExpanded: boolean,
-  ) => {
-    setIsExpanded(isExpanded);
-  };
+    const handleParentToggle = (
+        _event: React.SyntheticEvent,
+        isExpanded: boolean,
+    ) => {
+        setIsExpanded(isExpanded);
+    };
 
-  const handleSelectNumber = (
-    _: React.MouseEvent<HTMLElement>,
-    newNumber: number,
-  ) => {
-    if (newNumber) {
-      setNumberOfImages(newNumber);
-    }
-  };
+    const handleSelectNumber = (
+        _: React.MouseEvent<HTMLElement>,
+        newNumber: number,
+    ) => {
+        if (newNumber) {
+            setNumberOfImages(newNumber);
+        }
+    };
 
     return (
-        <div className='absolute flex flex-col w-[300px]'>
+        <div className='absolute flex flex-col w-[300px] shrink-0'>
             <div
                 aria-controls="panel2-content"
                 id="panel2-header"
@@ -71,7 +71,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                         timeout: 200,
                     },
                 }}
-                className={`flex ${isExpanded ? '' : 'hidden'} flex-col m-0 z-10 bg-white shadow-md border border-mountain-300 rounded-xl rounded-t-none w-[300px] custom-scrollbar ${isExpanded ? 'max-h-[calc(100vh-9.5rem)]' : 'h-fit'
+                className={`flex ${isExpanded ? '' : 'hidden'} flex-col m-0 z-10 bg-white shadow-md border border-mountain-300 rounded-xl rounded-t-none w-[300px] custom-scrollbar ${isExpanded ? 'max-h-[calc(100vh)]' : 'h-fit'
                     } overflow-y-auto`}>
 
                 <AccordionDetails className="flex flex-col flex-1 p-0 min-h-0 overflow-y-auto">
@@ -86,7 +86,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                                 General Settings
                             </Typography>
                         </AccordionSummary>
-                        <AccordionDetails className='flex flex-col space-y-2 pb-0'>
+                        <AccordionDetails className='flex flex-col space-y-1 pb-0'>
                             <div className='flex flex-col space-y-1'>
                                 <p className='text-mountain-600 text-sm'>Style</p>
                                 <StyleOptions

@@ -42,18 +42,17 @@ function AutoPostsTableHeader(props: ItemTableProps) {
 export default AutoPostsTableHeader;
 
 const headCells: readonly HeadCellItemTable[] = [
-  // {
-  //   id: 'content',
-  //   numeric: false,
-  //   disablePadding: true,
-  //   label: 'Content',
-  //   width: 200,
-  // },
   {
     id: 'id',
     numeric: true,
     disablePadding: false,
     label: 'Id',
+  },
+  {
+    id: 'content',
+    numeric: false,
+    disablePadding: true,
+    label: 'Content',
   },
   {
     id: 'imageUrl',

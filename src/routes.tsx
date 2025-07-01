@@ -11,7 +11,6 @@ import UserSubscription from './features/user-profile-private/UserSubscription';
 
 const AuthenLayout = lazy(() => import('@/layouts/featLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/InAppLayout'));
-const AILayout = lazy(() => import('@/layouts/featLayouts/ImageToolsLayout'));
 const Dashboard = lazy(() => import('./features/app-dashboard/Dashboard'));
 const EditUser = lazy(() => import('./features/edit-user/EditUserPage'));
 const OnboardingProfile = lazy(() => import('./pages/Onboarding'));
@@ -212,22 +211,6 @@ const routeConfig: RouteObject[] = [
           },
         ],
       },
-      // In-App AI Private
-      {
-        element: (
-          <RequireOnboard>
-            <ProtectedInAppRoute>
-              <AILayout>
-                <Outlet />
-              </AILayout>
-            </ProtectedInAppRoute>
-          </RequireOnboard>
-        ),
-        children: [
-          { path: '/image/tool/editor', element: <ImageEditor /> },
-          { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
-        ],
-      },
       // No layout routes
       {
         element: (
@@ -237,7 +220,11 @@ const routeConfig: RouteObject[] = [
             </ProtectedInAppRoute>
           </RequireOnboard>
         ),
-        children: [{ path: '/docs/:blogId', element: <MyWriting /> }],
+        children: [
+          { path: '/docs/:blogId', element: <MyWriting /> },
+          { path: '/image/tool/editor', element: <ImageEditor /> },
+          { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
+        ],
       },
       // Catch-all -> redirect
       { path: '*', element: <NotFoundPage /> },

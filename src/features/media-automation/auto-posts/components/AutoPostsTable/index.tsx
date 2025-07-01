@@ -2,7 +2,6 @@ import Loading from '@/components/loading/Loading';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
 import { getStatusChipProps } from '@/features/media-automation/projects/utils';
 import { useNumericParam } from '@/hooks/useNumericParam';
-import { formatDate, formatDateTime } from '@/utils/date.util';
 import {
   Button,
   Checkbox,
@@ -21,6 +20,8 @@ import {
 } from '../../../projects/types/automation-project';
 import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import PostsTableHeader from './AutoPostsTableHeader';
+import { AiFillEdit } from 'react-icons/ai';
+import { IoTrashBin } from 'react-icons/io5';
 
 const AutoPostsTable = () => {
   const projectId = useNumericParam('projectId');
@@ -32,7 +33,6 @@ const AutoPostsTable = () => {
   const navigate = useNavigate();
 
   const { data: projectDetails } = useGetProjectDetails(projectId);
-
   const { data: fetchedPostsResponse, isLoading } = useGetAutoPosts({
     projectId: projectId,
     orderBy,
@@ -91,7 +91,7 @@ const AutoPostsTable = () => {
     navigate(`/auto/projects/${projectDetails!.id}/posts/${postId}/edit`);
   };
 
-  if (isLoading) {
+  if (isLoading || !projectDetails) {
     return <Loading />;
   }
 
@@ -100,7 +100,7 @@ const AutoPostsTable = () => {
       <div className="flex w-full">
         <p>Number Of Posts: {posts.length}</p>
       </div>
-      <div className="flex border border-mountain-200 rounded-3xl w-full h-full overflow-hidden">
+      <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-full overflow-hidden">
         <TableContainer className="flex-col justify-between h-[calc(100vh-14rem)] overflow-hidden">
           <Table
             sx={{ minWidth: 750 }}
@@ -128,6 +128,7 @@ const AutoPostsTable = () => {
                     key={row.id}
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
+                    onClick={() => handleRowClick(row.id)}
                     className="hover:bg-mountain-50 border-mountain-100 border-b-2 last:border-b-0 h-12"
                   >
                     <TableCell padding="checkbox">
@@ -141,13 +142,15 @@ const AutoPostsTable = () => {
                       component="th"
                       id={labelId}
                       scope="row"
-                      padding="none"
-                      className=""
+                      align='right'
                     >
-                      {row.content}
+                      {row.id}
+                    </TableCell>
+                    <TableCell align='left' padding='none'>
+                      <p className='w-96 line-clamp-1'>{row.content}</p>
                     </TableCell>
                     <TableCell align="right">
-                      {row.imageUrl?.length || 0}
+                      {row.image_urls?.length || 0}
                     </TableCell>
                     <TableCell align="right">
                       <span className="flex justify-end items-center gap-2 text-sm">
@@ -158,22 +161,22 @@ const AutoPostsTable = () => {
                       </span>
                     </TableCell>
                     <TableCell align="right">
-                      {row.scheduledTime
-                        ? row.scheduledTime.toLocaleDateString()
+                      {row.scheduled_at
+                        ? new Date(row.scheduled_at).toLocaleDateString()
                         : 'N/A'}
                     </TableCell>
                     <TableCell align="right">
-                      {row.createdAt.toLocaleDateString()}
+                      {new Date(row.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell align="right" className="space-x-2">
                       <Tooltip title="Edit">
-                        <Button className="bg-indigo-50 p-0 border-1 border-mountain-200 font-normal">
-                          Edit
+                        <Button className="bg-indigo-50 py-2 border-1 border-mountain-200 font-normal">
+                          <AiFillEdit className="size-5 text-indigo-600" />
                         </Button>
                       </Tooltip>
                       <Tooltip title="Delete">
-                        <Button className="bg-red-50 p-0 border-1 border-mountain-200 font-normal">
-                          Delete
+                        <Button className="bg-red-50 py-2 border-1 border-mountain-200 font-normal">
+                          <IoTrashBin className="size-5 text-red-600" />
                         </Button>
                       </Tooltip>
                     </TableCell>
@@ -183,10 +186,10 @@ const AutoPostsTable = () => {
               {posts.length < 7 && (
                 <TableRow
                   sx={{ cursor: 'pointer' }}
-                  className="hover:bg-mountain-50 border-mountain-100 border-b-2 last:border-b-0 h-12"
-                  onClick={() => console.log('Add post clicked')} // Replace with your add logic
+                  className="hover:bg-mountain-50 border-mountain-100 border-b-2 last:border-b-0 w-full h-12"
+                  onClick={() => console.log('Add post clicked')}
                 >
-                  <TableCell colSpan={7} align="center">
+                  <TableCell colSpan={8} align="center">
                     <Button
                       onClick={() => handleAddPostClick()}
                       variant="outlined"

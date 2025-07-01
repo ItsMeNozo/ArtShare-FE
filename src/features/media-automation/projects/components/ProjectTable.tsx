@@ -289,7 +289,7 @@ export default function ProjectTable({
   };
 
   return (
-    <div className="flex border border-mountain-200 rounded-3xl w-full h-[calc(100vh-14rem)]">
+    <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-[calc(100vh-14rem)]">
       <div className="flex flex-col justify-between w-full">
         <div className="flex flex-col flex-grow overflow-hidden">
           <EnhancedTableToolbar

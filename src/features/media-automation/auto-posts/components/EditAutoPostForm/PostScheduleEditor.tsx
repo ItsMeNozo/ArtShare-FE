@@ -51,7 +51,7 @@ export default function PostScheduleEditor({
   };
 
   return (
-    <Box className="h-full max-w-xl">
+    <Box className="pb-20 max-w-xl h-full">
       <Box
         p={2}
         sx={{
@@ -61,6 +61,7 @@ export default function PostScheduleEditor({
           maxWidth: '576px',
           border: isInvalid ? '1px solid #d32f2f' : '1px solid',
         }}
+        className="border-mountain-200"
       >
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Stack direction="row" spacing={2} alignItems="center">
