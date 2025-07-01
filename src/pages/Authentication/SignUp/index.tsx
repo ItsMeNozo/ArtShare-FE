@@ -85,6 +85,10 @@ const SignUp = () => {
             errorMessage = err.message;
         }
       }
+      if (err instanceof Error) {
+        console.log('name', err.name);
+        errorMessage = err.message;
+      }
       setError(errorMessage);
     }
   };
@@ -227,7 +231,7 @@ const SignUp = () => {
             className={`dark:bg-mountain-900 shadow-sm mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 w-full h-10 text-mountain-950 dark:text-mountain-50 ${
               passwordError
                 ? "border-red-500 focus:ring-red-500"
-                : password && !passwordError
+                : password && (!passwordError || passwordError != "")
                   ? "border-green-500 focus:ring-green-500"
                   : "border-mountain-800 focus:ring-blue-500"
             }`}
