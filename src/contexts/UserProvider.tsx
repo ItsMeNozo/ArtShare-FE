@@ -59,8 +59,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     console.log('🔐 UserProvider: Setting up auth listener');
+
+    // Add a safety timeout to prevent infinite loading
+    const loadingTimeoutId = setTimeout(() => {
+      console.log(
+        '🔐 UserProvider: Loading timeout reached, forcing loading to false',
+      );
+      setLoading(false);
+    }, 10000); // 10 second timeout
+
     const unsubscribe = auth.onIdTokenChanged(
       async (firebaseUser) => {
+        // Clear the loading timeout since we're processing auth state
+        clearTimeout(loadingTimeoutId);
+
         if (firebaseUser) {
           console.log(
             '🔐 UserProvider: Firebase user detected, fetching backend token',
@@ -359,6 +371,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 } catch (retryErr) {
                   console.error('🔐 UserProvider: Retry failed:', retryErr);
                   setError('Failed to retrieve user profile after retry.');
+                } finally {
+                  // Always ensure loading is set to false after retry attempt
+                  setLoading(false);
                 }
               }, AUTH_RETRY_DELAY_MS);
             } else {
@@ -417,15 +432,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                   delete api.defaults.headers.common['Authorization'];
                   localStorage.removeItem('accessToken');
                 }
+                // Ensure loading is set to false after the delayed check
+                setLoading(false);
               }, AUTH_STATE_INITIALIZATION_DELAY_MS);
 
               authStateInitializedRef.current = true;
               console.log(
                 '🔐 UserProvider: Auth state marked as initialized (no token case)',
               );
-              setTimeout(() => {
-                setLoading(false);
-              }, LOADING_DELAY_MS);
               return; // Don't clear immediately, wait for the delayed check
             }
 
@@ -448,6 +462,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }, LOADING_DELAY_MS);
       },
       (err) => {
+        // Clear the loading timeout on error
+        clearTimeout(loadingTimeoutId);
         console.error('🔐 UserProvider: Auth listener error:', err);
         setError(err.message);
         setLoading(false);
@@ -457,7 +473,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     // Removed redundant clearStaleAuthState call - the auth listener handles cleanup
     // clearStaleAuthState();
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(loadingTimeoutId);
+      unsubscribe();
+    };
   }, []);
 
   const signUpWithEmail = async (
