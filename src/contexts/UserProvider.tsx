@@ -46,16 +46,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const BACKEND_TOKEN_PROCESSING_DELAY_MS = 100;
 const AUTH_RETRY_DELAY_MS = 1000;
 const LOADING_DELAY_MS = 300;
-
-// Helper function to clear stale authentication state
-const clearStaleAuthState = () => {
-  const token = localStorage.getItem('accessToken');
-  if (token && !auth.currentUser) {
-    console.log('🔐 Clearing stale authentication state');
-    localStorage.removeItem('accessToken');
-    delete api.defaults.headers.common['Authorization'];
-  }
-};
+const AUTH_STATE_INITIALIZATION_DELAY_MS = 1500; // Time to wait for Firebase auth state to initialize
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -63,11 +54,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const signupInProgressRef = useRef<boolean>(false);
   const externalLoginInProgressRef = useRef<boolean>(false);
-
-  // Clear any stale authentication state on initialization
-  useEffect(() => {
-    clearStaleAuthState();
-  }, []);
+  const authStateInitializedRef = useRef<boolean>(false); // Track if auth state has been properly initialized
+  const authenticatedInSessionRef = useRef<boolean>(false); // Track if user is already authenticated in this session
 
   useEffect(() => {
     console.log('🔐 UserProvider: Setting up auth listener');
@@ -109,6 +97,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
               try {
                 const data = await getUserProfile();
                 setUser(data);
+                authenticatedInSessionRef.current = true; // Mark as authenticated in this session
                 console.log(
                   '🔐 UserProvider: User profile set successfully from external login token:',
                   data.username,
@@ -160,6 +149,34 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             existingToken ? 'Found' : 'Not found',
           );
 
+          // Check if user is already authenticated in this session and has valid token
+          if (authenticatedInSessionRef.current && existingToken) {
+            console.log(
+              '🔐 UserProvider: User already authenticated in this session with valid token, skipping token refresh',
+            );
+            console.log(
+              '🔐 UserProvider: Session token (first 20 chars):',
+              existingToken.substring(0, 20) + '...',
+            );
+            // Still validate the token periodically, but don't fetch a new one
+            try {
+              api.defaults.headers.common['Authorization'] =
+                `Bearer ${existingToken}`;
+              const data = await getUserProfile();
+              setUser(data);
+              console.log(
+                '🔐 UserProvider: Session token still valid, user profile loaded',
+              );
+              return; // Exit early
+            } catch (err) {
+              console.log(
+                '🔐 UserProvider: Session token expired, will refresh:',
+                err,
+              );
+              authenticatedInSessionRef.current = false; // Reset flag
+            }
+          }
+
           if (existingToken) {
             console.log(
               '🔐 UserProvider: Access token already exists, validating and fetching user profile',
@@ -191,16 +208,49 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 '🔐 UserProvider: User profile set successfully from existing token:',
                 data.username,
               );
+              authenticatedInSessionRef.current = true; // Mark as authenticated in this session
+              console.log(
+                '🔐 UserProvider: Existing token is valid, stopping here',
+              );
               return; // Exit early since token already exists and is valid
             } catch (err) {
               console.error('🔐 UserProvider: Error with existing token:', err);
-              console.log(
-                '🔐 UserProvider: Will clear invalid token and get new one',
-              );
-              // Clear the invalid token and authorization header
-              localStorage.removeItem('accessToken');
-              delete api.defaults.headers.common['Authorization'];
-              // Continue to get new token if existing one failed
+
+              // Only clear token if it's actually a 401/403 (authentication/authorization error)
+              // Don't clear for network errors, 500 errors, etc.
+              const isAuthError =
+                (err instanceof Error &&
+                  (err.message.includes('401') ||
+                    err.message.includes('403') ||
+                    err.message.includes('not authenticated') ||
+                    err.message.includes('unauthorized'))) ||
+                (err &&
+                  typeof err === 'object' &&
+                  'response' in err &&
+                  err.response &&
+                  typeof err.response === 'object' &&
+                  'status' in err.response &&
+                  (err.response.status === 401 || err.response.status === 403));
+
+              if (isAuthError) {
+                console.log(
+                  '🔐 UserProvider: Token is actually invalid, clearing it',
+                );
+                localStorage.removeItem('accessToken');
+                delete api.defaults.headers.common['Authorization'];
+                // Continue to get new token since this one is definitely invalid
+              } else {
+                console.log(
+                  '🔐 UserProvider: Temporary error with existing token, keeping it for now',
+                );
+                // For temporary errors (network issues, 500 errors), don't fetch a new token
+                // Just set the user to null and keep the existing token for future retries
+                setUser(null);
+                console.log(
+                  '🔐 UserProvider: Keeping existing token due to temporary error, stopping here',
+                );
+                return; // Don't continue to fetch new token for temporary errors
+              }
             }
           } else {
             console.log(
@@ -283,6 +333,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             console.log('🔐 UserProvider: Fetching user profile');
             const data = await getUserProfile();
             setUser(data);
+            authenticatedInSessionRef.current = true; // Mark as authenticated in this session
             console.log(
               '🔐 UserProvider: User profile set successfully:',
               data.username,
@@ -315,8 +366,79 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             }
           }
         } else {
-          console.log('🔐 UserProvider: No Firebase user, clearing state');
+          console.log('🔐 UserProvider: No Firebase user detected');
+
+          // Don't immediately clear tokens on the first null event after page reload
+          // Firebase takes time to restore auth state, so wait a bit before clearing
+          if (!authStateInitializedRef.current) {
+            console.log(
+              '🔐 UserProvider: Auth state not initialized yet, checking for existing token',
+            );
+            const existingToken = localStorage.getItem('accessToken');
+
+            if (existingToken) {
+              console.log(
+                '🔐 UserProvider: Found existing token, attempting to validate before clearing',
+              );
+              try {
+                // Try to validate the existing token before clearing it
+                api.defaults.headers.common['Authorization'] =
+                  `Bearer ${existingToken}`;
+                const data = await getUserProfile();
+                setUser(data);
+                console.log(
+                  '🔐 UserProvider: Existing token is still valid, keeping user logged in',
+                );
+                authStateInitializedRef.current = true;
+                setTimeout(() => {
+                  setLoading(false);
+                }, LOADING_DELAY_MS);
+                return; // Don't clear the token if it's still valid
+              } catch (err) {
+                console.log(
+                  '🔐 UserProvider: Existing token validation failed, will clear it:',
+                  err,
+                );
+                // Token is invalid, proceed to clear it
+              }
+            } else {
+              // No existing token, but give Firebase more time to restore auth state
+              console.log(
+                '🔐 UserProvider: No existing token, waiting for Firebase auth state to initialize',
+              );
+              setTimeout(() => {
+                // Check again after waiting for Firebase auth state
+                if (!auth.currentUser && !localStorage.getItem('accessToken')) {
+                  console.log(
+                    '🔐 UserProvider: Firebase auth state still null after delay, confirming logout',
+                  );
+                  setUser(null);
+                  authenticatedInSessionRef.current = false;
+                  delete api.defaults.headers.common['Authorization'];
+                  localStorage.removeItem('accessToken');
+                }
+              }, AUTH_STATE_INITIALIZATION_DELAY_MS);
+
+              authStateInitializedRef.current = true;
+              console.log(
+                '🔐 UserProvider: Auth state marked as initialized (no token case)',
+              );
+              setTimeout(() => {
+                setLoading(false);
+              }, LOADING_DELAY_MS);
+              return; // Don't clear immediately, wait for the delayed check
+            }
+
+            // Mark auth state as initialized after the first check
+            authStateInitializedRef.current = true;
+            console.log(
+              '🔐 UserProvider: Auth state marked as initialized (token validation case)',
+            );
+          }
+
+          console.log('🔐 UserProvider: Clearing user state and tokens');
           setUser(null);
+          authenticatedInSessionRef.current = false; // Reset authentication flag
           // Clear authorization header when user logs out
           delete api.defaults.headers.common['Authorization'];
           localStorage.removeItem('accessToken');
@@ -332,8 +454,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       },
     );
 
-    // Clear stale auth state on initialization
-    clearStaleAuthState();
+    // Removed redundant clearStaleAuthState call - the auth listener handles cleanup
+    // clearStaleAuthState();
 
     return () => unsubscribe();
   }, []);
@@ -545,6 +667,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       await signOut(auth);
       setUser(null);
       setError(null);
+      authenticatedInSessionRef.current = false; // Reset authentication flag
       // Clear authorization header and token
       delete api.defaults.headers.common['Authorization'];
       localStorage.removeItem('accessToken');
