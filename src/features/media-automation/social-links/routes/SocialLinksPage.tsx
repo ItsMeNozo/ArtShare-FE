@@ -17,14 +17,14 @@ import fb_icon from '/fb_icon.svg';
 import ins_icon from '/ins_icon.svg';
 
 const SocialLinksPage = () => {
-  const [selectedPlatform, setSelectedPlatform] = useState<string>('Facebook');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('FACEBOOK');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogUserGuideOpen, setDialogUserGuideOpen] =
     useState<boolean>(false);
   const queryClient = useQueryClient();
 
   const { data: platforms, isLoading: isLoadingPlatforms } =
-    useFetchPlatforms();
+    useFetchPlatforms(selectedPlatform);
   const { data: fbAccountInfo, isLoading: isLoadingFbAccountInfo } =
     useFacebookAccountInfo();
   const { mutate: disconnect } = useDisconnectPlatform();
@@ -131,10 +131,10 @@ const SocialLinksPage = () => {
               <img src={fb_icon} className="size-10" />
               <div className="flex flex-col">
                 <p className="text-sm font-semibold">
-                  {selectedPlatform} Account
+                  {toTitleCase(selectedPlatform)} Account
                 </p>
                 <span className="text-xs text-gray-500">
-                  Manage your {selectedPlatform} accounts
+                  Manage your {toTitleCase(selectedPlatform)} accounts
                 </span>
               </div>
             </div>
