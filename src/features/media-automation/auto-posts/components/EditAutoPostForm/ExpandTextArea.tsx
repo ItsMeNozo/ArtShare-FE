@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import parse from 'html-react-parser';
-import { Typography, Button } from '@mui/material';
+import { Typography } from '@mui/material';
 
 interface PostContentProps {
   content: string;
