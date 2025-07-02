@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 // Context/hooks
-import { useUser } from '@/contexts/UserProvider';
+import { useUser } from '@/contexts/user';
 
 // Icons
 import { useTheme } from '@/hooks/useTheme';

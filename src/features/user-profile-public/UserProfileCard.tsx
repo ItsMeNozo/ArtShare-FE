@@ -1,7 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MoreHorizontal } from "lucide-react";
-import ProfileHeader from "./components/ProfileHeader";
-import ProfileInfo from "./components/ProfileInfo";
+import { useUser } from '@/contexts/user';
+import { useSnackbar } from '@/hooks/useSnackbar';
 import {
   Box,
   Button,
@@ -10,16 +8,18 @@ import {
   MenuItem,
   Tooltip,
   Typography,
-} from "@mui/material";
-import { getUserProfileByUsername, UserProfile } from "./api/user-profile.api";
-import { useUser } from "@/contexts/UserProvider";
-import { followUser, unfollowUser } from "./api/follow.api";
-import { useNavigate, useParams } from "react-router-dom";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { AxiosError } from "axios";
-import { MouseEvent, useEffect, useState, useMemo } from "react";
-import { useReportUser } from "./hooks/useReportUser";
-import ReportDialog from "./components/ReportDialog";
+} from '@mui/material';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { MoreHorizontal } from 'lucide-react';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { followUser, unfollowUser } from './api/follow.api';
+import { getUserProfileByUsername, UserProfile } from './api/user-profile.api';
+import ProfileHeader from './components/ProfileHeader';
+import ProfileInfo from './components/ProfileInfo';
+import ReportDialog from './components/ReportDialog';
+import { useReportUser } from './hooks/useReportUser';
 
 export const UserProfileCard = () => {
   const { username } = useParams();
@@ -29,11 +29,11 @@ export const UserProfileCard = () => {
   const [isHoveringFollowBtn, setIsHoveringFollowBtn] = useState(false);
   const [unfollowInFlight, setUnfollowInFlight] = useState(false);
 
-  console.log("🎭 UserProfileCard rendered with username:", username);
+  console.log('🎭 UserProfileCard rendered with username:', username);
 
   // Memoize the query function to prevent unnecessary re-renders
   const queryFn = useMemo(() => {
-    console.log("🏗️ Creating query function for username:", username);
+    console.log('🏗️ Creating query function for username:', username);
     return () => getUserProfileByUsername(username);
   }, [username]);
 
@@ -43,15 +43,15 @@ export const UserProfileCard = () => {
     isError,
     error,
   } = useQuery<UserProfile, Error>({
-    queryKey: ["userProfile", username],
+    queryKey: ['userProfile', username],
     queryFn,
-    enabled: !!username && username.trim() !== "", // Ensure username is not empty
+    enabled: !!username && username.trim() !== '', // Ensure username is not empty
     staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
     retry: (failureCount, error) => {
       // Don't retry on 404 (user not found)
-      if (error && "status" in error && error.status === 404) {
+      if (error && 'status' in error && error.status === 404) {
         return false;
       }
       // Retry up to 2 times for other errors
@@ -69,16 +69,16 @@ export const UserProfileCard = () => {
   const followMutation = useMutation({
     mutationFn: () => {
       if (!profileData?.id) {
-        return Promise.reject(new Error("User ID is undefined"));
+        return Promise.reject(new Error('User ID is undefined'));
       }
       return followUser(profileData.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userProfile", username] });
-      showSnackbar("Followed successfully.", "success");
+      queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
+      showSnackbar('Followed successfully.', 'success');
     },
     onError: (error: unknown) => {
-      let msg = "Failed to follow user.";
+      let msg = 'Failed to follow user.';
 
       if (error instanceof AxiosError && error.response?.data?.message) {
         msg = error.response.data.message;
@@ -86,23 +86,23 @@ export const UserProfileCard = () => {
         msg = error.message;
       }
 
-      showSnackbar(msg, "error");
+      showSnackbar(msg, 'error');
     },
   });
 
   const unfollowMutation = useMutation({
     mutationFn: () => {
       if (!profileData?.id) {
-        return Promise.reject(new Error("User ID is undefined"));
+        return Promise.reject(new Error('User ID is undefined'));
       }
       return unfollowUser(profileData.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userProfile", username] });
-      showSnackbar("Unfollow successfully.", "success");
+      queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
+      showSnackbar('Unfollow successfully.', 'success');
     },
     onError: (error: unknown) => {
-      let msg = "Failed to unfollow user.";
+      let msg = 'Failed to unfollow user.';
 
       if (error instanceof AxiosError && error.response?.data?.message) {
         msg = error.response.data.message;
@@ -110,7 +110,7 @@ export const UserProfileCard = () => {
         msg = error.message;
       }
 
-      showSnackbar(msg, "error");
+      showSnackbar(msg, 'error');
     },
   });
 
@@ -133,17 +133,22 @@ export const UserProfileCard = () => {
 
   const handleReport = (reason: string) => {
     reportUser(
-      { targetId: 1, userId: profileData?.id, reason, targetTitle: profileData?.username || "" },
+      {
+        targetId: 1,
+        userId: profileData?.id,
+        reason,
+        targetTitle: profileData?.username || '',
+      },
       {
         onSuccess: () => {
           setDialogOpen(false);
           showSnackbar(
-            "Your report will be reviewed soon! Thanks for your report",
-            "success",
+            'Your report will be reviewed soon! Thanks for your report',
+            'success',
           );
         },
         onError: (err) => {
-          showSnackbar(err.message, "error");
+          showSnackbar(err.message, 'error');
         },
       },
     );
@@ -151,7 +156,7 @@ export const UserProfileCard = () => {
 
   const handleEdit = () => {
     handleMenuClose();
-    navigate("/edit-user");
+    navigate('/edit-user');
   };
 
   // Conditional rendering based on loading, error, or data state
@@ -169,7 +174,7 @@ export const UserProfileCard = () => {
     // For example, if (error instanceof AxiosError && error.response?.status === 404)
     return (
       <Typography variant="body1" color="textPrimary">
-        Error loading profile: {error?.message || "An unknown error occurred"}
+        Error loading profile: {error?.message || 'An unknown error occurred'}
       </Typography>
     );
   }
@@ -218,24 +223,24 @@ export const UserProfileCard = () => {
         <div className="flex">
           {profileData.profile_picture_url ? (
             <ProfileHeader
-              name={profileData?.full_name ?? ""}
-              username={profileData.username || ""}
+              name={profileData?.full_name ?? ''}
+              username={profileData.username || ''}
               avatarUrl={profileData.profile_picture_url}
               isFollowing={false}
             />
           ) : (
             <Box display="flex" alignItems="center" gap={2}>
               <ProfileHeader
-                name={profileData?.full_name ?? ""}
-                username={profileData?.username ?? ""}
+                name={profileData?.full_name ?? ''}
+                username={profileData?.username ?? ''}
                 isFollowing={false}
               />
             </Box>
           )}
           <ProfileInfo
-            name={profileData?.full_name ?? ""}
-            username={profileData.username ?? ""}
-            bio={profileData.bio || ""}
+            name={profileData?.full_name ?? ''}
+            username={profileData.username ?? ''}
+            bio={profileData.bio || ''}
             followings_count={profileData.followings_count}
             followers_count={profileData.followers_count}
             userId={profileData.id}
@@ -251,21 +256,21 @@ export const UserProfileCard = () => {
                   /* Show red + filled whenever (a) hovering OR (b) waiting for unfollow */
                   variant={
                     isHoveringFollowBtn || unfollowInFlight
-                      ? "contained"
-                      : "outlined"
+                      ? 'contained'
+                      : 'outlined'
                   }
                   color={
                     isHoveringFollowBtn || unfollowInFlight
-                      ? "error"
-                      : "primary"
+                      ? 'error'
+                      : 'primary'
                   }
-                  sx={{ borderRadius: "9999px", textTransform: "none" }}
+                  sx={{ borderRadius: '9999px', textTransform: 'none' }}
                   onMouseEnter={() => setIsHoveringFollowBtn(true)}
                   onMouseLeave={() => setIsHoveringFollowBtn(false)}
                 >
                   {unfollowInFlight || isHoveringFollowBtn
-                    ? "Unfollow"
-                    : "Following"}
+                    ? 'Unfollow'
+                    : 'Following'}
                 </Button>
               ) : (
                 <Button
@@ -273,7 +278,7 @@ export const UserProfileCard = () => {
                   disabled={isProcessing}
                   variant="contained"
                   color="primary"
-                  sx={{ borderRadius: "9999px", textTransform: "none" }}
+                  sx={{ borderRadius: '9999px', textTransform: 'none' }}
                 >
                   Follow
                 </Button>
@@ -283,7 +288,7 @@ export const UserProfileCard = () => {
                 aria-label="More options"
                 color="primary"
                 size="medium"
-                sx={{ borderRadius: "50%", bgcolor: "transparent" }}
+                sx={{ borderRadius: '50%', bgcolor: 'transparent' }}
                 onClick={handleMenuOpen}
               >
                 <MoreHorizontal />
@@ -294,8 +299,8 @@ export const UserProfileCard = () => {
               anchorEl={anchorEl}
               open={menuOpen}
               onClose={handleMenuClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               className="m-2"
             >
               {isOwnProfile && (
