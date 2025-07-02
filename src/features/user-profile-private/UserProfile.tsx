@@ -1,17 +1,12 @@
 // import { useParams } from "react-router-dom";
 // import { useUser } from "@/contexts/UserProvider";
 import UserPosts from "@/features/user-profile-private/components/UserPosts";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import { UserProfileCard } from "../user-profile-public/UserProfileCard";
 import UserBlogs from "./components/UserBlogs";
 
 const UserProfile = () => {
-  // TODO: implement is owner for user profile
-
-  // const { username } = useParams();
-  // const { user } = useUser();
-  // const isOwner = user?.username === username;
   const [selectedTab, setSelectedTab] = useState(0);
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
