@@ -58,3 +58,21 @@ export const getProjects = async (
   const response = await api.get(`/auto-project${queryParams}`);
   return response.data;
 };
+
+export const pauseProject = async (
+  projectId: number,
+): Promise<AutoProjectDetailsDto> => {
+  const response = await api.patch<AutoProjectDetailsDto>(
+    `/auto-project/${projectId}/pause`,
+  );
+  return response.data;
+};
+
+export const resumeProject = async (
+  projectId: number,
+): Promise<AutoProjectDetailsDto> => {
+  const response = await api.patch<AutoProjectDetailsDto>(
+    `/auto-project/${projectId}/resume`,
+  );
+  return response.data;
+};
