@@ -6,10 +6,9 @@ import { MdAdd, MdClose } from 'react-icons/md';
 import { RiImageCircleAiLine } from 'react-icons/ri';
 import { TbDeviceDesktop } from 'react-icons/tb';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import TabValue from '../enum/media-tab-value';
-import MediaUploadTab from './media-upload-tab';
+import TabValue from '../../enum/media-tab-value';
+import MediaUploadTab from './MediaUploadTab';
 
-//Components
 import {
   Dialog,
   DialogContent,
@@ -25,13 +24,13 @@ import {
   MAX_VIDEO,
   validateVideoDuration,
   VIDEO_THUMBNAIL_DEFAULT_URL,
-} from '../helpers/media-upload.helper';
-import { useCheckMaturity } from '../hooks/useIsMature';
-import { PostMedia } from '../types/post-media';
+} from '../../helpers/media-upload.helper';
+import { useCheckMaturity } from '../../hooks/useIsMature';
+import { PostMedia } from '../../types/post-media';
 import InfoMediaRemaining from './InfoMediaRemaining';
-import MediaPreview from './media-preview';
-import PostAiImages from './post-ai-images';
-import UploadFromDevice from './UploadFromDevice';
+import MediaPreviewer from './MediaPreviewer';
+import SelectAiImagesPanel from './SelectAiImagesPanel';
+import SelectDeviceMediaPanel from './UploadFromDevice';
 
 interface MediaSelectorPanelProps {
   postMedias: PostMedia[];
@@ -43,7 +42,7 @@ interface MediaSelectorPanelProps {
   handleIsMatureAutoDetected: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function MediaSelectorPanel({
+export default function PostMediaManager({
   postMedias,
   setPostMedias,
   onThumbnailAddedOrRemoved,
@@ -317,14 +316,16 @@ export default function MediaSelectorPanel({
                 className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
               >
                 {selectedPreviewMedia ? (
-                  <MediaPreview media={selectedPreviewMedia} />
+                  <MediaPreviewer media={selectedPreviewMedia} />
                 ) : tabValue === TabValue.UPLOAD_MEDIA ? (
-                  <UploadFromDevice
+                  <SelectDeviceMediaPanel
                     onAddImages={handleImagesAdded}
                     onAddVideo={handleVideoAdded}
                   />
                 ) : (
-                  <PostAiImages handleImageFilesChange={handleImagesAdded} />
+                  <SelectAiImagesPanel
+                    handleImageFilesChange={handleImagesAdded}
+                  />
                 )}
               </Box>
               {/* Carousel */}
