@@ -19,7 +19,6 @@ const SignUp = () => {
   } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +74,7 @@ const SignUp = () => {
     }
 
     try {
-      const token = await signUpWithEmail(email, password, username); // Get the token
+      const token = await signUpWithEmail(email, password); // Get the token
       localStorage.setItem('user_verify', token);
       navigate(`/activate-account/${token}`); // Redirect to the activate-account page with the token
     } catch (err) {
@@ -268,10 +267,10 @@ const SignUp = () => {
             placeholder="Enter your password"
             className={`dark:bg-mountain-900 text-mountain-950 dark:text-mountain-50 mt-1 h-10 w-full rounded-lg border p-3 shadow-sm focus:ring-2 focus:outline-none ${
               passwordError
-                ? "border-red-500 focus:ring-red-500"
-                : password && (!passwordError || passwordError != "")
-                  ? "border-green-500 focus:ring-green-500"
-                  : "border-mountain-800 focus:ring-blue-500"
+                ? 'border-red-500 focus:ring-red-500'
+                : password && (!passwordError || passwordError != '')
+                  ? 'border-green-500 focus:ring-green-500'
+                  : 'border-mountain-800 focus:ring-blue-500'
             }`}
             value={password}
             onChange={handlePasswordChange}

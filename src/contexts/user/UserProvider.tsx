@@ -83,8 +83,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Auth methods using the extracted functions
-  const signUpWithEmail = (email: string, password: string, username: string) =>
-    signUpWithEmailAuth(email, password, username, setError);
+  const signUpWithEmail = (email: string, password: string) =>
+    signUpWithEmailAuth(email, password, setError);
 
   const loginWithEmail = (email: string, password: string) =>
     loginWithEmailAuth(email, password, setError);

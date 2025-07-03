@@ -9,7 +9,6 @@ import {
 export const signUpWithEmail = async (
   email: string,
   password: string,
-  username: string,
   setError: (error: string) => void,
 ): Promise<string> => {
   try {
@@ -19,7 +18,7 @@ export const signUpWithEmail = async (
       password,
     );
     const user = userCredential.user;
-    await signup(user.uid, email, '', username);
+    await signup(user.uid, email, '', '');
     const token = await user.getIdToken();
     return token;
   } catch (error) {

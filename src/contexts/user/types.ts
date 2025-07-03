@@ -6,11 +6,7 @@ export interface UserContextType {
   isOnboard: boolean;
   error: string | null;
   loading: boolean | null;
-  signUpWithEmail: (
-    email: string,
-    password: string,
-    username: string,
-  ) => Promise<string>;
+  signUpWithEmail: (email: string, password: string) => Promise<string>;
   loginWithEmail: (email: string, password: string) => Promise<string>;
   logout: () => Promise<void>;
   authenWithGoogle: () => Promise<void>;
