@@ -53,7 +53,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
             <div
                 aria-controls="panel2-content"
                 id="panel2-header"
-                className={`z-50 border border-b-0 hover:cursor-pointer border-mountain-300 ${isExpanded ? '' : 'shadow-md'} flex justify-between p-4 items-center bg-white ${isExpanded ? 'rounded-t-xl' : 'rounded-xl'}`}
+                className={`z-50 border bg-gradient-to-r from-indigo-100 to-purple-100 hover:cursor-pointer border-mountain-300 flex justify-between p-4 items-center bg-white ${isExpanded ? 'border-b-0 rounded-t-xl' : 'rounded-xl'}`}
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 <Typography component="span" className="flex items-center space-x-2 font-medium">

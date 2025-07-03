@@ -220,7 +220,7 @@ const ArtGenAI = () => {
         </div>
         <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div
-            className={`flex relative h-full custom-scrollbar flex-col ${expanded ? "w-[78%]" : "w-full delay-300"} items-start transition-all duration-200 ease-in-out`}
+            className={`flex relative h-full custom-scrollbar flex-col ${expanded ? "w-[80%]" : "w-full delay-300"} items-start transition-all duration-200 ease-in-out`}
           >
             {loading ? (
               <div className="flex justify-center items-start mt-4 w-full h-full">

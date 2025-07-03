@@ -31,6 +31,7 @@ import { useState } from "react";
 import TrendingPrompt from "./AI/TrendingPrompt";
 import { Tooltip } from "@mui/material";
 import { Button } from "@/components/ui/button";
+import { Clock } from "lucide-react";
 
 interface AIHeaderProps {
   historyFilter: { label: string; value: string };
@@ -60,39 +61,37 @@ const AIHeader: React.FC<AIHeaderProps> = ({ historyFilter, setHistoryFilter }) 
               </span>
             </div>
           </Link>
-          <div className="flex items-center space-x-2 rounded-xl w-48 h-10">
-            <div className="flex justify-start items-center bg-mountain-50 hover:bg-mountain-100/80 px-2 border border-mountain-100 rounded-lg w-full h-full font-normal">
-              <DropdownMenu>
-                <DropdownMenuTrigger className="justify-start outline-none w-full hover:cursor-pointer">
-                  <div className="flex items-center space-x-2">
-                    <p>
-                      Show{" "}
-                      <span className="font-medium">
-                        {historyFilter.label}
-                      </span>
-                    </p>
-                    <IoMdArrowDropdown />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="flex flex-col mt-4 border-mountain-200 min-w-48 select-none">
-                  {Object.values(HistoryFilter).map((filter, index) => (
-                    <div
-                      key={index}
-                      onClick={() => setHistoryFilter(filter)}
-                      className={`${loading && "pointer-events-none"} flex p-1.5 hover:bg-mountain-100 hover:cursor-pointer ${historyFilter.value == filter.value
-                        ? "bg-indigo-50 font-medium text-mountain-800"
-                        : ""
-                        }`}
-                    >
-                      {filter.label}
-                    </div>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
         </div>
-        <div className="flex items-center px-4 border-mountain-200 border-r-1">
+        <div className="flex items-center space-x-4 px-4 border-mountain-200 border-r-1">
+          <div className="flex justify-start items-center space-x-2 bg-mountain-50 hover:bg-mountain-100/80 px-2 border border-mountain-100 rounded-lg w-42 h-10 font-normal">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="justify-start outline-none w-full hover:cursor-pointer">
+                <div className="flex items-center space-x-2">
+                  <p className="flex space-x-2">
+                    <Clock />{" "}
+                    <span className="font-medium">
+                      {historyFilter.label}
+                    </span>
+                  </p>
+                  <IoMdArrowDropdown />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="flex flex-col mt-4 border-mountain-200 min-w-48 select-none">
+                {Object.values(HistoryFilter).map((filter, index) => (
+                  <div
+                    key={index}
+                    onClick={() => setHistoryFilter(filter)}
+                    className={`${loading && "pointer-events-none"} flex p-1.5 hover:bg-mountain-100 hover:cursor-pointer ${historyFilter.value == filter.value
+                      ? "bg-indigo-50 font-medium text-mountain-800"
+                      : ""
+                      }`}
+                  >
+                    {filter.label}
+                  </div>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <Dialog open={open} onOpenChange={handleOpenModal}>
             <DialogTrigger asChild>
               <Tooltip title="See top trending AI prompts">
