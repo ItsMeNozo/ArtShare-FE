@@ -59,8 +59,10 @@ const PostForm: React.FC<PostFormProps> = ({
   const handleGenerateContent = async (
     setFieldValue: FormikHelpers<PostFormValues>['setFieldValue'],
   ) => {
-    if (postMedias.length === 0) {
-      showSnackbar('Please upload an image first.', 'error');
+    if (
+      postMedias.filter((media) => media.type === MEDIA_TYPE.IMAGE).length === 0
+    ) {
+      showSnackbar('The feature only works on images', 'warning');
       return;
     }
 

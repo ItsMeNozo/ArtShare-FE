@@ -116,7 +116,7 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
 
   return (
     <Box
-      className="dark:bg-mountain-900 flex max-h-[40vh] w-[820px] flex-col rounded-lg bg-white p-3 text-black dark:text-white"
+      className="dark:bg-mountain-900 flex h-[40vh] w-[820px] flex-col rounded-lg bg-white p-3 text-black dark:text-white"
       style={{ scrollbarGutter: 'stable' }} /* reserve scroll‑bar width */
     >
       <Box className="flex flex-grow flex-row gap-4 overflow-hidden">
