@@ -8,6 +8,7 @@ import {
   Paper,
   Popper,
   TextField,
+  Typography,
   useTheme, // <-- add useTheme
 } from '@mui/material';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -79,12 +80,11 @@ export default function SelectCategorySection({
   return (
     <AsyncWrapper loading={isLoading} error={isError}>
       <Box sx={{ position: 'relative', width: '100%' }} ref={anchorRef}>
-        <p className="dark:text-mountain-200 mb-1 text-sm text-gray-800">
+        <Typography className="dark:text-mountain-200 mb-1 text-sm text-gray-800">
           How would you categorize this work? (Choose up to 3)
-        </p>
+        </Typography>
 
-        {/* wrapper styled like MUI InputBase-root */}
-        <div
+        <Box
           onClick={handleMainInputFocus}
           style={{
             display: 'flex',
@@ -161,7 +161,7 @@ export default function SelectCategorySection({
               },
             }}
           />
-        </div>
+        </Box>
 
         <Popper
           open={open}
