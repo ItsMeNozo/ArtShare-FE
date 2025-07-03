@@ -1,45 +1,45 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 //Components
-import type { Blog } from "@/types/blog";
-import { Button, CircularProgress, IconButton, Tooltip } from "@mui/material";
-import Avatar from "boring-avatars";
+import type { Blog } from '@/types/blog';
+import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
+import Avatar from 'boring-avatars';
 //Icons
-import { LikesDialog } from "@/components/like/LikesDialog";
-import { useUser } from "@/contexts/UserProvider";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { TargetType } from "@/utils/constants";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { formatDistanceToNow } from "date-fns";
-import { AiFillLike, AiOutlineLike } from "react-icons/ai";
-import { BiComment } from "react-icons/bi";
-import { FiTrash2 } from "react-icons/fi";
-import { IoPersonAddOutline } from "react-icons/io5";
-import { LuLink, LuPencil } from "react-icons/lu";
-import { MdOutlineFlag } from "react-icons/md"; // Report Icon
-import { fetchBlogComments } from "../post/api/comment.api";
+import { LikesDialog } from '@/components/like/LikesDialog';
+import { useUser } from '@/contexts/user';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { TargetType } from '@/utils/constants';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { formatDistanceToNow } from 'date-fns';
+import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
+import { BiComment } from 'react-icons/bi';
+import { FiTrash2 } from 'react-icons/fi';
+import { IoPersonAddOutline } from 'react-icons/io5';
+import { LuLink, LuPencil } from 'react-icons/lu';
+import { MdOutlineFlag } from 'react-icons/md'; // Report Icon
+import { fetchBlogComments } from '../post/api/comment.api';
 import CommentSection, {
   CommentSectionRef,
-} from "../post/components/CommentSection";
+} from '../post/components/CommentSection';
 import {
   followUser,
   unfollowUser,
-} from "../user-profile-public/api/follow.api";
-import { fetchBlogDetails } from "./api/blog";
-import { createLike, removeLike } from "./api/like-blog";
-import RelatedBlogs from "./components/RelatedBlogs";
+} from '../user-profile-public/api/follow.api';
+import { fetchBlogDetails } from './api/blog';
+import { createLike, removeLike } from './api/like-blog';
+import RelatedBlogs from './components/RelatedBlogs';
 
 // Import your ReportDialog and the reporting hook
-import { ReportTargetType } from "../user-profile-public/api/report.api";
-import ReportDialog from "../user-profile-public/components/ReportDialog";
-import { useReport } from "../user-profile-public/hooks/useReport";
-import { BlogDeleteConfirmDialog } from "../user-writing/components/BlogDeleteConfirmDialog";
-import { useDeleteBlog } from "../user-writing/hooks/useDeleteBlog";
+import { ReportTargetType } from '../user-profile-public/api/report.api';
+import ReportDialog from '../user-profile-public/components/ReportDialog';
+import { useReport } from '../user-profile-public/hooks/useReport';
+import { BlogDeleteConfirmDialog } from '../user-writing/components/BlogDeleteConfirmDialog';
+import { useDeleteBlog } from '../user-writing/hooks/useDeleteBlog';
 
-import "./BlogDetails.css";
+import './BlogDetails.css';
 interface BlogError {
   message: string;
   error?: string;
@@ -64,7 +64,7 @@ const BlogDetails = () => {
     error,
     refetch,
   } = useQuery<Blog, AxiosError<BlogError>>({
-    queryKey: ["blogDetails", blogId],
+    queryKey: ['blogDetails', blogId],
     queryFn: () => fetchBlogDetails(Number(blogId)),
     enabled: !!blogId,
     retry: (failureCount, error) => {
@@ -82,11 +82,11 @@ const BlogDetails = () => {
   const { mutate: deleteBlogMutation, isPending: isDeletingBlog } =
     useDeleteBlog({
       onSuccess: () => {
-        navigate("/blogs");
-        showSnackbar("Blog deleted successfully!", "success");
+        navigate('/blogs');
+        showSnackbar('Blog deleted successfully!', 'success');
       },
       onError: (errorMessage) => {
-        showSnackbar(errorMessage, "error");
+        showSnackbar(errorMessage, 'error');
       },
     });
 
@@ -99,7 +99,7 @@ const BlogDetails = () => {
     error: commentsError,
     refetch: refetchComments,
   } = useQuery({
-    queryKey: ["blogComments", blogId],
+    queryKey: ['blogComments', blogId],
     queryFn: () => fetchBlogComments(Number(blogId)),
     enabled: !!blogId,
   });
@@ -111,8 +111,8 @@ const BlogDetails = () => {
       const msg =
         error instanceof AxiosError && error.response?.data?.message
           ? error.response.data.message
-          : "Failed to follow user.";
-      showSnackbar(msg, "error");
+          : 'Failed to follow user.';
+      showSnackbar(msg, 'error');
     },
   });
 
@@ -123,8 +123,8 @@ const BlogDetails = () => {
       const msg =
         error instanceof AxiosError && error.response?.data?.message
           ? error.response.data.message
-          : "Failed to unfollow user.";
-      showSnackbar(msg, "error");
+          : 'Failed to unfollow user.';
+      showSnackbar(msg, 'error');
     },
   });
 
@@ -135,13 +135,13 @@ const BlogDetails = () => {
         target_type: TargetType.BLOG,
       }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["blogDetails", blogId] }),
+      queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] }),
     onError: (error: unknown) => {
       const msg =
         error instanceof AxiosError && error.response?.data?.message
           ? error.response.data.message
-          : "Failed to like blog.";
-      showSnackbar(msg, "error");
+          : 'Failed to like blog.';
+      showSnackbar(msg, 'error');
     },
   });
 
@@ -152,13 +152,13 @@ const BlogDetails = () => {
         target_type: TargetType.BLOG,
       }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["blogDetails", blogId] }),
+      queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] }),
     onError: (error: unknown) => {
       const msg =
         error instanceof AxiosError && error.response?.data?.message
           ? error.response.data.message
-          : "Failed to unlike blog.";
-      showSnackbar(msg, "error");
+          : 'Failed to unlike blog.';
+      showSnackbar(msg, 'error');
     },
   });
 
@@ -167,7 +167,7 @@ const BlogDetails = () => {
   const isPublished = blog?.is_published ?? true;
 
   const toggleFollow = () =>
-    requireAuth("follow/unfollow users", () =>
+    requireAuth('follow/unfollow users', () =>
       isFollowing ? unfollowMutation.mutate() : followMutation.mutate(),
     );
 
@@ -177,7 +177,7 @@ const BlogDetails = () => {
   const likeCount = blog?.like_count || 0;
 
   const handleToggleLike = () =>
-    requireAuth("like this blog", () => {
+    requireAuth('like this blog', () => {
       isLiked ? unlikeMutation.mutate() : likeMutation.mutate();
     });
 
@@ -191,25 +191,25 @@ const BlogDetails = () => {
 
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener("scroll", handleScroll, { passive: true });
-      return () => container.removeEventListener("scroll", handleScroll);
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      return () => container.removeEventListener('scroll', handleScroll);
     }
   }, []);
 
   const handleOpenLikesDialog = () =>
-    requireAuth("view likes", () => setLikesDialogOpen(true));
+    requireAuth('view likes', () => setLikesDialogOpen(true));
   const handleCloseLikesDialog = () => setLikesDialogOpen(false);
 
   // Report dialog handlers
   const handleOpenReportDialog = () => {
     if (!user) {
       showSnackbar(
-        "Please login to report this blog",
-        "warning",
+        'Please login to report this blog',
+        'warning',
         <Button
           size="small"
           color="inherit"
-          onClick={() => (window.location.href = "/login")}
+          onClick={() => (window.location.href = '/login')}
         >
           Login
         </Button>,
@@ -217,7 +217,7 @@ const BlogDetails = () => {
       return;
     }
     if (isOwnBlog) {
-      showSnackbar("You cannot report your own blog.", "info");
+      showSnackbar('You cannot report your own blog.', 'info');
       return;
     }
     setReportDialogOpen(true);
@@ -250,14 +250,14 @@ const BlogDetails = () => {
         onSuccess: () => {
           setReportDialogOpen(false);
           showSnackbar(
-            "Blog reported successfully. Thank you for your feedback.",
-            "success",
+            'Blog reported successfully. Thank you for your feedback.',
+            'success',
           );
         },
         onError: (err: Error) => {
           showSnackbar(
-            `Failed to report blog: ${err.message || "Unknown error"}`,
-            "error",
+            `Failed to report blog: ${err.message || 'Unknown error'}`,
+            'error',
           );
         },
       },
@@ -266,17 +266,17 @@ const BlogDetails = () => {
 
   const handleCommentAdded = () => {
     refetchComments();
-    queryClient.invalidateQueries({ queryKey: ["blogDetails", blogId] });
+    queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
   };
   const handleCommentDeleted = () => {
     refetchComments();
-    queryClient.invalidateQueries({ queryKey: ["blogDetails", blogId] });
+    queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
   };
 
   // Handle loading state
   if (isLoading || commentsLoading)
     return (
-      <div className="flex justify-center items-center space-x-4 h-screen bg-white dark:bg-mountain-950 text-black dark:text-white">
+      <div className="dark:bg-mountain-950 flex h-screen items-center justify-center space-x-4 bg-white text-black dark:text-white">
         <CircularProgress size={36} /> <p>Loading…</p>
       </div>
     );
@@ -289,11 +289,11 @@ const BlogDetails = () => {
     // Handle specific error cases
     if (statusCode === 403) {
       return (
-        <div className="flex flex-col items-center justify-center h-screen bg-white dark:bg-mountain-950 p-8">
-          <div className="text-center max-w-md">
+        <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
+          <div className="max-w-md text-center">
             <div className="mb-6">
               <svg
-                className="mx-auto w-20 h-20 text-yellow-500 dark:text-yellow-400"
+                className="mx-auto h-20 w-20 text-yellow-500 dark:text-yellow-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -306,22 +306,22 @@ const BlogDetails = () => {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
               Access Restricted
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {errorData?.message || "This blog is not accessible."}
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
+              {errorData?.message || 'This blog is not accessible.'}
             </p>
             <div className="space-y-3">
               <Button
-                onClick={() => navigate("/blogs")}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => navigate('/blogs')}
+                className="w-full bg-blue-600 text-white hover:bg-blue-700"
               >
                 Browse Other Blogs
               </Button>
               {user && (
                 <Button
-                  onClick={() => navigate("/docs/new")}
+                  onClick={() => navigate('/docs/new')}
                   variant="outlined"
                   className="w-full"
                 >
@@ -336,11 +336,11 @@ const BlogDetails = () => {
 
     if (statusCode === 404) {
       return (
-        <div className="flex flex-col items-center justify-center h-screen bg-white dark:bg-mountain-950 p-8">
-          <div className="text-center max-w-md">
+        <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
+          <div className="max-w-md text-center">
             <div className="mb-6">
               <svg
-                className="mx-auto w-20 h-20 text-gray-400 dark:text-gray-600"
+                className="mx-auto h-20 w-20 text-gray-400 dark:text-gray-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -353,16 +353,16 @@ const BlogDetails = () => {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
               Blog Not Found
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="mb-6 text-gray-600 dark:text-gray-400">
               {errorData?.message ||
                 "The blog you're looking for doesn't exist."}
             </p>
             <Button
-              onClick={() => navigate("/blogs")}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => navigate('/blogs')}
+              className="bg-blue-600 text-white hover:bg-blue-700"
             >
               Back to Blogs
             </Button>
@@ -372,11 +372,11 @@ const BlogDetails = () => {
     }
 
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-white dark:bg-mountain-950 p-8">
-        <div className="text-center max-w-md">
+      <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
+        <div className="max-w-md text-center">
           <div className="mb-6">
             <svg
-              className="mx-auto w-20 h-20 text-red-500 dark:text-red-400"
+              className="mx-auto h-20 w-20 text-red-500 dark:text-red-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -389,21 +389,21 @@ const BlogDetails = () => {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             Something went wrong
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {errorData?.message || error.message || "Failed to load the blog."}
+          <p className="mb-6 text-gray-600 dark:text-gray-400">
+            {errorData?.message || error.message || 'Failed to load the blog.'}
           </p>
           <div className="space-y-3">
             <Button
               onClick={() => refetch()}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-blue-600 text-white hover:bg-blue-700"
             >
               Try Again
             </Button>
             <Button
-              onClick={() => navigate("/blogs")}
+              onClick={() => navigate('/blogs')}
               variant="outlined"
               className="w-full"
             >
@@ -416,14 +416,14 @@ const BlogDetails = () => {
   }
   // Handle comments error
   if (commentsError) {
-    console.error("Failed to load comments:", commentsError);
+    console.error('Failed to load comments:', commentsError);
     // Continue showing the blog even if comments fail to load
   }
 
   // If no blog data after loading
   if (!blog) {
     return (
-      <div className="flex justify-center items-center h-screen bg-white dark:bg-mountain-950">
+      <div className="dark:bg-mountain-950 flex h-screen items-center justify-center bg-white">
         <p className="text-gray-600 dark:text-gray-400">
           No blog data available.
         </p>
@@ -435,10 +435,10 @@ const BlogDetails = () => {
 
   // Centralized Action Buttons Component with improved visibility
   const ActionButtons = () => (
-    <div className="transition ease-in-out duration-300 flex items-center p-2 bg-white dark:bg-mountain-900 border border-mountain-200 dark:border-mountain-700 space-x-3 rounded-full h-full w-full shadow-sm">
-      <Tooltip title={isLiked ? "Unlike" : "Like"} placement="bottom" arrow>
+    <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 flex h-full w-full items-center space-x-3 rounded-full border bg-white p-2 shadow-sm transition duration-300 ease-in-out">
+      <Tooltip title={isLiked ? 'Unlike' : 'Like'} placement="bottom" arrow>
         <div
-          className="flex justify-center items-center bg-blue-100 dark:bg-blue-800/40 hover:bg-blue-200 dark:hover:bg-blue-700/60 shadow-md p-2 rounded-full w-14 h-14 font-medium text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 hover:cursor-pointer transition-all duration-200"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 p-2 font-medium text-blue-700 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-blue-200 hover:text-blue-800 dark:bg-blue-800/40 dark:text-blue-300 dark:hover:bg-blue-700/60 dark:hover:text-blue-200"
           onClick={handleToggleLike}
           aria-disabled={likeMutation.isPending || unlikeMutation.isPending}
         >
@@ -448,7 +448,7 @@ const BlogDetails = () => {
             <AiOutlineLike className="size-5 text-blue-600 dark:text-blue-400" />
           )}
           <p
-            className="ml-1 hover:underline text-blue-700 dark:text-blue-300 font-medium"
+            className="ml-1 font-medium text-blue-700 hover:underline dark:text-blue-300"
             onClick={(e) => {
               e.stopPropagation();
               handleOpenLikesDialog();
@@ -460,24 +460,24 @@ const BlogDetails = () => {
       </Tooltip>
       <Tooltip title="Comment" placement="bottom" arrow>
         <div
-          className="flex justify-center items-center bg-green-100 dark:bg-green-800/40 hover:bg-green-200 dark:hover:bg-green-700/60 shadow-md p-2 rounded-full w-14 h-14 font-medium text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-200 hover:cursor-pointer transition-all duration-200"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 p-2 font-medium text-green-700 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-green-200 hover:text-green-800 dark:bg-green-800/40 dark:text-green-300 dark:hover:bg-green-700/60 dark:hover:text-green-200"
           onClick={() => commentSectionRef.current?.focusCommentInput()}
         >
           <BiComment className="mr-1 size-4 text-green-600 dark:text-green-400" />
-          <span className="text-green-700 dark:text-green-300 font-medium">
+          <span className="font-medium text-green-700 dark:text-green-300">
             {blog.comment_count}
           </span>
         </div>
       </Tooltip>
       <div className="ml-auto flex items-center space-x-3">
-        <Tooltip title={copied ? "Link copied!" : "Copy link"} arrow>
+        <Tooltip title={copied ? 'Link copied!' : 'Copy link'} arrow>
           <IconButton
             onClick={() => {
               navigator.clipboard.writeText(window.location.href);
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
-            className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-mountain-700 dark:text-mountain-200 hover:text-mountain-900 dark:hover:text-white hover:cursor-pointer bg-mountain-100 dark:bg-mountain-700 hover:bg-mountain-200 dark:hover:bg-mountain-600 transition-all duration-200"
+            className="text-mountain-700 dark:text-mountain-200 hover:text-mountain-900 bg-mountain-100 dark:bg-mountain-700 hover:bg-mountain-200 dark:hover:bg-mountain-600 flex h-12 w-12 items-center justify-center rounded-full p-2 font-medium shadow-md transition-all duration-200 hover:cursor-pointer dark:hover:text-white"
           >
             <LuLink className="size-4" />
           </IconButton>
@@ -487,7 +487,7 @@ const BlogDetails = () => {
           <Tooltip title="Report this blog" arrow>
             <IconButton
               onClick={handleOpenReportDialog}
-              className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:cursor-pointer bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/40 transition-all duration-200"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 p-2 font-medium text-red-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-800/40 dark:hover:text-red-300"
             >
               <MdOutlineFlag className="size-4" />
             </IconButton>
@@ -498,7 +498,7 @@ const BlogDetails = () => {
             <Tooltip title="Edit" arrow>
               <IconButton
                 onClick={() => navigate(`/docs/${blog.id}`)}
-                className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:cursor-pointer bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-800/40 transition-all duration-200"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-50 p-2 font-medium text-purple-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-purple-100 hover:text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-800/40 dark:hover:text-purple-300"
               >
                 <LuPencil className="size-4" />
               </IconButton>
@@ -506,7 +506,7 @@ const BlogDetails = () => {
             <Tooltip title="Delete" arrow>
               <IconButton
                 onClick={handleOpenDeleteDialog}
-                className="flex justify-center items-center shadow-md p-2 rounded-full w-12 h-12 font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:cursor-pointer bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/40 transition-all duration-200"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 p-2 font-medium text-red-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-800/40 dark:hover:text-red-300"
               >
                 <FiTrash2 className="size-4" />
               </IconButton>
@@ -520,14 +520,14 @@ const BlogDetails = () => {
   return (
     <div
       ref={scrollContainerRef}
-      className="w-full h-screen overflow-y-auto sidebar bg-white dark:bg-mountain-950"
+      className="sidebar dark:bg-mountain-950 h-screen w-full overflow-y-auto bg-white"
     >
-      <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12">
+      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="group flex flex-col space-y-8">
-          <div className="flex space-x-2 w-full">
+          <div className="flex w-full space-x-2">
             <Link
               to="/blogs"
-              className="underline text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
               Blogs
             </Link>
@@ -538,22 +538,22 @@ const BlogDetails = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <h1 className="font-medium text-4xl text-black dark:text-white">
+            <h1 className="text-4xl font-medium text-black dark:text-white">
               {blog.title}
             </h1>
             {/* Show draft badge if not published and user is the owner */}
             {!isPublished && isOwnBlog && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800">
+              <span className="inline-flex items-center rounded-full border border-yellow-200 bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                 Draft
               </span>
             )}
           </div>
 
-          <div className="flex items-center space-x-2 text-mountain-600 dark:text-mountain-400 text-sm">
+          <div className="text-mountain-600 dark:text-mountain-400 flex items-center space-x-2 text-sm">
             {isPublished ? (
               <>
                 <p>
-                  Published{" "}
+                  Published{' '}
                   {formatDistanceToNow(new Date(blog.created_at), {
                     addSuffix: true,
                   })}
@@ -568,7 +568,7 @@ const BlogDetails = () => {
                 </p>
                 <span>•</span>
                 <p>
-                  Created{" "}
+                  Created{' '}
                   {formatDistanceToNow(new Date(blog.created_at), {
                     addSuffix: true,
                   })}
@@ -581,10 +581,10 @@ const BlogDetails = () => {
 
           {/* Show a banner for unpublished content if owner */}
           {!isPublished && isOwnBlog && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+            <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
               <div className="flex items-start">
                 <svg
-                  className="flex-shrink-0 w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5"
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -604,7 +604,7 @@ const BlogDetails = () => {
                   </p>
                   <Button
                     onClick={() => navigate(`/docs/${blog.id}`)}
-                    className="mt-3 bg-yellow-600 hover:bg-yellow-700 text-white text-sm"
+                    className="mt-3 bg-yellow-600 text-sm text-white hover:bg-yellow-700"
                   >
                     Continue Editing
                   </Button>
@@ -616,40 +616,39 @@ const BlogDetails = () => {
           {/* For unpublished blogs, hide or disable certain actions */}
           {isPublished && (
             <div
-              className={`transition-all duration-300 ease-in-out w-full h-20 flex justify-center items-center
-                ${showAuthorBadge ? "sticky bottom-4 z-10" : "opacity-100"}`}
+              className={`flex h-20 w-full items-center justify-center transition-all duration-300 ease-in-out ${showAuthorBadge ? 'sticky bottom-4 z-10' : 'opacity-100'}`}
             >
               <ActionButtons />
             </div>
           )}
 
           {/* Author Info Box */}
-          <div className="flex justify-between items-center bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 shadow-sm p-4 rounded-lg border border-transparent dark:border-mountain-700">
+          <div className="dark:border-mountain-700 flex items-center justify-between rounded-lg border border-transparent bg-gradient-to-r from-indigo-100 to-purple-100 p-4 shadow-sm dark:from-indigo-900/30 dark:to-purple-900/30">
             <div className="flex items-center space-x-4">
               {blog.user.profile_picture_url ? (
                 <img
                   src={blog.user.profile_picture_url}
                   alt={blog.user.username}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="h-12 w-12 rounded-full object-cover"
                 />
               ) : (
                 <Avatar
                   name={blog.user.username}
                   size={48}
                   variant="beam"
-                  colors={["#84bfc3", "#ff9b62", "#d96153"]}
+                  colors={['#84bfc3', '#ff9b62', '#d96153']}
                 />
               )}
               <div className="flex flex-col">
-                <p className="font-medium text-gray-900 dark:text-gray-100 text-lg">
+                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
                   {blog.user.full_name}
                 </p>
-                <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-400 text-sm">
+                <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
                   <span>@{blog.user.username}</span>
                   <span className="text-gray-400 dark:text-gray-500">•</span>
                   <span>
-                    {blog.user.followers_count.toLocaleString()}{" "}
-                    {blog.user.followers_count <= 1 ? "follower" : "followers"}
+                    {blog.user.followers_count.toLocaleString()}{' '}
+                    {blog.user.followers_count <= 1 ? 'follower' : 'followers'}
                   </span>
                 </div>
               </div>
@@ -658,33 +657,33 @@ const BlogDetails = () => {
               <Button
                 onClick={toggleFollow}
                 disabled={followBtnLoading}
-                className="flex items-center bg-white dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 shadow w-32 h-10 font-medium text-sm text-black dark:text-white border border-mountain-200 dark:border-mountain-600"
+                className="dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 border-mountain-200 dark:border-mountain-600 flex h-10 w-32 items-center border bg-white text-sm font-medium text-black shadow dark:text-white"
               >
                 <IoPersonAddOutline className="mr-2 text-blue-500 dark:text-blue-400" />
-                {isFollowing ? "Unfollow" : "Follow"}
+                {isFollowing ? 'Unfollow' : 'Follow'}
               </Button>
             )}
           </div>
 
           {/* Blog Content */}
           <div
-            className="p-2 rounded-md max-w-none prose lg:prose-xl dark:prose-invert reset-tailwind bg-white dark:bg-mountain-950 text-black dark:text-white"
+            className="prose lg:prose-xl dark:prose-invert reset-tailwind dark:bg-mountain-950 max-w-none rounded-md bg-white p-2 text-black dark:text-white"
             dangerouslySetInnerHTML={{ __html: blog.content }}
           />
 
-          <hr className="flex border-mountain-200 dark:border-mountain-700 border-t-1 w-full" />
+          <hr className="border-mountain-200 dark:border-mountain-700 flex w-full border-t-1" />
 
           {/* Only show action bar and interactions for published blogs */}
           {isPublished ? (
             <>
               <div
-                className={`${showAuthorBadge ? "opacity-100" : "opacity-0 pointer-events-none"} transition ease-in-out duration-300 flex justify-center items-center rounded-full w-full h-20`}
+                className={`${showAuthorBadge ? 'opacity-100' : 'pointer-events-none opacity-0'} flex h-20 w-full items-center justify-center rounded-full transition duration-300 ease-in-out`}
               >
                 <ActionButtons />
               </div>
 
               <RelatedBlogs currentBlogId={Number(blogId)} />
-              <hr className="flex border-mountain-200 dark:border-mountain-700 border-t-1 w-full" />
+              <hr className="border-mountain-200 dark:border-mountain-700 flex w-full border-t-1" />
 
               <CommentSection
                 ref={commentSectionRef}
@@ -699,9 +698,9 @@ const BlogDetails = () => {
             </>
           ) : (
             <div className="py-12 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
+              <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
                 <svg
-                  className="w-8 h-8 text-gray-400 dark:text-gray-600"
+                  className="h-8 w-8 text-gray-400 dark:text-gray-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -714,7 +713,7 @@ const BlogDetails = () => {
                   />
                 </svg>
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-lg font-medium mb-2">
+              <p className="mb-2 text-lg font-medium text-gray-500 dark:text-gray-400">
                 Comments are disabled for drafts
               </p>
               <p className="text-gray-400 dark:text-gray-500">

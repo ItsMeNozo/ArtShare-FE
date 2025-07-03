@@ -1,6 +1,6 @@
-import { useUser } from "@/contexts/UserProvider";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { Button } from "@mui/material";
+import { useUser } from '@/contexts/user/useUser';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { Button } from '@mui/material';
 
 export function useRequireAuth() {
   const { user } = useUser();
@@ -10,11 +10,11 @@ export function useRequireAuth() {
     if (!user) {
       showSnackbar(
         `Please login to ${action}`,
-        "warning",
+        'warning',
         <Button
           size="small"
           color="inherit"
-          onClick={() => (window.location.href = "/login")}
+          onClick={() => (window.location.href = '/login')}
         >
           Login
         </Button>,

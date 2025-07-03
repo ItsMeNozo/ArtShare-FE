@@ -1,10 +1,10 @@
-import { useUser } from "@/contexts/UserProvider";
-import { Post } from "@/types";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { fetchUserPosts } from "../api/get-posts-by-user";
-import PostCard from "./PostCard";
+import { useUser } from '@/contexts/user';
+import { Post } from '@/types';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchUserPosts } from '../api/get-posts-by-user';
+import PostCard from './PostCard';
 
 const UserPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -18,10 +18,10 @@ const UserPosts = () => {
       try {
         setLoadingPosts(true);
         const userPosts = await fetchUserPosts(username, 1);
-        console.log("@@ User posts", userPosts);
+        console.log('@@ User posts', userPosts);
         setPosts(userPosts);
       } catch (error) {
-        console.error("Error fetching user posts:", error);
+        console.error('Error fetching user posts:', error);
       } finally {
         setLoadingPosts(false);
       }
@@ -63,7 +63,7 @@ const UserPosts = () => {
   }
 
   return (
-    <div className="gap-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 p-1 w-full">
+    <div className="grid w-full grid-cols-2 gap-3 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
       {posts.map((post) => {
         const isOwner = user?.username === post.user?.username;
 
