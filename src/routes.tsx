@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Outlet, RouteObject, useRoutes } from 'react-router-dom';
+import { createBrowserRouter, Outlet, RouteObject } from 'react-router-dom';
 
 // Layouts & Wrappers
 import ProtectedAuthRoute from '@/components/ProtectedItems/ProtectedAuthRoute';
@@ -251,6 +251,4 @@ const routeConfig: RouteObject[] = [
   },
 ];
 
-export function AppRoutes() {
-  return useRoutes(routeConfig);
-}
+export const router = createBrowserRouter(routeConfig);

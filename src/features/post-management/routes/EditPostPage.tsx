@@ -70,7 +70,7 @@ const EditPostPage: React.FC = () => {
     }
     return {
       title: fetchedPost.title,
-      description: fetchedPost.description,
+      description: fetchedPost.description || '',
       cate_ids: fetchedPost.categories?.map((c) => c.id) ?? [],
       isMature: fetchedPost.is_mature,
       thumbnailMeta: fetchedPost.thumbnail_crop_meta,

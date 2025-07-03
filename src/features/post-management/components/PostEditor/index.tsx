@@ -185,7 +185,6 @@ const PostEditor: React.FC<{
           open={thumbnailCropOpen}
           onClose={() => setThumbnailCropOpen(false)}
           onCropped={(blob, thumbnail_crop_meta) => {
-            console.log('Cropped thumbnail meta:', thumbnail_crop_meta);
             setThumbnail({
               file: new File([blob], 'cropped_thumbnail.png', {
                 type: 'image/png',
