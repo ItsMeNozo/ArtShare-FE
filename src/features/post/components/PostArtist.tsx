@@ -1,31 +1,32 @@
-import { ReportTargetType } from "@/features/user-profile-public/api/report.api";
-import ReportDialog from "@/features/user-profile-public/components/ReportDialog";
-import { useReport } from "@/features/user-profile-public/hooks/useReport";
-import { auth } from "@/firebase";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { Post, User } from "@/types";
-import { extractReportErrorMessage } from "@/utils/error.util";
-import { Box, CardContent, CardHeader, IconButton } from "@mui/material";
-import Avatar from "boring-avatars";
-import { X } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useDeletePost } from "../hooks/useDeletePost";
-import { PostMenu } from "./PostMenu";
+import { useUser } from '@/contexts/user';
+import { ReportTargetType } from '@/features/user-profile-public/api/report.api';
+import ReportDialog from '@/features/user-profile-public/components/ReportDialog';
+import { useReport } from '@/features/user-profile-public/hooks/useReport';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { Post, User } from '@/types';
+import { extractReportErrorMessage } from '@/utils/error.util';
+import { Box, CardContent, CardHeader, IconButton } from '@mui/material';
+import Avatar from 'boring-avatars';
+import { X } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDeletePost } from '../hooks/useDeletePost';
+import { PostMenu } from './PostMenu';
 
 const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
-  const currentUser = auth.currentUser;
-  const isOwner = currentUser && postData.user_id === currentUser.uid;
+  const { user: currentUser } = useUser();
+
+  const isOwner = currentUser && postData.user_id === currentUser.id;
 
   const { mutate: deletePostQuery } = useDeletePost({
     onSuccess: () => {
       navigate(`/${postData.user.username}`);
-      showSnackbar("Post successfully deleted!", "success");
+      showSnackbar('Post successfully deleted!', 'success');
     },
     onError: (errorMessage) => {
-      showSnackbar(errorMessage, "error");
+      showSnackbar(errorMessage, 'error');
     },
   });
 
@@ -54,8 +55,8 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
         onSuccess: () => {
           setDialogOpen(false);
           showSnackbar(
-            "Your report will be reviewed soon! Thanks for your report",
-            "success",
+            'Your report will be reviewed soon! Thanks for your report',
+            'success',
           );
         },
         onError: (err) => {
@@ -63,7 +64,7 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
             err,
             ReportTargetType.POST,
           );
-          showSnackbar(displayMessage, "error");
+          showSnackbar(displayMessage, 'error');
         },
       },
     );
@@ -71,14 +72,14 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
 
   if (!artist) {
     return (
-      <div className="flex items-center justify-center m-4">
+      <div className="m-4 flex items-center justify-center">
         Artist not found or data is unavailable.
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-white shadow dark:bg-mountain-950 md:border-b md:border-b-mountain-200 rounded-2xl md:rounded-b-none overflow-none">
+    <div className="dark:bg-mountain-950 md:border-b-mountain-200 overflow-none rounded-2xl bg-white p-4 shadow md:rounded-b-none md:border-b">
       <CardHeader
         className="p-0"
         action={
@@ -98,21 +99,21 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
         }
       />
       <CardContent
-        className="flex flex-col gap-4 p-2 transition-colors duration-200 rounded-lg cursor-pointer group hover:bg-gray-50 dark:hover:bg-mountain-800/50"
+        className="group dark:hover:bg-mountain-800/50 flex cursor-pointer flex-col gap-4 rounded-lg p-2 transition-colors duration-200 hover:bg-gray-50"
         onClick={() => navigate(`/${artist.username}`)}
       >
-        <div className="flex gap-4 cursor-pointer">
-          <div className="flex-shrink-0 overflow-hidden transition-all duration-200 rounded-full ring-2 ring-transparent group-hover:ring-blue-500/30">
+        <div className="flex cursor-pointer gap-4">
+          <div className="flex-shrink-0 overflow-hidden rounded-full ring-2 ring-transparent transition-all duration-200 group-hover:ring-blue-500/30">
             {artist.profile_picture_url ? (
               <img
                 src={artist.profile_picture_url}
-                className="object-cover w-20 h-20"
+                className="h-20 w-20 object-cover"
                 alt={`${artist.username}'s profile`}
               />
             ) : (
               <Avatar
-                name={artist.username || "Unknown"}
-                colors={["#84bfc3", "#ff9b62", "#d96153"]}
+                name={artist.username || 'Unknown'}
+                colors={['#84bfc3', '#ff9b62', '#d96153']}
                 variant="beam"
                 size={80}
               />
@@ -120,9 +121,9 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
           </div>
           <div className="flex flex-col pt-0.5">
             <div className="text-xl font-bold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-              {artist.full_name || "Unknown fullname"}
+              {artist.full_name || 'Unknown fullname'}
             </div>
-            <div className="text-sm transition-colors duration-200 line-clamp-1 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+            <div className="line-clamp-1 text-sm transition-colors duration-200 group-hover:text-blue-500 dark:group-hover:text-blue-300">
               @{artist.username}
             </div>
           </div>
