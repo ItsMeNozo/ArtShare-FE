@@ -1,10 +1,13 @@
-import IGallery, { GalleryPhoto } from "@/components/gallery/Gallery";
-import { useEffect, useRef, useState } from "react";
-import { BsFilter } from "react-icons/bs";
-import MediumFilters from "./MediumFilters";
-import CategoryList from "@/components/filters/Filter";
-import { useSearchPosts } from "../../hooks/useSearchPosts";
-import { Box } from "@mui/material";
+import CategoryList from '@/components/filters/Filter';
+import { ImageRenderer } from '@/components/gallery/ImageRenderer';
+import { InfiniteScroll } from '@/components/InfiniteScroll';
+import { Box } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { BsFilter } from 'react-icons/bs';
+import { RowsPhotoAlbum } from 'react-photo-album';
+import 'react-photo-album/rows.css';
+import { useSearchPosts } from '../../hooks/useSearchPosts';
+import MediumFilters from './MediumFilters';
 
 interface PostSearchResultsProps {
   finalQuery: string | null;
@@ -13,7 +16,6 @@ interface PostSearchResultsProps {
 const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
-  const galleryAreaRef = useRef<HTMLDivElement>(null);
 
   const {
     data: postsData,
@@ -29,73 +31,20 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
     enabled: !!finalQuery && finalQuery.length > 0,
   });
 
-  useEffect(() => {
-    const galleryElement = galleryAreaRef.current;
-    if (!galleryElement) return;
-
-    const handleScroll = () => {
-      const scrollThreshold = 200;
-      const scrolledFromTop = galleryElement.scrollTop;
-      const elementHeight = galleryElement.clientHeight;
-      const scrollableHeight = galleryElement.scrollHeight;
-
-      if (
-        elementHeight + scrolledFromTop >= scrollableHeight - scrollThreshold &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        fetchNextPage();
-      }
-    };
-
-    const checkInitialContentHeight = () => {
-      if (
-        galleryElement.scrollHeight <= galleryElement.clientHeight &&
-        hasNextPage &&
-        !isFetchingNextPage &&
-        !isLoadingPosts
-      ) {
-        fetchNextPage();
-      }
-    };
-    galleryElement.addEventListener("scroll", handleScroll);
-    const timeoutId = setTimeout(checkInitialContentHeight, 500);
-    return () => {
-      galleryElement.removeEventListener("scroll", handleScroll);
-      clearTimeout(timeoutId);
-    };
-  }, [
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    postsData,
-    isLoadingPosts,
-  ]);
-
-  const galleryPhotos: GalleryPhoto[] =
-    postsData?.pages?.flat().filter(Boolean) ?? [];
-
-  let isPostsDataEffectivelyEmpty = true;
-  if (postsData && postsData.pages && Array.isArray(postsData.pages)) {
-    if (
-      postsData.pages.length > 0 &&
-      postsData.pages.some((page) => page.length > 0)
-    ) {
-      isPostsDataEffectivelyEmpty = false;
-    }
-  }
-  const isInitialGalleryLoading = isLoadingPosts && isPostsDataEffectivelyEmpty;
+  const galleryPhotos = useMemo(() => {
+    return postsData?.pages.flatMap((page) => page.photos) ?? [];
+  }, [postsData]);
 
   return (
-    <Box className="flex flex-col p-2 h-screen pb-48 relative">
-      <div className="absolute left-0 top-0 z-50 flex h-16 bg-white dark:bg-mountain-950 dark:border-b dark:border-mountain-800">
+    <Box className="relative flex h-screen flex-col p-2 pb-48">
+      <div className="dark:bg-mountain-950 dark:border-mountain-800 absolute top-0 left-0 z-50 flex h-16 bg-white dark:border-b">
         {/* Left side - Filter */}
-        <div className="absolute flex items-center space-x-4 transform -translate-y-1/2 top-1/2 left-4">
+        <div className="absolute top-1/2 left-4 flex -translate-y-1/2 transform items-center space-x-4">
           <div
-            className={`flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-900 px-2 py-1 rounded-lg hover:cursor-pointer ${
+            className={`hover:bg-mountain-50 dark:hover:bg-mountain-900 flex items-center space-x-2 rounded-lg px-2 py-1 hover:cursor-pointer ${
               showFilters
-                ? "text-mountain-950 dark:text-mountain-50 font-medium"
-                : "text-mountain-600 dark:text-mountain-400 font-normal"
+                ? 'text-mountain-950 dark:text-mountain-50 font-medium'
+                : 'text-mountain-600 dark:text-mountain-400 font-normal'
             }`}
             onClick={() => {
               setShowFilters((prev) => !prev);
@@ -116,9 +65,9 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
       </div>
 
       {selectedMediums.length > 0 && (
-        <div className="flex items-center justify-center w-full h-12">
-          <p className="mr-2 text-mountain-400 dark:text-mountain-500">
-            Mediums:{" "}
+        <div className="flex h-12 w-full items-center justify-center">
+          <p className="text-mountain-400 dark:text-mountain-500 mr-2">
+            Mediums:{' '}
           </p>
           <CategoryList
             selectedCategories={selectedMediums}
@@ -127,24 +76,29 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
         </div>
       )}
       {selectedMediums.length === 0 && (
-        <div className="flex items-center justify-center w-full h-12">
+        <div className="flex h-12 w-full items-center justify-center">
           <div className="text-mountain-400 dark:text-mountain-500">
             Tips: Want more specific results? Try adding a channel filter.
           </div>
         </div>
       )}
-      <div
-        ref={galleryAreaRef}
-        className="flex-1 p-4 overflow-y-auto gallery-area sidebar"
+      <InfiniteScroll
+        data={galleryPhotos}
+        isLoading={isLoadingPosts}
+        isFetchingNextPage={isFetchingNextPage}
+        isError={isPostsError}
+        error={postsError}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
       >
-        <IGallery
+        <RowsPhotoAlbum
           photos={galleryPhotos}
-          isLoading={isInitialGalleryLoading}
-          isFetchingNextPage={isFetchingNextPage}
-          isError={isPostsError}
-          error={postsError as Error | null}
+          spacing={8}
+          targetRowHeight={256}
+          rowConstraints={{ singleRowMaxHeight: 256 }}
+          render={{ image: ImageRenderer }}
         />
-      </div>
+      </InfiniteScroll>
     </Box>
   );
 };

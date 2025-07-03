@@ -28,14 +28,12 @@ interface TrendingItem {
 // Component
 // =====================================================
 interface TrendingPromptProps {
-  selectedTab: string;
   onClose: () => void;
 }
 const example_1 =
   "https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/Models-Mock/Model-1/dzu0q9a2zxvtu3w1r29a";
 
 const TrendingPrompt: React.FC<TrendingPromptProps> = ({
-  selectedTab,
   onClose,
 }) => {
   const [translateY, setTranslateY] = useState(10);
@@ -133,7 +131,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
 
     container.addEventListener("wheel", handleScroll);
     return () => container.removeEventListener("wheel", handleScroll);
-  }, [selectedTab, trending]);
+  }, [trending]);
 
   // -----------------------------------------------------
   // Thumbnail click → select image & adjust scroll
@@ -171,7 +169,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
         <img
           src={trending[selectedImageIndex]?.image}
           alt="Selected"
-          className="flex shadow-lg rounded-lg h-128 transition-all duration-200 object-contain"
+          className="flex shadow-lg rounded-lg h-128 object-contain transition-all duration-200"
         />
       </div>
 
@@ -275,7 +273,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
         {/* top blur */}
 
         <div
-          className="flex flex-col items-end space-y-2 pr-3 w-full h-[2000px] mt-10"
+          className="flex flex-col items-end space-y-2 mt-10 pr-3 w-full h-[2000px]"
           style={{ transform: `translateY(${translateY}px)` }}
         >
           {trending.map((item, index) => (
@@ -283,9 +281,8 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({
               key={index}
               src={item.image}
               onClick={() => handleImageClick(index)}
-              className={`rounded-lg object-cover cursor-pointer ${
-                selectedImageIndex === index ? "w-20" : "w-16"
-              } min-h-16 max-h-16 transition-all duration-150`}
+              className={`rounded-lg object-cover cursor-pointer ${selectedImageIndex === index ? "w-20" : "w-16"
+                } min-h-16 max-h-16 transition-all duration-150`}
             />
           ))}
           <div />
