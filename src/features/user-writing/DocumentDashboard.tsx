@@ -1,27 +1,27 @@
-import { TUTORIAL_TEMPLATE_HTML } from "@/constants/template";
-import { useUser } from "@/contexts/UserProvider";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { Blog } from "@/types/blog";
-import { CircularProgress, IconButton, Menu } from "@mui/material";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import React, { useEffect, useState } from "react";
-import { IoMdMore } from "react-icons/io";
-import { IoBookOutline, IoFilter } from "react-icons/io5";
-import { MdOutlineAdd } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-import { fetchBlogsByUsername } from "../blog-details/api/blog";
-import { CreateBlogPayload, createNewBlog } from "./api/blog.api";
-import { BlogDeleteConfirmDialog } from "./components/BlogDeleteConfirmDialog";
-import { useDeleteBlog } from "./hooks/useDeleteBlog";
+import { TUTORIAL_TEMPLATE_HTML } from '@/constants/template';
+import { useUser } from '@/contexts/user';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { Blog } from '@/types/blog';
+import { CircularProgress, IconButton, Menu } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import React, { useEffect, useState } from 'react';
+import { IoMdMore } from 'react-icons/io';
+import { IoBookOutline, IoFilter } from 'react-icons/io5';
+import { MdOutlineAdd } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { fetchBlogsByUsername } from '../blog-details/api/blog';
+import { CreateBlogPayload, createNewBlog } from './api/blog.api';
+import { BlogDeleteConfirmDialog } from './components/BlogDeleteConfirmDialog';
+import { useDeleteBlog } from './hooks/useDeleteBlog';
 
 // Define a type for the sort order
-type BlogSortOrder = "latest" | "oldest" | "last7days" | "last30days";
+type BlogSortOrder = 'latest' | 'oldest' | 'last7days' | 'last30days';
 
 const DocumentDashboard = () => {
   // Set "latest" as the default order
-  const [order, setOrder] = React.useState<BlogSortOrder>("latest");
+  const [order, setOrder] = React.useState<BlogSortOrder>('latest');
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,14 +45,14 @@ const DocumentDashboard = () => {
     useDeleteBlog({
       onSuccess: (blogId) => {
         setUserBlogs((prev) => prev.filter((blog) => blog.id !== blogId));
-        showSnackbar("Document deleted successfully", "success", undefined, {
-          vertical: "top",
-          horizontal: "center",
+        showSnackbar('Document deleted successfully', 'success', undefined, {
+          vertical: 'top',
+          horizontal: 'center',
         });
         setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
       },
       onError: (errorMessage) => {
-        showSnackbar(errorMessage, "error");
+        showSnackbar(errorMessage, 'error');
         setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
       },
     });
@@ -62,7 +62,7 @@ const DocumentDashboard = () => {
     if (Array.isArray(blog.pictures) && blog.pictures[0]) {
       return blog.pictures[0];
     }
-    return "https://placehold.co/600x400";
+    return 'https://placehold.co/600x400';
   };
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const DocumentDashboard = () => {
         const now = new Date();
 
         // Apply date range filtering for "last7days" or "last30days"
-        if (order === "last7days" || order === "last30days") {
+        if (order === 'last7days' || order === 'last30days') {
           processedBlogs = processedBlogs.filter((blog) => {
             // Handle potential null updated_at
             if (!blog.updated_at) return false;
@@ -95,10 +95,10 @@ const DocumentDashboard = () => {
               diffInMilliseconds / (1000 * 60 * 60 * 24),
             );
 
-            if (order === "last7days") {
+            if (order === 'last7days') {
               return diffInDays <= 7;
             }
-            if (order === "last30days") {
+            if (order === 'last30days') {
               return diffInDays <= 30;
             }
             return true;
@@ -111,7 +111,7 @@ const DocumentDashboard = () => {
           const dateA = new Date(a.updated_at || a.created_at).getTime();
           const dateB = new Date(b.updated_at || b.created_at).getTime();
 
-          if (order === "oldest") {
+          if (order === 'oldest') {
             return dateA - dateB; // Ascending for oldest update
           }
           // "latest", "last7days", "last30days" will sort by most recent update first
@@ -121,8 +121,8 @@ const DocumentDashboard = () => {
         setUserBlogs(processedBlogs);
         setError(null);
       } catch (err) {
-        console.error("Error fetching user documents:", err);
-        setError("Failed to load documents");
+        console.error('Error fetching user documents:', err);
+        setError('Failed to load documents');
         setUserBlogs([]);
       } finally {
         setIsLoading(false);
@@ -139,29 +139,29 @@ const DocumentDashboard = () => {
   const createNewDocument = async () => {
     try {
       const newBlogPayload: CreateBlogPayload = {
-        title: "Untitled Document",
+        title: 'Untitled Document',
         is_published: false,
-        content: "<p></p>",
+        content: '<p></p>',
       };
       const createdBlog = await createNewBlog(newBlogPayload);
       navigate(`/docs/${createdBlog.id}`);
     } catch (error) {
-      showSnackbar("Failed to create blog", "error");
-      console.error("Error creating document:", error);
+      showSnackbar('Failed to create blog', 'error');
+      console.error('Error creating document:', error);
     }
   };
 
   const createTutorialDocument = async () => {
     try {
       const payload: CreateBlogPayload = {
-        title: "Untitled Tutorial",
+        title: 'Untitled Tutorial',
         is_published: false,
         content: TUTORIAL_TEMPLATE_HTML,
       };
       const newBlog = await createNewBlog(payload);
       navigate(`/docs/${newBlog.id}`);
     } catch (err) {
-      showSnackbar("Failed to create tutorial", "error");
+      showSnackbar('Failed to create tutorial', 'error');
       console.error(err);
     }
   };
@@ -176,10 +176,10 @@ const DocumentDashboard = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
     });
   };
 
@@ -227,37 +227,37 @@ const DocumentDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen overflow-auto sidebar">
+    <div className="sidebar flex h-screen flex-col items-center overflow-auto">
       {/* Top Templates Section */}
-      <div className="flex justify-center border-mountain-50 dark:border-mountain-700 w-full h-fit">
-        <div className="flex flex-col justify-center items-center space-y-2 p-4 w-fit h-full">
-          <div className="flex space-x-4 h-full">
+      <div className="border-mountain-50 dark:border-mountain-700 flex h-fit w-full justify-center">
+        <div className="flex h-full w-fit flex-col items-center justify-center space-y-2 p-4">
+          <div className="flex h-full space-x-4">
             {/* Blank Document Template */}
             <div
-              className="flex flex-col justify-center space-y-4 cursor-pointer"
+              className="flex cursor-pointer flex-col justify-center space-y-4"
               onClick={() => createNewDocument()}
             >
-              <div className="flex justify-center items-center bg-mountain-50 dark:bg-mountain-800 border-1 border-white dark:border-mountain-600 hover:border-indigo-600 dark:hover:border-indigo-400 w-42 h-48 transition-colors">
-                <div className="flex justify-center items-center bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700 rounded-full w-16 h-16">
+              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-colors hover:border-indigo-600 dark:hover:border-indigo-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700">
                   <MdOutlineAdd className="size-10 text-gray-800 dark:text-gray-200" />
                 </div>
               </div>
-              <p className="text-mountain-800 dark:text-mountain-200 text-sm text-center">
+              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm">
                 Blank Document
               </p>
             </div>
 
             {/* Tutorial Template */}
             <div
-              className="flex flex-col justify-center space-y-4 cursor-pointer"
+              className="flex cursor-pointer flex-col justify-center space-y-4"
               onClick={() => createTutorialDocument()}
             >
-              <div className="flex justify-center items-center bg-mountain-50 dark:bg-mountain-800 border-1 border-white dark:border-mountain-600 hover:border-indigo-600 dark:hover:border-indigo-400 w-42 h-48 transition-colors">
-                <div className="flex justify-center items-center bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700 rounded-full w-16 h-16">
+              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-colors hover:border-indigo-600 dark:hover:border-indigo-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700">
                   <IoBookOutline className="size-10 text-gray-800 dark:text-gray-200" />
                 </div>
               </div>
-              <p className="text-mountain-800 dark:text-mountain-200 text-sm text-center">
+              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm">
                 Tutorial Template
               </p>
             </div>
@@ -266,10 +266,10 @@ const DocumentDashboard = () => {
       </div>
 
       {/* Documents Section */}
-      <div className="flex flex-col space-y-6 w-full">
+      <div className="flex w-full flex-col space-y-6">
         {/* Header with Filter */}
-        <div className="top-0 sticky flex justify-between items-center bg-white dark:bg-mountain-800 shadow-md px-4 rounded-t-3xl w-full h-fit">
-          <p className="font-medium text-lg text-gray-900 dark:text-gray-100">
+        <div className="dark:bg-mountain-800 sticky top-0 flex h-fit w-full items-center justify-between rounded-t-3xl bg-white px-4 shadow-md">
+          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
             Recent projects
           </p>
           <div className="flex items-center">
@@ -279,74 +279,74 @@ const DocumentDashboard = () => {
                   value={order}
                   onChange={handleChange}
                   displayEmpty
-                  inputProps={{ "aria-label": "Order By" }}
+                  inputProps={{ 'aria-label': 'Order By' }}
                   MenuProps={{
                     disableScrollLock: true,
                     PaperProps: {
                       sx: {
-                        backgroundColor: "var(--select-bg)",
-                        color: "var(--select-text)",
-                        "& .MuiMenuItem-root": {
-                          color: "var(--select-text)",
-                          "&:hover": {
-                            backgroundColor: "var(--select-hover)",
+                        backgroundColor: 'var(--select-bg)',
+                        color: 'var(--select-text)',
+                        '& .MuiMenuItem-root': {
+                          color: 'var(--select-text)',
+                          '&:hover': {
+                            backgroundColor: 'var(--select-hover)',
                           },
-                          "&.Mui-selected": {
-                            backgroundColor: "var(--select-selected)",
+                          '&.Mui-selected': {
+                            backgroundColor: 'var(--select-selected)',
                           },
                         },
                       },
                     },
                   }}
                   sx={{
-                    backgroundColor: "var(--select-bg)",
-                    color: "var(--select-text)",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "var(--select-border)",
+                    backgroundColor: 'var(--select-bg)',
+                    color: 'var(--select-text)',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'var(--select-border)',
                     },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "var(--select-border-hover)",
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'var(--select-border-hover)',
                     },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "var(--select-border-focus)",
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'var(--select-border-focus)',
                     },
-                    "& .MuiSelect-icon": {
-                      color: "var(--select-text)",
+                    '& .MuiSelect-icon': {
+                      color: 'var(--select-text)',
                     },
                   }}
-                  className="relative pl-8 rounded-full w-36 h-10"
+                  className="relative h-10 w-36 rounded-full pl-8"
                   style={
                     {
-                      "--select-bg": "white",
-                      "--select-text": "#374151",
-                      "--select-border": "#d1d5db",
-                      "--select-border-hover": "#9ca3af",
-                      "--select-border-focus": "#6366f1",
-                      "--select-hover": "#f3f4f6",
-                      "--select-selected": "#e0e7ff",
+                      '--select-bg': 'white',
+                      '--select-text': '#374151',
+                      '--select-border': '#d1d5db',
+                      '--select-border-hover': '#9ca3af',
+                      '--select-border-focus': '#6366f1',
+                      '--select-hover': '#f3f4f6',
+                      '--select-selected': '#e0e7ff',
                     } as React.CSSProperties
                   }
                 >
-                  <MenuItem value={"latest"}>Latest</MenuItem>
-                  <MenuItem value={"oldest"}>Oldest</MenuItem>
-                  <MenuItem value={"last7days"}>Last 7 days</MenuItem>
-                  <MenuItem value={"last30days"}>Last 30 days</MenuItem>
+                  <MenuItem value={'latest'}>Latest</MenuItem>
+                  <MenuItem value={'oldest'}>Oldest</MenuItem>
+                  <MenuItem value={'last7days'}>Last 7 days</MenuItem>
+                  <MenuItem value={'last30days'}>Last 30 days</MenuItem>
                 </Select>
-                <IoFilter className="top-1/2 left-4 absolute -translate-y-1/2 text-gray-600 dark:text-gray-400" />
+                <IoFilter className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
               </FormControl>
             </div>
           </div>
         </div>
 
         {/* Documents Grid */}
-        <div className="items-start gap-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 p-6 pb-96 min-h-[calc(100vh-4rem)]">
+        <div className="grid min-h-[calc(100vh-4rem)] grid-cols-2 items-start gap-6 p-6 pb-96 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {isLoading ? (
-            <div className="flex justify-center items-center col-span-full py-8">
+            <div className="col-span-full flex items-center justify-center py-8">
               <CircularProgress
                 size={32}
-                sx={{ color: "var(--loader-color)" }}
+                sx={{ color: 'var(--loader-color)' }}
                 style={
-                  { "--loader-color": "rgb(79 70 229)" } as React.CSSProperties
+                  { '--loader-color': 'rgb(79 70 229)' } as React.CSSProperties
                 }
               />
               <span className="ml-2 text-gray-700 dark:text-gray-300">
@@ -354,48 +354,48 @@ const DocumentDashboard = () => {
               </span>
             </div>
           ) : error ? (
-            <div className="flex justify-center items-center col-span-full py-8 text-red-500 dark:text-red-400">
+            <div className="col-span-full flex items-center justify-center py-8 text-red-500 dark:text-red-400">
               <span>{error}</span>
             </div>
           ) : userBlogs.length === 0 ? (
-            <div className="flex justify-center items-center col-span-full py-8 text-gray-500 dark:text-gray-400">
+            <div className="col-span-full flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
               <span>No documents found for the selected criteria.</span>
             </div>
           ) : (
             userBlogs.map((blog) => (
               <div
                 key={blog.id}
-                className="flex flex-col justify-center items-center space-y-4 bg-white dark:bg-mountain-800 pb-2 border border-mountain-200 dark:border-mountain-600 hover:border-indigo-600 dark:hover:border-indigo-400 rounded-lg cursor-pointer transition-colors duration-200"
+                className="dark:bg-mountain-800 border-mountain-200 dark:border-mountain-600 flex cursor-pointer flex-col items-center justify-center space-y-4 rounded-lg border bg-white pb-2 transition-colors duration-200 hover:border-indigo-600 dark:hover:border-indigo-400"
                 onClick={() => handleDocumentClick(blog.id)}
               >
                 {/* Document Thumbnail */}
-                <div className="flex justify-center items-center bg-mountain-50 dark:bg-mountain-700 border border-mountain-50 dark:border-mountain-600 rounded-t-lg w-full aspect-square overflow-hidden">
+                <div className="bg-mountain-50 dark:bg-mountain-700 border-mountain-50 dark:border-mountain-600 flex aspect-square w-full items-center justify-center overflow-hidden rounded-t-lg border">
                   <img
                     src={getThumbnail(blog)}
                     alt={blog.title}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                     onError={(e) => {
                       // Fallback to placeholder if image fails to load
-                      e.currentTarget.src = "https://placehold.co/600x400";
+                      e.currentTarget.src = 'https://placehold.co/600x400';
                     }}
                   />
                 </div>
 
                 {/* Document Info */}
-                <div className="flex flex-col justify-start items-start space-y-2 w-full">
+                <div className="flex w-full flex-col items-start justify-start space-y-2">
                   <p
-                    className="bg-white dark:bg-mountain-800 px-2 w-full text-mountain-800 dark:text-mountain-200 text-sm text-left line-clamp-1 select-none"
+                    className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-200 line-clamp-1 w-full bg-white px-2 text-left text-sm select-none"
                     title={blog.title}
                   >
                     {truncateTitle(blog.title)}
                   </p>
-                  <div className="flex justify-between items-center w-full">
-                    <p className="bg-white dark:bg-mountain-800 px-2 w-full text-mountain-800 dark:text-mountain-300 text-xs text-left truncate select-none">
+                  <div className="flex w-full items-center justify-between">
+                    <p className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-300 w-full truncate bg-white px-2 text-left text-xs select-none">
                       {formatDate(blog.created_at)}
                     </p>
                     <IconButton
                       onClick={(event) => handleMenuClick(event, blog.id)}
-                      className="bg-white dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 mr-2 w-6 h-6 text-mountain-600 dark:text-mountain-400 cursor-pointer"
+                      className="dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 text-mountain-600 dark:text-mountain-400 mr-2 h-6 w-6 cursor-pointer bg-white"
                       size="small"
                     >
                       <IoMdMore className="size-5" />
@@ -410,23 +410,23 @@ const DocumentDashboard = () => {
                       onClick={(e) => e.stopPropagation()}
                       PaperProps={{
                         sx: {
-                          backgroundColor: "var(--menu-bg)",
-                          color: "var(--menu-text)",
-                          border: "1px solid var(--menu-border)",
-                          "& .MuiMenuItem-root": {
-                            color: "var(--menu-text)",
-                            "&:hover": {
-                              backgroundColor: "var(--menu-hover)",
+                          backgroundColor: 'var(--menu-bg)',
+                          color: 'var(--menu-text)',
+                          border: '1px solid var(--menu-border)',
+                          '& .MuiMenuItem-root': {
+                            color: 'var(--menu-text)',
+                            '&:hover': {
+                              backgroundColor: 'var(--menu-hover)',
                             },
                           },
                         },
                       }}
                       style={
                         {
-                          "--menu-bg": "white",
-                          "--menu-text": "#374151",
-                          "--menu-border": "#d1d5db",
-                          "--menu-hover": "#f3f4f6",
+                          '--menu-bg': 'white',
+                          '--menu-text': '#374151',
+                          '--menu-border': '#d1d5db',
+                          '--menu-hover': '#f3f4f6',
                         } as React.CSSProperties
                       }
                     >

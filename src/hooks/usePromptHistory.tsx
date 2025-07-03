@@ -1,74 +1,89 @@
-import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
-import api from "@/api/baseApi";
-import { HistoryFilter } from "@/features/gen-art/enum";
-import { useInfiniteTopScroll } from "./useInfiniteTopScroll";
+import api from '@/api/baseApi';
+import { PaginatedResponse } from '@/api/types/paginated-response.type';
+import { HistoryFilter } from '@/features/gen-art/enum';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteTopScroll } from './useInfiniteTopScroll';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export const usePromptHistory = () => {
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>(
-    HistoryFilter.TODAY,
+    HistoryFilter.ALL,
   );
-  const [promptResultList, setPromptResultList] = useState<PromptResult[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadedCount, setLoadedCount] = useState(PAGE_SIZE);
   const [displayedResults, setDisplayedResults] = useState<PromptResult[]>([]);
   const [initialScrollDone, setInitialScrollDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const isInFilterRange = (createdAt: string): boolean => {
-    const createdDate = new Date(createdAt);
-    const now = new Date();
-    switch (historyFilter) {
-      case HistoryFilter.TODAY:
-        return createdDate.toDateString() === now.toDateString();
-      case HistoryFilter.YESTERDAY: {
-        const yesterday = new Date();
-        yesterday.setDate(now.getDate() - 1);
-        return createdDate.toDateString() === yesterday.toDateString();
-      }
-      case HistoryFilter.LAST7DAYS: {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(now.getDate() - 6);
-        return createdDate >= sevenDaysAgo && createdDate <= now;
-      }
-      case HistoryFilter.LAST30DAYS: {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(now.getDate() - 29);
-        return createdDate >= thirtyDaysAgo && createdDate <= now;
-      }
-      default:
-        return true;
-    }
-  };
+  // Use React Query Infinite Query to fetch prompt history with pagination
+  const {
+    data,
+    isLoading: loading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<PaginatedResponse<PromptResult>>({
+    queryKey: ['prompt-history', historyFilter.value],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await api.get('/art-generation/prompt-history', {
+        params: {
+          page: pageParam,
+          limit: PAGE_SIZE,
+        },
+      });
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasNextPage ? lastPage.page + 1 : undefined;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    initialPageParam: 1,
+  });
 
-  // Fetch history on mount
-  useEffect(() => {
-    api
-      .get("/art-generation/prompt-history")
-      .then((res) => setPromptResultList(res.data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  // Flatten all pages into a single array
+  const allPromptResults = useMemo(() => {
+    return data?.pages.flatMap((page) => page.data) ?? [];
+  }, [data]);
 
-  // Reset pagination when filter or data changes
-  useEffect(() => {
-    setLoadedCount(PAGE_SIZE);
-    setInitialScrollDone(false);
-  }, [historyFilter, promptResultList]);
-
-  // Filter and reverse
-  const filtered = useMemo(
-    () => promptResultList.filter((r) => isInFilterRange(r.created_at)),
-    [promptResultList, historyFilter],
+  const isInFilterRange = useMemo(
+    () =>
+      (createdAt: string): boolean => {
+        const createdDate = new Date(createdAt);
+        const now = new Date();
+        switch (historyFilter) {
+          case HistoryFilter.LAST7DAYS: {
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(now.getDate() - 6);
+            return createdDate >= sevenDaysAgo && createdDate <= now;
+          }
+          case HistoryFilter.LAST30DAYS: {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(now.getDate() - 29);
+            return createdDate >= thirtyDaysAgo && createdDate <= now;
+          }
+          case HistoryFilter.ALL:
+          default:
+            return true;
+        }
+      },
+    [historyFilter],
   );
-  const reversed = useMemo(() => filtered.slice().reverse(), [filtered]);
 
-  // Compute slice
+  // Filter results based on the selected filter (client-side for now)
+  const filtered = useMemo(
+    () =>
+      allPromptResults.filter((r: PromptResult) =>
+        isInFilterRange(r.created_at),
+      ),
+    [allPromptResults, isInFilterRange],
+  );
+
+  // Set filtered results as displayed results (already ordered by latest from backend)
   useEffect(() => {
-    const start = Math.max(0, reversed.length - loadedCount);
-    setDisplayedResults(reversed.slice(start));
-  }, [reversed, loadedCount]);
+    setDisplayedResults(filtered);
+    setInitialScrollDone(false);
+  }, [filtered]);
 
   // Scroll to bottom once
   useLayoutEffect(() => {
@@ -78,11 +93,18 @@ export const usePromptHistory = () => {
     }
   }, [displayedResults, initialScrollDone]);
 
-  // Infinite scroll trigger
+  // Load more data when scrolling to top
+  const loadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  // Infinite scroll trigger for loading more
   useInfiniteTopScroll(
     scrollRef,
-    displayedResults.length < reversed.length,
-    () => setLoadedCount((c) => c + PAGE_SIZE),
+    hasNextPage ?? false,
+    loadMore,
     displayedResults.length,
   );
 
@@ -90,7 +112,7 @@ export const usePromptHistory = () => {
     scrollRef,
     displayedResults,
     setDisplayedResults,
-    loading,
+    loading: loading || isFetchingNextPage,
     historyFilter,
     setHistoryFilter,
   };

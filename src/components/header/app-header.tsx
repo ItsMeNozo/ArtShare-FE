@@ -1,5 +1,5 @@
 import { useSearch } from '@/contexts/SearchProvider';
-import { useUser } from '@/contexts/UserProvider';
+import { useUser } from '@/contexts/user/useUser';
 import { HeaderRoute, routesForHeaders } from '@/utils/constants';
 import React, { useRef, useState } from 'react';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -55,26 +55,26 @@ const Header: React.FC = () => {
 
   return (
     <nav
-      className={`py-4 top-0 z-50 sticky flex justify-between items-center dark:bg-mountain-950 dark:border-b-mountain-700 w-full h-16`}
+      className={`dark:bg-mountain-950 dark:border-b-mountain-700 sticky top-0 z-50 flex h-16 w-full items-center justify-between py-4`}
     >
-      <div className="flex items-center h-full">
-        <div className="flex items-center h-full">
+      <div className="flex h-full items-center">
+        <div className="flex h-full items-center">
           <div className="flex items-center space-x-2">
-            <div className="flex space-x-2 bg-white rounded-full">
+            <div className="flex space-x-2 rounded-full bg-white">
               <Button
                 disabled={!hasBack}
                 onClick={() => navigate(-1)}
-                className="flex items-center justify-center w-8 h-8 bg-white rounded-full cursor-pointer hover:bg-mountain-100 border-1 border-mountain-100 text-mountain-950"
+                className="hover:bg-mountain-100 border-mountain-100 text-mountain-950 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1 bg-white"
               >
                 <FaArrowLeft />
               </Button>
             </div>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex items-center gap-1 text-sm">
               {breadcrumbs.map((crumb, index) => (
                 <React.Fragment key={crumb.path}>
                   {index > 0 && <span className="px-1 text-gray-400">/</span>}
                   <span
-                    className={`${index === breadcrumbs.length - 1 ? 'font-medium text-foreground' : ''} text-lg`}
+                    className={`${index === breadcrumbs.length - 1 ? 'text-foreground font-medium' : ''} text-lg`}
                   >
                     {crumb.label}
                   </span>
@@ -83,18 +83,14 @@ const Header: React.FC = () => {
             </div>
           </div>
           <div
-            className={`hidden top-1/2 left-1/2 absolute lg:flex items-center dark:bg-mountain-1000 
-                            rounded-2xl h-10 text-neutral-700 focus-within:text-mountain-950 dark:focus-within:text-mountain-50 
-                            dark:text-neutral-300 -translate-x-1/2 -translate-y-1/2 
-                            transition-all duration-300 ease-in-out 
-                            ${isFocused ? 'w-108' : 'w-96'}`}
+            className={`dark:bg-mountain-1000 focus-within:text-mountain-950 dark:focus-within:text-mountain-50 absolute top-1/2 left-1/2 hidden h-10 -translate-x-1/2 -translate-y-1/2 items-center rounded-2xl text-neutral-700 transition-all duration-300 ease-in-out lg:flex dark:text-neutral-300 ${isFocused ? 'w-108' : 'w-96'}`}
           >
-            <FiSearch className="absolute w-5 h-5 -translate-y-1/2 top-1/2 left-2" />
+            <FiSearch className="absolute top-1/2 left-2 h-5 w-5 -translate-y-1/2" />
             <Input
               ref={inputRef}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              className="w-full pl-8 bg-white shadow-inner rounded-2xl"
+              className="w-full rounded-2xl bg-white pl-8 shadow-inner"
               placeholder="Search"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
@@ -108,22 +104,22 @@ const Header: React.FC = () => {
               }}
             />
             <TiDeleteOutline
-              className={`right-2 text-mountain-600 absolute w-5 h-5 ${inputValue.length <= 0 ? 'hidden' : 'flex'}`}
+              className={`text-mountain-600 absolute right-2 h-5 w-5 ${inputValue.length <= 0 ? 'hidden' : 'flex'}`}
               onClick={() => {
                 setInputValue('');
                 setQuery('');
               }}
             />
           </div>
-          <div className="flex items-center h-full border-b-4 border-white lg:hidden dark:border-mountain-950">
-            <div className="items-center hidden p-2 mt-1 rounded-lg md:flex space-x-1:lg:space-x-2 hover:bg-mountain-100 dark:hover:bg-mountain-1000 text-mountain-500 hover:text-mountain-800 dark:hover:text-mountain-50 hover:cursor-pointer lg">
-              <FiSearch className="w-6 h-6" />
+          <div className="dark:border-mountain-950 flex h-full items-center border-b-4 border-white lg:hidden">
+            <div className="space-x-1:lg:space-x-2 hover:bg-mountain-100 dark:hover:bg-mountain-1000 text-mountain-500 hover:text-mountain-800 dark:hover:text-mountain-50 lg mt-1 hidden items-center rounded-lg p-2 hover:cursor-pointer md:flex">
+              <FiSearch className="h-6 w-6" />
               <p className="text-sm">Search</p>
             </div>
           </div>
         </div>
       </div>
-      <div className={`flex items-center h-full space-x-2`}>
+      <div className={`flex h-full items-center space-x-2`}>
         <UserButton user={user!} loading={loading!} />
         <UserInAppConfigs />
       </div>
