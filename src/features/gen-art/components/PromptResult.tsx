@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { truncateText } from '@/utils/text';
 import {
   Button,
   CircularProgress,
@@ -77,7 +78,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
       <div className="flex w-full items-center justify-between space-x-2">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
-          {result.user_prompt}
+          {truncateText(result.user_prompt, 60)}
         </p>
         {!result.generating && (
           <div className="flex items-center space-x-2">

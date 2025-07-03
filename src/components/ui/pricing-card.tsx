@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { BadgeCheck, ArrowRight, Mail } from "lucide-react";
-import NumberFlow from "@number-flow/react";
+import NumberFlow from '@number-flow/react';
+import { ArrowRight, BadgeCheck, Mail } from 'lucide-react';
 
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SubscriptionPlan } from '@/api/subscription/get-subscription-info.api';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useUser } from '@/contexts/user/useUser';
+import { useSubscriptionInfo } from '@/hooks/useSubscription';
+import { cn } from '@/lib/utils';
 import {
   createCheckoutSession,
   CreateCheckoutSessionPayload,
-} from "@/pages/Home/api/stripe.api";
-import { useUser } from "@/contexts/UserProvider";
-import { useSubscriptionInfo } from "@/hooks/useSubscription";
-import { FaCheckCircle } from "react-icons/fa";
-import { SubscriptionPlan } from "@/api/subscription/get-subscription-info.api";
+} from '@/pages/Home/api/stripe.api';
+import { FaCheckCircle } from 'react-icons/fa';
 
-const DEFAULT_CONTACT_EMAIL = "your-default-email@example.com";
+const DEFAULT_CONTACT_EMAIL = 'your-default-email@example.com';
 
 export interface PricingTier {
   id: string;
@@ -24,7 +24,7 @@ export interface PricingTier {
   description: string;
   features: string[];
   cta: string;
-  actionType: "checkout" | "contact" | "none";
+  actionType: 'checkout' | 'contact' | 'none';
   contactEmail?: string;
   highlighted?: boolean;
   popular?: boolean;
@@ -37,13 +37,13 @@ interface PricingCardProps {
 
 const getSubscriptionPlanFromTier = (tierId: string): SubscriptionPlan => {
   switch (tierId) {
-    case "individual":
+    case 'individual':
       return SubscriptionPlan.FREE;
-    case "artist":
+    case 'artist':
       return SubscriptionPlan.ARTIST_PRO;
-    case "studio":
+    case 'studio':
       return SubscriptionPlan.STUDIO;
-    case "enterprise":
+    case 'enterprise':
       return SubscriptionPlan.ENTERPRISE;
     default:
       console.warn(`Unknown tier ID: ${tierId}. Defaulting to FREE plan.`);
@@ -60,7 +60,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
   const { data: subscriptionInfo } = useSubscriptionInfo();
 
   const handleProceedToCheckout = async () => {
-    if (tier.actionType !== "checkout") return;
+    if (tier.actionType !== 'checkout') return;
     const planId = tier.id + `_${paymentFrequency}`;
     if (!planId) {
       console.error(
@@ -77,7 +77,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       const sessionResult = await createCheckoutSession(payload);
       window.location.href = sessionResult.url;
     } catch (err) {
-      console.error("Checkout session creation failed:", err);
+      console.error('Checkout session creation failed:', err);
     }
   };
 
@@ -87,26 +87,26 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       subscriptionInfo.plan === getSubscriptionPlanFromTier(tier.id)
     ) {
       return {
-        text: "Current Plan",
+        text: 'Current Plan',
         action: undefined,
         icon: FaCheckCircle,
         asChild: false,
         href: undefined,
-        variant: isHighlighted ? "secondary" : "outline", // Give current plan a distinct look
+        variant: isHighlighted ? 'secondary' : 'outline', // Give current plan a distinct look
         disabled: true,
       };
     }
     switch (tier.actionType) {
-      case "checkout":
+      case 'checkout':
         return {
           text: tier.cta,
           action: handleProceedToCheckout,
           icon: ArrowRight,
           asChild: false,
           href: undefined,
-          variant: isHighlighted ? "secondary" : "default",
+          variant: isHighlighted ? 'secondary' : 'default',
         };
-      case "contact": {
+      case 'contact': {
         const email = tier.contactEmail || DEFAULT_CONTACT_EMAIL;
         return {
           text: tier.cta,
@@ -114,10 +114,10 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
           icon: Mail,
           asChild: true,
           href: `mailto:${email}?subject=Inquiry about ${tier.name} Plan`,
-          variant: isHighlighted ? "secondary" : "default",
+          variant: isHighlighted ? 'secondary' : 'default',
         };
       }
-      case "none":
+      case 'none':
       default:
         return null;
     }
@@ -128,13 +128,13 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
   return (
     <div
       className={cn(
-        "relative flex flex-1 flex-col gap-8 overflow-hidden p-6 rounded-lg border",
+        'relative flex flex-1 flex-col gap-8 overflow-hidden rounded-lg border p-6',
         isHighlighted
-          ? "bg-gradient-to-b from-blue-800 to-purple-800 text-white border-purple-700 dark:border-purple-600" // Gradient works for dark, ensure border is visible
-          : "bg-white dark:bg-slate-800 border-mountain-300 dark:border-slate-700 text-slate-900 dark:text-slate-50", // Default card styles
+          ? 'border-purple-700 bg-gradient-to-b from-blue-800 to-purple-800 text-white dark:border-purple-600' // Gradient works for dark, ensure border is visible
+          : 'border-mountain-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50', // Default card styles
         isPopular &&
           !isHighlighted &&
-          "border-2 border-indigo-600 dark:border-indigo-500", // Popular border only if not highlighted
+          'border-2 border-indigo-600 dark:border-indigo-500', // Popular border only if not highlighted
       )}
     >
       {isHighlighted && <HighlightedBackground isDarkMode />}
@@ -143,8 +143,8 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       {/* Tier Name and Popular Badge */}
       <h2
         className={cn(
-          "flex items-center gap-3 text-xl capitalize",
-          isHighlighted ? "text-white" : "text-slate-900 dark:text-slate-50",
+          'flex items-center gap-3 text-xl capitalize',
+          isHighlighted ? 'text-white' : 'text-slate-900 dark:text-slate-50',
         )}
       >
         {tier.name}
@@ -152,10 +152,10 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
           <Badge
             variant="secondary" // shadcn secondary usually adapts
             className={cn(
-              "z-10 mt-1",
+              'z-10 mt-1',
               isHighlighted
-                ? "bg-white/20 text-white" // Badge on highlighted card
-                : "bg-indigo-50 dark:bg-indigo-500/30 text-indigo-700 dark:text-indigo-200", // Badge on default card
+                ? 'bg-white/20 text-white' // Badge on highlighted card
+                : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-200', // Badge on default card
             )}
           >
             🔥 Most Popular
@@ -166,16 +166,16 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       {/* Price Display */}
       <div
         className={cn(
-          "relative h-12",
-          isHighlighted ? "text-white" : "text-slate-900 dark:text-slate-100",
+          'relative h-12',
+          isHighlighted ? 'text-white' : 'text-slate-900 dark:text-slate-100',
         )}
       >
-        {typeof price === "number" ? (
+        {typeof price === 'number' ? (
           <>
             <NumberFlow
               format={{
-                style: "currency",
-                currency: "USD",
+                style: 'currency',
+                currency: 'USD',
                 minimumFractionDigits: 0,
               }}
               value={price}
@@ -183,10 +183,10 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
             />
             <p
               className={cn(
-                "-mt-2 text-xs",
+                '-mt-2 text-xs',
                 isHighlighted
-                  ? "text-purple-200"
-                  : "text-muted-foreground dark:text-slate-400",
+                  ? 'text-purple-200'
+                  : 'text-muted-foreground dark:text-slate-400',
               )}
             >
               Per month/user
@@ -201,10 +201,10 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       <div className="flex-1 space-y-2">
         <h3
           className={cn(
-            "text-xs",
+            'text-xs',
             isHighlighted
-              ? "text-purple-100"
-              : "text-slate-700 dark:text-slate-300",
+              ? 'text-purple-100'
+              : 'text-slate-700 dark:text-slate-300',
           )}
         >
           {tier.description}
@@ -214,18 +214,18 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
             <li
               key={index}
               className={cn(
-                "flex items-center gap-2 text-xs",
+                'flex items-center gap-2 text-xs',
                 isHighlighted
-                  ? "text-mountain-200 dark:text-purple-200"
-                  : "text-muted-foreground dark:text-slate-400",
+                  ? 'text-mountain-200 dark:text-purple-200'
+                  : 'text-muted-foreground dark:text-slate-400',
               )}
             >
               <BadgeCheck
                 className={cn(
-                  "flex-shrink-0 w-4 h-4",
+                  'h-4 w-4 flex-shrink-0',
                   isHighlighted
-                    ? "text-purple-300"
-                    : "text-indigo-500 dark:text-indigo-400", // Give check a distinct color
+                    ? 'text-purple-300'
+                    : 'text-indigo-500 dark:text-indigo-400', // Give check a distinct color
                 )}
               />
               {feature}
@@ -237,16 +237,16 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       {/* Conditional CTA Button/Link */}
       {ctaProps && (
         <Button
-          variant={isHighlighted ? "secondary" : "default"}
+          variant={isHighlighted ? 'secondary' : 'default'}
           size="lg" // Make buttons a bit larger for pricing cards
           className={cn(
-            "z-10 w-full cursor-pointer mt-auto", // Use mt-auto to push to bottom if card heights vary
-            ctaProps.disabled && "opacity-70 cursor-not-allowed",
+            'z-10 mt-auto w-full cursor-pointer', // Use mt-auto to push to bottom if card heights vary
+            ctaProps.disabled && 'cursor-not-allowed opacity-70',
             ctaProps.disabled && isHighlighted
-              ? "bg-white/30 hover:bg-white/40 text-white"
+              ? 'bg-white/30 text-white hover:bg-white/40'
               : ctaProps.disabled && !isHighlighted
-                ? "dark:bg-slate-700 dark:text-slate-400 bg-slate-200 text-slate-500"
-                : "",
+                ? 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                : '',
           )}
           onClick={ctaProps.action}
           asChild={ctaProps.asChild}
@@ -257,14 +257,14 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
               href={ctaProps.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex justify-center items-center"
+              className="flex items-center justify-center"
             >
-              {ctaProps.icon && <ctaProps.icon className="mr-2 w-4 h-4" />}
+              {ctaProps.icon && <ctaProps.icon className="mr-2 h-4 w-4" />}
               {ctaProps.text}
             </a>
           ) : (
             <>
-              {ctaProps.icon && <ctaProps.icon className="mr-2 w-4 h-4" />}
+              {ctaProps.icon && <ctaProps.icon className="mr-2 h-4 w-4" />}
               {ctaProps.text}
             </>
           )}
@@ -277,10 +277,10 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
 const HighlightedBackground = ({ isDarkMode }: { isDarkMode?: boolean }) => (
   <div
     className={cn(
-      "absolute inset-0 bg-[size:45px_45px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-50 dark:opacity-30",
+      'absolute inset-0 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-[size:45px_45px] opacity-50 dark:opacity-30',
       isDarkMode
-        ? "bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)]"
-        : "bg-[linear-gradient(to_right,#00000012_1px,transparent_1px),linear-gradient(to_bottom,#00000012_1px,transparent_1px)]",
+        ? 'bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)]'
+        : 'bg-[linear-gradient(to_right,#00000012_1px,transparent_1px),linear-gradient(to_bottom,#00000012_1px,transparent_1px)]',
     )}
     style={{
       // Use light grid for the dark gradient background
@@ -292,10 +292,10 @@ const HighlightedBackground = ({ isDarkMode }: { isDarkMode?: boolean }) => (
 const PopularBackground = ({ isDarkMode }: { isDarkMode?: boolean }) => (
   <div
     className={cn(
-      "absolute inset-0",
-      "bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15)_0%,rgba(255,255,255,0)_100%)]",
+      'absolute inset-0',
+      'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15)_0%,rgba(255,255,255,0)_100%)]',
       isDarkMode &&
-        "dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2)_0%,rgba(255,255,255,0)_100%)]", // Slightly more intense for dark
+        'dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2)_0%,rgba(255,255,255,0)_100%)]', // Slightly more intense for dark
     )}
   />
 );
