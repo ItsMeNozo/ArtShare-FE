@@ -15,7 +15,7 @@ import { AiOutlineCamera } from "react-icons/ai";
 const CameraOptions: React.FC<SelectCameraProp> = ({ selectedCamera, onChange }) => {
     return (
         <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger asChild>
                 <Button className='flex justify-between bg-mountain-100 p-3 rounded-xl w-full font-normal'>
                     <div className='flex items-center space-x-2'>
                         <AiOutlineCamera className='rounded-xs w-5 h-5' />

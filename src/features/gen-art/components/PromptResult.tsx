@@ -1,26 +1,10 @@
 //Core
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 //Icons
-import { FiDownload } from "react-icons/fi";
-import { FiTrash2 } from "react-icons/fi";
+import { FiDownload, FiTrash2 } from 'react-icons/fi';
 
 //Components
-import {
-  Button,
-  CircularProgress,
-  ImageList,
-  ImageListItem,
-  Tooltip,
-} from "@mui/material";
-import GenImage from "./GenImage";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +12,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { RiShareBoxFill } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
+} from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { truncateText } from '@/utils/text';
+import {
+  Button,
+  CircularProgress,
+  ImageList,
+  ImageListItem,
+  Tooltip,
+} from '@mui/material';
+import { saveAs } from 'file-saver';
+import JSZip from 'jszip';
+import { RiShareBoxFill } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import GenImage from './GenImage';
 
 interface promptResultProps {
   result: PromptResult;
@@ -65,30 +65,30 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
       }),
     );
 
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveAs(zipBlob, "images.zip");
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    saveAs(zipBlob, 'images.zip');
   };
 
   const handleNavigateToUploadPost = (prompt: PromptResult) => {
-    navigate("/posts/new?type=ai-gen", { state: { prompt } });
+    navigate('/posts/new?type=ai-gen', { state: { prompt } });
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full">
-      <div className="flex justify-between items-center space-x-2 w-full">
+    <div className="flex w-full flex-col space-y-2">
+      <div className="flex w-full items-center justify-between space-x-2">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
-          {result.user_prompt}
+          {truncateText(result.user_prompt, 60)}
         </p>
         {!result.generating && (
           <div className="flex items-center space-x-2">
-            <Tooltip title="Share Post" placement="bottom" arrow>
+            <Tooltip title="Post this" placement="bottom" arrow>
               <Button
                 onClick={() => handleNavigateToUploadPost(result!)}
-                className={`flex bg-mountain-100 ${useToShare ? "w-36" : "w-8"}`}
+                className={`bg-mountain-100 flex ${useToShare ? 'w-36' : 'w-8'}`}
               >
                 <RiShareBoxFill className="size-5" />
-                <p className={`${!useToShare ? "hidden" : "ml-2 font-normal"}`}>
+                <p className={`${!useToShare ? 'hidden' : 'ml-2 font-normal'}`}>
                   Share These
                 </p>
               </Button>
@@ -106,14 +106,14 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
               <PopoverTrigger asChild>
                 <Tooltip title="Delete" placement="bottom" arrow>
                   <Button
-                    className="flex bg-mountain-100 w-4"
+                    className="bg-mountain-100 flex w-4"
                     hidden={useToShare || false}
                   >
                     <FiTrash2 className="size-5 text-red-900" />
                   </Button>
                 </Tooltip>
               </PopoverTrigger>
-              <PopoverContent className="dark:bg-mountain-900 mt-2 mr-6 p-2 border-mountain-100 dark:border-mountain-700 w-48">
+              <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-2 mr-6 w-48 p-2">
                 <div className="flex flex-col space-y-2">
                   <p className="text-sm">Are you sure to delete?</p>
                   <Dialog>
@@ -124,13 +124,13 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                       </Button>
                     </DialogTrigger>
                     <DialogContent
-                      className="flex justify-center sm:max-w-[320px] h-fit cursor-not-allowed"
+                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
                       hideCloseButton
                     >
                       <DialogHeader>
-                        <DialogDescription className="flex justify-center items-center space-x-4">
+                        <DialogDescription className="flex items-center justify-center space-x-4">
                           <CircularProgress size={32} thickness={4} />
-                          <DialogTitle className="font-normal text-base text-center">
+                          <DialogTitle className="text-center text-base font-normal">
                             Deleting These Images
                           </DialogTitle>
                         </DialogDescription>
@@ -143,13 +143,13 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
           </div>
         )}
       </div>
-      <ImageList cols={4} gap={8} sx={{ width: "100%", minHeight: "268px" }}>
+      <ImageList cols={4} gap={8} sx={{ width: '100%', minHeight: '268px' }}>
         {result.image_urls.map((__, index) => (
           <ImageListItem key={index} className="flex h-full object-cover">
             {result.generating ? (
-              <div className="relative flex justify-center items-center bg-mountain-100 rounded-[8px] h-full">
+              <div className="bg-mountain-100 relative flex h-full items-center justify-center rounded-[8px]">
                 <CircularProgress size={64} thickness={4} />
-                <p className="absolute font-medium text-gray-700 text-xs">
+                <p className="absolute text-xs font-medium text-gray-700">
                   Loading
                 </p>
               </div>

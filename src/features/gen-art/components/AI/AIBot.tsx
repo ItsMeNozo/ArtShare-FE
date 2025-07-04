@@ -91,7 +91,7 @@ const AIBotPopover = () => {
 
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger asChild>
         <Button className="bg-white hover:bg-mountain-50 shadow-md ml-4 border border-mountain-300 rounded-full w-15 h-15 hover:cursor-pointer">
           <RiChatAiLine className="size-8 text-indigo-950" />
         </Button>

@@ -81,9 +81,7 @@ const ArtGenAI = () => {
     scrollRef,
     displayedResults,
     setDisplayedResults,
-    loading,
-    historyFilter,
-    setHistoryFilter,
+    loading
   } = usePromptHistory();
   useScrollBottom(scrollRef, [scrollTrigger], 200);
 
@@ -212,11 +210,7 @@ const ArtGenAI = () => {
       />
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-col items-end pr-4 border-mountain-200 border-b-1">
-          <AIHeader
-            historyFilter={historyFilter}
-            setHistoryFilter={setHistoryFilter}
-            loading={loading}
-          />
+          <AIHeader />
         </div>
         <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div

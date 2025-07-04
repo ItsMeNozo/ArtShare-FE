@@ -1,5 +1,5 @@
 import { useSearch } from '@/contexts/SearchProvider';
-import { useUser } from '@/contexts/UserProvider';
+import { useUser } from '@/contexts/user/useUser';
 import { HeaderRoute, routesForHeaders } from '@/utils/constants';
 import React, { useRef, useState } from 'react';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -95,11 +95,7 @@ const Header: React.FC = () => {
             </div>
           </div>
           <div
-            className={`hidden top-1/2 left-1/2 absolute lg:flex items-center dark:bg-mountain-1000 
-                            rounded-2xl h-10 text-neutral-700 focus-within:text-mountain-950 dark:focus-within:text-mountain-50 
-                            dark:text-neutral-300 -translate-x-1/2 -translate-y-1/2 
-                            transition-all duration-300 ease-in-out 
-                            ${isFocused ? 'w-108' : 'w-96'}`}
+            className={`dark:bg-mountain-1000 focus-within:text-mountain-950 dark:focus-within:text-mountain-50 absolute top-1/2 left-1/2 hidden h-10 -translate-x-1/2 -translate-y-1/2 items-center rounded-2xl text-neutral-700 transition-all duration-300 ease-in-out lg:flex dark:text-neutral-300 ${isFocused ? 'w-108' : 'w-96'}`}
           >
             <FiSearch className="top-1/2 left-2 absolute w-5 h-5 -translate-y-1/2" />
             <Input
@@ -120,7 +116,7 @@ const Header: React.FC = () => {
               }}
             />
             <TiDeleteOutline
-              className={`right-2 text-mountain-600 absolute w-5 h-5 ${inputValue.length <= 0 ? 'hidden' : 'flex'}`}
+              className={`text-mountain-600 absolute right-2 h-5 w-5 ${inputValue.length <= 0 ? 'hidden' : 'flex'}`}
               onClick={() => {
                 setInputValue('');
                 setQuery('');
@@ -135,7 +131,7 @@ const Header: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className={`flex items-center h-full space-x-2`}>
+      <div className={`flex h-full items-center space-x-2`}>
         <UserButton user={user!} loading={loading!} />
         <UserInAppConfigs />
       </div>

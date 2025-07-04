@@ -1,30 +1,34 @@
 // Core
-import { useState } from "react";
+import { useState } from 'react';
 
 // Context/hooks
-import { useUser } from "@/contexts/UserProvider";
+import { useUser } from '@/contexts/user';
 
 // Icons
-import { MdDarkMode, MdMailOutline, MdMoreVert } from "react-icons/md";
-import { MdLightMode } from "react-icons/md";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from '@/hooks/useTheme';
+import {
+  MdDarkMode,
+  MdLightMode,
+  MdMailOutline,
+  MdMoreVert,
+} from 'react-icons/md';
 // Components
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 // Avatars
-import BoringAvatar from "boring-avatars";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import BoringAvatar from 'boring-avatars';
 
-import { Switch } from "@/components/ui/switch";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
-import { FaRegCircleUser } from "react-icons/fa6";
-import { TbChessQueen } from "react-icons/tb";
-import { LuSettings } from "react-icons/lu";
+import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@mui/material';
+import { FaRegCircleUser } from 'react-icons/fa6';
+import { LuSettings } from 'react-icons/lu';
+import { TbChessQueen } from 'react-icons/tb';
+import { Link, useNavigate } from 'react-router-dom';
 
 const UserInAppConfigs = () => {
   const { user, loading, logout } = useUser();
@@ -34,12 +38,21 @@ const UserInAppConfigs = () => {
   const [matureContent, setMatureContent] = useState(false);
   const [aiContent, setAiContent] = useState(false);
 
-  const handleLogout = () => {
-    setOpen(false);
-    setTimeout(() => {
-      logout();
-      navigate("/login");
-    }, 300);
+  const handleLogout = async () => {
+    try {
+      // Close the popover immediately
+      setOpen(false);
+
+      // Call logout immediately - no delay needed
+      await logout();
+
+      // Navigate to login page
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Navigate to login anyway in case of error
+      navigate('/login');
+    }
   };
 
   if (loading)
@@ -50,13 +63,13 @@ const UserInAppConfigs = () => {
     );
 
   return (
-    <Popover open={open}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <div>
           <Button
             title="User menu"
             className={`flex items-center rounded-full`}
-            onMouseEnter={() => setOpen(true)}
+            onClick={() => setOpen(!open)}
             disableRipple
             sx={{
               p: 0,
@@ -75,11 +88,11 @@ const UserInAppConfigs = () => {
                       name={user.username}
                       variant="beam"
                       colors={[
-                        "#84bfc3",
-                        "#fff5d6",
-                        "#ffb870",
-                        "#d96153",
-                        "#000511",
+                        '#84bfc3',
+                        '#fff5d6',
+                        '#ffb870',
+                        '#d96153',
+                        '#000511',
                       ]}
                     />
                   </AvatarFallback>
@@ -90,11 +103,11 @@ const UserInAppConfigs = () => {
                   name={user.username}
                   variant="beam"
                   colors={[
-                    "#84bfc3",
-                    "#fff5d6",
-                    "#ffb870",
-                    "#d96153",
-                    "#000511",
+                    '#84bfc3',
+                    '#fff5d6',
+                    '#ffb870',
+                    '#d96153',
+                    '#000511',
                   ]}
                 />
               )
@@ -104,11 +117,7 @@ const UserInAppConfigs = () => {
           </Button>
         </div>
       </PopoverTrigger>
-      <PopoverContent
-        className="dark:bg-mountain-900 mt-4 p-0 py-2 border-mountain-100 dark:border-mountain-700 w-64"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-      >
+      <PopoverContent className="dark:bg-mountain-900 mt-4 p-0 py-2 border-mountain-100 dark:border-mountain-700 w-64">
         {user && (
           <>
             <div className="flex items-center space-x-2 p-3">
@@ -121,11 +130,11 @@ const UserInAppConfigs = () => {
                       name={user.username}
                       variant="beam"
                       colors={[
-                        "#84bfc3",
-                        "#fff5d6",
-                        "#ffb870",
-                        "#d96153",
-                        "#000511",
+                        '#84bfc3',
+                        '#fff5d6',
+                        '#ffb870',
+                        '#d96153',
+                        '#000511',
                       ]}
                     />
                   </AvatarFallback>
@@ -136,11 +145,11 @@ const UserInAppConfigs = () => {
                   name={user.username}
                   variant="beam"
                   colors={[
-                    "#84bfc3",
-                    "#fff5d6",
-                    "#ffb870",
-                    "#d96153",
-                    "#000511",
+                    '#84bfc3',
+                    '#fff5d6',
+                    '#ffb870',
+                    '#d96153',
+                    '#000511',
                   ]}
                 />
               )}
@@ -156,6 +165,7 @@ const UserInAppConfigs = () => {
               to={`/${user.username}`}
               className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
             >
+              <FaRegCircleUser className="text-mountain-600" />
               <FaRegCircleUser className="text-mountain-600" />
               <p className="text-sm">My Profile</p>
             </Link>

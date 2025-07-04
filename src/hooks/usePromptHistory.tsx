@@ -7,7 +7,7 @@ const PAGE_SIZE = 5;
 
 export const usePromptHistory = () => {
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>(
-    HistoryFilter.TODAY,
+    HistoryFilter.ALL,
   );
   const [promptResultList, setPromptResultList] = useState<PromptResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,13 +20,6 @@ export const usePromptHistory = () => {
     const createdDate = new Date(createdAt);
     const now = new Date();
     switch (historyFilter) {
-      case HistoryFilter.TODAY:
-        return createdDate.toDateString() === now.toDateString();
-      case HistoryFilter.YESTERDAY: {
-        const yesterday = new Date();
-        yesterday.setDate(now.getDate() - 1);
-        return createdDate.toDateString() === yesterday.toDateString();
-      }
       case HistoryFilter.LAST7DAYS: {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(now.getDate() - 6);

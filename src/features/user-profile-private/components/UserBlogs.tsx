@@ -1,10 +1,10 @@
-import BlogItem from "@/components/lists/BlogItem";
-import { useUser } from "@/contexts/UserProvider";
-import { fetchBlogsByUsername } from "@/features/blog-details/api/blog";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import BlogItem from '@/components/lists/BlogItem';
+import { useUser } from '@/contexts/user';
+import { fetchBlogsByUsername } from '@/features/blog-details/api/blog';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 
 const PAGE_SIZE = 12;
 
@@ -21,7 +21,7 @@ const UserBlogs = () => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["userBlogs", username],
+    queryKey: ['userBlogs', username],
     queryFn: async ({ pageParam = 0 }) => {
       if (!username) return [];
       return await fetchBlogsByUsername(username, {
@@ -58,8 +58,8 @@ const UserBlogs = () => {
       }
     };
 
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    return () => container.removeEventListener("scroll", handleScroll);
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (!username) return null;
@@ -110,7 +110,7 @@ const UserBlogs = () => {
   return (
     <div
       ref={scrollContainerRef}
-      className="flex flex-col gap-4 w-full max-h-[600px] overflow-y-auto"
+      className="flex max-h-[600px] w-full flex-col gap-4 overflow-y-auto"
     >
       {blogs.map((blog) => {
         const isOwner = user?.username === blog.user?.username;
@@ -124,17 +124,17 @@ const UserBlogs = () => {
             thumbnail={
               Array.isArray(blog.pictures) && blog.pictures[0]
                 ? blog.pictures[0]
-                : "https://placehold.co/600x400"
+                : 'https://placehold.co/600x400'
             }
             author={{
               username: blog.user.username,
               avatar:
                 blog.user.profile_picture_url &&
-                blog.user.profile_picture_url.trim() !== ""
+                blog.user.profile_picture_url.trim() !== ''
                   ? blog.user.profile_picture_url
-                  : "",
+                  : '',
             }}
-            category={blog.categories?.[0]?.name ?? "Uncategorized"}
+            category={blog.categories?.[0]?.name ?? 'Uncategorized'}
             timeReading={`${Math.ceil((blog.content ? blog.content.split(/\s+/).length : 0) / 200)}m reading`}
             dateCreated={blog.created_at}
             like_count={blog.like_count}
