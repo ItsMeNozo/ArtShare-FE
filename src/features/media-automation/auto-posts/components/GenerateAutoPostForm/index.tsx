@@ -1,5 +1,5 @@
 import InlineErrorMessage from '@/components/InlineErrorMessage';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField } from '@mui/material';
 import {
   ErrorMessage,
   Field,
@@ -8,7 +8,6 @@ import {
   FormikHelpers,
   FormikProps,
 } from 'formik';
-import { Info } from 'lucide-react';
 import { TbFileTextSpark } from 'react-icons/tb';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -47,7 +46,7 @@ const GenerateAutoPostForm = () => {
   };
 
   return (
-    <Box className="border-mountain-200 flex h-full flex-1 flex-col items-center border-b-1 bg-white pb-2">
+    <Box className="flex flex-col flex-1 items-center bg-white pb-2 border-mountain-200 border-b-1 h-full">
       <Formik
         initialValues={{
           contentPrompt: '',
@@ -63,44 +62,33 @@ const GenerateAutoPostForm = () => {
         {(formikProps: FormikProps<GenAutoPostFormValues>) => {
           const { isSubmitting } = formikProps;
           return (
-            <Form className="bg-mountain-50 border-mountain-200 flex w-full items-center gap-4 border-b p-2 pl-4">
+            <Form className="flex items-center gap-4 bg-white pl-4 border-mountain-200 border-b rounded-tr-3xl w-full h-20">
               <Box className="flex flex-col">
-                <Typography className="text-mountain-800 mb-1 flex items-center space-x-2 text-sm">
-                  Prompt Post Content
-                  <span>
-                    <Info className="size-4" />
-                  </span>
-                </Typography>
                 <Field
                   name="contentPrompt"
                   as={TextField}
-                  className="placeholder:text-mountain-400 h-10 w-108 rounded-md"
+                  className="rounded-md w-108 h-10 placeholder:text-mountain-400"
                   placeholder="Generate your post content"
                 />
                 <ErrorMessage name="contentPrompt">
                   {(errorMsg) => <InlineErrorMessage errorMsg={errorMsg} />}
                 </ErrorMessage>
               </Box>
-              <Box className="flex flex-col">
-                <Typography className="text-mountain-800 mb-1 text-sm">
-                  How many posts?
-                </Typography>
+              <Box className="flex h-10">
                 <Field
                   name="postCount"
                   type="number"
                   min={1}
                   max={7}
-                  className="w-32 rounded-md border border-gray-300 px-3 py-2"
+                  className="bg-white px-2 border border-gray-300 rounded-md w-16 h-10"
                   placeholder="e.g. 5"
                 />
               </Box>
-
               <SettingsPopover />
-
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex h-10 w-30 shrink-0 items-center justify-center rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md transition"
+                className="flex justify-center items-center bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md rounded-md w-30 h-10 text-white transition shrink-0"
               >
                 {isSubmitting ? 'Writing...' : 'Start Writing'}
               </Button>
@@ -108,9 +96,8 @@ const GenerateAutoPostForm = () => {
           );
         }}
       </Formik>
-
-      <div className="ml-4 flex flex-1 flex-col items-center justify-center gap-4">
-        <TbFileTextSpark className="text-mountain-400 size-12" />
+      <div className="flex flex-col flex-1 justify-center items-center gap-4 ml-4">
+        <TbFileTextSpark className="size-12 text-mountain-400" />
         <p className="text-mountain-400 text-sm">
           Prompt for your post content to automate posting workflow
         </p>

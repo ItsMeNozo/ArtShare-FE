@@ -64,24 +64,25 @@ const ProfileStats: FC<ProfileStatsProps> = ({
 
   return (
     <>
-      <div className="py-3 flex gap-4 text-sm">
+      <div className="flex items-center gap-2 text-sm">
         <div
           onClick={openFollowingsModal}
-          className="flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-mountain-800 px-2 py-1 rounded-md transition-colors duration-200"
+          className="group flex items-center py-1 rounded-md transition-colors duration-200 cursor-pointer"
         >
-          <span className="font-bold text-black dark:text-white">
+          <span className="font-bold text-mountain-600 dark:text-white">
             {following}
           </span>
-          <span className="ml-1 text-black dark:text-gray-500">Following</span>
+          <span className="ml-1 text-mountain-600 dark:text-gray-500 group-hover:underline">Following</span>
         </div>
+        <span>•</span>
         <div
           onClick={openFollowersModal}
-          className="flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-mountain-800 px-2 py-1 rounded-md transition-colors duration-200"
+          className="group flex items-center py-1 rounded-md transition-colors duration-200 cursor-pointer"
         >
-          <span className="font-bold text-black dark:text-white">
+          <span className="font-bold text-mountain-600 dark:text-white">
             {followers}
           </span>
-          <span className="ml-1 text-black dark:text-gray-500">Followers</span>
+          <span className="ml-1 text-mountain-600 dark:text-gray-500 group-hover:underline">Followers</span>
         </div>
       </div>
 

@@ -20,6 +20,8 @@ import ProfileHeader from './components/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo';
 import ReportDialog from './components/ReportDialog';
 import { useReportUser } from './hooks/useReportUser';
+import { HiUserAdd } from 'react-icons/hi';
+import { BiEdit } from 'react-icons/bi';
 
 export const UserProfileCard = () => {
   const { username } = useParams();
@@ -218,59 +220,57 @@ export const UserProfileCard = () => {
   const isFollowing = profileData?.isFollowing;
 
   return (
-    <div>
-      <div className="flex justify-between">
-        <div className="flex">
-          {profileData.profile_picture_url ? (
+    <div className="flex justify-between items-end pb-4 w-full h-full">
+      <div className="flex items-end space-x-4 w-full">
+        {profileData.profile_picture_url ? (
+          <ProfileHeader
+            name={profileData?.full_name ?? ""}
+            username={profileData.username || ""}
+            avatarUrl={profileData.profile_picture_url}
+            isFollowing={false}
+          />
+        ) : (
+          <Box display="flex" alignItems="center">
             <ProfileHeader
-              name={profileData?.full_name ?? ''}
-              username={profileData.username || ''}
-              avatarUrl={profileData.profile_picture_url}
+              name={profileData?.full_name ?? ""}
+              username={profileData?.username ?? ""}
               isFollowing={false}
             />
-          ) : (
-            <Box display="flex" alignItems="center" gap={2}>
-              <ProfileHeader
-                name={profileData?.full_name ?? ''}
-                username={profileData?.username ?? ''}
-                isFollowing={false}
-              />
-            </Box>
-          )}
+          </Box>
+        )}
+        <div className="flex justify-between items-center w-full">
           <ProfileInfo
-            name={profileData?.full_name ?? ''}
-            username={profileData.username ?? ''}
-            bio={profileData.bio || ''}
+            name={profileData?.full_name ?? ""}
+            username={profileData.username ?? ""}
+            bio={profileData.bio || ""}
             followings_count={profileData.followings_count}
             followers_count={profileData.followers_count}
             userId={profileData.id}
           />
-        </div>
-        <Box className="self-start">
-          <Box className="flex gap-2">
+          <Box className="flex h-10">
             {!isOwnProfile &&
               (isFollowing ? (
                 <Button
                   onClick={toggleFollow}
                   disabled={isProcessing || unfollowInFlight}
-                  /* Show red + filled whenever (a) hovering OR (b) waiting for unfollow */
                   variant={
                     isHoveringFollowBtn || unfollowInFlight
-                      ? 'contained'
-                      : 'outlined'
+                      ? "contained"
+                      : "outlined"
                   }
                   color={
                     isHoveringFollowBtn || unfollowInFlight
-                      ? 'error'
-                      : 'primary'
+                      ? "error"
+                      : "primary"
                   }
-                  sx={{ borderRadius: '9999px', textTransform: 'none' }}
+                  sx={{ textTransform: "none" }}
                   onMouseEnter={() => setIsHoveringFollowBtn(true)}
                   onMouseLeave={() => setIsHoveringFollowBtn(false)}
+                  className="flex"
                 >
                   {unfollowInFlight || isHoveringFollowBtn
-                    ? 'Unfollow'
-                    : 'Following'}
+                    ? "Unfollow"
+                    : "Following"}
                 </Button>
               ) : (
                 <Button
@@ -278,49 +278,59 @@ export const UserProfileCard = () => {
                   disabled={isProcessing}
                   variant="contained"
                   color="primary"
-                  sx={{ borderRadius: '9999px', textTransform: 'none' }}
+                  sx={{ textTransform: "none" }}
+                  className="flex w-28"
                 >
-                  Follow
+                  <HiUserAdd className="mr-2 size-4" />
+                  <p>Follow</p>
                 </Button>
               ))}
-            <Tooltip title="More options" arrow>
-              <IconButton
-                aria-label="More options"
-                color="primary"
-                size="medium"
-                sx={{ borderRadius: '50%', bgcolor: 'transparent' }}
-                onClick={handleMenuOpen}
+            {isOwnProfile && (
+              <Button
+                onClick={handleEdit}
+                disabled={isProcessing}
+                variant="contained"
+                sx={{ textTransform: "none" }}
+                className="flex w-36"
               >
-                <MoreHorizontal />
-              </IconButton>
-            </Tooltip>
-
+                <BiEdit className="mr-2 size-4" />
+                <p>Edit Profile</p>
+              </Button>
+            )}
+            {!isOwnProfile && (
+              <Tooltip title="More options" arrow>
+                <IconButton
+                  aria-label="More options"
+                  color="primary"
+                  size="medium"
+                  sx={{ borderRadius: "50%", bgcolor: "transparent" }}
+                  onClick={handleMenuOpen}
+                >
+                  <MoreHorizontal />
+                </IconButton>
+              </Tooltip>
+            )}
             <Menu
               anchorEl={anchorEl}
               open={menuOpen}
               onClose={handleMenuClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
               className="m-2"
             >
-              {isOwnProfile && (
-                <MenuItem onClick={handleEdit}>Edit Profile</MenuItem>
-              )}
-              {!isOwnProfile && (
-                <MenuItem onClick={() => setDialogOpen(true)}>
-                  Report User
-                </MenuItem>
-              )}
+              <MenuItem onClick={() => setDialogOpen(true)}>
+                Report User
+              </MenuItem>
             </Menu>
           </Box>
-          <ReportDialog
-            open={dialogOpen}
-            onClose={() => setDialogOpen(false)}
-            onSubmit={handleReport}
-            submitting={isLoadingReportUser}
-          />
-        </Box>
+        </div>
       </div>
+      <ReportDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSubmit={handleReport}
+        submitting={isLoadingReportUser}
+      />
     </div>
   );
 };

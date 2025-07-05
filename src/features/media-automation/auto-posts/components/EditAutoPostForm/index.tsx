@@ -5,8 +5,8 @@ import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Tooltip, Typography } from '@mui/material';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
-import { Clock, Image } from 'lucide-react';
-import { useMemo } from 'react';
+import { Image } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { LuCalendarClock, LuScanEye, LuTrash2 } from 'react-icons/lu';
 import * as Yup from 'yup';
 import { MAX_IMAGE_COUNT } from '../../constants';
@@ -17,15 +17,14 @@ import { AutoPostFormValues, ImageState } from '../../types';
 import PostContentEditor from './PostContentEditor';
 import PostImagesEditor from './PostImagesEditor';
 import PostScheduleEditor from './PostScheduleEditor';
+import { FacebookPostDialog } from './PostPreviewer';
 
 // import { Link, Element } from "react-scroll";
 
 const EditAutoPostForm = () => {
-  // const navigate = useNavigate();
   const postId = useNumericParam('postId');
-
+  const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
   const { data: postToEdit, isLoading } = useGetAutoPostDetails(postId);
-
   const initialValues = useMemo((): AutoPostFormValues => {
     if (postToEdit) {
       const initialImages: ImageState[] = postToEdit.image_urls.map((url) => ({
@@ -64,6 +63,10 @@ const EditAutoPostForm = () => {
     );
   };
 
+  const handlePreviewClick = () => {
+    setOpenPreviewDialog(true);
+  };
+
   const {
     isDialogOpen,
     itemToConfirm: postIdToDelete,
@@ -84,7 +87,7 @@ const EditAutoPostForm = () => {
 
   if (!postToEdit) {
     return (
-      <Box className="flex h-full items-center justify-center">
+      <Box className="flex justify-center items-center h-full">
         <Typography variant="h6" className="text-gray-600">
           Post not found or has been deleted
         </Typography>
@@ -105,19 +108,19 @@ const EditAutoPostForm = () => {
     >
       {({ values, setFieldValue, errors, touched }) => {
         return (
-          <Form className="bg-mountain-50 flex h-full flex-col">
-            <div className="border-mountain-200 flex w-full items-end border-b-1 bg-white p-4 pb-2">
-              <div className="flex w-full items-center justify-between">
+          <Form className="flex flex-col bg-mountain-50 w-full h-[calc(100vh-4rem)]">
+            <div className="flex items-center bg-white px-4 border-mountain-200 border-b-1 w-full h-20">
+              <div className="flex justify-between items-center w-full">
                 <div className="flex space-x-4">
                   <div className="flex py-2">
-                    <p className="text-lg font-medium">Post {postId}</p>
+                    <p className="font-medium text-lg">Post {postId}</p>
                   </div>
-                  <div className="bg-mountain-200 flex h-12 w-0.5" />
-                  <div className="hover:bg-mountain-50/60 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border p-2">
+                  <div className="flex bg-mountain-200 w-0.5 h-12" />
+                  <div onClick={handlePreviewClick} className="flex items-center space-x-2 hover:bg-mountain-50/60 p-2 border border-mountain-200 rounded-lg cursor-pointer">
                     <LuScanEye />
                     <div>Preview</div>
                   </div>
-                  <div className="hover:bg-mountain-50/60 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border p-2">
+                  <div className="flex items-center space-x-2 hover:bg-mountain-50/60 p-2 border border-mountain-200 rounded-lg cursor-pointer">
                     <Image className="size-4" />
                     <div>Images: {values.images.length}</div>
                   </div>
@@ -126,26 +129,19 @@ const EditAutoPostForm = () => {
                     arrow
                     placement="bottom"
                   >
-                    <div className="flex w-fit cursor-pointer items-center space-x-2 rounded-full bg-blue-100 px-4 py-2 font-medium text-blue-800 hover:bg-blue-100/60">
+                    <div className="flex items-center space-x-2 bg-blue-100 hover:bg-blue-100/60 px-4 py-2 rounded-full w-fit font-medium text-blue-800 cursor-pointer">
                       <LuCalendarClock className="size-4 shrink-0" />
-                      <div className="flex h-8 w-0.5 bg-blue-800" />
+                      <div className="flex bg-blue-800 w-0.5 h-8" />
                       <p>12/06/2025</p>
                       <p>21:00</p>
                     </div>
                   </Tooltip>
                 </div>
                 <div className="flex space-x-2">
-                  <div className="border-mountain-200 flex items-center space-x-2 rounded-lg border p-2">
-                    <Clock className="size-4" />
-                    <div className="relative flex flex-col text-xs select-none">
-                      <p className="text-mountain-600">Created At</p>
-                      <p>09/06/2025</p>
-                    </div>
-                  </div>
                   <Button
                     type="button"
                     onClick={() => openDialog(postId!)}
-                    className="bg-mountain-100 hover:bg-mountain-50 border-mountain-200 flex items-center space-x-2 rounded-lg border p-2"
+                    className="flex items-center space-x-2 bg-mountain-100 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg"
                   >
                     <LuTrash2 className="size-4" />
                     <div>Delete</div>
@@ -153,21 +149,9 @@ const EditAutoPostForm = () => {
                 </div>
               </div>
             </div>
-            <Box>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Saving...' : 'Save Changes'}
-              </Button>
-            </Box>
-
-            <Box className="ml-4 flex min-h-0 flex-1 flex-col overflow-y-auto">
-              <Box>
-                <Typography className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
+            <Box className="flex flex-col flex-1 space-y-8 ml-4 min-h-0 overflow-y-auto sidebar">
+              <Box className="flex flex-col space-y-4">
+                <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
                   <span className="mr-2">🖊️</span>Post Content
                 </Typography>
                 <PostContentEditor
@@ -180,8 +164,8 @@ const EditAutoPostForm = () => {
                   {(msg) => <InlineErrorMessage errorMsg={msg} />}
                 </ErrorMessage>
               </Box>
-              <Box>
-                <div className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
+              <Box className="flex flex-col space-y-4">
+                <div className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
                   <p>🖼️</p>
                   <p>Post Images</p>
                 </div>
@@ -196,8 +180,8 @@ const EditAutoPostForm = () => {
                   {(msg) => <InlineErrorMessage errorMsg={msg} />}
                 </ErrorMessage>
               </Box>
-              <Box>
-                <Typography className="border-mountain-200 flex items-center space-x-2 border-b py-2 font-medium text-indigo-900">
+              <Box className="flex flex-col space-y-4">
+                <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b font-medium text-indigo-900">
                   <span className="mr-2">📅</span> Post Scheduling
                 </Typography>
                 <PostScheduleEditor
@@ -217,6 +201,12 @@ const EditAutoPostForm = () => {
               contentText="Are you sure you want to permanently delete this post? This action cannot be undone."
               confirmButtonText="Delete Post"
               isConfirming={isDeleting}
+            />
+            <FacebookPostDialog
+              open={openPreviewDialog}
+              onClose={() => setOpenPreviewDialog(false)}
+              content={values.content}
+              images={values.images.map((img) => img.url)}
             />
           </Form>
         );

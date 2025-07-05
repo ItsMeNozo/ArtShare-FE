@@ -19,10 +19,9 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   userId,
 }) => {
   return (
-    <div className="pt-3 px-4 pb-3">
-      <h1 className="text-black dark:text-white text-xl font-bold">{name}</h1>
-      <p className="text-black dark:text-gray-500">@{username}</p>
-      <p className="mt-3 text-sm text-black dark:text-white">{bio}</p>
+    <div className="flex flex-col justify-end pb-4 h-full">
+      <h1 className="font-bold text-mountain-950 dark:text-white text-xl">{name} <span className="font-normal text-mountain-400 text-sm">@{username}</span></h1>
+      <p className="text-mountain-800 dark:text-white text-sm">{bio}</p>
       <ProfileStats
         following={followings_count || 0}
         followers={followers_count || 0}

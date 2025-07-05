@@ -14,7 +14,7 @@ import { aspectOptions } from "../../enum"
 const AspectRatioOptions: React.FC<SelectRatioProp> = ({ selectedAspect, onChange }) => {
     return (
         <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger asChild>
                 <Button className='flex justify-between bg-mountain-100 p-3 rounded-xl w-full font-normal'>
                     <div className='flex items-center space-x-2'>
                         <selectedAspect.icon className="size-5 text-mountain-600" />

@@ -11,7 +11,7 @@ const InAppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         className={`z-50 flex h-full min-h-0 w-[calc(100vw-16rem)] flex-1 flex-col px-2`}
       >
         <Header />
-        <div className="dark:bg-mountain-1000 min-h-0 flex-1 rounded-t-3xl bg-white shadow-[-4px_-4px_16px_rgba(0,0,0,0.12)] transition-shadow duration-300">
+        <div className="flex-1 bg-gradient-to-b from-mountain-100/80 dark:from-mountain-1000 to-white dark:to-mountain-900 border border-mountain-100 dark:border-black rounded-t-3xl transition-shadow duration-300">
           {children}
         </div>
       </div>
