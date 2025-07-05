@@ -202,9 +202,7 @@ const SocialLinksPage = () => {
                       <div className="flex flex-1 items-center gap-4 overflow-hidden">
                         <div className="border-mountain-200 flex w-[30%] shrink-0 items-center space-x-2 border-r-1">
                           <img
-                            src={
-                              page.pictureUrl || getPlatformIcon(page.name)!
-                            }
+                            src={page.pictureUrl || getPlatformIcon(page.name)!}
                             className="size-8 rounded-full object-cover"
                             alt={`${page.config.pageName}'s icon`}
                           />
@@ -240,9 +238,7 @@ const SocialLinksPage = () => {
                           <div className="border-mountain-200 text-mountain-600 flex h-10 w-fit items-center space-x-2 rounded-full border px-4 text-sm select-none">
                             <span>Expires at: </span>
                             <span>
-                              {dayjs(page.tokenExpiresAt).format(
-                                'MMM D, YYYY',
-                              )}
+                              {dayjs(page.tokenExpiresAt).format('MMM D, YYYY')}
                             </span>
                           </div>
                         ) : (

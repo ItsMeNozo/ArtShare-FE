@@ -12,8 +12,8 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   FiX as CancelIcon,
-  FiCheck as SaveIcon,
   FiMoreVertical as MoreIcon,
+  FiCheck as SaveIcon,
 } from 'react-icons/fi';
 
 interface CollectionTitleProps {

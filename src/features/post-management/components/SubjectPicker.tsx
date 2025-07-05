@@ -62,7 +62,9 @@ export default function SubjectPicker({
 
   const selectedSubjectObjects = useMemo(
     () =>
-      allSubjectsForDisplay.filter((subject) => categoryIds.includes(subject.id)),
+      allSubjectsForDisplay.filter((subject) =>
+        categoryIds.includes(subject.id),
+      ),
     [categoryIds, allSubjectsForDisplay],
   );
 
@@ -149,7 +151,10 @@ export default function SubjectPicker({
             disabled={selectedSubjectObjects.length >= 3 && !search}
             onFocus={handleMainInputFocus}
             slotProps={{
-              input: { readOnly: categoryIds.length >= 3, disableUnderline: true },
+              input: {
+                readOnly: categoryIds.length >= 3,
+                disableUnderline: true,
+              },
             }}
             sx={{
               flexGrow: 1,

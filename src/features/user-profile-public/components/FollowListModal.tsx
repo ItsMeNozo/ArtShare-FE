@@ -99,10 +99,7 @@ const FollowListModal: FC<FollowListModalProps> = ({
               >
                 <ListItemAvatar>
                   {user.profilePictureUrl ? (
-                    <Avatar
-                      src={user.profilePictureUrl}
-                      alt={user.username}
-                    />
+                    <Avatar src={user.profilePictureUrl} alt={user.username} />
                   ) : (
                     <BoringAvatar
                       size={40}

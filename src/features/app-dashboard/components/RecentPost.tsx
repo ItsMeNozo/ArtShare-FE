@@ -32,7 +32,7 @@ const RecentPost = () => {
             loading="lazy"
           />
         )}
-        <span className="absolute z-50 text-sm font-medium text-mountain-50 dark:text-mountain-200 bottom-2 left-2 line-clamp-2">
+        <span className="text-mountain-50 dark:text-mountain-200 absolute bottom-2 left-2 z-50 line-clamp-2 text-sm font-medium">
           {post.user.username}
         </span>
       </div>

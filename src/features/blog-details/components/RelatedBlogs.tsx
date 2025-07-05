@@ -41,7 +41,7 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
   if (isLoading) {
     return (
       <div className="flex min-h-[300px] w-full flex-col items-center justify-center space-y-8 pt-8">
-        <div className="flex items-center justify-center w-full space-x-2 font-medium text-gray-900 dark:text-gray-100">
+        <div className="flex w-full items-center justify-center space-x-2 font-medium text-gray-900 dark:text-gray-100">
           <LuBookOpenText className="text-gray-700 dark:text-gray-300" />
           <p>Loading Related Blogs...</p>
         </div>
@@ -61,7 +61,7 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
   if (relatedBlogs.length === 0 && skip === 0) {
     return (
       <div className="flex min-h-[300px] w-full flex-col items-center justify-center space-y-8 pt-8">
-        <div className="flex items-center justify-center w-full space-x-2 font-medium text-gray-900 dark:text-gray-100">
+        <div className="flex w-full items-center justify-center space-x-2 font-medium text-gray-900 dark:text-gray-100">
           <LuBookOpenText className="text-gray-700 dark:text-gray-300" />
           <p>Related Blogs</p>
         </div>
@@ -73,23 +73,23 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full pt-8 space-y-8">
-      <div className="flex items-center justify-center w-full space-x-2 font-medium text-gray-900 dark:text-gray-100">
+    <div className="flex w-full flex-col items-center justify-center space-y-8 pt-8">
+      <div className="flex w-full items-center justify-center space-x-2 font-medium text-gray-900 dark:text-gray-100">
         <LuBookOpenText className="text-gray-700 dark:text-gray-300" />
         <p>Related Blogs</p>
       </div>
-      <div className="relative flex items-center justify-center w-full gap-6 px-4 max-w-7xl">
+      <div className="relative flex w-full max-w-7xl items-center justify-center gap-6 px-4">
         {!(skip === 0 && isLastPage) && (
           <button
             onClick={handlePrevious}
             disabled={skip === 0 || isFetching}
-            className="flex items-center justify-center w-12 h-12 transition-all duration-200 rounded-lg shadow-md bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 shrink-0 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <ArrowLeft className="text-white size-5" />
+            <ArrowLeft className="size-5 text-white" />
           </button>
         )}
 
-        <div className="flex-grow w-full">
+        <div className="w-full flex-grow">
           <div
             className={`grid gap-6 transition-opacity duration-300 ${
               isFetching ? 'opacity-50' : 'opacity-100'
@@ -129,7 +129,7 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
           </div>
 
           {isLastPage && skip > 0 && (
-            <p className="mt-4 text-sm text-center text-gray-500 dark:text-gray-400">
+            <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
               End of results
             </p>
           )}
@@ -139,9 +139,9 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
           <button
             onClick={handleNext}
             disabled={isLastPage || isFetching}
-            className="flex items-center justify-center w-12 h-12 transition-all duration-200 rounded-lg shadow-md bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 shrink-0 disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <ArrowRight className="text-white size-5" />
+            <ArrowRight className="size-5 text-white" />
           </button>
         )}
       </div>

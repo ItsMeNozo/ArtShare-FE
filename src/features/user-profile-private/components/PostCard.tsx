@@ -160,23 +160,23 @@ const PostCard: React.FC<PostCardProps> = ({
   onPostDeleted,
 }) => {
   return (
-    <div className="relative overflow-hidden group aspect-square">
+    <div className="group relative aspect-square overflow-hidden">
       <Link
         component={RouterLink}
         to={`/posts/${post.id}`}
-        className="block w-full h-full"
+        className="block h-full w-full"
         underline="none"
       >
         <img
           src={post.thumbnailUrl}
           alt={post.title}
-          className="object-cover w-full h-full"
+          className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 flex flex-col justify-end p-3 text-white transition-opacity duration-300 opacity-0 bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:opacity-100">
-          <div className="flex items-end justify-between w-full">
+        <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-b from-transparent via-transparent to-black/70 p-3 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="flex w-full items-end justify-between">
             <div>
-              <p className="font-medium truncate">{post.title || 'Untitled'}</p>
-              <p className="text-xs text-gray-300 break-words whitespace-normal">
+              <p className="truncate font-medium">{post.title || 'Untitled'}</p>
+              <p className="text-xs break-words whitespace-normal text-gray-300">
                 @{username}
               </p>
             </div>

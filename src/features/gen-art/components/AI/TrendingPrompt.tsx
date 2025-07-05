@@ -141,11 +141,11 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
     <div
       id="trending-container"
       ref={containerRef}
-      className="flex justify-start w-full h-full"
+      className="flex h-full w-full justify-start"
     >
       {/* Main preview image */}
       <div className="bg-mountain-100 relative flex h-full w-[60%] items-center justify-center">
-        <div className="absolute flex items-center justify-center p-3 text-sm font-medium bg-white rounded-full top-6 px-9">
+        <div className="absolute top-6 flex items-center justify-center rounded-full bg-white p-3 px-9 text-sm font-medium">
           <p>
             <span className="text-xl">👑</span> Top Trending Prompt Results
           </p>
@@ -154,15 +154,15 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
         <img
           src={trending[selectedImageIndex]?.image}
           alt="Selected"
-          className="flex object-contain transition-all duration-200 rounded-lg shadow-lg h-128"
+          className="flex h-128 rounded-lg object-contain shadow-lg transition-all duration-200"
         />
       </div>
 
       {/* Prompt & metadata */}
       <div className="border-mountain-200 flex h-full w-[30%] border-r">
-        <div className="relative flex flex-col w-full">
+        <div className="relative flex w-full flex-col">
           {/* Author */}
-          <div className="flex items-end justify-between w-full p-4 border-b border-mountain-100 h-28">
+          <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
             <div className="flex items-center space-x-2">
               <Avatar className="size-12">
                 {formData?.profilePictureUrl ? (
@@ -181,33 +181,33 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
           </div>
 
           {/* Prompt text */}
-          <div className="flex flex-col w-full p-4 space-y-2 border-b border-mountain-100 h-1/2">
-            <div className="flex items-center justify-between w-full">
+          <div className="border-mountain-100 flex h-1/2 w-full flex-col space-y-2 border-b p-4">
+            <div className="flex w-full items-center justify-between">
               <p className="font-medium">Prompt</p>
               <Button title="Copy" className="bg-mountain-100">
                 <IoCopyOutline className="size-5" />
               </Button>
             </div>
 
-            <div className="flex max-h-full p-2 overflow-y-auto text-sm rounded-lg bg-mountain-50 custom-scrollbar">
+            <div className="bg-mountain-50 custom-scrollbar flex max-h-full overflow-y-auto rounded-lg p-2 text-sm">
               {trending[selectedImageIndex]?.prompt}
             </div>
           </div>
 
           {/* Model & aspect ratio */}
-          <div className="flex w-full p-4 space-x-4">
+          <div className="flex w-full space-x-4 p-4">
             {/* Model */}
-            <div className="flex flex-col w-1/3 space-y-2">
+            <div className="flex w-1/3 flex-col space-y-2">
               <p className="font-medium">Model</p>
               <div className="flex items-center space-x-2">
                 {/* Replace example_1 if you have distinct icons per model */}
-                <img src={example_1} className="w-5 h-5 rounded-xs" />
+                <img src={example_1} className="h-5 w-5 rounded-xs" />
                 <p className="text-mountain-600 line-clamp-1">GPT</p>
               </div>
             </div>
 
             {/* Aspect ratio */}
-            <div className="flex flex-col w-1/3 space-y-2">
+            <div className="flex w-1/3 flex-col space-y-2">
               <p className="font-medium">Aspect Ratio</p>
               <div className="flex items-center space-x-2">
                 <IoIosSquareOutline className="size-5" />
@@ -219,7 +219,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
           </div>
 
           {/* Style · Lighting · Camera */}
-          <div className="flex justify-between w-full px-4">
+          <div className="flex w-full justify-between px-4">
             <div className="flex flex-col space-y-2">
               <p className="font-medium">Style</p>
               <p className="text-mountain-600">
@@ -244,7 +244,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
           <div className="absolute bottom-0 w-full p-4">
             <Button
               onClick={handleApplyPrompt}
-              className="w-full h-12 font-normal shadow-sm bg-mountain-100 text-mountain-700"
+              className="bg-mountain-100 text-mountain-700 h-12 w-full font-normal shadow-sm"
             >
               <LuImagePlus className="mr-2 size-5" />
               <p>Apply This Prompt</p>
@@ -274,7 +274,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
           <div />
         </div>
         {/* bottom blur */}
-        <div className="absolute z-10 flex w-full h-10 -bottom-2 bg-white/60 blur-sm" />
+        <div className="absolute -bottom-2 z-10 flex h-10 w-full bg-white/60 blur-sm" />
       </div>
     </div>
   );

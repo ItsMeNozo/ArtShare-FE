@@ -1,6 +1,6 @@
 import Loading from '@/components/loading/Loading';
-import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
 import { getStatusChipProps } from '@/features/media-automation/auto-posts/utils';
+import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import {
   Button,
