@@ -148,13 +148,13 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/auto/projects/new',
     label: 'New Workflow',
-    description: 'Create new workflow for automative upload',
+    description: 'Create new workflow for automatic upload',
     parent: '/auto/projects',
   },
   {
     path: '/auto/projects/:id/edit',
     label: 'Edit Workflow',
-    description: 'Create new workflow for automative upload',
+    description: 'Create new workflow for automatic upload',
     parent: '/auto/projects',
   },
   {

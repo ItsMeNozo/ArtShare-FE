@@ -227,9 +227,9 @@ const DocumentDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen overflow-auto sidebar">
+    <div className="flex flex-col items-center rounded-t-3xl h-screen overflow-auto custom-scrollbar">
       {/* Top Templates Section */}
-      <div className="flex justify-center border-mountain-50 dark:border-mountain-700 w-full h-fit">
+      <div className="flex justify-center bg-white border-mountain-50 dark:border-mountain-700 w-full h-fit">
         <div className="flex flex-col justify-center items-center space-y-2 p-4 w-fit h-full">
           <div className="flex space-x-4 h-full">
             {/* Blank Document Template */}
@@ -263,11 +263,10 @@ const DocumentDashboard = () => {
           </div>
         </div>
       </div>
-
       {/* Documents Section */}
-      <div className="flex flex-col space-y-6 w-full">
+      <div className="flex flex-col space-y-6 border-mountain-200 border-t-1 w-full">
         {/* Header with Filter */}
-        <div className="top-0 sticky flex justify-between items-center bg-white dark:bg-mountain-800 shadow-md px-4 rounded-t-3xl w-full h-fit">
+        <div className="top-0 sticky flex justify-between items-center bg-white dark:bg-mountain-800 shadow-md px-4 w-full h-fit">
           <p className="font-medium text-gray-900 dark:text-gray-100 text-lg">
             Recent projects
           </p>

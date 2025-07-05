@@ -9,8 +9,8 @@ import RootLayout from '@/layouts';
 import OnboardingRoute from './components/ProtectedItems/OnboardingRoute';
 import UserSubscription from './features/user-profile-private/UserSubscription';
 
-const AuthenLayout = lazy(() => import('@/layouts/featLayouts/AuthenLayout'));
-const InAppLayout = lazy(() => import('@/layouts/InAppLayout'));
+const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
+const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
 const Dashboard = lazy(() => import('./features/app-dashboard/Dashboard'));
 const EditUser = lazy(() => import('./features/edit-user/EditUserPage'));
 const OnboardingProfile = lazy(() => import('./pages/Onboarding'));

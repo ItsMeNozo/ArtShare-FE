@@ -4,7 +4,6 @@ export const getTrendingAiPosts = async (): Promise<TrendingItem[]> => {
   try {
     const response = await api.get('/posts/ai-trending');
     const data = response.data;
-    console.log(data);
     const withArt = data.filter((item: any) => item.art_generation);
     return withArt.map((item: any): TrendingItem => {
       const art = item.art_generation;
