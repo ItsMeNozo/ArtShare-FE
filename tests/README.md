@@ -2,6 +2,59 @@
 
 A comprehensive end-to-end test suite for the ArtShare application using Playwright.
 
+## 🧹 Test Data Cleanup System
+
+This test suite includes an advanced cleanup system to ensure tests don't leave behind unwanted data.
+
+### Quick Start with Cleanup
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { TestHelpers } from '../utils/test-helpers';
+
+test.describe('My Test Suite', () => {
+  let helpers: TestHelpers;
+
+  test.beforeEach(async ({ page }) => {
+    helpers = new TestHelpers(page);
+    await helpers.loginWithTestUser();
+  });
+
+  test.afterEach(async () => {
+    await helpers.cleanup(); // Automatically cleans up test data
+  });
+
+  test('should create a post', async ({ page }) => {
+    // Create post and track it for cleanup
+    const postId = await helpers.submitPostAndTrack();
+    // Post will be automatically deleted after test
+  });
+});
+```
+
+### Available Cleanup Scripts
+
+```bash
+npm run test:cleanup          # Verify cleanup status
+npm run test:cleanup:posts    # Clean up test posts
+npm run test:cleanup:files    # Clean up test files
+npm run test:cleanup:all      # Clean up everything
+npm run test:integration      # Run integration tests with real data
+```
+
+### Environment Setup
+
+Create `.env.test` file:
+
+```bash
+TEST_USER_EMAIL=testuser@example.com
+TEST_USER_PASSWORD=TestPassword123!
+VITE_BE_URL=http://localhost:3000
+TEST_CLEANUP_ENABLED=true
+```
+
+See the full documentation in this file for advanced usage.
+
 ## 📋 Test Coverage
 
 ### 🔐 Authentication Tests (`auth.spec.ts`)
@@ -71,8 +124,8 @@ Create a `.env.test` file for test-specific environment variables:
 
 ```env
 VITE_BE_URL=http://localhost:3000
-TEST_USER_EMAIL=test@artshare.com
-TEST_USER_PASSWORD=TestPassword123!
+TEST_USER_EMAIL=panngoc21@clc.fitus.edu.vn
+TEST_USER_PASSWORD=Test@123
 ```
 
 ## 🎮 Running Tests
@@ -127,9 +180,6 @@ npx playwright test --project=mobile-chrome --project=mobile-safari
 ```bash
 # Test against local development
 TEST_ENV=local npx playwright test
-
-# Test against staging
-TEST_ENV=staging npx playwright test
 
 # Test against production
 TEST_ENV=production npx playwright test
@@ -392,3 +442,214 @@ When adding new tests:
 - [Playwright Test Runner](https://playwright.dev/docs/test-intro)
 - [Playwright Codegen](https://playwright.dev/docs/codegen)
 - [Best Practices](https://playwright.dev/docs/best-practices)
+
+## 🗑️ Detailed Test Data Cleanup Documentation
+
+### System Overview
+
+The test data cleanup system provides automatic cleanup of test data created during E2E tests, including:
+
+- Posts created during tests
+- Uploaded files (images, videos, etc.)
+- Test users (when applicable)
+- Browser storage and cookies
+
+### Key Components
+
+#### TestHelpers Class (`tests/utils/test-helpers.ts`)
+
+- Main helper class for E2E tests
+- Provides methods to track created test data
+- Handles cleanup during test teardown
+
+#### TestDataCleanup Class (`tests/utils/test-data-cleanup.ts`)
+
+- Advanced cleanup utility with robust error handling
+- Supports batch cleanup operations
+- Provides cleanup verification
+
+#### Environment Configuration (`.env.test`)
+
+- Configure test environment settings
+- Set API endpoints for cleanup
+- Enable/disable cleanup features
+
+### Test Types
+
+#### Unit Tests (Mock Mode)
+
+```typescript
+test.beforeEach(async ({ page }) => {
+  helpers = new TestHelpers(page);
+  helpers.enableMockMode(); // Prevents real API calls
+  await helpers.setupPostCreationMocks();
+});
+```
+
+#### Integration Tests (Real Data)
+
+```typescript
+test.beforeEach(async ({ page }) => {
+  helpers = new TestHelpers(page);
+  helpers.disableMockMode(); // Allows real API calls (default)
+  await helpers.loginWithTestUser();
+});
+```
+
+### Manual Tracking
+
+If you need to track data manually:
+
+```typescript
+test('manual tracking example', async ({ page }) => {
+  // Create post via direct API call
+  const postId = '123';
+  helpers.trackCreatedPost(postId);
+
+  // Upload file
+  const fileUrl = 'https://example.com/uploads/test-image.jpg';
+  helpers.trackUploadedFile(fileUrl);
+
+  // Cleanup will handle these automatically
+});
+```
+
+### Best Practices
+
+#### 1. Always Use Unique Test Data
+
+```typescript
+const timestamp = new Date().getTime();
+const title = `Test Post ${timestamp}`;
+```
+
+#### 2. Proper Error Handling
+
+```typescript
+test('should handle failures gracefully', async ({ page }) => {
+  try {
+    const postId = await helpers.submitPostAndTrack();
+    // ... test logic ...
+  } catch (error) {
+    // Test failed, but cleanup will still happen in afterEach
+    console.error('Test failed:', error);
+    throw error;
+  }
+});
+```
+
+#### 3. Use Test Tags
+
+```typescript
+test('@integration @cleanup Real data test', async ({ page }) => {
+  // This test creates real data and requires cleanup
+});
+
+test('@unit @mock Unit test', async ({ page }) => {
+  helpers.enableMockMode();
+  // This test uses mocks, no cleanup needed
+});
+```
+
+### Environment Variables
+
+```bash
+# Test user credentials
+TEST_USER_EMAIL=testuser@example.com
+TEST_USER_PASSWORD=TestPassword123!
+
+# Backend API URL
+VITE_BE_URL=http://localhost:3000
+
+# Cleanup settings
+TEST_CLEANUP_ENABLED=true
+TEST_VERBOSE_LOGGING=true
+TEST_DATA_RETENTION_HOURS=24
+
+# Database connection for direct cleanup (optional)
+TEST_DB_URL=postgresql://testuser:testpass@localhost:5432/artshare_test
+
+# File storage settings
+TEST_STORAGE_PATH=/tmp/test-uploads
+TEST_STORAGE_CLEANUP_ENABLED=true
+```
+
+### Troubleshooting
+
+#### Cleanup Not Working?
+
+1. Check if `TEST_CLEANUP_ENABLED=true` in `.env.test`
+2. Verify your backend cleanup endpoints are working
+3. Check console logs for cleanup errors
+4. Run `npm run test:cleanup` to see remaining data
+
+#### Authentication Issues?
+
+```typescript
+// Check if auth token is available
+const authToken = await page.evaluate(() => {
+  return localStorage.getItem('authToken');
+});
+console.log('Auth token:', authToken);
+```
+
+#### Files Not Being Deleted?
+
+1. Check file permissions
+2. Verify the cleanup endpoint URL
+3. Check if files are actually uploaded to the expected location
+
+### Advanced Features
+
+#### Batch Cleanup
+
+```typescript
+// Clean up old test data (older than 24 hours)
+await helpers.cleanupUtility.cleanupTestDataByAge(24);
+```
+
+#### Cleanup Verification
+
+```typescript
+// Verify cleanup was successful
+const failed = await helpers.cleanupUtility.verifyCleanup(postIds, fileUrls);
+if (failed.posts.length > 0) {
+  console.warn('Failed to clean up posts:', failed.posts);
+}
+```
+
+#### Custom Cleanup Logic
+
+```typescript
+class CustomTestHelpers extends TestHelpers {
+  async customCleanup() {
+    await super.cleanup();
+    // Add your custom cleanup logic here
+  }
+}
+```
+
+### Performance Considerations
+
+- Use mock mode for unit tests to avoid cleanup overhead
+- Run cleanup verification only in CI environments
+- Consider using a dedicated test database that can be easily reset
+- Implement cleanup timeouts to prevent hanging tests
+
+### Security Notes
+
+- Never use production credentials in tests
+- Use dedicated test accounts with limited permissions
+- Consider using temporary/sandbox environments for integration tests
+- Regularly audit test data to ensure cleanup is working
+
+### Migration from Old Tests
+
+If you have existing tests without cleanup:
+
+1. Add `TestHelpers` to your test setup
+2. Replace direct API calls with `helpers.submitPostAndTrack()`
+3. Add `await helpers.cleanup()` in `afterEach`
+4. Test the cleanup by running the verification script
+
+This system ensures your E2E tests are clean, isolated, and don't interfere with each other or leave behind test data.

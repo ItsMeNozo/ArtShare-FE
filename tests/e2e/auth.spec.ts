@@ -1,7 +1,7 @@
-import { test, expect } from "@playwright/test";
-import { TestHelpers } from "./utils/test-helpers";
+import { expect, test } from '@playwright/test';
+import { TestHelpers } from '../utils/test-helpers';
 
-test.describe("Authentication Flow", () => {
+test.describe('Authentication Flow', () => {
   let helpers: TestHelpers;
 
   test.beforeEach(async ({ page }) => {
@@ -14,29 +14,33 @@ test.describe("Authentication Flow", () => {
     });
   });
 
-  test.describe("Landing Page", () => {
-    test("@smoke should display landing page correctly", async ({ page }) => {
-      await page.goto("/");
+  test.describe('Landing Page', () => {
+    test('@smoke @safe should display landing page correctly', async ({
+      page,
+    }) => {
+      await page.goto('/');
 
       // Check if main elements are visible
       await expect(page).toHaveTitle(/ArtShare/i);
 
       // Look for key landing page elements
-      await helpers.waitForElement("body");
+      await helpers.waitForElement('body');
 
       // Take screenshot for visual regression
-      await helpers.takeScreenshot("landing-page");
+      await helpers.takeScreenshot('landing-page');
     });
 
-    test("should navigate to login from landing page", async ({ page }) => {
-      await page.goto("/");
+    test('@safe should navigate to login from landing page', async ({
+      page,
+    }) => {
+      await page.goto('/');
 
       // Find and click login link/button
       const loginSelectors = [
         'a[href="/login"]',
         'button:has-text("Login")',
         'a:has-text("Login")',
-        ".login-button",
+        '.login-button',
       ];
 
       let found = false;
@@ -52,15 +56,17 @@ test.describe("Authentication Flow", () => {
 
       if (!found) {
         // If no login button found, navigate directly
-        await page.goto("/login");
+        await page.goto('/login');
       }
 
       // Verify we're on login page
       await expect(page).toHaveURL(/.*login/);
     });
 
-    test("should navigate to signup from landing page", async ({ page }) => {
-      await page.goto("/");
+    test('@safe should navigate to signup from landing page', async ({
+      page,
+    }) => {
+      await page.goto('/');
 
       // Find and click signup link/button
       const signupSelectors = [
@@ -68,7 +74,7 @@ test.describe("Authentication Flow", () => {
         'a[href="/register"]',
         'button:has-text("Sign Up")',
         'a:has-text("Sign Up")',
-        ".signup-button",
+        '.signup-button',
       ];
 
       let found = false;
@@ -84,7 +90,7 @@ test.describe("Authentication Flow", () => {
 
       if (!found) {
         // If no signup button found, navigate directly
-        await page.goto("/signup");
+        await page.goto('/signup');
       }
 
       // Verify we're on signup page
@@ -92,22 +98,20 @@ test.describe("Authentication Flow", () => {
     });
   });
 
-  test.describe("Login", () => {
-    test("@smoke should login successfully with valid credentials", async ({
+  test.describe('Login', () => {
+    test('@smoke @unsafe should login successfully with valid credentials', async ({
       page,
     }) => {
-      // Mock successful login response
-      await helpers.mockApiResponse("/auth/login", {
-        token: "mock-jwt-token",
-        user: { id: 1, email: "test@artshare.com", is_onboard: true },
-        message: "Login successful",
-      });
+      // Test real login with test credentials
 
-      await page.goto("/login");
+      await page.goto('/login');
 
       // Fill in login form
-      await helpers.fillField('input[type="email"]', "test@artshare.com");
-      await helpers.fillField('input[type="password"]', "TestPassword123!");
+      await helpers.fillField(
+        'input[type="email"]',
+        'panngoc21@clc.fitus.edu.vn',
+      );
+      await helpers.fillField('input[type="password"]', 'Test@123');
 
       // Submit form
       await helpers.clickAndWait('button[type="submit"]', {
@@ -122,8 +126,8 @@ test.describe("Authentication Flow", () => {
       expect(isAuth).toBe(true);
     });
 
-    test("should handle empty form submission", async ({ page }) => {
-      await page.goto("/login");
+    test('@safe should handle empty form submission', async ({ page }) => {
+      await page.goto('/login');
 
       // Try to submit empty form
       await page.click('button[type="submit"]');
@@ -136,12 +140,14 @@ test.describe("Authentication Flow", () => {
       await expect(errorMessages.first()).toBeVisible({ timeout: 3000 });
     });
 
-    test("should show error for invalid email format", async ({ page }) => {
-      await page.goto("/login");
+    test('@safe should show error for invalid email format', async ({
+      page,
+    }) => {
+      await page.goto('/login');
 
       // Fill invalid email
-      await helpers.fillField('input[type="email"]', "invalid-email");
-      await helpers.fillField('input[type="password"]', "TestPassword123!");
+      await helpers.fillField('input[type="email"]', 'invalid-email');
+      await helpers.fillField('input[type="password"]', 'Test@123');
 
       // Submit form
       await page.click('button[type="submit"]');
@@ -154,8 +160,10 @@ test.describe("Authentication Flow", () => {
       expect(isInvalid).toBe(true);
     });
 
-    test("should have password toggle functionality", async ({ page }) => {
-      await page.goto("/login");
+    test('@safe should have password toggle functionality', async ({
+      page,
+    }) => {
+      await page.goto('/login');
 
       const passwordInput = page.locator('input[type="password"]');
       const toggleButton = page.locator(
@@ -163,39 +171,36 @@ test.describe("Authentication Flow", () => {
       );
 
       if ((await toggleButton.count()) > 0) {
-        await helpers.fillField('input[type="password"]', "TestPassword123!");
+        await helpers.fillField('input[type="password"]', 'Test@123');
 
         // Click toggle button
         await toggleButton.click();
 
         // Check if password is now visible (input type changed to text)
-        const inputType = await passwordInput.getAttribute("type");
-        expect(inputType).toBe("text");
+        const inputType = await passwordInput.getAttribute('type');
+        expect(inputType).toBe('text');
       }
     });
   });
 
-  test.describe("Signup", () => {
-    test("should register new user successfully", async ({ page }) => {
-      // Mock successful registration response
-      await helpers.mockApiResponse("/auth/signup", {
-        token: "mock-jwt-token",
-        user: { id: 2, email: "newuser@artshare.com", is_onboard: false },
-        message: "Registration successful",
-      });
+  test.describe('Signup', () => {
+    test('@unsafe should register new user successfully', async ({ page }) => {
+      // Test real registration (will require unique email)
+      const timestamp = Date.now();
+      const testEmail = `testuser${timestamp}@example.com`;
 
-      await page.goto("/signup");
+      await page.goto('/signup');
 
       // Fill registration form
-      await helpers.fillField('input[type="email"]', "newuser@artshare.com");
-      await helpers.fillField('input[type="password"]', "TestPassword123!");
+      await helpers.fillField('input[type="email"]', testEmail);
+      await helpers.fillField('input[type="password"]', 'Test@123');
 
       // Fill confirm password if exists
       const confirmPasswordField = page.locator(
         'input[name*="confirm"], input[name*="repeat"]',
       );
       if ((await confirmPasswordField.count()) > 0) {
-        await confirmPasswordField.fill("TestPassword123!");
+        await confirmPasswordField.fill('Test@123');
       }
 
       // Fill additional fields if they exist
@@ -203,7 +208,7 @@ test.describe("Authentication Flow", () => {
         'input[name="username"], input[name="user_name"]',
       );
       if ((await usernameField.count()) > 0) {
-        await usernameField.fill("testuser");
+        await usernameField.fill('testuser');
       }
 
       // Submit form
@@ -215,12 +220,12 @@ test.describe("Authentication Flow", () => {
       await expect(page).toHaveURL(/.*onboarding|.*dashboard|.*profile/);
     });
 
-    test("should show error for invalid email format in signup", async ({
+    test('@safe should show error for invalid email format in signup', async ({
       page,
     }) => {
-      await page.goto("/signup");
+      await page.goto('/signup');
 
-      await helpers.fillField('input[type="email"]', "invalid-email");
+      await helpers.fillField('input[type="email"]', 'invalid-email');
 
       // Try to submit
       await page.click('button[type="submit"]');
@@ -233,11 +238,14 @@ test.describe("Authentication Flow", () => {
       expect(isInvalid).toBe(true);
     });
 
-    test("should show error for weak password", async ({ page }) => {
-      await page.goto("/signup");
+    test('@safe should show error for weak password', async ({ page }) => {
+      await page.goto('/signup');
 
-      await helpers.fillField('input[type="email"]', "test@artshare.com");
-      await helpers.fillField('input[type="password"]', "123");
+      await helpers.fillField(
+        'input[type="email"]',
+        'panngoc21@clc.fitus.edu.vn',
+      );
+      await helpers.fillField('input[type="password"]', '123');
 
       // Submit form
       await page.click('button[type="submit"]');
@@ -248,21 +256,22 @@ test.describe("Authentication Flow", () => {
     });
   });
 
-  test.describe("Password Reset", () => {
-    test("should request password reset successfully", async ({ page }) => {
-      // Mock password reset response
-      await helpers.mockApiResponse("/auth/forgot-password", {
-        message: "Password reset email sent successfully",
-      });
-
-      await page.goto("/forgot-password");
+  test.describe('Password Reset', () => {
+    test('@unsafe should request password reset successfully', async ({
+      page,
+    }) => {
+      // Test real password reset functionality
+      await page.goto('/forgot-password');
 
       // Fill email
-      await helpers.fillField('input[type="email"]', "test@artshare.com");
+      await helpers.fillField(
+        'input[type="email"]',
+        'panngoc21@clc.fitus.edu.vn',
+      );
 
       // Submit form
       await helpers.clickAndWait('button[type="submit"]', {
-        waitForResponse: "/auth/forgot-password",
+        waitForResponse: '/auth/forgot-password',
       });
 
       // Check for success message
@@ -272,8 +281,10 @@ test.describe("Authentication Flow", () => {
       await expect(successMessage.first()).toBeVisible({ timeout: 5000 });
     });
 
-    test("should handle empty email in password reset", async ({ page }) => {
-      await page.goto("/forgot-password");
+    test('@safe should handle empty email in password reset', async ({
+      page,
+    }) => {
+      await page.goto('/forgot-password');
 
       // Try to submit without email
       await page.click('button[type="submit"]');
@@ -286,15 +297,10 @@ test.describe("Authentication Flow", () => {
       expect(isInvalid).toBe(true);
     });
   });
-  test.describe("Session Management", () => {
-    test("should logout successfully", async () => {
-      // First login
-      await helpers.mockApiResponse("/auth/login", {
-        token: "mock-jwt-token",
-        user: { id: 1, email: "test@artshare.com", is_onboard: true },
-      });
-
-      await helpers.loginWithEmail("test@artshare.com", "TestPassword123!");
+  test.describe('Session Management', () => {
+    test('@unsafe should logout successfully', async () => {
+      // First login with real credentials
+      await helpers.loginWithEmail('panngoc21@clc.fitus.edu.vn', 'Test@123');
 
       // Verify logged in
       const isAuthBefore = await helpers.isAuthenticated();
@@ -308,19 +314,11 @@ test.describe("Authentication Flow", () => {
       expect(isAuthAfter).toBe(false);
     });
 
-    test("should maintain session across page refreshes", async ({ page }) => {
-      // Mock login
-      await helpers.mockApiResponse("/auth/login", {
-        token: "mock-jwt-token",
-        user: { id: 1, email: "test@artshare.com", is_onboard: true },
-      });
-
-      await helpers.loginWithEmail("test@artshare.com", "TestPassword123!");
-
-      // Set token in localStorage to simulate persistent session
-      await page.evaluate(() => {
-        localStorage.setItem("authToken", "mock-jwt-token");
-      });
+    test('@unsafe should maintain session across page refreshes', async ({
+      page,
+    }) => {
+      // Login with real credentials
+      await helpers.loginWithEmail('panngoc21@clc.fitus.edu.vn', 'Test@123');
 
       // Refresh page
       await page.reload();
