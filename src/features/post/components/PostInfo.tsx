@@ -1,24 +1,24 @@
-import { Button, CardContent, Divider } from "@mui/material";
-import { MessageSquareText, Bookmark, Share2 } from "lucide-react";
-import ShowMoreText from "react-show-more-text";
-import { ElementType, useState, useEffect, useCallback } from "react";
-import ReactTimeAgo from "react-time-ago";
-import { Post, Collection } from "@/types";
-import { useFocusContext } from "@/contexts/focus/useFocusText";
+import { useFocusContext } from '@/contexts/focus/useFocusText';
+import { Collection, Post } from '@/types';
+import { Button, CardContent, Divider } from '@mui/material';
+import { Bookmark, MessageSquareText, Share2 } from 'lucide-react';
+import { ElementType, useCallback, useEffect, useState } from 'react';
+import ShowMoreText from 'react-show-more-text';
+import ReactTimeAgo from 'react-time-ago';
 
-import { SavePostDialog } from "./SavePostDialog";
-import { CreateCollectionDialog } from "@/features/collection/components/CreateCollectionDialog";
+import { CreateCollectionDialog } from '@/features/collection/components/CreateCollectionDialog';
+import { SavePostDialog } from './SavePostDialog';
 
-import { AiFillLike, AiOutlineLike } from "react-icons/ai";
-import { fetchCollectionsForDialog } from "../api/collection.api";
-import { LikesDialog } from "@/components/like/LikesDialog";
-import { useUser } from "@/contexts/UserProvider";
+import { LikesDialog } from '@/components/like/LikesDialog';
+import { useUser } from '@/contexts/user/useUser';
+import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
+import { fetchCollectionsForDialog } from '../api/collection.api';
 // 👉 Like/unlike API helpers
-import { likePost, unlikePost } from "../api/post.api";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { TargetType } from "@/utils/constants";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { useLocation } from "react-router-dom";
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { TargetType } from '@/utils/constants';
+import { useLocation } from 'react-router-dom';
+import { likePost, unlikePost } from '../api/post.api';
 
 interface SimpleCollection {
   id: number;
@@ -70,7 +70,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
         setSimpleCollections(fetchedCollections);
       } catch (error) {
         setCollectionError(
-          error instanceof Error ? error.message : "Could not load list.",
+          error instanceof Error ? error.message : 'Could not load list.',
         );
       } finally {
         setIsLoadingCollections(false);
@@ -107,9 +107,9 @@ const PostInfo = ({ postData }: PostInfoProps) => {
 
   // Like / Unlike handler (optimistic update)
   const handleLikeClick = () =>
-    requireAuth("like this post", async () => {
+    requireAuth('like this post', async () => {
       if (!user) {
-        showSnackbar("Please log in to like", "error");
+        showSnackbar('Please log in to like', 'error');
         return;
       }
       if (isLiking || isFetchingLike) return;
@@ -120,7 +120,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
       try {
         willLike ? await likePost(postData.id) : await unlikePost(postData.id);
       } catch (error) {
-        console.error("Error toggling like status:", error);
+        console.error('Error toggling like status:', error);
         setUserLike(!willLike);
         setLikeCount((prev) => (willLike ? Math.max(prev - 1, 0) : prev + 1));
       } finally {
@@ -129,7 +129,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
     });
 
   const handleOpenLikesDialog = () =>
-    requireAuth("view likes", () => {
+    requireAuth('view likes', () => {
       if (likeCount > 0) setIsLikesDialogOpen(true);
     });
   const handleCloseLikesDialog = () => setIsLikesDialogOpen(false);
@@ -141,44 +141,44 @@ const PostInfo = ({ postData }: PostInfoProps) => {
   const location = useLocation();
 
   const handleCopyLink = async (e: React.MouseEvent) => {
-      e.stopPropagation();
-      const fullUrl = `${window.location.origin}${location.pathname}${location.search}`;
-      try {
-        await navigator.clipboard.writeText(fullUrl);
-        showSnackbar('Copied post link', 'success');
-      } catch (err) {
-        console.error("Failed to copy link:", err);
-        showSnackbar('Cannot copy post link!', 'error');
-      }
-    };
+    e.stopPropagation();
+    const fullUrl = `${window.location.origin}${location.pathname}${location.search}`;
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      showSnackbar('Copied post link', 'success');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      showSnackbar('Cannot copy post link!', 'error');
+    }
+  };
 
   if (!postData) return null;
 
   const existingCollectionNames = simpleCollections.map((c) => c.name);
   const disableCreate = isLoadingCollections || !!collectionError;
   const createTooltip = isLoadingCollections
-    ? "Loading collection list..."
+    ? 'Loading collection list...'
     : collectionError
       ? `Cannot create: ${collectionError}`
-      : "";
+      : '';
 
   return (
     <>
-      <div className="bg-white dark:bg-mountain-950 rounded-2xl overflow-none">
+      <div className="dark:bg-mountain-950 overflow-none rounded-2xl bg-white">
         <CardContent className="flex flex-col gap-2 p-0">
           {/* Title, description, date */}
           <div className="flex flex-col gap-2">
-            <div className="font-bold text-xl">{postData.title}</div>
+            <div className="text-xl font-bold">{postData.title}</div>
             <AnyShowMoreText
               lines={3}
               more="Show more"
               less="Show less"
               anchorClass="text-blue-600 hover:underline cursor-pointer text-sm"
             >
-              {postData.description || ""}
+              {postData.description || ''}
             </AnyShowMoreText>
-            <div className="text-gray-500 text-xs italic">
-              Posted{" "}
+            <div className="text-xs text-gray-500 italic">
+              Posted{' '}
               {postData.created_at &&
               !isNaN(new Date(postData.created_at).getTime()) ? (
                 <ReactTimeAgo
@@ -186,7 +186,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
                   locale="en-US"
                 />
               ) : (
-                "Unknown time"
+                'Unknown time'
               )}
             </div>
           </div>
@@ -195,7 +195,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
             {postData.categories?.map((cat) => (
               <div
                 key={cat.id}
-                className="bg-mountain-50 dark:bg-mountain-800 px-2 py-1 rounded text-xs"
+                className="bg-mountain-50 dark:bg-mountain-800 rounded px-2 py-1 text-xs"
               >
                 {cat.name}
               </div>
@@ -203,30 +203,30 @@ const PostInfo = ({ postData }: PostInfoProps) => {
           </div>
           <Divider className="border-0.5" />
           {/* Stats */}
-          <div className="flex gap-6 text-mountain-950">
+          <div className="text-mountain-950 flex gap-6">
             <div
-              className={`text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm ${likeCount > 0 ? "cursor-pointer hover:underline" : "cursor-default"}`}
+              className={`text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm ${likeCount > 0 ? 'cursor-pointer hover:underline' : 'cursor-default'}`}
               onClick={handleOpenLikesDialog}
-              title={likeCount > 0 ? "View who liked this" : "No likes yet"}
+              title={likeCount > 0 ? 'View who liked this' : 'No likes yet'}
             >
               <p className="font-semibold">{likeCount}</p>
               <span className="text-mountain-600 dark:text-mountain-200">
-                {likeCount > 1 ? " Likes" : " Like"}
+                {likeCount > 1 ? ' Likes' : ' Like'}
               </span>
             </div>
-            <div className="flex items-center gap-1 text-sm text-mountain-950 dark:text-mountain-100">
+            <div className="text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm">
               <p className="font-semibold">{postData.comment_count}</p>
               <span className="text-mountain-600 dark:text-mountain-200">
-                {postData.comment_count > 1 ? " Comments" : " Comment"}
+                {postData.comment_count > 1 ? ' Comments' : ' Comment'}
               </span>
             </div>
           </div>
           <Divider className="border-0.5" />
           {/* Actions */}
-          <div className="flex justify-between w-full">
+          <div className="flex w-full justify-between">
             <Button
-              className="hover:bg-blue-50 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200 hover:dark:bg-blue-900"
-              title={userLike ? "Unlike" : "Like"}
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
+              title={userLike ? 'Unlike' : 'Like'}
               onClick={handleLikeClick}
               disabled={isLiking || isFetchingLike}
             >
@@ -237,21 +237,21 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               )}
             </Button>
             <Button
-              className="hover:bg-blue-50 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200 hover:dark:bg-blue-900"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title="Comment"
               onClick={handleFocusCommentInput}
             >
               <MessageSquareText className="size-5" />
             </Button>
             <Button
-              className="hover:bg-blue-50 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200 hover:dark:bg-blue-900"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title="Save"
               onClick={handleOpenSaveDialog}
             >
               <Bookmark className="size-5" />
             </Button>
             <Button
-              className="hover:bg-blue-50 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200 hover:dark:bg-blue-900"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title="Copy Link"
               onClick={(e) => handleCopyLink(e)}
             >

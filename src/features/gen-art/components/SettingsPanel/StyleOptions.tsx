@@ -16,7 +16,6 @@ import { MockModelOptionsData } from "../../mock/Data";
 //Icons
 import { IoIosArrowForward } from "react-icons/io";
 import { Button } from "@mui/material";
-import { Input } from "@/components/ui/input";
 import StyleOption from "./StyleOption";
 
 const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
@@ -65,7 +64,7 @@ const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
           <IoIosArrowForward />
         </Button>
       </DialogTrigger>
-      <DialogContent className="gap-0 space-y-0 bg-white p-0 border-0 rounded-xl min-w-5xl">
+      <DialogContent className="gap-0 space-y-0 bg-white p-0 border border-mountain-200 rounded-xl w-fit">
         <DialogHeader className="p-4 border-mountain-200 border-b-[1px]">
           <DialogTitle className="font-normal text-mountain-700">
             Styles
@@ -74,22 +73,8 @@ const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
         </DialogHeader>
         <div className="relative flex w-full h-[600px]">
           <div className="flex flex-col space-y-4 p-4 border-mountain-200 border-r-[1px] w-[717px]">
-            <div className="flex justify-end items-end">
-              <Input
-                autoFocus={false}
-                className="bg-mountain-50 w-64 placeholder:text-mountain-400"
-                placeholder="Search styles"
-              />
-            </div>
-
             <div
-              className="
-                                grid
-                                grid-cols-[repeat(auto-fill,minmax(8rem,1fr))]
-                                gap-4
-                                overflow-y-auto
-                                h-[500px]
-                            "
+              className="gap-4 grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] pr-4 h-full overflow-y-auto custom-scrollbar"
             >
               {MockModelOptionsData.map((style) => (
                 <StyleOption
@@ -125,7 +110,7 @@ const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
                   Sample Results
                 </p>
                 <div
-                  className="flex space-x-2 w-[500px] duration-300 ease-in-out overflow-x-auto"
+                  className="flex space-x-2 w-[500px] overflow-x-auto duration-300 ease-in-out"
                   style={{ transform: `translateX(${translateValue}px)` }}
                 >
                   {selectedStyle?.images.map((img, idx) => (

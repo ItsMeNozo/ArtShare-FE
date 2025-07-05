@@ -1,12 +1,12 @@
-import api from "@/api/baseApi";
-import { useFocusContext } from "@/contexts/focus/useFocusText";
-import { useUser } from "@/contexts/UserProvider";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { isTemporaryCommentId } from "@/lib/utils";
-import { User } from "@/types";
-import { CommentUI, CreateCommentDto } from "@/types/comment";
-import { TargetType } from "@/utils/constants";
+import api from '@/api/baseApi';
+import { useFocusContext } from '@/contexts/focus/useFocusText';
+import { useUser } from '@/contexts/user/useUser';
+import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { isTemporaryCommentId } from '@/lib/utils';
+import { User } from '@/types';
+import { CommentUI, CreateCommentDto } from '@/types/comment';
+import { TargetType } from '@/utils/constants';
 import {
   Box,
   Button,
@@ -16,16 +16,16 @@ import {
   MenuItem,
   TextareaAutosize,
   Typography,
-} from "@mui/material";
-import MuiLink from "@mui/material/Link";
-import Avatar from "boring-avatars";
+} from '@mui/material';
+import MuiLink from '@mui/material/Link';
+import Avatar from 'boring-avatars';
 import {
   ChevronDown,
   ChevronUp,
   Heart,
   MoreVertical,
   SendHorizontal,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   forwardRef,
   MouseEvent,
@@ -35,16 +35,16 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import ReactTimeAgo from "react-time-ago";
+} from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import ReactTimeAgo from 'react-time-ago';
 import {
   createComment,
   fetchComments,
   likeComment,
   unlikeComment,
-} from "../api/comment.api";
-import { FreshRepliesCtx } from "./FreshReplies";
+} from '../api/comment.api';
+import { FreshRepliesCtx } from './FreshReplies';
 /* ------------------------------------------------------------------ */
 /* Constants & helpers                                                */
 /* ------------------------------------------------------------------ */
@@ -61,11 +61,11 @@ export interface CommentSectionRef {
 }
 
 const DATETIME_FORMAT_OPTIONS_FOR_TITLE: Intl.DateTimeFormatOptions = {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
 };
 
 const addReplyRecursive = (
@@ -216,7 +216,7 @@ const CommentRow = ({
   const closeMenu = () => setAnchorEl(null);
   const requireAuth = useRequireAuth();
   const [replying, setReplying] = useState(false);
-  const [replyText, setReplyText] = useState("");
+  const [replyText, setReplyText] = useState('');
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
   const olderCount = Math.max(0, (comment.reply_count ?? 0) - freshIds.size);
   // show the thread container if there's any older OR any fresh replies
@@ -278,10 +278,10 @@ const CommentRow = ({
         onRepliesFetched(comment.id, fetchedReplies as CommentUI[]);
       } catch (err) {
         console.error(
-          "Failed to load replies for comment " + comment.id + ":",
+          'Failed to load replies for comment ' + comment.id + ':',
           err,
         );
-        showSnackbar("Failed to load replies", "error");
+        showSnackbar('Failed to load replies', 'error');
       } finally {
         setLoading(false);
       }
@@ -319,7 +319,7 @@ const CommentRow = ({
   return (
     <div
       id={`comment-${comment.id}`}
-      className={`w-full comment-item ${isHighlighted ? "comment-highlighted" : ""}`}
+      className={`comment-item w-full ${isHighlighted ? 'comment-highlighted' : ''}`}
     >
       <Box className="w-full">
         <div className="flex w-full gap-3 py-3">
@@ -327,7 +327,7 @@ const CommentRow = ({
             <img
               src={comment.user.profile_picture_url}
               alt={comment.user.username}
-              className="object-cover w-8 h-8 transition-all duration-200 rounded-full cursor-pointer ring-2 ring-transparent hover:ring-blue-500/30"
+              className="h-8 w-8 cursor-pointer rounded-full object-cover ring-2 ring-transparent transition-all duration-200 hover:ring-blue-500/30"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/${comment.user.username}`);
@@ -335,7 +335,7 @@ const CommentRow = ({
             />
           ) : (
             <div
-              className="transition-all duration-200 rounded-full cursor-pointer ring-2 ring-transparent hover:ring-blue-500/30"
+              className="cursor-pointer rounded-full ring-2 ring-transparent transition-all duration-200 hover:ring-blue-500/30"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/${comment.user.username}`);
@@ -345,14 +345,14 @@ const CommentRow = ({
                 name={comment.user.username}
                 size={32}
                 variant="beam"
-                colors={["#84bfc3", "#ff9b62", "#d96153"]}
+                colors={['#84bfc3', '#ff9b62', '#d96153']}
               />
             </div>
           )}
-          <div className="flex flex-col flex-grow">
+          <div className="flex flex-grow flex-col">
             <div className="flex items-center gap-2 text-sm">
               <span
-                className="font-bold transition-colors duration-200 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
+                className="cursor-pointer font-bold transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/${comment.user.username}`);
@@ -377,7 +377,7 @@ const CommentRow = ({
                   locale="en-US"
                 />
                 {new Date(comment.updated_at).getTime() !==
-                  new Date(comment.created_at).getTime() && " (edited)"}
+                  new Date(comment.created_at).getTime() && ' (edited)'}
               </span>
             </div>
 
@@ -387,7 +387,7 @@ const CommentRow = ({
                   ref={editRef}
                   defaultValue={comment.content}
                   minRows={2}
-                  className="w-full p-2 border rounded-md border-neutral-300"
+                  className="w-full rounded-md border border-neutral-300 p-2"
                 />
                 <div className="flex gap-2 text-xs">
                   <Button
@@ -413,18 +413,18 @@ const CommentRow = ({
             )}
 
             {!isEditing && (
-              <div className="flex items-center gap-1 mt-1">
+              <div className="mt-1 flex items-center gap-1">
                 <IconButton
                   size="small"
-                  color={comment.likedByCurrentUser ? "primary" : "default"}
+                  color={comment.likedByCurrentUser ? 'primary' : 'default'}
                   onClick={() =>
-                    requireAuth("like comments", () => onLike(comment.id))
+                    requireAuth('like comments', () => onLike(comment.id))
                   }
                   disabled={false} // We'll handle the debouncing in the parent
                 >
                   <Heart
                     size={16}
-                    fill={comment.likedByCurrentUser ? "currentColor" : "none"}
+                    fill={comment.likedByCurrentUser ? 'currentColor' : 'none'}
                     stroke="currentColor"
                   />
                 </IconButton>
@@ -436,13 +436,13 @@ const CommentRow = ({
                     size="small"
                     color="primary"
                     onClick={() =>
-                      requireAuth("reply to comments", () => {
+                      requireAuth('reply to comments', () => {
                         setReplying((v) => !v);
                         setTimeout(() => replyInputRef.current?.focus(), 0);
                       })
                     }
                   >
-                    {replying ? "Cancel" : "Reply"}
+                    {replying ? 'Cancel' : 'Reply'}
                   </Button>
                 )}
               </div>
@@ -461,9 +461,9 @@ const CommentRow = ({
                   width: 28,
                   height: 28,
                   p: 0.5,
-                  borderRadius: "50%",
-                  "&:hover": {
-                    backgroundColor: "action.hover", // subtle, uses theme value
+                  borderRadius: '50%',
+                  '&:hover': {
+                    backgroundColor: 'action.hover', // subtle, uses theme value
                   },
                 }}
               >
@@ -499,7 +499,7 @@ const CommentRow = ({
         {/* ▶️  INLINE REPLY INPUT  */}
         {showThread && depth < MAX_REPLY_DEPTH && (
           <div
-            className="flex flex-col gap-1 mb-3"
+            className="mb-3 flex flex-col gap-1"
             style={{ marginLeft: INDENT }}
           >
             {/* A.  View / Hide button (only for true older replies) */}
@@ -516,8 +516,8 @@ const CommentRow = ({
                 ) : (
                   <ChevronDown size={14} />
                 )}
-                {showReplies ? "Hide" : "View"} {olderCount}{" "}
-                {olderCount === 1 ? "reply" : "replies"}
+                {showReplies ? 'Hide' : 'View'} {olderCount}{' '}
+                {olderCount === 1 ? 'reply' : 'replies'}
               </button>
             )}
 
@@ -554,7 +554,7 @@ const CommentRow = ({
         {/* B.  Inline-reply input - MOVED HERE and corrected indentation & styling */}
         {replying && canReplyToThisComment && (
           <div
-            className="flex items-start gap-3 mt-2"
+            className="mt-2 flex items-start gap-3"
             style={{ marginLeft: INDENT }} // Apply indent directly to the reply box container
           >
             {/* avatar */}
@@ -562,18 +562,18 @@ const CommentRow = ({
               <img
                 src={user.profile_picture_url}
                 alt={user.username}
-                className="object-cover w-8 h-8 rounded-full"
+                className="h-8 w-8 rounded-full object-cover"
               />
             ) : (
               <Avatar
-                name={user?.username || "Guest"}
+                name={user?.username || 'Guest'}
                 size={32}
                 variant="beam"
-                colors={["#84bfc3", "#ff9b62", "#d96153"]}
+                colors={['#84bfc3', '#ff9b62', '#d96153']}
               />
             )}
             {/* input + buttons */}
-            <div className="flex flex-col flex-1 pr-4">
+            <div className="flex flex-1 flex-col pr-4">
               <TextareaAutosize
                 ref={replyInputRef}
                 placeholder="Reply…"
@@ -582,32 +582,32 @@ const CommentRow = ({
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
+                  if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     const txt = replyText.trim();
                     if (!txt) return;
                     // Critical check: ensure parent (this comment) is not temporary
                     if (thisCommentIsTemporary) {
                       showSnackbar(
-                        "Cannot submit reply, parent comment is still saving.",
-                        "error",
+                        'Cannot submit reply, parent comment is still saving.',
+                        'error',
                       );
                       return;
                     }
                     // setShowReplies(true);
                     onSubmitReply(comment.id, txt); // comment.id here MUST be the real persisted ID
-                    setReplyText("");
+                    setReplyText('');
                     setReplying(false);
                   }
                 }}
-                className="border border-neutral-300 rounded-lg p-3 w-full max-w-full ..."
+                className="w-full max-w-full rounded-lg border border-neutral-300 p-3 ..."
               />
-              <div className="flex justify-end gap-2 mt-1">
+              <div className="mt-1 flex justify-end gap-2">
                 <Button
                   size="small"
                   color="inherit"
                   onClick={() => {
-                    setReplyText("");
+                    setReplyText('');
                     setReplying(false);
                   }}
                 >
@@ -622,14 +622,14 @@ const CommentRow = ({
                     if (!txt) return;
                     if (thisCommentIsTemporary) {
                       showSnackbar(
-                        "Cannot submit reply, parent comment is still saving.",
-                        "error",
+                        'Cannot submit reply, parent comment is still saving.',
+                        'error',
                       );
                       return;
                     }
                     //  setShowReplies(true); // keep thread open
                     onSubmitReply(comment.id, txt);
-                    setReplyText("");
+                    setReplyText('');
                     setReplying(false);
                   }}
                 >
@@ -652,7 +652,7 @@ interface Props {
   /** id of the post or blog we are commenting on */
   targetId: number;
   /** where to show the input bar - defaults to bottom (post layout) */
-  inputPosition?: "top" | "bottom";
+  inputPosition?: 'top' | 'bottom';
   /** distinguishes which table to update on the back-end */
   targetType: TargetType;
   onCommentAdded(): void;
@@ -667,7 +667,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       comments: initial,
       targetId,
       targetType = TargetType.POST,
-      inputPosition = "bottom",
+      inputPosition = 'bottom',
       onCommentAdded,
       onCommentDeleted,
       hideWrapper = false,
@@ -681,7 +681,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     const { postCommentsRef } = useFocusContext();
     const listRef = useRef<HTMLDivElement>(null);
     const [comments, setComments] = useState<CommentUI[]>(initial);
-    const [newComment, setNewComment] = useState("");
+    const [newComment, setNewComment] = useState('');
     const [replyParentId, setReplyParentId] = useState<number | null>(null);
     const [isPosting, setIsPosting] = useState(false);
     const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -710,12 +710,12 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     const focusLogic = useCallback(() => {
       if (!user) {
         showSnackbar(
-          "Please login to comment",
-          "warning",
+          'Please login to comment',
+          'warning',
           <Button
             size="small"
             color="inherit"
-            onClick={() => (window.location.href = "/login")}
+            onClick={() => (window.location.href = '/login')}
           >
             Login
           </Button>,
@@ -777,9 +777,9 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       _ref,
       () => ({
         highlightComment: (commentId: number) => {
-          console.log("[CommentSection] Highlighting comment:", commentId);
+          console.log('[CommentSection] Highlighting comment:', commentId);
           console.log(
-            "[CommentSection] Current highlightedCommentId before:",
+            '[CommentSection] Current highlightedCommentId before:',
             highlightedCommentId,
           );
 
@@ -795,17 +795,17 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
           const commentExists = findComment(comments, commentId);
           console.log(
-            "[CommentSection] Comment exists in current comments:",
+            '[CommentSection] Comment exists in current comments:',
             commentExists,
           );
 
           setHighlightedCommentId(commentId);
           console.log(
-            "[CommentSection] Setting highlightedCommentId to:",
+            '[CommentSection] Setting highlightedCommentId to:',
             commentId,
           );
           setTimeout(() => {
-            console.log("[CommentSection] Removing highlight after 5 seconds");
+            console.log('[CommentSection] Removing highlight after 5 seconds');
             setHighlightedCommentId(null);
           }, 5000);
         },
@@ -814,7 +814,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
         },
         getScrollContainer: () => {
           // Find the scroll container in the desktop layout
-          const sidebarContainer = document.querySelector(".sidebar");
+          const sidebarContainer = document.querySelector('.sidebar');
           if (sidebarContainer) {
             return sidebarContainer as HTMLElement;
           }
@@ -834,11 +834,11 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           commentId: number,
           highlight: boolean = true,
         ) => {
-          console.log("[CommentSection] === ENHANCED SCROLL START ===");
+          console.log('[CommentSection] === ENHANCED SCROLL START ===');
           console.log(
-            "[CommentSection] Target:",
+            '[CommentSection] Target:',
             commentId,
-            "highlight:",
+            'highlight:',
             highlight,
           );
 
@@ -846,27 +846,27 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           const element = document.getElementById(`comment-${commentId}`);
           if (!element) {
             console.error(
-              "[CommentSection] ❌ Element not found:",
+              '[CommentSection] ❌ Element not found:',
               `comment-${commentId}`,
             );
 
             // Show available elements for debugging
             const allComments = document.querySelectorAll('[id^="comment-"]');
             console.log(
-              "[CommentSection] Available comments:",
+              '[CommentSection] Available comments:',
               Array.from(allComments).map((el) => el.id),
             );
             return false;
           }
 
-          console.log("[CommentSection] ✅ Element found:", element);
+          console.log('[CommentSection] ✅ Element found:', element);
 
           // Check visibility and dimensions
           const rect = element.getBoundingClientRect();
           const isVisible = rect.width > 0 && rect.height > 0;
           const computedStyle = window.getComputedStyle(element);
 
-          console.log("[CommentSection] Element analysis:", {
+          console.log('[CommentSection] Element analysis:', {
             rect: rect,
             isVisible: isVisible,
             display: computedStyle.display,
@@ -879,27 +879,27 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           // If element is not visible, try to expand parent threads first
           if (!isVisible) {
             console.log(
-              "[CommentSection] 🔍 Element not visible, trying to expand parent threads...",
+              '[CommentSection] 🔍 Element not visible, trying to expand parent threads...',
             );
 
             try {
               // Try to expand all collapsed threads that might contain this comment
-              const allToggleButtons = document.querySelectorAll("button");
+              const allToggleButtons = document.querySelectorAll('button');
               let expandedAny = false;
 
               for (const button of allToggleButtons) {
-                const buttonText = button.textContent?.toLowerCase() || "";
+                const buttonText = button.textContent?.toLowerCase() || '';
                 const hasViewText =
-                  buttonText.includes("view") &&
-                  (buttonText.includes("repl") ||
-                    buttonText.includes("comment"));
+                  buttonText.includes('view') &&
+                  (buttonText.includes('repl') ||
+                    buttonText.includes('comment'));
                 const hasChevronDown = button.querySelector(
                   'svg[data-lucide="chevron-down"]',
                 );
 
                 if (hasViewText || hasChevronDown) {
                   console.log(
-                    "[CommentSection] 🔄 Expanding thread with button:",
+                    '[CommentSection] 🔄 Expanding thread with button:',
                     buttonText,
                   );
                   button.click();
@@ -912,7 +912,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                   const newRect = element.getBoundingClientRect();
                   if (newRect.width > 0 && newRect.height > 0) {
                     console.log(
-                      "[CommentSection] ✅ Target element now visible after expansion",
+                      '[CommentSection] ✅ Target element now visible after expansion',
                     );
                     break;
                   }
@@ -924,7 +924,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                 await new Promise((resolve) => setTimeout(resolve, 500));
               }
             } catch (error) {
-              console.error("[CommentSection] Error expanding threads:", error);
+              console.error('[CommentSection] Error expanding threads:', error);
             }
           }
 
@@ -932,38 +932,38 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           const finalRect = element.getBoundingClientRect();
           const finalVisible = finalRect.width > 0 && finalRect.height > 0;
 
-          console.log("[CommentSection] Final visibility check:", {
+          console.log('[CommentSection] Final visibility check:', {
             rect: finalRect,
             isVisible: finalVisible,
           });
 
           if (!finalVisible) {
             console.warn(
-              "[CommentSection] ⚠️ Element still not visible after expansion attempts",
+              '[CommentSection] ⚠️ Element still not visible after expansion attempts',
             );
 
             // Try forcing the element to be visible
             console.log(
-              "[CommentSection] 🔧 Attempting to force visibility...",
+              '[CommentSection] 🔧 Attempting to force visibility...',
             );
-            element.style.display = "block";
-            element.style.visibility = "visible";
-            element.style.opacity = "1";
+            element.style.display = 'block';
+            element.style.visibility = 'visible';
+            element.style.opacity = '1';
 
             // Check parent containers
             let parent = element.parentElement;
             while (parent && parent !== document.body) {
               const parentStyle = window.getComputedStyle(parent);
               if (
-                parentStyle.display === "none" ||
-                parentStyle.visibility === "hidden"
+                parentStyle.display === 'none' ||
+                parentStyle.visibility === 'hidden'
               ) {
                 console.log(
-                  "[CommentSection] 🔧 Found hidden parent, making visible:",
+                  '[CommentSection] 🔧 Found hidden parent, making visible:',
                   parent,
                 );
-                parent.style.display = "block";
-                parent.style.visibility = "visible";
+                parent.style.display = 'block';
+                parent.style.visibility = 'visible';
               }
               parent = parent.parentElement;
             }
@@ -973,23 +973,23 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           }
 
           // Final attempt to scroll
-          console.log("[CommentSection] 🚀 Attempting scroll...");
+          console.log('[CommentSection] 🚀 Attempting scroll...');
 
           try {
             // Method 1: scrollIntoView
             element.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              inline: "nearest",
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest',
             });
 
-            console.log("[CommentSection] ✅ scrollIntoView called");
+            console.log('[CommentSection] ✅ scrollIntoView called');
 
             // Method 2: Manual scroll as backup
             setTimeout(() => {
               const afterScrollRect = element.getBoundingClientRect();
               console.log(
-                "[CommentSection] After scroll check:",
+                '[CommentSection] After scroll check:',
                 afterScrollRect,
               );
 
@@ -998,7 +998,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                 afterScrollRect.top > window.innerHeight
               ) {
                 console.log(
-                  "[CommentSection] 🔄 Element not in view, trying manual scroll...",
+                  '[CommentSection] 🔄 Element not in view, trying manual scroll...',
                 );
 
                 const elementTop = afterScrollRect.top + window.pageYOffset;
@@ -1006,49 +1006,49 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
                 window.scrollTo({
                   top: Math.max(0, targetY),
-                  behavior: "smooth",
+                  behavior: 'smooth',
                 });
 
-                console.log("[CommentSection] ✅ Manual scroll executed");
+                console.log('[CommentSection] ✅ Manual scroll executed');
               }
             }, 1000);
           } catch (error) {
-            console.error("[CommentSection] ❌ Scroll failed:", error);
+            console.error('[CommentSection] ❌ Scroll failed:', error);
             return false;
           }
 
           // Add highlight
           if (highlight) {
-            console.log("[CommentSection] 🎨 Adding highlight");
+            console.log('[CommentSection] 🎨 Adding highlight');
             setHighlightedCommentId(commentId);
             setTimeout(() => setHighlightedCommentId(null), 5000);
           }
 
-          console.log("[CommentSection] === ENHANCED SCROLL END ===");
+          console.log('[CommentSection] === ENHANCED SCROLL END ===');
           return true;
         },
         // Debug helper function for testing in console
         debugScrollToComment: (commentId: number) => {
           console.log(
-            "[CommentSection] DEBUG: Testing scroll to comment",
+            '[CommentSection] DEBUG: Testing scroll to comment',
             commentId,
           );
           const element = document.getElementById(`comment-${commentId}`);
           if (element) {
             console.log(
-              "[CommentSection] DEBUG: Element found, using scrollIntoView",
+              '[CommentSection] DEBUG: Element found, using scrollIntoView',
             );
-            element.scrollIntoView({ behavior: "smooth", block: "center" });
-            element.style.backgroundColor = "#ffeb3b";
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.style.backgroundColor = '#ffeb3b';
             setTimeout(() => {
-              element.style.backgroundColor = "";
+              element.style.backgroundColor = '';
             }, 3000);
           } else {
-            console.log("[CommentSection] DEBUG: Element not found");
+            console.log('[CommentSection] DEBUG: Element not found');
           }
         },
         expandToComment: async (commentId: number) => {
-          console.log("[CommentSection] Expanding to show comment:", commentId);
+          console.log('[CommentSection] Expanding to show comment:', commentId);
 
           // Function to recursively find the path to the target comment and expand all parent threads
           const findCommentPath = (
@@ -1083,7 +1083,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           const targetElement = document.getElementById(`comment-${commentId}`);
           if (!targetElement) {
             console.log(
-              "[CommentSection] Target comment element not found in DOM, trying to expand all collapsed threads",
+              '[CommentSection] Target comment element not found in DOM, trying to expand all collapsed threads',
             );
 
             // If the target comment is not in the DOM, we need to expand all collapsed threads
@@ -1091,7 +1091,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
             const expandAllCollapsedThreads = async (): Promise<boolean> => {
               let expandedAny = false;
               const allToggleButtons = document.querySelectorAll(
-                "button.text-blue-600:not([disabled]), button.dark\\:text-blue-200:not([disabled])",
+                'button.text-blue-600:not([disabled]), button.dark\\:text-blue-200:not([disabled])',
               );
 
               for (const button of allToggleButtons) {
@@ -1099,16 +1099,16 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                 if (toggleButton.textContent) {
                   const buttonText = toggleButton.textContent.toLowerCase();
                   const hasViewText =
-                    buttonText.includes("view") &&
-                    (buttonText.includes("repl") ||
-                      buttonText.includes("comment"));
+                    buttonText.includes('view') &&
+                    (buttonText.includes('repl') ||
+                      buttonText.includes('comment'));
                   const hasChevronDown = toggleButton.querySelector(
                     'svg[data-lucide="chevron-down"]',
                   );
 
                   if (hasViewText || hasChevronDown) {
                     console.log(
-                      "[CommentSection] Expanding collapsed thread with button text:",
+                      '[CommentSection] Expanding collapsed thread with button text:',
                       buttonText,
                     );
                     toggleButton.click();
@@ -1123,7 +1123,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
             const wasExpanded = await expandAllCollapsedThreads();
             console.log(
-              "[CommentSection] Expanded all collapsed threads, expandedAny:",
+              '[CommentSection] Expanded all collapsed threads, expandedAny:',
               wasExpanded,
             );
             return wasExpanded;
@@ -1131,16 +1131,16 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
           // Find the path to the target comment
           const commentPath = findCommentPath(comments, commentId);
-          console.log("[CommentSection] Comment path:", commentPath);
+          console.log('[CommentSection] Comment path:', commentPath);
 
           if (!commentPath) {
             console.log(
-              "[CommentSection] Comment not found in comment tree, but element exists in DOM",
+              '[CommentSection] Comment not found in comment tree, but element exists in DOM',
             );
             // The comment exists in DOM but not in our tree, probably because parent threads are collapsed
             // Try to expand all collapsed threads
             const allToggleButtons = document.querySelectorAll(
-              "button.text-blue-600:not([disabled]), button.dark\\:text-blue-200:not([disabled])",
+              'button.text-blue-600:not([disabled]), button.dark\\:text-blue-200:not([disabled])',
             );
             let expandedAny = false;
 
@@ -1149,15 +1149,15 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
               if (toggleButton.textContent) {
                 const buttonText = toggleButton.textContent.toLowerCase();
                 const hasViewText =
-                  buttonText.includes("view") &&
-                  (buttonText.includes("repl") ||
-                    buttonText.includes("comment"));
+                  buttonText.includes('view') &&
+                  (buttonText.includes('repl') ||
+                    buttonText.includes('comment'));
                 const hasChevronDown = toggleButton.querySelector(
                   'svg[data-lucide="chevron-down"]',
                 );
 
                 if (hasViewText || hasChevronDown) {
-                  console.log("[CommentSection] Expanding collapsed thread");
+                  console.log('[CommentSection] Expanding collapsed thread');
                   toggleButton.click();
                   expandedAny = true;
                   await new Promise((resolve) => setTimeout(resolve, 400));
@@ -1170,7 +1170,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
           if (commentPath.length <= 1) {
             console.log(
-              "[CommentSection] Comment is top-level, no expansion needed",
+              '[CommentSection] Comment is top-level, no expansion needed',
             );
             return false;
           }
@@ -1183,45 +1183,45 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
             if (parentElement) {
               // Look for the toggle button that shows/hides replies - more specific selector
               const toggleButton = parentElement.querySelector(
-                "button.text-blue-600:not([disabled]), button.dark\\:text-blue-200:not([disabled])",
+                'button.text-blue-600:not([disabled]), button.dark\\:text-blue-200:not([disabled])',
               ) as HTMLButtonElement;
               if (toggleButton && toggleButton.textContent) {
                 const buttonText = toggleButton.textContent.toLowerCase();
                 // Check for "view" text and SVG chevron down icon
                 const hasViewText =
-                  buttonText.includes("view") &&
-                  (buttonText.includes("repl") ||
-                    buttonText.includes("comment"));
+                  buttonText.includes('view') &&
+                  (buttonText.includes('repl') ||
+                    buttonText.includes('comment'));
                 const hasChevronDown = toggleButton.querySelector(
                   'svg[data-lucide="chevron-down"]',
                 );
 
                 if (hasViewText || hasChevronDown) {
                   console.log(
-                    "[CommentSection] Found collapsed thread, expanding parent:",
+                    '[CommentSection] Found collapsed thread, expanding parent:',
                     parentId,
-                    "button text:",
+                    'button text:',
                     buttonText,
                   );
                   toggleButton.click();
                   return true;
                 } else {
                   console.log(
-                    "[CommentSection] Toggle button found but already expanded for parent:",
+                    '[CommentSection] Toggle button found but already expanded for parent:',
                     parentId,
-                    "button text:",
+                    'button text:',
                     buttonText,
                   );
                 }
               } else {
                 console.log(
-                  "[CommentSection] No toggle button found for parent:",
+                  '[CommentSection] No toggle button found for parent:',
                   parentId,
                 );
               }
             } else {
               console.log(
-                "[CommentSection] Parent element not found:",
+                '[CommentSection] Parent element not found:',
                 parentId,
               );
             }
@@ -1243,7 +1243,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           }
 
           console.log(
-            "[CommentSection] Expansion complete, expandedAny:",
+            '[CommentSection] Expansion complete, expandedAny:',
             expandedAny,
           );
           return expandedAny;
@@ -1274,16 +1274,16 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           );
           if (!commentElement) {
             console.warn(
-              "[CommentSection] Comment element not found:",
+              '[CommentSection] Comment element not found:',
               `comment-${commentId}`,
             );
             return false;
           }
 
           commentElement.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-            inline: "nearest",
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest',
           });
 
           if (highlight) {
@@ -1339,10 +1339,10 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
       const optimistic: CommentUI = {
         id: tmpId,
-        user_id: CURRENT_USER_ID || "",
+        user_id: CURRENT_USER_ID || '',
         user: {
           id: CURRENT_USER_ID!,
-          username: user?.username || "",
+          username: user?.username || '',
           profile_picture_url: user?.profile_picture_url,
         } as User,
         parent_comment_id: parentId ?? null,
@@ -1366,9 +1366,9 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
       // mark this reply so it stays visible even if thread is collapsed
       if (parentId) appendFresh(parentId, tmpId);
-      listRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       // Clear input and set states
-      setNewComment("");
+      setNewComment('');
       setReplyParentId(null);
       setIsPosting(true);
 
@@ -1423,10 +1423,10 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           if (parentId) {
             const parentEl = document.getElementById(`comment-${parentId}`);
             if (parentEl) {
-              parentEl.scrollIntoView({ behavior: "smooth", block: "center" });
+              parentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           } else {
-            listRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+            listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
           }
         }, 100);
         setReplyParentId(null);
@@ -1434,7 +1434,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       } catch (err) {
         console.error(err);
         setComments((prev) => removeRecursive(prev, tmpId));
-        showSnackbar("Failed to post comment", "error");
+        showSnackbar('Failed to post comment', 'error');
       } finally {
         setIsPosting(false);
       }
@@ -1479,7 +1479,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       } catch (err) {
         console.error(err);
         setComments(prev);
-        showSnackbar("Could not delete comment", "error");
+        showSnackbar('Could not delete comment', 'error');
       } finally {
         setDeletingId(null);
       }
@@ -1499,7 +1499,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       } catch (err) {
         console.error(err);
         setComments(prev);
-        showSnackbar("Could not update comment", "error");
+        showSnackbar('Could not update comment', 'error');
       }
     };
 
@@ -1538,7 +1538,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
         console.error(err);
         // Revert the optimistic update on error
         setComments((prev) => toggleLikeRecursive(prev, id));
-        showSnackbar("Failed to update like", "error");
+        showSnackbar('Failed to update like', 'error');
       } finally {
         // Remove the comment from the processing set
         setLikingComments((prev) => {
@@ -1556,8 +1556,8 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           const data = await fetchComments(targetId, targetType);
           setComments(data as CommentUI[]);
         } catch (err) {
-          console.error("Failed to load comments:", err);
-          showSnackbar("Failed to load comments", "error");
+          console.error('Failed to load comments:', err);
+          showSnackbar('Failed to load comments', 'error');
         }
       };
       if (targetId) {
@@ -1568,13 +1568,13 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     const InputBar = (
       <div
         className={
-          inputPosition === "bottom"
+          inputPosition === 'bottom'
             ? // Fixed bottom: absolute positioning, ensure dark mode
-              "sticky bottom-0 inset-x-0 flex items-center gap-2 bg-white dark:bg-mountain-950 p-4 border-t border-mountain-200 dark:border-mountain-700"
+              'dark:bg-mountain-950 border-mountain-200 dark:border-mountain-700 sticky inset-x-0 bottom-0 flex items-center gap-2 border-t bg-white p-4'
             : // top version, but if hideWrapper remove border & rounding
               hideWrapper
-              ? "flex items-center gap-2 bg-white dark:bg-mountain-950 mb-4 px-4 mt-3" // blog comments
-              : "flex items-center gap-2 bg-white dark:bg-mountain-950 p-4 border border-mountain-200 dark:border-mountain-700 rounded-lg mb-4"
+              ? 'dark:bg-mountain-950 mt-3 mb-4 flex items-center gap-2 bg-white px-4' // blog comments
+              : 'dark:bg-mountain-950 border-mountain-200 dark:border-mountain-700 mb-4 flex items-center gap-2 rounded-lg border bg-white p-4'
         }
       >
         {/* Avatar */}
@@ -1582,14 +1582,14 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
           <img
             src={user.profile_picture_url}
             alt={user.username}
-            className="object-cover w-8 h-8 rounded-full"
+            className="h-8 w-8 rounded-full object-cover"
           />
         ) : (
           <Avatar
-            name={user?.username || "Guest"}
+            name={user?.username || 'Guest'}
             size={32}
             variant="beam"
-            colors={["#84bfc3", "#ff9b62", "#d96153"]}
+            colors={['#84bfc3', '#ff9b62', '#d96153']}
           />
         )}
 
@@ -1600,26 +1600,26 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
             placeholder={
               user
                 ? replyParentId
-                  ? "Replying…"
-                  : "Add a comment"
-                : "Login to add a comment"
+                  ? 'Replying…'
+                  : 'Add a comment'
+                : 'Login to add a comment'
             }
-            className="w-full p-3 bg-white border rounded-lg resize-none border-neutral-300 dark:border-neutral-600 dark:bg-mountain-900 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="dark:bg-mountain-900 w-full resize-none rounded-lg border border-neutral-300 bg-white p-3 text-neutral-800 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:text-neutral-100"
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={isPosting || !user}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                newComment.trim() && requireAuth("comment", handleAdd);
+                newComment.trim() && requireAuth('comment', handleAdd);
               }
             }}
           />
 
           <Button
             variant="contained"
-            className="p-0.5 min-w-auto h-12 aspect-[1/1]"
-            onClick={() => requireAuth("comment", handleAdd)}
+            className="aspect-[1/1] h-12 min-w-auto p-0.5"
+            onClick={() => requireAuth('comment', handleAdd)}
             disabled={!newComment.trim() || isPosting || !user}
           >
             {isPosting ? <CircularProgress size={24} /> : <SendHorizontal />}
@@ -1628,38 +1628,38 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       </div>
     );
 
-    const baseWrapperClasses = "relative flex flex-col w-full";
-    const responsiveGrowClass = "md:flex-grow";
+    const baseWrapperClasses = 'relative flex flex-col w-full';
+    const responsiveGrowClass = 'md:flex-grow';
     const conditionalAppearanceClasses = !hideWrapper
-      ? "bg-white dark:bg-mountain-950 rounded-2xl"
-      : "";
+      ? 'bg-white dark:bg-mountain-950 rounded-2xl'
+      : '';
 
     const wrapperClass =
       `${baseWrapperClasses} ${responsiveGrowClass} ${conditionalAppearanceClasses}`
         .trim()
-        .replace(/\s+/g, " ");
+        .replace(/\s+/g, ' ');
 
     return (
       <div className={wrapperClass}>
-        <span className="px-4 pt-4 font-bold text-md dark:text-white">
+        <span className="text-md px-4 pt-4 font-bold dark:text-white">
           Comments
         </span>
-        {inputPosition === "top" && InputBar}
+        {inputPosition === 'top' && InputBar}
         <FreshRepliesCtx.Provider
           value={{ map: newRepliesMap, clear: clearFresh }}
         >
           <div
             ref={listRef}
-            className={`flex-grow px-4 overflow-x-hidden overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-700 ${
+            className={`flex-grow divide-y divide-neutral-100 overflow-x-hidden overflow-y-auto px-4 dark:divide-neutral-700 ${
               hideWrapper
-                ? ""
-                : "bg-white dark:bg-neutral-800 rounded-lg shadow"
+                ? ''
+                : 'rounded-lg bg-white shadow dark:bg-neutral-800'
             } ${
-              inputPosition === "top"
-                ? "pb-4" // Add padding to bottom if input is at top
-                : "pt-4" // Add padding to top if input is at bottom
+              inputPosition === 'top'
+                ? 'pb-4' // Add padding to bottom if input is at top
+                : 'pt-4' // Add padding to top if input is at bottom
             }`}
-            style={{ scrollBehavior: "smooth" }}
+            style={{ scrollBehavior: 'smooth' }}
           >
             {comments.map((c) => (
               <CommentRow
@@ -1671,7 +1671,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                 comment={c}
                 onLike={handleLike}
                 onSubmitReply={(parentId, content) =>
-                  requireAuth("reply to comments", () =>
+                  requireAuth('reply to comments', () =>
                     handleAdd(content, parentId),
                   )
                 }
@@ -1690,11 +1690,11 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
             ))}
           </div>
         </FreshRepliesCtx.Provider>
-        {inputPosition === "bottom" && InputBar}
+        {inputPosition === 'bottom' && InputBar}
         {/* input */}
 
         {deletingId && (
-          <div className="absolute inset-0 flex items-center justify-center text-sm bg-white/70">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 text-sm">
             <CircularProgress size={20} />
             <span className="ml-2">Deleting…</span>
           </div>
@@ -1704,26 +1704,26 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
   },
 );
 
-CommentSection.displayName = "PostComments";
+CommentSection.displayName = 'PostComments';
 
 // Global debug functions for browser console testing
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   // Simple test function accessible from browser console
   (
     window as unknown as Window & {
       testCommentScroll: (commentId: number) => boolean;
     }
   ).testCommentScroll = function (commentId: number) {
-    console.log("🧪 === BROWSER CONSOLE TEST ===");
-    console.log("🎯 Testing scroll to comment:", commentId);
+    console.log('🧪 === BROWSER CONSOLE TEST ===');
+    console.log('🎯 Testing scroll to comment:', commentId);
 
     const element = document.getElementById(`comment-${commentId}`);
     if (!element) {
-      console.error("❌ Element not found:", `comment-${commentId}`);
+      console.error('❌ Element not found:', `comment-${commentId}`);
 
       // Show available comments
       const allComments = document.querySelectorAll('[id^="comment-"]');
-      console.log("📋 Available comments:");
+      console.log('📋 Available comments:');
       allComments.forEach((el: Element) => {
         const rect = el.getBoundingClientRect();
         const isVisible = rect.width > 0 && rect.height > 0;
@@ -1734,11 +1734,11 @@ if (typeof window !== "undefined") {
       return false;
     }
 
-    console.log("✅ Element found:", element);
+    console.log('✅ Element found:', element);
 
     // Check current dimensions
     const rect = element.getBoundingClientRect();
-    console.log("📐 Current dimensions:", {
+    console.log('📐 Current dimensions:', {
       width: rect.width,
       height: rect.height,
       top: rect.top,
@@ -1748,39 +1748,39 @@ if (typeof window !== "undefined") {
 
     if (rect.width === 0 && rect.height === 0) {
       console.log(
-        "⚠️ Element has zero dimensions - trying to expand threads...",
+        '⚠️ Element has zero dimensions - trying to expand threads...',
       );
 
       // Find and click expand buttons
-      const buttons = document.querySelectorAll("button");
+      const buttons = document.querySelectorAll('button');
       let expandedAny = false;
 
       buttons.forEach((button: Element) => {
         const buttonElement = button as HTMLButtonElement;
-        const text = buttonElement.textContent?.toLowerCase() || "";
+        const text = buttonElement.textContent?.toLowerCase() || '';
         const hasViewText =
-          text.includes("view") &&
-          (text.includes("repl") || text.includes("comment"));
+          text.includes('view') &&
+          (text.includes('repl') || text.includes('comment'));
         const hasChevronDown = buttonElement.querySelector(
           'svg[data-lucide="chevron-down"]',
         );
 
         if (hasViewText || hasChevronDown) {
-          console.log("🔄 Clicking expand button:", text);
+          console.log('🔄 Clicking expand button:', text);
           buttonElement.click();
           expandedAny = true;
         }
       });
 
       if (expandedAny) {
-        console.log("⏳ Waiting for expansions...");
+        console.log('⏳ Waiting for expansions...');
         setTimeout(() => {
           const newRect = element.getBoundingClientRect();
-          console.log("📐 After expansion:", newRect);
+          console.log('📐 After expansion:', newRect);
           performScroll(element);
         }, 1000);
       } else {
-        console.log("🔧 No expand buttons found, forcing visibility...");
+        console.log('🔧 No expand buttons found, forcing visibility...');
         forceVisibility(element);
       }
     } else {
@@ -1788,22 +1788,22 @@ if (typeof window !== "undefined") {
     }
 
     function forceVisibility(el: HTMLElement) {
-      console.log("🔧 Forcing element visibility...");
-      el.style.display = "block";
-      el.style.visibility = "visible";
-      el.style.opacity = "1";
+      console.log('🔧 Forcing element visibility...');
+      el.style.display = 'block';
+      el.style.visibility = 'visible';
+      el.style.opacity = '1';
 
       // Force parent visibility
       let parent = el.parentElement;
       while (parent && parent !== document.body) {
         const parentStyle = window.getComputedStyle(parent);
         if (
-          parentStyle.display === "none" ||
-          parentStyle.visibility === "hidden"
+          parentStyle.display === 'none' ||
+          parentStyle.visibility === 'hidden'
         ) {
-          console.log("🔧 Making parent visible:", parent.tagName);
-          (parent as HTMLElement).style.display = "block";
-          (parent as HTMLElement).style.visibility = "visible";
+          console.log('🔧 Making parent visible:', parent.tagName);
+          (parent as HTMLElement).style.display = 'block';
+          (parent as HTMLElement).style.visibility = 'visible';
         }
         parent = parent.parentElement;
       }
@@ -1812,51 +1812,51 @@ if (typeof window !== "undefined") {
     }
 
     function performScroll(el: HTMLElement) {
-      console.log("🚀 Performing scroll...");
+      console.log('🚀 Performing scroll...');
 
       // Add visual highlight
       const originalBg = el.style.backgroundColor;
       const originalBorder = el.style.border;
 
-      el.style.backgroundColor = "#ffeb3b";
-      el.style.border = "3px solid #f44336";
-      el.style.transition = "all 0.3s ease";
+      el.style.backgroundColor = '#ffeb3b';
+      el.style.border = '3px solid #f44336';
+      el.style.transition = 'all 0.3s ease';
 
-      console.log("🎨 Added highlight");
+      console.log('🎨 Added highlight');
 
       // Scroll to element
       try {
         el.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "nearest",
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest',
         });
-        console.log("✅ scrollIntoView called");
+        console.log('✅ scrollIntoView called');
 
         // Verify scroll after delay
         setTimeout(() => {
           const finalRect = el.getBoundingClientRect();
-          console.log("📍 Final position:", finalRect.top);
+          console.log('📍 Final position:', finalRect.top);
 
           if (finalRect.top < 50 || finalRect.top > window.innerHeight - 50) {
-            console.log("🔄 Adjusting scroll position...");
+            console.log('🔄 Adjusting scroll position...');
             const targetY =
               finalRect.top + window.pageYOffset - window.innerHeight / 2;
-            window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+            window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
           }
 
-          console.log("✅ Scroll test completed");
+          console.log('✅ Scroll test completed');
         }, 1000);
       } catch (error) {
-        console.error("❌ Scroll failed:", error);
+        console.error('❌ Scroll failed:', error);
       }
 
       // Remove highlight
       setTimeout(() => {
         el.style.backgroundColor = originalBg;
         el.style.border = originalBorder;
-        console.log("🧹 Removed highlight");
-        console.log("🧪 === TEST COMPLETE ===");
+        console.log('🧹 Removed highlight');
+        console.log('🧪 === TEST COMPLETE ===');
       }, 4000);
     }
 
@@ -1866,31 +1866,31 @@ if (typeof window !== "undefined") {
   // List available comments function
   (window as unknown as Window & { listComments: () => void }).listComments =
     function () {
-      console.log("📋 === AVAILABLE COMMENTS ===");
+      console.log('📋 === AVAILABLE COMMENTS ===');
       const comments = document.querySelectorAll('[id^="comment-"]');
 
       if (comments.length === 0) {
-        console.log("❌ No comment elements found");
+        console.log('❌ No comment elements found');
         return;
       }
 
       comments.forEach((el: Element, index: number) => {
         const rect = el.getBoundingClientRect();
         const isVisible = rect.width > 0 && rect.height > 0;
-        const commentId = el.id.replace("comment-", "");
+        const commentId = el.id.replace('comment-', '');
 
         console.log(
           `${index + 1}. Comment ${commentId} - Visible: ${isVisible} - Dimensions: ${rect.width}x${rect.height} - Top: ${rect.top}`,
         );
       });
 
-      console.log("💡 Use: testCommentScroll(24) to test scrolling");
+      console.log('💡 Use: testCommentScroll(24) to test scrolling');
     };
 
-  console.log("🧪 Comment scroll test functions loaded!");
-  console.log("Available functions:");
-  console.log("- testCommentScroll(commentId) - Test scrolling to a comment");
-  console.log("- listComments() - List all available comments");
+  console.log('🧪 Comment scroll test functions loaded!');
+  console.log('Available functions:');
+  console.log('- testCommentScroll(commentId) - Test scrolling to a comment');
+  console.log('- listComments() - List all available comments');
 }
 
 export default CommentSection;

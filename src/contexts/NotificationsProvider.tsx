@@ -1,20 +1,20 @@
-import api from "@/api/baseApi";
-import { connectToNotifications } from "@/api/sockets/socket";
+import api from '@/api/baseApi';
+import { connectToNotifications } from '@/api/sockets/socket';
 import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-} from "react";
-import type { Socket } from "socket.io-client";
+} from 'react';
+import type { Socket } from 'socket.io-client';
 import {
   Notification,
   NotificationsContext,
   NotificationsContextType,
   ReportResolvedPayload,
-} from "./NotificationsContext";
-import { useUser } from "./UserProvider";
+} from './NotificationsContext';
+import { useUser } from './user/useUser';
 
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -35,17 +35,17 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     console.log(
-      "[NotificationsProvider] Starting polling fallback (every 5 minutes)",
+      '[NotificationsProvider] Starting polling fallback (every 5 minutes)',
     );
 
     const checkForNotifications = async () => {
       try {
-        const res = await api.get("/notifications");
+        const res = await api.get('/notifications');
         if (res.status === 200 || res.status === 201) {
           const freshNotifications: Notification<ReportResolvedPayload>[] =
             res.data.filter(
               (notification: Notification<ReportResolvedPayload>) =>
-                notification.type !== "report_created",
+                notification.type !== 'report_created',
             );
 
           setNotifications((prev) => {
@@ -58,7 +58,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
               !Array.from(freshIds).every((id) => currentIds.has(id))
             ) {
               console.log(
-                "[NotificationsProvider] Found new notifications via polling",
+                '[NotificationsProvider] Found new notifications via polling',
               );
               return freshNotifications;
             }
@@ -66,7 +66,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           });
         }
       } catch (error) {
-        console.error("[NotificationsProvider] Polling failed:", error);
+        console.error('[NotificationsProvider] Polling failed:', error);
       }
     };
 
@@ -76,7 +76,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const stopPollingFallback = useCallback(() => {
     if (pollingIntervalRef.current) {
-      console.log("[NotificationsProvider] Stopping polling fallback");
+      console.log('[NotificationsProvider] Stopping polling fallback');
       clearInterval(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
@@ -127,14 +127,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       const notification: Notification<ReportResolvedPayload> = {
         id:
           (data.id as string) ||
-          `report_${(data.reportId as number) || "unknown"}_${Date.now()}`,
+          `report_${(data.reportId as number) || 'unknown'}_${Date.now()}`,
         userId: user.id,
-        type: "report_resolved",
+        type: 'report_resolved',
         payload: {
           message:
             (data.message as string) ||
             (payload?.message as string) ||
-            "Your report has been resolved",
+            'Your report has been resolved',
           reportId:
             (data.reportId as number) || (payload?.reportId as number) || 0,
           resolvedAt:
@@ -151,26 +151,26 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     // Set up socket event listeners IMMEDIATELY
     if (socketRef.current) {
       // Add the notification listener immediately
-      socketRef.current.on("new-notification", handler);
+      socketRef.current.on('new-notification', handler);
 
       // Listen for specific report resolved events (backend might emit different event names)
-      socketRef.current.on("report_resolved", reportResolvedHandler);
-      socketRef.current.on("reportResolved", reportResolvedHandler);
-      socketRef.current.on("report-resolved", reportResolvedHandler);
+      socketRef.current.on('report_resolved', reportResolvedHandler);
+      socketRef.current.on('reportResolved', reportResolvedHandler);
+      socketRef.current.on('report-resolved', reportResolvedHandler);
 
       // Listen for common event patterns to debug (but don't auto-refresh)
       socketRef.current.onAny((eventName: string, ...args) => {
         if (
           ![
-            "connect",
-            "disconnect",
-            "connect_error",
-            "reconnect",
-            "reconnect_attempt",
-            "reconnect_error",
-            "reconnect_failed",
-            "ping",
-            "pong",
+            'connect',
+            'disconnect',
+            'connect_error',
+            'reconnect',
+            'reconnect_attempt',
+            'reconnect_error',
+            'reconnect_failed',
+            'ping',
+            'pong',
           ].includes(eventName)
         ) {
           console.log(
@@ -182,77 +182,77 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       // Also listen for connection events to ensure we're ready
-      socketRef.current.on("connect", () => {
-        console.log("[NotificationsProvider] Socket connected successfully");
+      socketRef.current.on('connect', () => {
+        console.log('[NotificationsProvider] Socket connected successfully');
         setIsConnected(true);
         stopPollingFallback();
       });
 
-      socketRef.current.on("disconnect", () => {
-        console.log("[NotificationsProvider] Socket disconnected");
+      socketRef.current.on('disconnect', () => {
+        console.log('[NotificationsProvider] Socket disconnected');
         setIsConnected(false);
         // Start polling only after a longer delay to allow for reconnection
         setTimeout(() => {
           if (!socketRef.current?.connected && user?.id) {
             console.log(
-              "[NotificationsProvider] Socket still disconnected, starting polling fallback",
+              '[NotificationsProvider] Socket still disconnected, starting polling fallback',
             );
             startPollingFallback();
           }
         }, 30000); // Wait 30 seconds before falling back to polling
       });
 
-      socketRef.current.on("connect_error", (error) => {
+      socketRef.current.on('connect_error', (error) => {
         console.error(
-          "[NotificationsProvider] Socket connection error:",
+          '[NotificationsProvider] Socket connection error:',
           error,
         );
         console.error(
-          "[NotificationsProvider] Make sure the backend server is running!",
+          '[NotificationsProvider] Make sure the backend server is running!',
         );
         setIsConnected(false);
         // Start polling fallback on connection error, but wait longer
         setTimeout(() => {
           if (!socketRef.current?.connected && user?.id) {
             console.log(
-              "[NotificationsProvider] Starting polling fallback due to connection error",
+              '[NotificationsProvider] Starting polling fallback due to connection error',
             );
             startPollingFallback();
           }
         }, 60000); // Wait 1 minute before falling back to polling
       });
 
-      socketRef.current.on("error", (error) => {
-        console.error("[NotificationsProvider] Socket error:", error);
+      socketRef.current.on('error', (error) => {
+        console.error('[NotificationsProvider] Socket error:', error);
       });
 
       // Add additional debugging for socket connection
-      socketRef.current.on("reconnect", () => {
-        console.log("[NotificationsProvider] Socket reconnected successfully");
+      socketRef.current.on('reconnect', () => {
+        console.log('[NotificationsProvider] Socket reconnected successfully');
         setIsConnected(true);
         stopPollingFallback();
       });
 
-      socketRef.current.on("reconnect_attempt", () => {
+      socketRef.current.on('reconnect_attempt', () => {
         // Reconnection attempt in progress
       });
 
-      socketRef.current.on("reconnect_error", (error) => {
+      socketRef.current.on('reconnect_error', (error) => {
         console.error(
-          "[NotificationsProvider] Socket reconnection failed:",
+          '[NotificationsProvider] Socket reconnection failed:',
           error,
         );
       });
 
-      socketRef.current.on("reconnect_failed", () => {
+      socketRef.current.on('reconnect_failed', () => {
         console.error(
-          "[NotificationsProvider] Socket reconnection failed permanently - backend may be down",
+          '[NotificationsProvider] Socket reconnection failed permanently - backend may be down',
         );
         // Start polling as last resort
         setTimeout(() => {
           if (!socketRef.current?.connected && user?.id) {
             console.log(
-              "[NotificationsProvider] Starting polling fallback due to permanent reconnection failure",
+              '[NotificationsProvider] Starting polling fallback due to permanent reconnection failure',
             );
             startPollingFallback();
           }
@@ -263,10 +263,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     // Load initial notifications
     (async () => {
       try {
-        const res = await api.get("/notifications");
+        const res = await api.get('/notifications');
         if (res.status !== 200 && res.status !== 201) {
-          console.log("failed res:", res);
-          throw new Error("Failed to fetch notifications");
+          console.log('failed res:', res);
+          throw new Error('Failed to fetch notifications');
         }
         const existing: Notification<ReportResolvedPayload>[] = res.data;
 
@@ -283,7 +283,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       } catch (err) {
         console.error(
-          "[NotificationsProvider] could not load initial notifications:",
+          '[NotificationsProvider] could not load initial notifications:',
           err,
         );
         // Don't clear socket notifications if API fails
@@ -291,7 +291,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         // Start polling if initial load fails AND socket isn't connected
         if (!socketRef.current?.connected) {
           console.log(
-            "[NotificationsProvider] Initial load failed and socket not connected, starting polling",
+            '[NotificationsProvider] Initial load failed and socket not connected, starting polling',
           );
           startPollingFallback();
         }
@@ -304,14 +304,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       stopPollingFallback();
       if (socketRef.current) {
-        socketRef.current.off("new-notification", handler);
-        socketRef.current.off("report_resolved", reportResolvedHandler);
-        socketRef.current.off("reportResolved", reportResolvedHandler);
-        socketRef.current.off("report-resolved", reportResolvedHandler);
-        socketRef.current.off("connect");
-        socketRef.current.off("disconnect");
-        socketRef.current.off("connect_error");
-        socketRef.current.off("error");
+        socketRef.current.off('new-notification', handler);
+        socketRef.current.off('report_resolved', reportResolvedHandler);
+        socketRef.current.off('reportResolved', reportResolvedHandler);
+        socketRef.current.off('report-resolved', reportResolvedHandler);
+        socketRef.current.off('connect');
+        socketRef.current.off('disconnect');
+        socketRef.current.off('connect_error');
+        socketRef.current.off('error');
         socketRef.current.offAny();
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -328,7 +328,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     try {
-      const res = await api.post("/notifications/read", { id: notificationId });
+      const res = await api.post('/notifications/read', { id: notificationId });
       if (res.status !== 200 && res.status !== 201) {
         // Revert the optimistic update if the API call failed
         setNotifications((prev) =>
@@ -336,11 +336,11 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
             notif.id === notificationId ? { ...notif, isRead: false } : notif,
           ),
         );
-        throw new Error("Failed to mark notification as read");
+        throw new Error('Failed to mark notification as read');
       }
     } catch (error) {
       console.error(
-        "[NotificationsProvider] Failed to mark notification as read:",
+        '[NotificationsProvider] Failed to mark notification as read:',
         error,
       );
       // Revert the optimistic update
@@ -356,7 +356,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       const unreadIds = notifications.filter((n) => !n.isRead).map((n) => n.id);
       if (unreadIds.length === 0) return;
 
-      const res = await api.post("/notifications/read-all");
+      const res = await api.post('/notifications/read-all');
       if (res.status === 200 || res.status === 201) {
         setNotifications((prev) =>
           prev.map((notif) => ({ ...notif, isRead: true })),
@@ -364,7 +364,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (error) {
       console.error(
-        "[NotificationsProvider] Failed to mark all notifications as read:",
+        '[NotificationsProvider] Failed to mark all notifications as read:',
         error,
       );
     }
@@ -386,7 +386,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <NotificationsContext.Provider value={value}>
-      {children}{" "}
+      {children}{' '}
     </NotificationsContext.Provider>
   );
 };

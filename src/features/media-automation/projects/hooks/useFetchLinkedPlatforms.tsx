@@ -1,4 +1,4 @@
-import { useUser } from '@/contexts/UserProvider';
+import { useUser } from '@/contexts/user';
 import { useQuery } from '@tanstack/react-query';
 import { fetchLinkedPlatforms } from '../api/fetch-linked-platforms';
 

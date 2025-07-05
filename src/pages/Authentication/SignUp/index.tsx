@@ -1,14 +1,11 @@
-import { useState, useEffect } from "react";
-import { FcGoogle } from "react-icons/fc";
-// import { FaFacebookF } from "react-icons/fa";
-// import InstagramIcon from "/auth_logo_instagram.svg";
-// import { FaApple } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useUser } from "@/contexts/UserProvider";
-import { AxiosError } from "axios";
-import { validatePassword, validateEmail } from "@/utils/validation";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useUser } from '@/contexts/user';
+import { validateEmail, validatePassword } from '@/utils/validation';
+import { AxiosError } from 'axios';
+import { useEffect, useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
   const {
@@ -18,11 +15,10 @@ const SignUp = () => {
     user,
     loading,
   } = useUser();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -30,9 +26,9 @@ const SignUp = () => {
   useEffect(() => {
     if (user && !loading) {
       if (!user.is_onboard) {
-        navigate("/onboarding");
+        navigate('/onboarding');
       } else {
-        navigate("/explore");
+        navigate('/explore');
       }
     }
   }, [user, loading, navigate]); // To navigate after signup
@@ -43,7 +39,7 @@ const SignUp = () => {
     setPassword(passwordValue);
 
     const validationError = validatePassword(passwordValue);
-    setPasswordError(validationError || "");
+    setPasswordError(validationError || '');
   };
 
   // Handle email change with validation
@@ -52,14 +48,14 @@ const SignUp = () => {
     setEmail(emailValue);
 
     const validationError = validateEmail(emailValue);
-    setEmailError(validationError || "");
+    setEmailError(validationError || '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Clear previous error
-    setEmailError("");
-    setPasswordError("");
+    setError(''); // Clear previous error
+    setEmailError('');
+    setPasswordError('');
 
     // Validate email before submitting
     const emailValidationError = validateEmail(email);
@@ -76,25 +72,25 @@ const SignUp = () => {
     }
 
     try {
-      const token = await signUpWithEmail(email, password, username); // Get the token
-      localStorage.setItem("user_verify", token);
+      const token = await signUpWithEmail(email, password); // Get the token
+      localStorage.setItem('user_verify', token);
       navigate(`/activate-account/${token}`); // Redirect to the activate-account page with the token
     } catch (err) {
-      let errorMessage = "";
+      let errorMessage = '';
       if (err instanceof AxiosError) {
         const code = err.code;
         switch (code) {
-          case "auth/email-already-in-use":
-            errorMessage = "Already used email. Please try with another";
+          case 'auth/email-already-in-use':
+            errorMessage = 'Already used email. Please try with another';
             break;
-          case "auth/invalid-email":
-            setEmailError("Invalid email. Please try again");
+          case 'auth/invalid-email':
+            setEmailError('Invalid email. Please try again');
             break;
-          case "auth/missing-password":
-            setPasswordError("Missing password. Please try again");
+          case 'auth/missing-password':
+            setPasswordError('Missing password. Please try again');
             break;
-          case "auth/network-request-failed":
-            errorMessage = "Overload sign up request. Please try again";
+          case 'auth/network-request-failed':
+            errorMessage = 'Overload sign up request. Please try again';
             break;
           default:
             errorMessage = err.message;
@@ -110,33 +106,33 @@ const SignUp = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      setError(""); // Clear any previous errors
+      setError(''); // Clear any previous errors
       await authenWithGoogle();
       // The UserProvider will handle fetching profile and setting user state
       // We'll navigate after the user state is updated
     } catch (error) {
-      console.error("Google login error:", error);
-      let message = "Something went wrong. Please try again.";
+      console.error('Google login error:', error);
+      let message = 'Something went wrong. Please try again.';
 
       if (error instanceof Error) {
         // Handle Firebase Auth errors and our custom errors
-        if (error.message.includes("popup-closed-by-user")) {
+        if (error.message.includes('popup-closed-by-user')) {
           message =
-            "Login was cancelled. You closed the popup before signing in.";
-        } else if (error.message.includes("popup-blocked")) {
+            'Login was cancelled. You closed the popup before signing in.';
+        } else if (error.message.includes('popup-blocked')) {
           message =
-            "The login popup was blocked by your browser. Please enable popups and try again.";
-        } else if (error.message.includes("cancelled-popup-request")) {
-          message = "Login was interrupted by another popup request.";
+            'The login popup was blocked by your browser. Please enable popups and try again.';
+        } else if (error.message.includes('cancelled-popup-request')) {
+          message = 'Login was interrupted by another popup request.';
         } else if (
-          error.message.includes("account-exists-with-different-credential")
+          error.message.includes('account-exists-with-different-credential')
         ) {
           message =
-            "An account already exists with a different sign-in method. Try logging in using that method.";
-        } else if (error.message.includes("network-request-failed")) {
+            'An account already exists with a different sign-in method. Try logging in using that method.';
+        } else if (error.message.includes('network-request-failed')) {
           message =
-            "Network error. Please check your connection and try again.";
-        } else if (error.message.includes("Failed to create account")) {
+            'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('Failed to create account')) {
           message = error.message; // Use our custom error message
         } else {
           message = error.message;
@@ -144,20 +140,20 @@ const SignUp = () => {
       } else if (error instanceof AxiosError) {
         const code = error.code;
         switch (code) {
-          case "auth/popup-closed-by-user":
+          case 'auth/popup-closed-by-user':
             message =
-              "Login was cancelled. You closed the popup before signing in.";
+              'Login was cancelled. You closed the popup before signing in.';
             break;
-          case "auth/cancelled-popup-request":
-            message = "Login was interrupted by another popup request.";
+          case 'auth/cancelled-popup-request':
+            message = 'Login was interrupted by another popup request.';
             break;
-          case "auth/account-exists-with-different-credential":
+          case 'auth/account-exists-with-different-credential':
             message =
-              "An account already exists with a different sign-in method. Try logging in using that method.";
+              'An account already exists with a different sign-in method. Try logging in using that method.';
             break;
-          case "auth/popup-blocked":
+          case 'auth/popup-blocked':
             message =
-              "The login popup was blocked by your browser. Please enable popups and try again.";
+              'The login popup was blocked by your browser. Please enable popups and try again.';
             break;
           default:
             message = error.message;
@@ -166,15 +162,6 @@ const SignUp = () => {
       setError(message);
     }
   };
-
-  // const handleFacebookLogin = async () => {
-  //   try {
-  //     await signUpWithFacebook(); // Call Facebook login function from UserProvider
-  //     navigate("/home"); // Redirect after successful login
-  //   } catch (error) {
-  //     setError((error as Error).message); // Handle errors from Facebook login
-  //   }
-  // };
 
   return (
     <div className="flex-1 space-y-4 px-10 md:px-0 lg:px-20 py-8">
@@ -193,7 +180,7 @@ const SignUp = () => {
         {/* Google Login */}
         <div className="flex w-full">
           <Button
-            variant={"outline"}
+            variant={'outline'}
             className="flex justify-center items-center hover:brightness-115 px-4 py-3 border border-mountain-950 dark:border-mountain-700 rounded-lg focus:outline-none focus:ring-2 w-full h-10 font-normal text-mountain-950 dark:text-mountain-50 text-sm hover:cursor-pointer"
             onClick={handleGoogleLogin}
           >
@@ -201,32 +188,6 @@ const SignUp = () => {
             <span>Continue with Google</span>
           </Button>
         </div>
-
-        {/* Facebook, Instagram, Apple Login */}
-        {/* <div className="flex justify-between w-full">
-          <Button
-            variant={"outline"}
-            className="flex justify-center items-center hover:brightness-115 px-4 py-3 border border-mountain-950 dark:border-mountain-700 rounded-lg focus:outline-none focus:ring-2 w-[32%] h-10 font-normal text-mountain-950 dark:text-mountain-50 text-sm hover:cursor-pointer"
-            onClick={handleFacebookLogin}
-          >
-            <FaFacebookF className="size-5 text-blue-700" />
-            <span>Facebook</span>
-          </Button>
-          <Button
-            variant={"outline"}
-            className="flex justify-center items-center hover:brightness-115 px-4 py-3 border border-mountain-950 dark:border-mountain-700 rounded-lg focus:outline-none focus:ring-2 w-[32%] h-10 font-normal text-mountain-950 dark:text-mountain-50 text-sm hover:cursor-pointer"
-          >
-            <img src={InstagramIcon} alt="Instagram" className="size-5" />
-            <span>Instagram</span>
-          </Button>
-          <Button
-            variant={"outline"}
-            className="flex justify-center items-center hover:brightness-115 px-4 py-3 border border-mountain-950 dark:border-mountain-700 rounded-lg focus:outline-none focus:ring-2 w-[32%] h-10 font-normal text-mountain-950 dark:text-mountain-50 text-sm hover:cursor-pointer"
-          >
-            <FaApple className="size-5" />
-            <span>Apple</span>
-          </Button>
-        </div> */}
       </div>
 
       <div className="flex items-center space-x-4 mt-6 text-center">
@@ -267,11 +228,11 @@ const SignUp = () => {
           <Input
             type="password"
             placeholder="Enter your password"
-            className={`dark:bg-mountain-900 shadow-sm mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 w-full h-10 text-mountain-950 dark:text-mountain-50 ${passwordError
-                ? "border-red-500 focus:ring-red-500"
-                : password && (!passwordError || passwordError != "")
-                  ? "border-green-500 focus:ring-green-500"
-                  : "border-mountain-800 focus:ring-blue-500"
+            className={`dark:bg-mountain-900 text-mountain-950 dark:text-mountain-50 mt-1 h-10 w-full rounded-lg border p-3 shadow-sm focus:ring-2 focus:outline-none ${passwordError
+              ? 'border-red-500 focus:ring-red-500'
+              : password && (!passwordError || passwordError != '')
+                ? 'border-green-500 focus:ring-green-500'
+                : 'border-mountain-800 focus:ring-blue-500'
               }`}
             value={password}
             onChange={handlePasswordChange}
@@ -321,14 +282,14 @@ const SignUp = () => {
       <div className="mt-4 text-[10px] text-mountain-500 dark:text-mountain-300 xl:text-xs lg:text-left text-center">
         <p>
           By signing up for ArtShare, I confirm that I have read and agree to
-          the ArtShare{" "}
+          the ArtShare{' '}
           <a href="#" className="text-indigo-600 dark:text-indigo-300">
             Terms of Service
-          </a>{" "}
-          -{" "}
+          </a>{' '}
+          -{' '}
           <a href="#" className="text-indigo-600 dark:text-indigo-300">
             Privacy Policy
-          </a>{" "}
+          </a>{' '}
           regarding data usage.
         </p>
       </div>
