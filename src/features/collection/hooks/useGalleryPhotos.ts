@@ -39,14 +39,14 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
             try {
               const { width, height } = await getMediaDimensions(imageUrl);
               return {
-                src: imageUrl || '',
+                src: imageUrl,
                 width,
                 height,
                 key: post.id.toString(),
-                title: post.title || '',
+                title: post.title || 'Untitled Post',
                 postId: post.id,
                 postLength: post.medias?.length || 0,
-                author: post.user.username,
+                author: post.user?.username || 'Unknown',
                 isMature: post.isMature || false,
                 aiCreated: post.aiCreated || false,
                 likeCount: post.likeCount,

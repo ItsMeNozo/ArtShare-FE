@@ -19,6 +19,7 @@ export type SliderItemCollection = {
   name: string;
   thumbnailUrl?: string;
   count: number;
+  isPrivate: boolean;
 };
 export type SliderItemAdd = {
   type: 'add';

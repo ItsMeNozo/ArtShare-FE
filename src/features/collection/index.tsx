@@ -80,7 +80,7 @@ const CollectionPage: React.FC = () => {
       };
     }
 
-    const pubCollections = collections.filter((c) => !c.is_private && c.posts);
+    const pubCollections = collections.filter((c) => !c.isPrivate && c.posts);
     const pubPosts = pubCollections.flatMap((col) => col.posts);
     const uniquePublicMap = new Map<number, Post>();
     pubPosts.forEach((post) => {
@@ -90,13 +90,13 @@ const CollectionPage: React.FC = () => {
     });
     const uniquePublicPosts = Array.from(uniquePublicMap.values()).sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
     const newestPublicPost = uniquePublicPosts[0];
     const pubThumbnail =
-      newestPublicPost?.thumbnail_url || newestPublicPost?.medias?.[0]?.url;
+      newestPublicPost?.thumbnailUrl || newestPublicPost?.medias?.[0]?.url;
 
-    const privCollections = collections.filter((c) => c.is_private && c.posts);
+    const privCollections = collections.filter((c) => c.isPrivate && c.posts);
     const privPosts = privCollections.flatMap((col) => col.posts);
     const uniquePrivateMap = new Map<number, Post>();
     privPosts.forEach((post) => {
@@ -106,11 +106,11 @@ const CollectionPage: React.FC = () => {
     });
     const uniquePrivatePosts = Array.from(uniquePrivateMap.values()).sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
     const newestPrivatePost = uniquePrivatePosts[0];
     const privThumbnail =
-      newestPrivatePost?.thumbnail_url || newestPrivatePost?.medias?.[0]?.url;
+      newestPrivatePost?.thumbnailUrl || newestPrivatePost?.medias?.[0]?.url;
 
     return {
       publicPosts: uniquePublicPosts,
@@ -134,7 +134,7 @@ const CollectionPage: React.FC = () => {
     } else {
       if (currentCollection) {
         const collectionMatchesFilter =
-          !showOnlyPrivate || currentCollection.is_private;
+          !showOnlyPrivate || currentCollection.isPrivate;
         return collectionMatchesFilter ? currentCollection.posts || [] : [];
       }
       return [];
@@ -159,11 +159,11 @@ const CollectionPage: React.FC = () => {
     return collections.map((collection) => {
       const sortedPosts = [...(collection.posts || [])].sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
       const newestPostInCollection = sortedPosts[0];
       const thumbnailUrl =
-        newestPostInCollection?.thumbnail_url ||
+        newestPostInCollection?.thumbnailUrl ||
         newestPostInCollection?.medias?.[0]?.url;
       return { ...collection, thumbnailUrl, posts: collection.posts || [] };
     });
@@ -196,7 +196,7 @@ const CollectionPage: React.FC = () => {
     const filteredCollectionItems: SliderItemCollection[] =
       collectionsForDisplay
         .filter((collection) => {
-          const matchesVisibility = !showOnlyPrivate || collection.is_private;
+          const matchesVisibility = !showOnlyPrivate || collection.isPrivate;
           const matchesSearch =
             !normalizedQuery ||
             collection.name.toLowerCase().includes(normalizedQuery);
@@ -206,7 +206,7 @@ const CollectionPage: React.FC = () => {
           type: 'collection',
           id: collection.id,
           name: collection.name,
-
+          isPrivate: collection.isPrivate,
           thumbnailUrl: collection.thumbnailUrl,
           count: collection.posts?.length ?? 0,
         }));
@@ -310,6 +310,40 @@ const CollectionPage: React.FC = () => {
         console.error('Error renaming collection via API:', err);
         const errorMsg =
           err instanceof Error ? err.message : 'Failed to rename collection.';
+
+        setActionError(errorMsg);
+
+        throw err;
+      }
+    },
+    [currentCollection, setCollections, setActionError],
+  );
+
+  const handleSetPrivacy = useCallback(
+    async (isPrivate: boolean): Promise<void> => {
+      if (!currentCollection) return;
+
+      setActionError(null);
+
+      try {
+        const updatedCollectionFromApi = await updateCollection(
+          currentCollection.id,
+          { isPrivate },
+        );
+
+        setCollections((prevCollections) =>
+          prevCollections.map((col) =>
+            col.id === updatedCollectionFromApi.id
+              ? { ...col, isPrivate: updatedCollectionFromApi.isPrivate }
+              : col,
+          ),
+        );
+      } catch (err) {
+        console.error('Error updating collection privacy via API:', err);
+        const errorMsg =
+          err instanceof Error
+            ? err.message
+            : 'Failed to update collection privacy.';
 
         setActionError(errorMsg);
 
@@ -426,7 +460,7 @@ const CollectionPage: React.FC = () => {
 
     if (currentCollection) {
       const collectionMatchesFilter =
-        !showOnlyPrivate || currentCollection.is_private;
+        !showOnlyPrivate || currentCollection.isPrivate;
 
       if (collectionMatchesFilter) {
         return currentCollection.name;
@@ -546,8 +580,9 @@ const CollectionPage: React.FC = () => {
           itemCountText={galleryItemCountText}
           isEditable={
             typeof selectedCollectionId === 'number' &&
-            (!showOnlyPrivate || !!currentCollection?.is_private)
+            (!showOnlyPrivate || !!currentCollection?.isPrivate)
           }
+          isPrivate={!!currentCollection?.isPrivate}
           isLoading={
             loadingCollections &&
             !currentCollection &&
@@ -555,6 +590,7 @@ const CollectionPage: React.FC = () => {
           }
           error={actionError}
           onSave={handleSaveTitle}
+          onSetPrivacy={handleSetPrivacy}
           isEditing={isTitleEditing}
           onEditRequest={handleEditRequest}
           onEditCancel={handleEditCancel}

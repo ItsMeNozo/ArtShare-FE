@@ -2,6 +2,8 @@ import {
   Box,
   CircularProgress,
   IconButton,
+  Menu,
+  MenuItem,
   Stack,
   TextField,
   Tooltip,
@@ -10,17 +12,19 @@ import {
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   FiX as CancelIcon,
-  FiEdit as EditIcon,
   FiCheck as SaveIcon,
+  FiMoreVertical as MoreIcon,
 } from 'react-icons/fi';
 
 interface CollectionTitleProps {
   title: string;
   itemCountText: string;
   isEditable: boolean;
+  isPrivate: boolean;
   isLoading?: boolean;
   error?: string | null;
   onSave: (newName: string) => Promise<void>;
+  onSetPrivacy: (isPrivate: boolean) => Promise<void>;
   isEditing: boolean;
   onEditRequest: () => void;
   onEditCancel: () => void;
@@ -31,9 +35,11 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   title,
   itemCountText,
   isEditable,
+  isPrivate,
   isLoading = false,
   error,
   onSave,
+  onSetPrivacy,
   isEditing,
   onEditRequest,
   onEditCancel,
@@ -43,6 +49,27 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorEl);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleRenameClick = () => {
+    handleMenuClose();
+    requestEditMode();
+  };
+
+  const handlePrivacyClick = async () => {
+    handleMenuClose();
+    // Assuming onSetPrivacy will handle the API call and state update
+    await onSetPrivacy(!isPrivate);
+  };
 
   useEffect(() => {
     if (!isEditing) {
@@ -182,18 +209,30 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
               </Typography>
             )}
             {isEditable && !isLoading && (
-              <Tooltip title="Rename Collection">
-                <IconButton
-                  size="small"
-                  onClick={requestEditMode}
-                  sx={{
-                    opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.2s ease-in-out',
-                  }}
+              <>
+                <Tooltip title="Options">
+                  <IconButton
+                    size="small"
+                    onClick={handleMenuOpen}
+                    sx={{
+                      opacity: isHovered || isMenuOpen ? 1 : 0,
+                      transition: 'opacity 0.2s ease-in-out',
+                    }}
+                  >
+                    <MoreIcon fontSize={20} />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={isMenuOpen}
+                  onClose={handleMenuClose}
                 >
-                  <EditIcon fontSize={20} />
-                </IconButton>
-              </Tooltip>
+                  <MenuItem onClick={handleRenameClick}>Rename</MenuItem>
+                  <MenuItem onClick={handlePrivacyClick}>
+                    {isPrivate ? 'Make Public' : 'Make Private'}
+                  </MenuItem>
+                </Menu>
+              </>
             )}
           </>
         )}

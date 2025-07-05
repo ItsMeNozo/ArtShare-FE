@@ -12,7 +12,11 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
-import { FiPlus as AddIcon, FiX as DeleteIcon } from 'react-icons/fi';
+import {
+  FiPlus as AddIcon,
+  FiX as DeleteIcon,
+  FiLock as LockIcon,
+} from 'react-icons/fi';
 import { SelectedCollectionId, SliderItem } from '../types/collection';
 
 const CARD_MIN_WIDTH = 256;
@@ -128,30 +132,53 @@ const renderSliderItem = (
               height: '100%',
             }}
           >
-            {thumbnailUrl ? (
-              <CardMedia
-                component="img"
-                image={thumbnailUrl}
-                alt={title}
-                sx={{
-                  aspectRatio: '16 / 9',
-                  objectFit: 'cover',
-                  width: '100%',
-                  borderRadius: 1,
-                  flexShrink: 0,
-                }}
-              />
-            ) : (
-              <Box
-                sx={{
-                  aspectRatio: '16 / 9',
-                  width: '100%',
-                  borderRadius: 1,
-                  flexShrink: 0,
-                  bgcolor: 'grey.200',
-                }}
-              ></Box>
-            )}
+            <Box sx={{ position: 'relative', width: '100%' }}>
+              {thumbnailUrl ? (
+                <CardMedia
+                  component="img"
+                  image={thumbnailUrl}
+                  alt={title}
+                  sx={{
+                    aspectRatio: '16 / 9',
+                    objectFit: 'cover',
+                    width: '100%',
+                    borderRadius: 1,
+                    flexShrink: 0,
+                  }}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    aspectRatio: '16 / 9',
+                    width: '100%',
+                    borderRadius: 1,
+                    flexShrink: 0,
+                    bgcolor: 'grey.200',
+                  }}
+                ></Box>
+              )}
+              {isCollection && item.isPrivate && (
+                <Tooltip title="Private">
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 8,
+                      right: 8,
+                      zIndex: 1,
+                      color: 'white',
+                      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                      borderRadius: '50%',
+                      p: 0.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <LockIcon size={12} />
+                  </Box>
+                </Tooltip>
+              )}
+            </Box>
             <CardContent sx={{ flexGrow: 1, width: '100%', p: 0, pt: 1.5 }}>
               <Typography
                 gutterBottom
