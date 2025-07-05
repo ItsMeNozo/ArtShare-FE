@@ -89,3 +89,19 @@ interface HistoryFilter {
   label: string;
   value: string;
 }
+
+interface TrendingItem {
+  image: string;
+  prompt: string;
+  style: string;
+  lighting: string;
+  camera: string;
+  aspect_ratio: string;
+  model_key: string;
+  author: {
+    id: string;
+    username: string;
+    full_name: string;
+    profile_picture_url: string | null;
+  };
+}

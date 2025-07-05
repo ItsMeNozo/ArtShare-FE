@@ -57,7 +57,7 @@ const AIHeader: React.FC = () => {
                 </Button>
               </Tooltip>
             </DialogTrigger>
-            <DialogContent className="flex flex-col gap-0 space-y-0 bg-white p-0 border-0 rounded-xl min-w-6xl h-[95%]">
+            <DialogContent className="flex flex-col gap-0 space-y-0 bg-white p-0 border-0 rounded-xl w-[90%] h-[95%]">
               <DialogHeader
                 hidden
                 className="flex p-4 border-mountain-200 border-b-[1px] h-12"
@@ -67,9 +67,7 @@ const AIHeader: React.FC = () => {
                 </DialogTitle>
                 <DialogDescription hidden>Image Description</DialogDescription>
               </DialogHeader>
-              <div className="relative flex h-full">
-                <TrendingPrompt onClose={handleOpenModal} />
-              </div>
+              <TrendingPrompt onClose={handleOpenModal} />
             </DialogContent>
           </Dialog>
         </div>
