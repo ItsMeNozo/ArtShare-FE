@@ -11,34 +11,34 @@ import {
   ToggleButton,
   Tooltip,
   Typography,
-} from "@mui/material";
-import React, { useCallback, useMemo, useState } from "react";
+} from '@mui/material';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { SearchInput } from "@/components/SearchInput";
-import { Collection, Post } from "@/types";
-import { FiGlobe as AllIcon, FiLock as LockIcon } from "react-icons/fi";
+import { SearchInput } from '@/components/SearchInput';
+import { Collection, Post } from '@/types';
+import { FiGlobe as AllIcon, FiLock as LockIcon } from 'react-icons/fi';
 import {
   deleteCollection,
   removePostFromCollection,
   updateCollection,
-} from "./api/collection.api";
-import { CollectionGallery } from "./components/CollectionGallery";
-import { CollectionSlider } from "./components/CollectionSlider";
-import { CollectionTitle } from "./components/CollectionTitle";
-import { CreateCollectionDialog } from "./components/CreateCollectionDialog";
-import { useCollectionsData } from "./hooks/useCollectionsData";
-import { useGalleryPhotos } from "./hooks/useGalleryPhotos";
+} from './api/collection.api';
+import { CollectionGallery } from './components/CollectionGallery';
+import { CollectionSlider } from './components/CollectionSlider';
+import { CollectionTitle } from './components/CollectionTitle';
+import { CreateCollectionDialog } from './components/CreateCollectionDialog';
+import { useCollectionsData } from './hooks/useCollectionsData';
+import { useGalleryPhotos } from './hooks/useGalleryPhotos';
 import {
   CollectionDisplayInfo,
   SelectedCollectionId,
   SliderItem,
   SliderItemCollection,
-} from "./types/collection";
+} from './types/collection';
 
 const CollectionPage: React.FC = () => {
   const [selectedCollectionId, setSelectedCollectionId] =
-    useState<SelectedCollectionId>("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+    useState<SelectedCollectionId>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [actionError, setActionError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
@@ -56,7 +56,7 @@ const CollectionPage: React.FC = () => {
   } = useCollectionsData();
 
   const currentCollection = useMemo<Collection | undefined>(() => {
-    return typeof selectedCollectionId === "number"
+    return typeof selectedCollectionId === 'number'
       ? collections.find((c) => c.id === selectedCollectionId)
       : undefined;
   }, [collections, selectedCollectionId]);
@@ -129,7 +129,7 @@ const CollectionPage: React.FC = () => {
     );
     if (loadingCollections) return [];
 
-    if (selectedCollectionId === "all") {
+    if (selectedCollectionId === 'all') {
       return showOnlyPrivate ? privatePosts : publicPosts;
     } else {
       if (currentCollection) {
@@ -173,9 +173,9 @@ const CollectionPage: React.FC = () => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
     const items: SliderItem[] = [];
 
-    items.push({ type: "add" });
+    items.push({ type: 'add' });
 
-    const allPostsTitle = "all posts";
+    const allPostsTitle = 'all posts';
     if (!normalizedQuery || allPostsTitle.includes(normalizedQuery)) {
       const countForAllPosts = showOnlyPrivate
         ? privatePosts.length
@@ -185,7 +185,7 @@ const CollectionPage: React.FC = () => {
         : newestPublicThumbnail;
 
       items.push({
-        type: "all",
+        type: 'all',
 
         thumbnailUrl: countForAllPosts > 0 ? thumbnailForAllPosts : undefined,
 
@@ -203,7 +203,7 @@ const CollectionPage: React.FC = () => {
           return matchesVisibility && matchesSearch;
         })
         .map((collection) => ({
-          type: "collection",
+          type: 'collection',
           id: collection.id,
           name: collection.name,
 
@@ -213,8 +213,8 @@ const CollectionPage: React.FC = () => {
 
     items.push(...filteredCollectionItems);
 
-    const addIndex = items.findIndex((item) => item.type === "add");
-    const allPostsIndex = items.findIndex((item) => item.type === "all");
+    const addIndex = items.findIndex((item) => item.type === 'add');
+    const allPostsIndex = items.findIndex((item) => item.type === 'all');
     if (allPostsIndex > addIndex + 1) {
       const [allPostsItem] = items.splice(allPostsIndex, 1);
       items.splice(addIndex + 1, 0, allPostsItem);
@@ -307,9 +307,9 @@ const CollectionPage: React.FC = () => {
 
         setIsTitleEditing(false);
       } catch (err) {
-        console.error("Error renaming collection via API:", err);
+        console.error('Error renaming collection via API:', err);
         const errorMsg =
-          err instanceof Error ? err.message : "Failed to rename collection.";
+          err instanceof Error ? err.message : 'Failed to rename collection.';
 
         setActionError(errorMsg);
 
@@ -321,7 +321,7 @@ const CollectionPage: React.FC = () => {
 
   const handleRemovePost = useCallback(
     async (postId: number) => {
-      if (typeof selectedCollectionId !== "number") return;
+      if (typeof selectedCollectionId !== 'number') return;
 
       setActionError(null);
       const originalCollections = collections;
@@ -343,7 +343,7 @@ const CollectionPage: React.FC = () => {
       } catch (err) {
         console.error(`Error removing post ${postId}:`, err);
         const errorMsg =
-          err instanceof Error ? err.message : "Failed to remove post.";
+          err instanceof Error ? err.message : 'Failed to remove post.';
         setActionError(errorMsg);
         setCollections(originalCollections);
         alert(`Error removing post: ${errorMsg}`);
@@ -357,7 +357,7 @@ const CollectionPage: React.FC = () => {
       const collection = collections.find((c) => c.id === collectionIdToRemove);
       if (!collection) {
         console.warn(
-          "Tried to initiate delete for non-existent collection:",
+          'Tried to initiate delete for non-existent collection:',
           collectionIdToRemove,
         );
         return;
@@ -381,7 +381,7 @@ const CollectionPage: React.FC = () => {
     setCollections((prev) => prev.filter((c) => c.id !== collectionIdToRemove));
 
     if (selectedCollectionId === collectionIdToRemove) {
-      setSelectedCollectionId("all");
+      setSelectedCollectionId('all');
     }
 
     try {
@@ -389,15 +389,15 @@ const CollectionPage: React.FC = () => {
 
       console.log(`Collection ${collectionIdToRemove} deleted successfully.`);
     } catch (err) {
-      console.error("Error deleting collection:", err);
+      console.error('Error deleting collection:', err);
       const errorMsg =
-        err instanceof Error ? err.message : "Failed to delete collection.";
+        err instanceof Error ? err.message : 'Failed to delete collection.';
       setActionError(errorMsg);
 
       setCollections(originalCollections);
 
       if (
-        selectedCollectionId === "all" &&
+        selectedCollectionId === 'all' &&
         originalCollections.some((c) => c.id === collectionIdToRemove)
       ) {
         setSelectedCollectionId(collectionIdToRemove);
@@ -414,14 +414,14 @@ const CollectionPage: React.FC = () => {
   const galleryTitle = useMemo(() => {
     if (
       loadingCollections &&
-      selectedCollectionId !== "all" &&
+      selectedCollectionId !== 'all' &&
       !currentCollection
     ) {
-      return "Loading...";
+      return 'Loading...';
     }
 
-    if (selectedCollectionId === "all") {
-      return "All";
+    if (selectedCollectionId === 'all') {
+      return 'All';
     }
 
     if (currentCollection) {
@@ -431,15 +431,15 @@ const CollectionPage: React.FC = () => {
       if (collectionMatchesFilter) {
         return currentCollection.name;
       } else {
-        return "All";
+        return 'All';
       }
     }
 
     console.warn(
-      "GalleryTitle: Fallback reached, currentCollection likely undefined for selected ID",
+      'GalleryTitle: Fallback reached, currentCollection likely undefined for selected ID',
       selectedCollectionId,
     );
-    return showOnlyPrivate ? "Private Collections" : "All Collections";
+    return showOnlyPrivate ? 'Private Collections' : 'All Collections';
   }, [
     selectedCollectionId,
     currentCollection,
@@ -448,8 +448,8 @@ const CollectionPage: React.FC = () => {
   ]);
 
   const galleryItemCountText = useMemo(() => {
-    if (loadingCollections) return "Loading...";
-    if (isProcessingPhotos) return "Processing...";
+    if (loadingCollections) return 'Loading...';
+    if (isProcessingPhotos) return 'Processing...';
     return `${galleryPhotos.length} items`;
   }, [loadingCollections, isProcessingPhotos, galleryPhotos.length]);
 
@@ -460,7 +460,7 @@ const CollectionPage: React.FC = () => {
     <Container maxWidth="xl" className="h-screen py-3">
       {/* Header */}
       <Stack
-        direction={{ xs: "column", md: "row" }}
+        direction={{ xs: 'column', md: 'row' }}
         justifyContent="space-between"
         alignItems="center"
         spacing={{ xs: 2, md: 3 }}
@@ -478,8 +478,8 @@ const CollectionPage: React.FC = () => {
           <Tooltip
             title={
               showOnlyPrivate
-                ? "Show All Collections"
-                : "Show Only Private Collections"
+                ? 'Show All Collections'
+                : 'Show Only Private Collections'
             }
           >
             <ToggleButton
@@ -489,12 +489,12 @@ const CollectionPage: React.FC = () => {
               aria-label="Toggle private collection filter"
               size="small"
               sx={{
-                height: "fit-content",
-                textTransform: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                bgcolor: "background.paper",
+                height: 'fit-content',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'background.paper',
               }}
             >
               {/* Show Lock icon when filtering, LockOpen/Apps when not */}
@@ -508,12 +508,12 @@ const CollectionPage: React.FC = () => {
                 variant="caption"
                 sx={{
                   ml: 1,
-                  display: { xs: "none", sm: "inline" },
+                  display: { xs: 'none', sm: 'inline' },
                   lineHeight: 1,
                 }}
               >
                 {/* Text also depends on the current state */}
-                {showOnlyPrivate ? "All" : "Private Only"}
+                {showOnlyPrivate ? 'All' : 'Private Only'}
               </Typography>
             </ToggleButton>
           </Tooltip>
@@ -545,13 +545,13 @@ const CollectionPage: React.FC = () => {
           title={galleryTitle}
           itemCountText={galleryItemCountText}
           isEditable={
-            typeof selectedCollectionId === "number" &&
+            typeof selectedCollectionId === 'number' &&
             (!showOnlyPrivate || !!currentCollection?.is_private)
           }
           isLoading={
             loadingCollections &&
             !currentCollection &&
-            selectedCollectionId !== "all"
+            selectedCollectionId !== 'all'
           }
           error={actionError}
           onSave={handleSaveTitle}
@@ -594,7 +594,7 @@ const CollectionPage: React.FC = () => {
         <DialogContent>
           <DialogContentText id="delete-collection-dialog-description">
             Are you sure you want to delete the collection
-            <strong>"{collectionToDelete?.name || "this collection"}"</strong>?
+            <strong>"{collectionToDelete?.name || 'this collection'}"</strong>?
             <br />
           </DialogContentText>
         </DialogContent>

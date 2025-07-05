@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 // Define the shape of the context's value
 export interface LoadingContextType {

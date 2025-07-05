@@ -1,5 +1,5 @@
-import { TargetType } from "@/types/likes";
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
+import { TargetType } from '@/types/likes';
 
 // Type definitions
 export interface CreateLikeDto {
@@ -24,13 +24,13 @@ export interface LikeDetailsDto {
 export const createLike = async (
   dto: CreateLikeDto,
 ): Promise<LikeDetailsDto> => {
-  const response = await api.post("/likes", dto);
+  const response = await api.post('/likes', dto);
   return response.data;
 };
 
 export const removeLike = async (
   dto: RemoveLikeDto,
 ): Promise<{ success: boolean }> => {
-  const response = await api.delete("/likes", { data: dto });
+  const response = await api.delete('/likes', { data: dto });
   return response.data;
 };

@@ -6,13 +6,13 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+} from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FiX as CancelIcon,
   FiEdit as EditIcon,
   FiCheck as SaveIcon,
-} from "react-icons/fi";
+} from 'react-icons/fi';
 
 interface CollectionTitleProps {
   title: string;
@@ -69,7 +69,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   const handleSave = useCallback(async () => {
     const newNameTrimmed = editedTitle.trim();
 
-    if (newNameTrimmed === "" || newNameTrimmed === title) {
+    if (newNameTrimmed === '' || newNameTrimmed === title) {
       cancelEditMode();
       return;
     }
@@ -84,7 +84,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
     );
 
     if (isDuplicate) {
-      setSaveError("A collection with this name already exists.");
+      setSaveError('A collection with this name already exists.');
       setIsSaving(false);
       return;
     }
@@ -94,9 +94,9 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
     try {
       await onSave(newNameTrimmed);
     } catch (err) {
-      console.error("Error saving title:", err);
+      console.error('Error saving title:', err);
       setSaveError(
-        err instanceof Error ? err.message : "Failed to save title.",
+        err instanceof Error ? err.message : 'Failed to save title.',
       );
     } finally {
       setIsSaving(false);
@@ -126,8 +126,8 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
               autoFocus
               disabled={isSaving || isLoading}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !isSaving) handleSave();
-                if (e.key === "Escape" && !isSaving) cancelEditMode();
+                if (e.key === 'Enter' && !isSaving) handleSave();
+                if (e.key === 'Escape' && !isSaving) cancelEditMode();
               }}
               error={!!saveError}
               sx={{ flexGrow: 1, maxWidth: 400 }}
@@ -141,7 +141,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
                   disabled={
                     isSaving ||
                     isLoading ||
-                    editedTitle.trim() === "" ||
+                    editedTitle.trim() === '' ||
                     editedTitle.trim() === title
                   }
                 >
@@ -170,7 +170,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
           <>
             {/* Display Mode */}
             <Typography variant="h6" component="h2" fontWeight="normal" noWrap>
-              {isLoading ? "Loading Title..." : title}
+              {isLoading ? 'Loading Title...' : title}
             </Typography>
             {!isLoading && (
               <Typography
@@ -188,7 +188,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
                   onClick={requestEditMode}
                   sx={{
                     opacity: isHovered ? 1 : 0,
-                    transition: "opacity 0.2s ease-in-out",
+                    transition: 'opacity 0.2s ease-in-out',
                   }}
                 >
                   <EditIcon fontSize={20} />

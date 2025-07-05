@@ -26,61 +26,61 @@ import {
   Underline,
   Undo2Icon,
   UploadIcon,
-} from "lucide-react";
-import { AiOutlineYoutube } from "react-icons/ai";
+} from 'lucide-react';
+import { AiOutlineYoutube } from 'react-icons/ai';
 
 //Components
-import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
+import { Separator } from '@/components/ui/separator';
 
 //Stores
-import { useEditorStore } from "../stores/use-editor-store";
+import { useEditorStore } from '../stores/use-editor-store';
 
 //Ultils
-import { cn } from "@/lib/utils";
-import { ColorResult, CirclePicker } from "react-color";
-import { Level } from "@tiptap/extension-heading";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogFooter,
   DialogContent,
-  DialogTitle,
+  DialogFooter,
   DialogHeader,
-} from "@/components/ui/dialog";
-import { Tooltip } from "@mui/material";
-import { useWritingMediaUploader } from "../hooks/use-writing-medias-uploader";
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { Tooltip } from '@mui/material';
+import { Level } from '@tiptap/extension-heading';
+import { useState } from 'react';
+import { CirclePicker, ColorResult } from 'react-color';
+import { useWritingMediaUploader } from '../hooks/use-writing-medias-uploader';
 
 const LineHeightButton = () => {
   const { editor } = useEditorStore();
 
   const lineHeights = [
     {
-      label: "Default",
-      value: "normal",
+      label: 'Default',
+      value: 'normal',
     },
     {
-      label: "Single",
-      value: "1",
+      label: 'Single',
+      value: '1',
     },
     {
-      label: "1.15",
-      value: "1.15",
+      label: '1.15',
+      value: '1.15',
     },
     {
-      label: "1.5",
-      value: "1.5",
+      label: '1.5',
+      value: '1.5',
     },
     {
-      label: "Double",
-      value: "2.0",
+      label: 'Double',
+      value: '2.0',
     },
   ];
   return (
@@ -88,21 +88,21 @@ const LineHeightButton = () => {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <ListCollapseIcon className="size-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col gap-x-2 gap-y-1 mt-2 p-0 border-1 border-mountain-200 dark:border-mountain-600 overflow-hidden bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex flex-col gap-x-2 gap-y-1 overflow-hidden border-1 bg-white p-0">
         {lineHeights.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => editor?.chain().focus().setLineHeight(value).run()}
             className={cn(
-              "h-7 min-w-7 shrink-0 items-center flex space-x-2 rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
-              editor?.getAttributes("paragraph").lineHeight === value &&
-                "bg-mountain-100/80 dark:bg-mountain-700/80",
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 items-center space-x-2 overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
+              editor?.getAttributes('paragraph').lineHeight === value &&
+                'bg-mountain-100/80 dark:bg-mountain-700/80',
             )}
           >
             <span className="text-sm">{label}</span>
@@ -116,9 +116,9 @@ const LineHeightButton = () => {
 const FontSizeButton = () => {
   const { editor } = useEditorStore();
 
-  const currentFontSize = editor?.getAttributes("textStyle").fontSize
-    ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
-    : "16";
+  const currentFontSize = editor?.getAttributes('textStyle').fontSize
+    ? editor?.getAttributes('textStyle').fontSize.replace('px', '')
+    : '16';
 
   const [fontSize, setFontSize] = useState(currentFontSize);
   const [inputValue, setInputValue] = useState(fontSize);
@@ -143,7 +143,7 @@ const FontSizeButton = () => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       updateFontSize(inputValue);
       editor?.commands.focus();
@@ -164,7 +164,7 @@ const FontSizeButton = () => {
     <div className="flex items-center gap-x-0.5">
       <button
         onClick={decrement}
-        className="flex flex-col justify-center items-center hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 rounded-sm w-7 h-7 shrink-0 text-gray-900 dark:text-gray-100"
+        className="hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 w-7 shrink-0 flex-col items-center justify-center rounded-sm text-gray-900 dark:text-gray-100"
       >
         <MinusIcon className="size-4" />
       </button>
@@ -175,7 +175,7 @@ const FontSizeButton = () => {
           onChange={handleInputChange}
           onBlur={handleInputBlur}
           onKeyDown={handleKeyDown}
-          className="bg-transparent border border-mountain-100 dark:border-mountain-600 rounded-sm focus:outline-none focus:ring-0 w-10 h-7 text-sm text-center cursor-text text-gray-900 dark:text-gray-100"
+          className="border-mountain-100 dark:border-mountain-600 h-7 w-10 cursor-text rounded-sm border bg-transparent text-center text-sm text-gray-900 focus:ring-0 focus:outline-none dark:text-gray-100"
         />
       ) : (
         <button
@@ -183,14 +183,14 @@ const FontSizeButton = () => {
             setIsEditing(true);
             setFontSize(currentFontSize);
           }}
-          className="bg-transparent border border-mountain-100 dark:border-mountain-600 rounded-sm w-10 h-7 text-sm text-center cursor-text text-gray-900 dark:text-gray-100"
+          className="border-mountain-100 dark:border-mountain-600 h-7 w-10 cursor-text rounded-sm border bg-transparent text-center text-sm text-gray-900 dark:text-gray-100"
         >
           {currentFontSize}
         </button>
       )}
       <button
         onClick={increment}
-        className="flex flex-col justify-center items-center hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 rounded-sm w-7 h-7 shrink-0 text-gray-900 dark:text-gray-100"
+        className="hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 w-7 shrink-0 flex-col items-center justify-center rounded-sm text-gray-900 dark:text-gray-100"
       >
         <PlusIcon className="size-4" />
       </button>
@@ -203,18 +203,18 @@ const ListButton = () => {
 
   const lists = [
     {
-      label: "Bullet List",
+      label: 'Bullet List',
       icon: ListIcon,
-      isActive: () => editor?.isActive("bulletList"),
+      isActive: () => editor?.isActive('bulletList'),
       onClick: () => {
         const check = editor?.chain().focus().toggleBulletList().run();
-        console.log("Bullet List toggled:", check);
+        console.log('Bullet List toggled:', check);
       },
     },
     {
-      label: "Ordered List",
+      label: 'Ordered List',
       icon: ListOrderedIcon,
-      isActive: () => editor?.isActive("orderList"),
+      isActive: () => editor?.isActive('orderList'),
       onClick: () => editor?.chain().focus().toggleOrderedList().run(),
     },
   ];
@@ -224,20 +224,20 @@ const ListButton = () => {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <ListIcon className="size-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col gap-x-2 gap-y-1 mt-2 p-0 border-1 border-mountain-200 dark:border-mountain-600 overflow-hidden bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex flex-col gap-x-2 gap-y-1 overflow-hidden border-1 bg-white p-0">
         {lists.map(({ label, icon: Icon, onClick, isActive }) => (
           <button
             key={label}
             onClick={onClick}
             className={cn(
-              "h-7 min-w-7 shrink-0 items-center flex space-x-2 rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
-              isActive() && "bg-mountain-100/80 dark:bg-mountain-700/80",
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 items-center space-x-2 overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
+              isActive() && 'bg-mountain-100/80 dark:bg-mountain-700/80',
             )}
           >
             <Icon className="size-4" />
@@ -254,23 +254,23 @@ const AlignButton = () => {
 
   const alignments = [
     {
-      label: "Align Left",
-      value: "left",
+      label: 'Align Left',
+      value: 'left',
       icon: AlignLeftIcon,
     },
     {
-      label: "Align Center",
-      value: "center",
+      label: 'Align Center',
+      value: 'center',
       icon: AlignCenterIcon,
     },
     {
-      label: "Align Right",
-      value: "right",
+      label: 'Align Right',
+      value: 'right',
       icon: AlignRightIcon,
     },
     {
-      label: "Align Justify",
-      value: "justify",
+      label: 'Align Justify',
+      value: 'justify',
       icon: AlignJustifyIcon,
     },
   ];
@@ -279,19 +279,19 @@ const AlignButton = () => {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <AlignLeftIcon className="size-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col gap-x-2 gap-y-1 mt-2 p-0 border-1 border-mountain-200 dark:border-mountain-600 overflow-hidden bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex flex-col gap-x-2 gap-y-1 overflow-hidden border-1 bg-white p-0">
         {alignments.map(({ label, value, icon: Icon }) => (
           <button
             key={value}
             onClick={() => editor?.chain().focus().setTextAlign(value).run()}
             className={cn(
-              "h-7 min-w-7 shrink-0 items-center flex space-x-2 rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 items-center space-x-2 overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
             )}
           >
             <Icon className="size-4" />
@@ -306,7 +306,7 @@ const AlignButton = () => {
 const YoutubeButton = () => {
   const { editor } = useEditorStore();
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState('');
   const [height] = useState(480);
   const [width] = useState(640);
 
@@ -319,7 +319,7 @@ const YoutubeButton = () => {
         height: Math.max(180, parseInt(height.toString(), 10)) || 480,
       });
       setIsVideoDialogOpen(false);
-      setVideoUrl("");
+      setVideoUrl('');
     }
   };
 
@@ -329,16 +329,16 @@ const YoutubeButton = () => {
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
             )}
           >
             <AiOutlineYoutube className="size-5" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="flex flex-col gap-y-1 mt-2 p-2.5 border border-mountain-200 dark:border-mountain-600 bg-white dark:bg-mountain-800">
+        <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex flex-col gap-y-1 border bg-white p-2.5">
           <DropdownMenuItem
             onClick={() => setIsVideoDialogOpen(true)}
-            className="text-gray-900 dark:text-gray-100 hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80"
+            className="hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 text-gray-900 dark:text-gray-100"
           >
             <SearchIcon className="mr-2 size-4" />
             Paste Youtube URL
@@ -351,7 +351,7 @@ const YoutubeButton = () => {
         onOpenChange={setIsVideoDialogOpen}
         modal={false}
       >
-        <DialogContent className="bg-white dark:bg-mountain-800 border-gray-200 dark:border-mountain-600">
+        <DialogContent className="dark:bg-mountain-800 dark:border-mountain-600 border-gray-200 bg-white">
           <DialogHeader>
             <DialogTitle className="text-gray-900 dark:text-gray-100">
               Insert Youtube Embedded Link
@@ -362,17 +362,17 @@ const YoutubeButton = () => {
             value={videoUrl}
             onChange={(e) => setVideoUrl(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 e.preventDefault();
                 addYoutubeVideo(e);
               }
             }}
-            className="placeholder:text-mountain-400 dark:placeholder:text-mountain-500 bg-white dark:bg-mountain-700 border-gray-300 dark:border-mountain-600 text-gray-900 dark:text-gray-100"
+            className="placeholder:text-mountain-400 dark:placeholder:text-mountain-500 dark:bg-mountain-700 dark:border-mountain-600 border-gray-300 bg-white text-gray-900 dark:text-gray-100"
           />
           <DialogFooter>
             <Button
               onClick={addYoutubeVideo}
-              className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white"
+              className="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
             >
               Insert
             </Button>
@@ -386,7 +386,7 @@ const YoutubeButton = () => {
 const ImageButton = () => {
   const { editor } = useEditorStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState('');
 
   const { handleUploadImageFile } = useWritingMediaUploader();
 
@@ -397,13 +397,13 @@ const ImageButton = () => {
   };
 
   const onUpload = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        const imageS3Url = await handleUploadImageFile(file, "blog");
+        const imageS3Url = await handleUploadImageFile(file, 'blog');
         if (imageS3Url) {
           insertImage(imageS3Url);
         }
@@ -415,7 +415,7 @@ const ImageButton = () => {
   const handleImageUrlSubmit = () => {
     if (imageUrl.trim()) {
       insertImage(imageUrl.trim());
-      setImageUrl("");
+      setImageUrl('');
       setIsDialogOpen(false);
     }
   };
@@ -426,23 +426,23 @@ const ImageButton = () => {
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
             )}
           >
             <ImageIcon className="size-4" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="flex flex-col gap-y-1 mt-2 p-2.5 border border-mountain-200 dark:border-mountain-600 bg-white dark:bg-mountain-800">
+        <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex flex-col gap-y-1 border bg-white p-2.5">
           <DropdownMenuItem
             onClick={onUpload}
-            className="text-gray-900 dark:text-gray-100 hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80"
+            className="hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 text-gray-900 dark:text-gray-100"
           >
             <UploadIcon className="mr-2 size-4" />
             Upload
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setIsDialogOpen(true)}
-            className="text-gray-900 dark:text-gray-100 hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80"
+            className="hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 text-gray-900 dark:text-gray-100"
           >
             <SearchIcon className="mr-2 size-4" />
             Paste image URL
@@ -451,7 +451,7 @@ const ImageButton = () => {
       </DropdownMenu>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} modal={false}>
-        <DialogContent className="bg-white dark:bg-mountain-800 border-gray-200 dark:border-mountain-600">
+        <DialogContent className="dark:bg-mountain-800 dark:border-mountain-600 border-gray-200 bg-white">
           <DialogHeader>
             <DialogTitle className="text-gray-900 dark:text-gray-100">
               Insert Image URL
@@ -462,17 +462,17 @@ const ImageButton = () => {
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 e.preventDefault();
                 handleImageUrlSubmit();
               }
             }}
-            className="placeholder:text-mountain-400 dark:placeholder:text-mountain-500 bg-white dark:bg-mountain-700 border-gray-300 dark:border-mountain-600 text-gray-900 dark:text-gray-100"
+            className="placeholder:text-mountain-400 dark:placeholder:text-mountain-500 dark:bg-mountain-700 dark:border-mountain-600 border-gray-300 bg-white text-gray-900 dark:text-gray-100"
           />
           <DialogFooter>
             <Button
               onClick={handleImageUrlSubmit}
-              className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white"
+              className="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
             >
               Insert
             </Button>
@@ -485,40 +485,40 @@ const ImageButton = () => {
 
 const LinkButon = () => {
   const { editor } = useEditorStore();
-  const [value, setValue] = useState(editor?.getAttributes("link").href || "");
+  const [value, setValue] = useState(editor?.getAttributes('link').href || '');
 
   const onChange = (href: string) => {
-    editor?.chain().focus().extendMarkRange("link").setLink({ href }).run();
-    setValue("");
+    editor?.chain().focus().extendMarkRange('link').setLink({ href }).run();
+    setValue('');
   };
   return (
     <DropdownMenu
       modal={false}
       onOpenChange={(open) => {
         if (open) {
-          setValue(editor?.getAttributes("link").href || "");
+          setValue(editor?.getAttributes('link').href || '');
         }
       }}
     >
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <Link2Icon className="size-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex gap-x-2 mt-2 p-2.5 border-1 border-mountain-200 dark:border-mountain-600 overflow-hidden bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex gap-x-2 overflow-hidden border-1 bg-white p-2.5">
         <Input
           placeholder="https://example.com"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="placeholder:text-mountain-400 dark:placeholder:text-mountain-500 line-clamp-1 bg-white dark:bg-mountain-700 border-gray-300 dark:border-mountain-600 text-gray-900 dark:text-gray-100"
+          className="placeholder:text-mountain-400 dark:placeholder:text-mountain-500 dark:bg-mountain-700 dark:border-mountain-600 line-clamp-1 border-gray-300 bg-white text-gray-900 dark:text-gray-100"
         />
         <Button
           onClick={() => onChange(value)}
-          className="bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700 text-white"
+          className="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Apply
         </Button>
@@ -530,7 +530,7 @@ const LinkButon = () => {
 const HighLightColorButton = () => {
   const { editor } = useEditorStore();
 
-  const value = editor?.getAttributes("highlight").color || "#FFFFFF";
+  const value = editor?.getAttributes('highlight').color || '#FFFFFF';
 
   const onChange = (color: ColorResult) => {
     editor?.chain().focus().setHighlight({ color: color.hex }).run();
@@ -541,17 +541,17 @@ const HighLightColorButton = () => {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <HighlighterIcon className="size-4" />
           <div
-            className="mt-0.5 w-full h-0.5"
+            className="mt-0.5 h-0.5 w-full"
             style={{ backgroundColor: value }}
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mt-2 p-2.5 border-1 border-mountain-200 dark:border-mountain-600 overflow-hidden bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 overflow-hidden border-1 bg-white p-2.5">
         <CirclePicker onChange={onChange} />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -560,7 +560,7 @@ const HighLightColorButton = () => {
 
 const TextColorButton = () => {
   const { editor } = useEditorStore();
-  const value = editor?.getAttributes("textStyle").color || "#000000";
+  const value = editor?.getAttributes('textStyle').color || '#000000';
 
   const onChange = (color: ColorResult) => {
     editor?.chain().focus().setColor(color.hex).run();
@@ -570,14 +570,14 @@ const TextColorButton = () => {
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex-col flex justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 flex-col items-center justify-center overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <span className="text-sm">A</span>
-          <div className="w-full h-0.5" style={{ backgroundColor: value }} />
+          <div className="h-0.5 w-full" style={{ backgroundColor: value }} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mt-2 p-2.5 border-1 border-mountain-200 dark:border-mountain-600 overflow-hidden bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 overflow-hidden border-1 bg-white p-2.5">
         <CirclePicker color={value} onChange={onChange} />
       </DropdownMenuContent>
     </DropdownMenu>
@@ -587,34 +587,34 @@ const TextColorButton = () => {
 const HeadingLevelButton = () => {
   const { editor } = useEditorStore();
   const headings = [
-    { label: "Heading 1", value: 1, fontSize: "32px" },
-    { label: "Heading 2", value: 2, fontSize: "24px" },
-    { label: "Heading 3", value: 3, fontSize: "20px" },
-    { label: "Heading 4", value: 3, fontSize: "18px" },
-    { label: "Heading 5", value: 3, fontSize: "16px" },
-    { label: "Normal text", value: 0, fontSize: "16px" },
+    { label: 'Heading 1', value: 1, fontSize: '32px' },
+    { label: 'Heading 2', value: 2, fontSize: '24px' },
+    { label: 'Heading 3', value: 3, fontSize: '20px' },
+    { label: 'Heading 4', value: 3, fontSize: '18px' },
+    { label: 'Heading 5', value: 3, fontSize: '16px' },
+    { label: 'Normal text', value: 0, fontSize: '16px' },
   ];
   const getCurrentHeading = () => {
     for (let level = 1; level <= 5; level++) {
-      if (editor?.isActive("heading", { level })) {
+      if (editor?.isActive('heading', { level })) {
         return `Heading ${level}`;
       }
     }
-    return "Normal text";
+    return 'Normal text';
   };
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <button
           className={cn(
-            "h-7 min-w-7 shrink-0 items-center flex justify-between rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <span className="truncate">{getCurrentHeading()}</span>
           <ChevronDownIcon className="ml-2 size-4 shrink-0" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col gap-y-1 mt-2 p-1 border-mountain-200 dark:border-mountain-600 bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 mt-2 flex flex-col gap-y-1 bg-white p-1">
         {headings.map(({ label, value, fontSize }) => (
           <button
             onClick={() => {
@@ -630,10 +630,10 @@ const HeadingLevelButton = () => {
             }}
             key={value}
             className={cn(
-              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 text-gray-900 dark:text-gray-100",
-              (value === 0 && !editor?.isActive("heading")) ||
-                (editor?.isActive("heading", { level: value }) &&
-                  "bg-mountain-100/80 dark:bg-mountain-700/80"),
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex items-center gap-x-2 rounded-sm px-2 py-1 text-gray-900 dark:text-gray-100',
+              (value === 0 && !editor?.isActive('heading')) ||
+                (editor?.isActive('heading', { level: value }) &&
+                  'bg-mountain-100/80 dark:bg-mountain-700/80'),
             )}
             style={{ fontSize }}
           >
@@ -648,27 +648,27 @@ const HeadingLevelButton = () => {
 const FontFamilyButton = () => {
   const { editor } = useEditorStore();
   const fonts = [
-    { label: "Arial", value: "Arial" },
-    { label: "Times New Roman", value: "Times New Roman" },
-    { label: "Courier New", value: "Courier New" },
-    { label: "Georgia", value: "Georgia" },
-    { label: "Verdana", value: "Verdana" },
+    { label: 'Arial', value: 'Arial' },
+    { label: 'Times New Roman', value: 'Times New Roman' },
+    { label: 'Courier New', value: 'Courier New' },
+    { label: 'Georgia', value: 'Georgia' },
+    { label: 'Verdana', value: 'Verdana' },
   ];
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger>
         <button
           className={cn(
-            "h-7 w-[120px] shrink-0 items-center flex justify-between rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 px-1.5 overflow-hidden text-sm text-gray-900 dark:text-gray-100",
+            'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 w-[120px] shrink-0 items-center justify-between overflow-hidden rounded-sm px-1.5 text-sm text-gray-900 dark:text-gray-100',
           )}
         >
           <span className="truncate">
-            {editor?.getAttributes("textStyle").fontFamily || "Arial"}
+            {editor?.getAttributes('textStyle').fontFamily || 'Arial'}
           </span>
           <ChevronDownIcon className="ml-2 size-4 shrink-0" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="flex flex-col gap-y-1 p-1 border-mountain-200 dark:border-mountain-600 bg-white dark:bg-mountain-800">
+      <DropdownMenuContent className="border-mountain-200 dark:border-mountain-600 dark:bg-mountain-800 flex flex-col gap-y-1 bg-white p-1">
         {fonts.map((font, value) => (
           <DropdownMenuItem
             onClick={() =>
@@ -676,9 +676,9 @@ const FontFamilyButton = () => {
             }
             key={value}
             className={cn(
-              "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 text-gray-900 dark:text-gray-100",
-              editor?.getAttributes("textStyle").fontFamily === value &&
-                "bg-mountain-100/80 dark:bg-mountain-700/80",
+              'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex items-center gap-x-2 rounded-sm px-2 py-1 text-gray-900 dark:text-gray-100',
+              editor?.getAttributes('textStyle').fontFamily === value &&
+                'bg-mountain-100/80 dark:bg-mountain-700/80',
             )}
             style={{ fontFamily: font.value }}
           >
@@ -710,8 +710,8 @@ const ToolbarButton = ({
       <button
         onClick={onClick}
         className={cn(
-          "text-sm h-7 min-w-7 flex items-center justify-center rounded-sm hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 text-gray-900 dark:text-gray-100",
-          isActive && "bg-mountain-100/80 dark:bg-mountain-700/80",
+          'hover:bg-mountain-100/80 dark:hover:bg-mountain-700/80 flex h-7 min-w-7 items-center justify-center rounded-sm text-sm text-gray-900 dark:text-gray-100',
+          isActive && 'bg-mountain-100/80 dark:bg-mountain-700/80',
         )}
       >
         <Icon className="size-4" />
@@ -732,85 +732,85 @@ const Toolbar = () => {
   }[][] = [
     [
       {
-        label: "Undo",
-        shortcut: "Crl + Z",
+        label: 'Undo',
+        shortcut: 'Crl + Z',
         icon: Undo2Icon,
         onClick: () => editor?.chain().focus().undo().run(),
       },
       {
-        label: "Redo",
-        shortcut: "Crl + Y",
+        label: 'Redo',
+        shortcut: 'Crl + Y',
         icon: Redo2Icon,
         onClick: () => editor?.chain().focus().redo().run(),
       },
       {
-        label: "Print",
-        shortcut: "Crl + P",
+        label: 'Print',
+        shortcut: 'Crl + P',
         icon: PrinterIcon,
         onClick: () => window.print(),
       },
       {
-        label: "Spell Check",
-        shortcut: "Crl + Alt + X",
+        label: 'Spell Check',
+        shortcut: 'Crl + Alt + X',
         icon: SpellCheck,
         onClick: () => {
-          const current = editor?.view.dom.getAttribute("spellcheck");
+          const current = editor?.view.dom.getAttribute('spellcheck');
           editor?.view.dom.setAttribute(
-            "spellcheck",
-            current === "false" ? "true" : "false",
+            'spellcheck',
+            current === 'false' ? 'true' : 'false',
           );
         },
       },
     ],
     [
       {
-        label: "Bold",
-        shortcut: "Crl + B",
+        label: 'Bold',
+        shortcut: 'Crl + B',
         icon: BoldIcon,
-        isActive: editor?.isActive("bold"),
+        isActive: editor?.isActive('bold'),
         onClick: () => editor?.chain().focus().toggleBold().run(),
       },
       {
-        label: "Italic",
-        shortcut: "Crl + I",
+        label: 'Italic',
+        shortcut: 'Crl + I',
         icon: ItalicIcon,
-        isActive: editor?.isActive("italic"),
+        isActive: editor?.isActive('italic'),
         onClick: () => editor?.chain().focus().toggleItalic().run(),
       },
       {
-        label: "Underline",
-        shortcut: "Crl + U",
+        label: 'Underline',
+        shortcut: 'Crl + U',
         icon: Underline,
-        isActive: editor?.isActive("underline"),
+        isActive: editor?.isActive('underline'),
         onClick: () => editor?.chain().focus().toggleUnderline().run(),
       },
     ],
     [
       {
-        label: "List Todo",
-        shortcut: "Crl + Shift + 9",
+        label: 'List Todo',
+        shortcut: 'Crl + Shift + 9',
         icon: ListTodo,
         onClick: () => editor?.chain().focus().toggleTaskList().run(),
-        isActive: editor?.isActive("taskList"),
+        isActive: editor?.isActive('taskList'),
       },
       {
-        label: "Remove Formatting",
-        shortcut: "Crl + /",
+        label: 'Remove Formatting',
+        shortcut: 'Crl + /',
         icon: RemoveFormattingIcon,
         onClick: () => editor?.chain().focus().unsetAllMarks().run(),
       },
       {
-        label: "Comment",
-        shortcut: "Crl + Shift + P",
+        label: 'Comment',
+        shortcut: 'Crl + Shift + P',
         icon: MessageSquarePlusIcon,
-        onClick: () => console.log("TODO: comment"),
+        onClick: () => console.log('TODO: comment'),
         isActive: false,
       },
     ],
   ];
 
   return (
-    <div className="top-16 z-20 sticky flex justify-center items-center gap-x-0.5 bg-white dark:bg-mountain-800 shadow-md px-2.5 py-0.5 border-1 border-mountain-200 dark:border-mountain-600 border-r-1 min-h-[48px] overflow-x-auto">
+    <div className="dark:bg-mountain-800 border-mountain-200 dark:border-mountain-600 sticky top-16 z-20 flex min-h-[48px] items-center justify-center gap-x-0.5 overflow-x-auto border-1 border-r-1 bg-white px-2.5 py-0.5 shadow-md">
       {sections[0].map((item) => (
         <ToolbarButton key={item.label} {...item} />
       ))}

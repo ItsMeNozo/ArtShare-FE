@@ -1,4 +1,4 @@
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
 
 export type ThumbnailCropMeta = {
   crop_x: number;
@@ -6,7 +6,7 @@ export type ThumbnailCropMeta = {
   crop_w: number;
   crop_h: number;
   zoom: number;
-  aspect?: number | "free";
+  aspect?: number | 'free';
 };
 
 export const patchThumbnailMeta = async (

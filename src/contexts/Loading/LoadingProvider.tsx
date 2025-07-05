@@ -1,14 +1,14 @@
-import { useState, useMemo, ReactNode } from "react";
-import { Backdrop, CircularProgress, Typography } from "@mui/material";
-import { LoadingContext, LoadingContextType } from "./LoadingContext";
+import { Backdrop, CircularProgress, Typography } from '@mui/material';
+import { ReactNode, useMemo, useState } from 'react';
+import { LoadingContext, LoadingContextType } from './LoadingContext';
 
 export const LoadingProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("Processing...");
+  const [message, setMessage] = useState('Processing...');
 
   const value: LoadingContextType = useMemo(
     () => ({
-      showLoading: (msg = "Processing...") => {
+      showLoading: (msg = 'Processing...') => {
         setMessage(msg);
         setIsLoading(true);
       },
@@ -26,16 +26,16 @@ export const LoadingProvider = ({ children }: { children: ReactNode }) => {
         <Backdrop
           open={true}
           sx={{
-            color: "#fff",
+            color: '#fff',
             zIndex: (theme) => theme.zIndex.modal + 9999,
-            position: "fixed",
+            position: 'fixed',
             inset: 0,
-            flexDirection: "column",
-            backdropFilter: "blur(3px)",
+            flexDirection: 'column',
+            backdropFilter: 'blur(3px)',
           }}
         >
           <CircularProgress color="inherit" />
-          <Typography variant="h6" sx={{ mt: 2, color: "white" }}>
+          <Typography variant="h6" sx={{ mt: 2, color: 'white' }}>
             {message}
           </Typography>
         </Backdrop>

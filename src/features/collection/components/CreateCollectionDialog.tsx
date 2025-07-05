@@ -1,17 +1,17 @@
-import { Collection } from "@/types";
-import { Alert, CircularProgress, Paper } from "@mui/material";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import IconButton from "@mui/material/IconButton";
-import Input from "@mui/material/Input";
-import { X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createCollection } from "../api/collection.api";
+import { Collection } from '@/types';
+import { Alert, CircularProgress, Paper } from '@mui/material';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
+import { X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createCollection } from '../api/collection.api';
 
 export interface CreateCollectionFormData {
   name: string;
@@ -31,14 +31,14 @@ export const CreateCollectionDialog = ({
   onSuccess,
   existingCollectionNames,
 }: CreateCollectionDialogProps) => {
-  const [collectionName, setCollectionName] = useState("");
+  const [collectionName, setCollectionName] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
-      setCollectionName("");
+      setCollectionName('');
       setIsPrivate(false);
       setIsLoading(false);
       setError(null);
@@ -53,7 +53,7 @@ export const CreateCollectionDialog = ({
   const handleCreateClick = async () => {
     const trimmedName = collectionName.trim();
     if (!trimmedName) {
-      setError("Collection name cannot be empty.");
+      setError('Collection name cannot be empty.');
       return;
     }
 
@@ -77,17 +77,17 @@ export const CreateCollectionDialog = ({
 
     try {
       const newCollection = await createCollection(formData);
-      console.log("Collection created successfully:", newCollection);
+      console.log('Collection created successfully:', newCollection);
 
       onSuccess(newCollection);
 
       handleInternalClose();
     } catch (err) {
-      console.error("Failed to create collection:", err);
+      console.error('Failed to create collection:', err);
 
       setError(
         (err as Error).message ||
-          "An unexpected error occurred. Please try again.",
+          'An unexpected error occurred. Please try again.',
       );
     } finally {
       setIsLoading(false);
@@ -114,9 +114,9 @@ export const CreateCollectionDialog = ({
         sx={{
           m: 0,
           p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <span>Create New Collection</span>
@@ -146,17 +146,17 @@ export const CreateCollectionDialog = ({
             }
           }}
           sx={{
-            p: "2px 4px",
+            p: '2px 4px',
             mb: 2,
-            display: "flex",
-            alignItems: "center",
-            borderRadius: "16px",
-            border: "1px solid",
-            boxShadow: "none",
-            bgcolor: "background.paper",
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: '16px',
+            border: '1px solid',
+            boxShadow: 'none',
+            bgcolor: 'background.paper',
             height: 40,
           }}
-          className={`${error ? "border-red-400" : ""} `}
+          className={`${error ? 'border-red-400' : ''} `}
         >
           <Input
             placeholder="Collection name"
@@ -181,7 +181,7 @@ export const CreateCollectionDialog = ({
             />
           }
           label="Make this collection private"
-          sx={{ display: "block" }}
+          sx={{ display: 'block' }}
         />
       </DialogContent>
       <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
@@ -200,7 +200,7 @@ export const CreateCollectionDialog = ({
             isLoading ? <CircularProgress size={20} color="inherit" /> : null
           }
         >
-          {isLoading ? "Creating..." : "Create"}
+          {isLoading ? 'Creating...' : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>

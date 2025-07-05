@@ -1,10 +1,10 @@
 // src/hooks/useReportUser.ts
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from '@tanstack/react-query';
 import {
   CreateReportDto,
   ReportTargetType,
   submitReport,
-} from "../api/report.api";
+} from '../api/report.api';
 
 interface ReportUserVariables {
   targetId: number;
@@ -15,7 +15,12 @@ interface ReportUserVariables {
 
 export function useReportUser() {
   return useMutation({
-    mutationFn: ({ targetId, reason, userId, targetTitle }: ReportUserVariables) => {
+    mutationFn: ({
+      targetId,
+      reason,
+      userId,
+      targetTitle,
+    }: ReportUserVariables) => {
       const url = window.location.href;
       const dto: CreateReportDto = {
         target_id: targetId,
@@ -25,7 +30,7 @@ export function useReportUser() {
         target_url: url,
         target_title: targetTitle,
       };
-      console.log("response", dto);
+      console.log('response', dto);
       return submitReport(dto);
     },
   });

@@ -1,8 +1,8 @@
-import React from "react";
-import { LuCheck, LuLoader, LuCloud, LuCloudOff } from "react-icons/lu";
-import { formatTimeAgo } from "@/lib/utils";
+import { formatTimeAgo } from '@/lib/utils';
+import React from 'react';
+import { LuCheck, LuCloud, LuCloudOff, LuLoader } from 'react-icons/lu';
 
-type SaveStatus = "saved" | "saving" | "unsaved" | "error";
+type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
 
 interface AutoSaveStatusProps {
   status: SaveStatus;
@@ -15,29 +15,29 @@ export const AutoSaveStatus: React.FC<AutoSaveStatusProps> = ({
 }) => {
   const getStatusDisplay = () => {
     switch (status) {
-      case "saved":
+      case 'saved':
         return {
-          icon: <LuCheck className="w-4 h-4" />,
-          text: lastSaved ? `Saved ${formatTimeAgo(lastSaved)}` : "Saved",
-          className: "text-green-600",
+          icon: <LuCheck className="h-4 w-4" />,
+          text: lastSaved ? `Saved ${formatTimeAgo(lastSaved)}` : 'Saved',
+          className: 'text-green-600',
         };
-      case "saving":
+      case 'saving':
         return {
-          icon: <LuLoader className="w-4 h-4 animate-spin" />,
-          text: "Saving...",
-          className: "text-blue-600",
+          icon: <LuLoader className="h-4 w-4 animate-spin" />,
+          text: 'Saving...',
+          className: 'text-blue-600',
         };
-      case "unsaved":
+      case 'unsaved':
         return {
-          icon: <LuCloud className="w-4 h-4" />,
-          text: "Unsaved changes",
-          className: "text-gray-600",
+          icon: <LuCloud className="h-4 w-4" />,
+          text: 'Unsaved changes',
+          className: 'text-gray-600',
         };
-      case "error":
+      case 'error':
         return {
-          icon: <LuCloudOff className="w-4 h-4" />,
-          text: "Error saving",
-          className: "text-red-600",
+          icon: <LuCloudOff className="h-4 w-4" />,
+          text: 'Error saving',
+          className: 'text-red-600',
         };
     }
   };

@@ -1,6 +1,6 @@
-import { Collection, Post } from "@/types";
-import { useEffect, useMemo, useState } from "react";
-import { fetchCollectionsWithPosts } from "../api/collection.api";
+import { Collection, Post } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
+import { fetchCollectionsWithPosts } from '../api/collection.api';
 
 export interface UseCollectionsDataResult {
   collections: Collection[];
@@ -24,11 +24,11 @@ export function useCollectionsData(): UseCollectionsDataResult {
         const fetchedCollections = await fetchCollectionsWithPosts();
         setCollections(fetchedCollections);
       } catch (err) {
-        console.error("Error loading collection data:", err);
+        console.error('Error loading collection data:', err);
         setError(
           err instanceof Error
             ? err.message
-            : "An unknown error occurred loading collections.",
+            : 'An unknown error occurred loading collections.',
         );
       } finally {
         setLoading(false);

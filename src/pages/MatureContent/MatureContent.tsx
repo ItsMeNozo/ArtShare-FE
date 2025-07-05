@@ -1,10 +1,10 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from '@mui/material';
+import React from 'react';
 
 const MatureContentPage: React.FC = () => {
   return (
     <Box className="min-h-screen w-full bg-gray-100 p-8">
-      <Box className="w-full bg-white p-6 rounded-md shadow-md">
+      <Box className="w-full rounded-md bg-white p-6 shadow-md">
         <Typography variant="h4" className="mb-4 text-gray-800">
           Mature Content & Unsuitable Content Guidelines
         </Typography>

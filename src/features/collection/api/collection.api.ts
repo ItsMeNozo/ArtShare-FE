@@ -1,7 +1,7 @@
-import api from "@/api/baseApi";
-import { Collection } from "@/types";
-import { CreateCollectionFormData } from "../components/CreateCollectionDialog";
-import { UpdateCollectionData } from "../types/collection";
+import api from '@/api/baseApi';
+import { Collection } from '@/types';
+import { CreateCollectionFormData } from '../components/CreateCollectionDialog';
+import { UpdateCollectionData } from '../types/collection';
 
 interface UpdateCollectionPayload {
   name?: string;
@@ -21,7 +21,7 @@ interface CreateCollectionPayload {
  */
 export const fetchCollectionsWithPosts = async (): Promise<Collection[]> => {
   try {
-    const response = await api.get<Collection[]>("/collections");
+    const response = await api.get<Collection[]>('/collections');
 
     const collectionsWithSortedPosts = response.data.map((collection) => ({
       ...collection,
@@ -40,7 +40,7 @@ export const fetchCollectionsWithPosts = async (): Promise<Collection[]> => {
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     );
   } catch (error) {
-    console.error("API Error fetching collections:", error);
+    console.error('API Error fetching collections:', error);
     throw error;
   }
 };
@@ -69,8 +69,8 @@ export const updateCollection = async (
   }
 
   if (Object.keys(payload).length === 0) {
-    console.warn("API: No fields provided for update. Skipping API call.");
-    throw new Error("No update data provided for the collection.");
+    console.warn('API: No fields provided for update. Skipping API call.');
+    throw new Error('No update data provided for the collection.');
   }
 
   try {
@@ -116,7 +116,7 @@ export const createCollection = async (
       name: data.name.trim(),
       is_private: data.isPrivate,
     };
-    const response = await api.post<Collection>("/collections", payload);
+    const response = await api.post<Collection>('/collections', payload);
     return response.data;
   } catch (error) {
     console.error(`API Error creating collection '${data.name}':`, error);

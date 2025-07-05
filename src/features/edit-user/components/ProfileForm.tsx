@@ -1,6 +1,6 @@
-import type React from "react";
-import { Box, Typography, TextField } from "@mui/material";
-import { UserProfile } from "@/features/user-profile-public/api/user-profile.api";
+import { UserProfile } from '@/features/user-profile-public/api/user-profile.api';
+import { Box, TextField, Typography } from '@mui/material';
+import type React from 'react';
 
 interface ProfileFormProps {
   formData: UserProfile;
@@ -21,7 +21,7 @@ export function ProfileForm({
   return (
     <Box className="space-y-6 dark:text-white">
       {/* Email */}
-      <Box className="space-y-2 ">
+      <Box className="space-y-2">
         <Typography>Email</Typography>
         <TextField
           fullWidth
@@ -30,13 +30,13 @@ export function ProfileForm({
           onChange={handleChange}
           disabled={isSubmitting}
           variant="outlined"
-          className="bg-[#1e1e1e] rounded"
-          InputProps={{ className: "text-white" }}
+          className="rounded bg-[#1e1e1e]"
+          InputProps={{ className: 'text-white' }}
         />
       </Box>
 
       {/* Username */}
-      <Box className="space-y-2 ">
+      <Box className="space-y-2">
         <Typography>Username</Typography>
         <TextField
           fullWidth
@@ -45,8 +45,8 @@ export function ProfileForm({
           onChange={handleChange}
           disabled={isSubmitting}
           variant="outlined"
-          className="bg-[#1e1e1e] rounded"
-          InputProps={{ className: "text-white" }}
+          className="rounded bg-[#1e1e1e]"
+          InputProps={{ className: 'text-white' }}
         />
       </Box>
 
@@ -56,12 +56,12 @@ export function ProfileForm({
         <TextField
           fullWidth
           name="full_name"
-          value={formData.full_name || ""}
+          value={formData.full_name || ''}
           onChange={handleChange}
           disabled={isSubmitting}
           variant="outlined"
-          className="bg-[#1e1e1e] rounded"
-          InputProps={{ className: "text-white" }}
+          className="rounded bg-[#1e1e1e]"
+          InputProps={{ className: 'text-white' }}
         />
       </Box>
 
@@ -73,13 +73,13 @@ export function ProfileForm({
             fullWidth
             type="date"
             name="birthday"
-            value={formData.birthday || ""}
+            value={formData.birthday || ''}
             onChange={(e) =>
-              handleDateChange(new Date(e.target.value), "birthday")
+              handleDateChange(new Date(e.target.value), 'birthday')
             }
             disabled={isSubmitting}
             variant="outlined"
-            className="bg-[#1e1e1e] rounded text-white"
+            className="rounded bg-[#1e1e1e] text-white"
           />
         </Box>
       )}
@@ -90,14 +90,14 @@ export function ProfileForm({
         <TextField
           fullWidth
           name="bio"
-          value={formData.bio || ""}
+          value={formData.bio || ''}
           onChange={handleChange}
           disabled={isSubmitting}
           variant="outlined"
           multiline
           rows={4}
-          className="bg-[#1e1e1e] rounded"
-          InputProps={{ className: "text-white" }}
+          className="rounded bg-[#1e1e1e]"
+          InputProps={{ className: 'text-white' }}
         />
       </Box>
     </Box>

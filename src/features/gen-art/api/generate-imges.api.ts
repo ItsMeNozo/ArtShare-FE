@@ -1,5 +1,5 @@
-import api from "@/api/baseApi";
-import { ModelKey } from "../enum";
+import api from '@/api/baseApi';
+import { ModelKey } from '../enum';
 
 // request payload
 export interface ImageGenRequestDto {
@@ -17,12 +17,12 @@ export const generateImages = async (
 ): Promise<PromptResult> => {
   try {
     const response = await api.post<PromptResult>(
-      "/art-generation/text-to-image",
+      '/art-generation/text-to-image',
       payload,
     );
     return response.data;
   } catch (error) {
-    console.error("Error generating images:", error);
+    console.error('Error generating images:', error);
     throw error; // Re-throw the error to be handled by the caller
   }
 };

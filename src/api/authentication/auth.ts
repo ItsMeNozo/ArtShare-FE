@@ -1,26 +1,26 @@
-import axios from "axios";
-import api from "../baseApi";
+import axios from 'axios';
+import api from '../baseApi';
 // Base URL of your NestJS backend API
-const rawUrl = import.meta.env.VITE_BE_URL ?? "http://localhost:3000";
-const API_BASE_URL = `${rawUrl.replace(/\/+$/, "")}/auth`;
+const rawUrl = import.meta.env.VITE_BE_URL ?? 'http://localhost:3000';
+const API_BASE_URL = `${rawUrl.replace(/\/+$/, '')}/auth`;
 // Function to get user profile by userId
 export const getUserProfile = async (userId: string) => {
   try {
     const response = await api.get(`/users/profile/${userId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    console.error('Error fetching user profile:', error);
     throw error;
   }
 };
 // Function to handle user sign up
 export const signup = async (
   userId: string,
-  email: string | "",
+  email: string | '',
   password: string,
   username: string,
 ) => {
-  console.log("🔐 API: Starting signup for user:", { userId, email, username });
+  console.log('🔐 API: Starting signup for user:', { userId, email, username });
   try {
     const response = await axios.post(`${API_BASE_URL}/register`, {
       userId,
@@ -28,10 +28,10 @@ export const signup = async (
       password,
       username,
     });
-    console.log("🔐 API: Signup successful");
+    console.log('🔐 API: Signup successful');
     return response.data;
   } catch (error) {
-    console.error("🔐 API: Signup error:", error);
+    console.error('🔐 API: Signup error:', error);
     throw error; // Handle error accordingly
   }
 };
@@ -44,7 +44,7 @@ export const login = async (token: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error logging in:", error);
+    console.error('Error logging in:', error);
     throw error; // Handle error accordingly
   }
 };
@@ -57,7 +57,7 @@ export const signout = async (uid: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error signing out:", error);
+    console.error('Error signing out:', error);
     throw error; // Handle error accordingly
   }
 };
@@ -70,7 +70,7 @@ export const verifyToken = async (token: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error verifying token:", error);
+    console.error('Error verifying token:', error);
     throw error; // Handle error accordingly
   }
 };
@@ -83,7 +83,7 @@ export const forgotPassword = async (email: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error sending password reset email:", error);
+    console.error('Error sending password reset email:', error);
     throw error; // Handle error accordingly
   }
 };

@@ -32,7 +32,7 @@ const SettingsPopover = () => {
         <Button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="flex items-center gap-2 bg-white hover:bg-mountain-100 px-4 py-2 border border-mountain-200 rounded-md text-mountain-950 cursor-pointer"
+          className="hover:bg-mountain-100 border-mountain-200 text-mountain-950 flex cursor-pointer items-center gap-2 rounded-md border bg-white px-4 py-2"
         >
           <Settings2 className="size-4" />
           Settings
@@ -42,14 +42,14 @@ const SettingsPopover = () => {
         align="center"
         sideOffset={8}
         onInteractOutside={() => setOpen(false)}
-        className="space-y-6 shadow-md mt-2 border border-mountain-200 rounded-lg w-72 overflow-x-hidden overflow-y-auto"
+        className="border-mountain-200 mt-2 w-72 space-y-6 overflow-x-hidden overflow-y-auto rounded-lg border shadow-md"
       >
         <Box className="space-y-4">
-          <Typography className="font-bold text-mountain-800 text-sm">
+          <Typography className="text-mountain-800 text-sm font-bold">
             Prompt Settings
           </Typography>
           <Box className="space-y-2">
-            <Typography className="px-1 text-mountain-800 text-sm">
+            <Typography className="text-mountain-800 px-1 text-sm">
               Tone of Voice
             </Typography>
             <Box className="flex flex-wrap gap-2 px-1">
@@ -57,18 +57,18 @@ const SettingsPopover = () => {
                 <Button
                   key={tone}
                   onClick={handleToneChange}
-                  className={`px-2 py-1 rounded-md text-sm border transition
-                  ${selectedTone === tone
-                      ? 'bg-indigo-500 text-white border-indigo-600'
-                      : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
-                    }`}
+                  className={`rounded-md border px-2 py-1 text-sm transition ${
+                    selectedTone === tone
+                      ? 'border-indigo-600 bg-indigo-500 text-white'
+                      : 'border-gray-300 bg-white text-gray-800 hover:bg-gray-100'
+                  }`}
                 >
                   {tone}
                 </Button>
               ))}
               <Button
-                onClick={() => { }}
-                className="flex items-center bg-white hover:bg-gray-100 px-3 py-1 border border-gray-300 rounded-md text-gray-800 text-sm"
+                onClick={() => {}}
+                className="flex items-center rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 hover:bg-gray-100"
               >
                 <BiChevronDown className="mr-1" />
                 <Typography>More</Typography>
@@ -83,7 +83,7 @@ const SettingsPopover = () => {
               <Field
                 name="wordCount"
                 as={Input}
-                className="w-18 h-8"
+                className="h-8 w-18"
                 type="number"
                 min={100}
                 max={500}

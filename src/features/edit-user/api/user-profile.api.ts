@@ -1,5 +1,5 @@
-import api from "@/api/baseApi";
-import { UserProfile } from "@/features/user-profile-public/api/user-profile.api";
+import api from '@/api/baseApi';
+import { UserProfile } from '@/features/user-profile-public/api/user-profile.api';
 
 export interface UpdateUserDTO {
   email?: string;
@@ -11,4 +11,4 @@ export interface UpdateUserDTO {
 }
 
 export const updateUserProfile = (payload: UpdateUserDTO) =>
-  api.patch<UserProfile>("/users/profile", payload);
+  api.patch<UserProfile>('/users/profile', payload);

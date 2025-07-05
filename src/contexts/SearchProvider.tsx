@@ -1,11 +1,11 @@
 import {
   createContext,
-  useState,
   Dispatch,
-  SetStateAction,
   ReactNode,
+  SetStateAction,
   useContext,
-} from "react";
+  useState,
+} from 'react';
 
 // Define the shape of the context
 interface GlobalSearchContextType {
@@ -15,13 +15,13 @@ interface GlobalSearchContextType {
 
 // Create the context with default values
 export const GlobalSearchContext = createContext<GlobalSearchContextType>({
-  query: "",
+  query: '',
   setQuery: () => {},
 });
 
 // Create a provider component
 export const GlobalSearchProvider = ({ children }: { children: ReactNode }) => {
-  const [query, setQuery] = useState<string>("");
+  const [query, setQuery] = useState<string>('');
 
   return (
     <GlobalSearchContext.Provider value={{ query, setQuery }}>

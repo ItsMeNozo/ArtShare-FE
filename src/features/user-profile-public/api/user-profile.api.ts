@@ -1,4 +1,4 @@
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
 
 export interface UserProfile {
   id: string;
@@ -16,15 +16,15 @@ export interface UserProfile {
 export const getUserProfile = async (userId?: string): Promise<UserProfile> => {
   const url = userId
     ? `/users/profile/${encodeURIComponent(userId)}`
-    : "/users/profile";
+    : '/users/profile';
 
-  console.log("url for userProfile: ", url);
+  console.log('url for userProfile: ', url);
 
   try {
     const { data } = await api.get<UserProfile>(url);
     return data;
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    console.error('Error fetching user profile:', error);
     throw error;
   }
 };
@@ -32,17 +32,17 @@ export const getUserProfile = async (userId?: string): Promise<UserProfile> => {
 export const getUserProfileByUsername = async (
   username?: string,
 ): Promise<UserProfile> => {
-  console.log("🔍 getUserProfileByUsername called with username: ", username);
+  console.log('🔍 getUserProfileByUsername called with username: ', username);
 
   const url = `/users/profile/username/${username}`;
 
   try {
     const { data } = await api.get<UserProfile>(url);
-    console.log("✅ getUserProfileByUsername successful for: ", username);
+    console.log('✅ getUserProfileByUsername successful for: ', username);
     return data;
   } catch (error) {
     console.error(
-      "❌ Error fetching user profile by username:",
+      '❌ Error fetching user profile by username:',
       username,
       error,
     );

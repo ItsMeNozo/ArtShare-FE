@@ -1,4 +1,4 @@
-type LayerType = "image" | "text";
+type LayerType = 'image' | 'text';
 
 type BaseLayer = {
   id: string;
@@ -11,7 +11,7 @@ type BaseLayer = {
 };
 
 type ImageLayer = BaseLayer & {
-  type: "image";
+  type: 'image';
   id: string;
   src: string;
   zoom: number;
@@ -33,7 +33,7 @@ type ImageLayer = BaseLayer & {
 };
 
 type TextLayer = BaseLayer & {
-  type: "text";
+  type: 'text';
   text: string;
   fontSize: number;
   color: string;

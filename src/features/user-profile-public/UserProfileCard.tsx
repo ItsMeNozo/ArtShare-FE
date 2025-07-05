@@ -13,6 +13,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { MoreHorizontal } from 'lucide-react';
 import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { BiEdit } from 'react-icons/bi';
+import { HiUserAdd } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { followUser, unfollowUser } from './api/follow.api';
 import { getUserProfileByUsername, UserProfile } from './api/user-profile.api';
@@ -20,8 +22,6 @@ import ProfileHeader from './components/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo';
 import ReportDialog from './components/ReportDialog';
 import { useReportUser } from './hooks/useReportUser';
-import { HiUserAdd } from 'react-icons/hi';
-import { BiEdit } from 'react-icons/bi';
 
 export const UserProfileCard = () => {
   const { username } = useParams();
@@ -220,29 +220,29 @@ export const UserProfileCard = () => {
   const isFollowing = profileData?.isFollowing;
 
   return (
-    <div className="flex justify-between items-end pb-4 w-full h-full">
-      <div className="flex items-end space-x-4 w-full">
+    <div className="flex h-full w-full items-end justify-between pb-4">
+      <div className="flex w-full items-end space-x-4">
         {profileData.profile_picture_url ? (
           <ProfileHeader
-            name={profileData?.full_name ?? ""}
-            username={profileData.username || ""}
+            name={profileData?.full_name ?? ''}
+            username={profileData.username || ''}
             avatarUrl={profileData.profile_picture_url}
             isFollowing={false}
           />
         ) : (
           <Box display="flex" alignItems="center">
             <ProfileHeader
-              name={profileData?.full_name ?? ""}
-              username={profileData?.username ?? ""}
+              name={profileData?.full_name ?? ''}
+              username={profileData?.username ?? ''}
               isFollowing={false}
             />
           </Box>
         )}
-        <div className="flex justify-between items-center w-full">
+        <div className="flex w-full items-center justify-between">
           <ProfileInfo
-            name={profileData?.full_name ?? ""}
-            username={profileData.username ?? ""}
-            bio={profileData.bio || ""}
+            name={profileData?.full_name ?? ''}
+            username={profileData.username ?? ''}
+            bio={profileData.bio || ''}
             followings_count={profileData.followings_count}
             followers_count={profileData.followers_count}
             userId={profileData.id}
@@ -255,22 +255,22 @@ export const UserProfileCard = () => {
                   disabled={isProcessing || unfollowInFlight}
                   variant={
                     isHoveringFollowBtn || unfollowInFlight
-                      ? "contained"
-                      : "outlined"
+                      ? 'contained'
+                      : 'outlined'
                   }
                   color={
                     isHoveringFollowBtn || unfollowInFlight
-                      ? "error"
-                      : "primary"
+                      ? 'error'
+                      : 'primary'
                   }
-                  sx={{ textTransform: "none" }}
+                  sx={{ textTransform: 'none' }}
                   onMouseEnter={() => setIsHoveringFollowBtn(true)}
                   onMouseLeave={() => setIsHoveringFollowBtn(false)}
                   className="flex"
                 >
                   {unfollowInFlight || isHoveringFollowBtn
-                    ? "Unfollow"
-                    : "Following"}
+                    ? 'Unfollow'
+                    : 'Following'}
                 </Button>
               ) : (
                 <Button
@@ -278,7 +278,7 @@ export const UserProfileCard = () => {
                   disabled={isProcessing}
                   variant="contained"
                   color="primary"
-                  sx={{ textTransform: "none" }}
+                  sx={{ textTransform: 'none' }}
                   className="flex w-28"
                 >
                   <HiUserAdd className="mr-2 size-4" />
@@ -290,7 +290,7 @@ export const UserProfileCard = () => {
                 onClick={handleEdit}
                 disabled={isProcessing}
                 variant="contained"
-                sx={{ textTransform: "none" }}
+                sx={{ textTransform: 'none' }}
                 className="flex w-36"
               >
                 <BiEdit className="mr-2 size-4" />
@@ -303,7 +303,7 @@ export const UserProfileCard = () => {
                   aria-label="More options"
                   color="primary"
                   size="medium"
-                  sx={{ borderRadius: "50%", bgcolor: "transparent" }}
+                  sx={{ borderRadius: '50%', bgcolor: 'transparent' }}
                   onClick={handleMenuOpen}
                 >
                   <MoreHorizontal />
@@ -314,8 +314,8 @@ export const UserProfileCard = () => {
               anchorEl={anchorEl}
               open={menuOpen}
               onClose={handleMenuClose}
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               className="m-2"
             >
               <MenuItem onClick={() => setDialogOpen(true)}>

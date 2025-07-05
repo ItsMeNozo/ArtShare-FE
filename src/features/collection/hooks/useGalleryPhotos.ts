@@ -1,7 +1,7 @@
-import { GalleryPhoto } from "@/components/gallery/Gallery";
-import { Post } from "@/types";
-import { getMediaDimensions } from "@/utils/helpers/gallery.helper";
-import { useEffect, useState } from "react";
+import { GalleryPhoto } from '@/components/gallery/Gallery';
+import { Post } from '@/types';
+import { getMediaDimensions } from '@/utils/helpers/gallery.helper';
+import { useEffect, useState } from 'react';
 
 export interface UseGalleryPhotosResult {
   galleryPhotos: GalleryPhoto[];
@@ -43,8 +43,8 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
                 src: imageUrl,
                 width: dimensions.width,
                 height: dimensions.height,
-                title: post.title || "Untitled Post",
-                author: post.user?.username || "Unknown",
+                title: post.title || 'Untitled Post',
+                author: post.user?.username || 'Unknown',
                 postId: post.id,
                 postLength: post.medias?.length ?? 0,
                 is_mature: post.is_mature || false,
@@ -65,8 +65,8 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
         );
         setGalleryPhotos(validPhotos);
       } catch (error) {
-        console.error("Error during post transformation:", error);
-        setProcessingError("Failed to process post images.");
+        console.error('Error during post transformation:', error);
+        setProcessingError('Failed to process post images.');
         setGalleryPhotos([]);
       } finally {
         setIsProcessing(false);

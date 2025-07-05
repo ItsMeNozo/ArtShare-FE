@@ -1,5 +1,5 @@
-import api from "@/api/baseApi";
-import { Post } from "@/types";
+import api from '@/api/baseApi';
+import { Post } from '@/types';
 
 /**
  * GET /posts/user/:username
@@ -20,7 +20,7 @@ export const fetchUserPosts = async (
     );
     return response.data;
   } catch (error) {
-    console.error("fetchPostsByUsername error:", error);
+    console.error('fetchPostsByUsername error:', error);
     throw error;
   }
 };

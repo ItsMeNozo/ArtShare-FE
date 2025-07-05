@@ -1,6 +1,6 @@
-import { Category } from "./category";
-import { MediaDto } from "./media";
-import { User } from "./user";
+import { Category } from './category';
+import { MediaDto } from './media';
+import { User } from './user';
 
 export interface Post {
   id: number;

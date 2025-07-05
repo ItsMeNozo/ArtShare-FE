@@ -1,21 +1,21 @@
 // src/components/FollowListModal.tsx
-import { FC } from "react";
 import {
+  Avatar,
+  CircularProgress,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
-  Avatar,
   ListItemText,
-  IconButton,
-  CircularProgress,
   Typography,
-} from "@mui/material";
-import { X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import BoringAvatar from "boring-avatars";
+} from '@mui/material';
+import BoringAvatar from 'boring-avatars';
+import { X } from 'lucide-react';
+import { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface FollowListModalProps {
   open: boolean;
@@ -54,7 +54,7 @@ const FollowListModal: FC<FollowListModalProps> = ({
           aria-label="close"
           onClick={onClose}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             right: 8,
             top: 8,
           }}
@@ -78,12 +78,12 @@ const FollowListModal: FC<FollowListModalProps> = ({
                 disablePadding
                 onClick={() => handleUserClick(user.username)}
                 sx={{
-                  cursor: "pointer",
+                  cursor: 'pointer',
                   borderRadius: 1,
-                  "&:hover": {
-                    backgroundColor: "action.hover",
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
                   },
-                  transition: "background-color 0.2s ease-in-out",
+                  transition: 'background-color 0.2s ease-in-out',
                   px: 2,
                   py: 1,
                 }}
@@ -91,7 +91,7 @@ const FollowListModal: FC<FollowListModalProps> = ({
                 aria-label={`Navigate to ${user.username}'s profile`}
                 tabIndex={0}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     handleUserClick(user.username);
                   }
@@ -109,11 +109,11 @@ const FollowListModal: FC<FollowListModalProps> = ({
                       name={user.username}
                       variant="beam"
                       colors={[
-                        "#84bfc3",
-                        "#fff5d6",
-                        "#ffb870",
-                        "#d96153",
-                        "#000511",
+                        '#84bfc3',
+                        '#fff5d6',
+                        '#ffb870',
+                        '#d96153',
+                        '#000511',
                       ]}
                     />
                   )}

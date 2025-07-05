@@ -1,4 +1,4 @@
-import { Category } from "./category";
+import { Category } from './category';
 
 export interface Blog {
   categories?: Category[];
@@ -121,7 +121,7 @@ export interface SimpleBlogResponseDto {
   user: {
     id: string;
     username: string;
-    profile_picture_url: string | null | "";
+    profile_picture_url: string | null | '';
     full_name: string;
     followers_count: number;
     is_following: boolean;
@@ -155,7 +155,7 @@ export const mapSimpleBlogResponseToBlog = (
       username: backendBlog.user.username,
       full_name: backendBlog.user.full_name,
       profile_picture_url:
-        backendBlog.user.profile_picture_url === ""
+        backendBlog.user.profile_picture_url === ''
           ? null
           : backendBlog.user.profile_picture_url,
       followers_count: backendBlog.user.followers_count,

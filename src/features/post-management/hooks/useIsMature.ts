@@ -1,10 +1,15 @@
 // src/hooks/useIsMature.ts
+import {
+  detectAdultImages,
+  DetectAdultImagesResponse,
+} from '@/api/detect-adult-images.api';
 import { useState } from 'react';
 import { PostMedia } from '../types/post-media';
-import { detectAdultImages, DetectAdultImagesResponse } from '@/api/detect-adult-images.api';
 
 interface UseIsMatureReturn {
-  checkMaturityForNewItems: (newMediaItems: PostMedia[]) => Promise<PostMedia[]>;
+  checkMaturityForNewItems: (
+    newMediaItems: PostMedia[],
+  ) => Promise<PostMedia[]>;
   isLoading: boolean;
   isError: boolean;
 }
@@ -27,18 +32,21 @@ export default function useIsMature(): UseIsMatureReturn {
       return newMediaItems;
     }
 
-    const filesToDetect: File[] = imageMediasToProcess.map(media => media.file!);
+    const filesToDetect: File[] = imageMediasToProcess.map(
+      (media) => media.file!,
+    );
     let processedImageMedias: PostMedia[] = [...imageMediasToProcess];
 
     try {
-      const detectionResults: DetectAdultImagesResponse[] = await detectAdultImages(filesToDetect);
+      const detectionResults: DetectAdultImagesResponse[] =
+        await detectAdultImages(filesToDetect);
 
       processedImageMedias = imageMediasToProcess.map((mediaItem, index) => ({
         ...mediaItem,
         isMature: detectionResults[index].isAdult,
       }));
     } catch (err) {
-      console.error("Error in detectAdultImages:", err);
+      console.error('Error in detectAdultImages:', err);
       setIsError(true);
       throw err;
     } finally {

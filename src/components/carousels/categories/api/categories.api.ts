@@ -1,7 +1,7 @@
-import api from "@/api/baseApi";
-import { Category } from "@/types";
+import api from '@/api/baseApi';
+import { Category } from '@/types';
 
-const CATEGORIES_API_PATH = "categories";
+const CATEGORIES_API_PATH = 'categories';
 
 export const categoryService = {
   /**

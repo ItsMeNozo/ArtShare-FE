@@ -1,11 +1,11 @@
-import { Area } from "react-easy-crop";
+import { Area } from 'react-easy-crop';
 
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
-    image.setAttribute("crossOrigin", "anonymous"); // needed for CORS
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', (error) => reject(error));
+    image.setAttribute('crossOrigin', 'anonymous'); // needed for CORS
     image.src = url;
   });
 
@@ -14,10 +14,10 @@ export default async function getCroppedImg(
   pixelCrop: Area,
 ): Promise<Blob> {
   const image = await createImage(imageSrc);
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", { alpha: true }); // ✅ enable transparency
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { alpha: true }); // ✅ enable transparency
 
-  if (!ctx) throw new Error("Could not get canvas context");
+  if (!ctx) throw new Error('Could not get canvas context');
 
   canvas.width = pixelCrop.width;
   canvas.height = pixelCrop.height;
@@ -39,7 +39,7 @@ export default async function getCroppedImg(
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((file) => {
       if (file) resolve(file);
-      else reject("Failed to crop image.");
-    }, "image/png"); // ✅ use PNG for transparency
+      else reject('Failed to crop image.');
+    }, 'image/png'); // ✅ use PNG for transparency
   });
 }

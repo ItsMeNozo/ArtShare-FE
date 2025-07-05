@@ -1,4 +1,4 @@
-import { CategoryTypeValues } from "@/constants";
+import { CategoryTypeValues } from '@/constants';
 
 export interface Category {
   id: number;

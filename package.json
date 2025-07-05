@@ -10,7 +10,8 @@
     "cy-open": "cypress open",
     "cy-open-unit": "vite --mode test & cypress open --component --browser chrome",
     "cy-run-unit": "cross-env MODE=test cypress run --component",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write ."
   },
   "prepare": "husky",
   "lint-staged": {

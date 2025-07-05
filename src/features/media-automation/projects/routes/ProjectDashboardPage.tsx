@@ -43,22 +43,22 @@ const ProjectDashboardPage = () => {
   const isPaused = projectDetails.status.toUpperCase() === 'PAUSED';
 
   return (
-    <div className="flex flex-col items-center w-full p-4 space-y-6 text-sm">
-      <div className="relative flex items-end w-full gap-6 pb-4 border-b border-mountain-200">
-        <div className="flex flex-col space-y-1 w-96">
-          <p className="text-sm text-muted-foreground">Automation Project</p>
-          <p className="py-1 pl-2 text-lg font-medium bg-indigo-200 rounded-lg line-clamp-1 h-9">
+    <div className="flex w-full flex-col items-center space-y-6 p-4 text-sm">
+      <div className="border-mountain-200 relative flex w-full items-end gap-6 border-b pb-4">
+        <div className="flex w-96 flex-col space-y-1">
+          <p className="text-muted-foreground text-sm">Automation Project</p>
+          <p className="line-clamp-1 h-9 rounded-lg bg-indigo-200 py-1 pl-2 text-lg font-medium">
             {projectDetails.title}
           </p>
         </div>
-        <div className="flex flex-col space-y-1 w-52">
-          <p className="text-sm text-muted-foreground">Platform</p>
-          <p className="py-1 pl-2 text-lg font-medium border-white rounded-lg line-clamp-1 h-9 border-1 bg-amber-200">
+        <div className="flex w-52 flex-col space-y-1">
+          <p className="text-muted-foreground text-sm">Platform</p>
+          <p className="line-clamp-1 h-9 rounded-lg border-1 border-white bg-amber-200 py-1 pl-2 text-lg font-medium">
             {projectDetails?.platform?.name}
           </p>
         </div>
         <div className="flex flex-col space-y-1">
-          <p className="text-sm text-muted-foreground">Status</p>
+          <p className="text-muted-foreground text-sm">Status</p>
           <div className="border-mountain-200 flex h-9 items-center space-x-4 rounded-lg border-[1px] bg-white px-2 py-1 text-sm">
             <div
               className={`h-2 w-2 rounded-full ${getStatusChipProps(projectDetails.status)}`}
@@ -69,23 +69,23 @@ const ProjectDashboardPage = () => {
             </span>
           </div>
         </div>
-        <div className="flex items-center ml-auto space-x-2">
+        <div className="ml-auto flex items-center space-x-2">
           <Button
-            className="flex px-4 py-2 font-normal bg-white border-mountain-200 border-1"
+            className="border-mountain-200 flex border-1 bg-white px-4 py-2 font-normal"
             onClick={() => navigate(`/auto/projects/${projectId}/edit`)}
           >
             <BiEdit className="mr-2 size-6" />
             <span>Edit Project</span>
           </Button>
           <Button
-            className="flex px-4 py-2 font-normal bg-white border-mountain-200 border-1"
+            className="border-mountain-200 flex border-1 bg-white px-4 py-2 font-normal"
             onClick={handleToggleStatus}
             disabled={isUpdatingStatus}
           >
             {isPaused ? (
-              <PlayIcon className="mr-2 text-green-600 size-6" />
+              <PlayIcon className="mr-2 size-6 text-green-600" />
             ) : (
-              <PauseIcon className="mr-2 text-yellow-600 size-6" />
+              <PauseIcon className="mr-2 size-6 text-yellow-600" />
             )}
             <span>{isPaused ? 'Resume' : 'Pause'}</span>
           </Button>

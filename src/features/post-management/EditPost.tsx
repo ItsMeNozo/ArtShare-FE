@@ -126,7 +126,7 @@ const EditPost: React.FC = () => {
   if (isPostLoading) return <Loading />;
   if (postError || !fetchedPost) {
     return (
-      <Box className="flex justify-center items-center h-full text-red-500">
+      <Box className="flex h-full items-center justify-center text-red-500">
         <p>
           Error loading post:{' '}
           {postError instanceof Error ? postError.message : 'Unknown error'}

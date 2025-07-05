@@ -1,24 +1,23 @@
 // This component is currently not being used in the app. Previously it was used in BlogDetails.tsx
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 //Components
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
   PopperPlacementType,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
+} from '@mui/material';
 
 //Libs
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 //Icons
-import { Share2, X } from "lucide-react";
-import { LuCheck, LuCopy } from "react-icons/lu";
-import { FaLinkedin } from "react-icons/fa";
-import { FaFacebookF } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
+import { Share2, X } from 'lucide-react';
+import { FaFacebookF, FaLinkedin } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import { LuCheck, LuCopy } from 'react-icons/lu';
 
 type ShareDialogProp = {
   tooltipDirection: PopperPlacementType;
@@ -53,7 +52,7 @@ const Share: React.FC<ShareDialogProp> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
     } catch (err) {
-      console.error("Failed to copy: ", err);
+      console.error('Failed to copy: ', err);
     }
   };
 
@@ -61,7 +60,7 @@ const Share: React.FC<ShareDialogProp> = ({
     <>
       <Tooltip title="Share" placement={tooltipDirection} arrow>
         <div onClick={handleOpen} className={cn(className)}>
-          <Share2 className={cn("size-4", iconClassName)} />
+          <Share2 className={cn('size-4', iconClassName)} />
         </div>
       </Tooltip>
       <Dialog
@@ -70,22 +69,22 @@ const Share: React.FC<ShareDialogProp> = ({
         onClose={handleClose}
         disableScrollLock
       >
-        <DialogTitle className="flex justify-between items-center">
+        <DialogTitle className="flex items-center justify-between">
           <p>Share This Blog</p>
           <X className="size-4 hover:cursor-pointer" onClick={handleClose} />
         </DialogTitle>
 
-        <DialogContent className="flex flex-col justify-center items-center space-y-4 w-106">
-          <div className="relative flex justify-end items-center p-1 border-1 rounded-full w-full h-16">
-            <p className="left-4 absolute text-lg line-clamp-1">{link}</p>
-            <div className="right-8 absolute flex bg-white blur-xl w-42 h-full" />
+        <DialogContent className="flex w-106 flex-col items-center justify-center space-y-4">
+          <div className="relative flex h-16 w-full items-center justify-end rounded-full border-1 p-1">
+            <p className="absolute left-4 line-clamp-1 text-lg">{link}</p>
+            <div className="absolute right-8 flex h-full w-42 bg-white blur-xl" />
             <div
               onClick={copied ? undefined : handleCopy}
               className={cn(
-                "z-50 flex justify-center items-center space-x-2 rounded-full w-36 h-full text-mountain-50 font-medium transition-all duration-200",
+                'text-mountain-50 z-50 flex h-full w-36 items-center justify-center space-x-2 rounded-full font-medium transition-all duration-200',
                 copied
-                  ? "bg-mountain-700 hover:cursor-not-allowed"
-                  : "bg-mountain-950 hover:bg-mountain-900 hover:cursor-pointer",
+                  ? 'bg-mountain-700 hover:cursor-not-allowed'
+                  : 'bg-mountain-950 hover:bg-mountain-900 hover:cursor-pointer',
               )}
             >
               {copied ? (
@@ -102,10 +101,10 @@ const Share: React.FC<ShareDialogProp> = ({
             </div>
           </div>
 
-          <hr className="flex border-mountain-200 border-t-1 w-full" />
+          <hr className="border-mountain-200 flex w-full border-t-1" />
           <span className="text-xs">Or use other embedded links</span>
 
-          <div className="flex justify-center space-x-8 w-full">
+          <div className="flex w-full justify-center space-x-8">
             <SocialButton
               icon={<FaLinkedin className="size-5 group-hover:text-white" />}
               label="Linkedin"
@@ -137,10 +136,10 @@ const SocialButton = ({
   label: string;
   color: string;
 }) => (
-  <div className="group flex flex-col justify-center items-center space-y-2 hover:cursor-pointer">
+  <div className="group flex flex-col items-center justify-center space-y-2 hover:cursor-pointer">
     <div
       className={cn(
-        "flex justify-center items-center bg-mountain-100 rounded-full w-12 h-12",
+        'bg-mountain-100 flex h-12 w-12 items-center justify-center rounded-full',
         `group-hover:${color}`,
       )}
     >

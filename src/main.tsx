@@ -1,23 +1,23 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StyledEngineProvider } from "@mui/material/styles";
-import { ThemeProvider } from "@/contexts/ThemeProvider"; // Your custom theme context
-import { AppThemeProvider } from "./contexts/AppThemeProvider.tsx";
-import { FocusProvider } from "./contexts/focus/FocusProvider.tsx";
-import "./index.css";
-import App from "./App.tsx";
-import { SnackbarProvider } from "./contexts/SnackbarProvider.tsx";
-import { persistQueryClient } from "@tanstack/react-query-persist-client";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+import { ThemeProvider } from '@/contexts/ThemeProvider'; // Your custom theme context
+import { StyledEngineProvider } from '@mui/material/styles';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import { AppThemeProvider } from './contexts/AppThemeProvider.tsx';
+import { FocusProvider } from './contexts/focus/FocusProvider.tsx';
+import { SnackbarProvider } from './contexts/SnackbarProvider.tsx';
+import './index.css';
 
-import TimeAgo from "javascript-time-ago";
+import TimeAgo from 'javascript-time-ago';
 
-import en from "javascript-time-ago/locale/en";
-import vi from "javascript-time-ago/locale/vi";
+import en from 'javascript-time-ago/locale/en';
+import vi from 'javascript-time-ago/locale/vi';
 
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 TimeAgo.addDefaultLocale(en);
 TimeAgo.addLocale(vi);
@@ -46,7 +46,7 @@ const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string,
 );
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <StyledEngineProvider injectFirst>
       <QueryClientProvider client={queryClient}>

@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import { Box, Container } from "@mui/material";
-import { AvatarSection } from "./components/AvatarSection";
+import { Box, Container } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import {
   getUserProfile,
   UserProfile,
-} from "../user-profile-public/api/user-profile.api"; // Make sure this path is correct
-import { useQuery } from "@tanstack/react-query";
-import EditProfileForm from "./components/EditProfileForm"; // Already has dark mode considerations
+} from '../user-profile-public/api/user-profile.api'; // Make sure this path is correct
+import { AvatarSection } from './components/AvatarSection';
+import EditProfileForm from './components/EditProfileForm'; // Already has dark mode considerations
 
 export default function EditUser() {
   const { data: profileData, isLoading: loadingProfile } = useQuery<
     UserProfile,
     Error
   >({
-    queryKey: ["userProfile"],
+    queryKey: ['userProfile'],
     queryFn: () => getUserProfile(),
   });
 
@@ -36,7 +36,7 @@ export default function EditUser() {
   }
 
   return (
-    <Container disableGutters className={"px-15 pt-6 h-full  min-h-screen"}>
+    <Container disableGutters className={'h-full min-h-screen px-15 pt-6'}>
       <Box>
         <AvatarSection
           profilePictureUrl={formData.profile_picture_url}

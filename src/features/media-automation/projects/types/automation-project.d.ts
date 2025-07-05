@@ -125,7 +125,13 @@ export interface AutoProjectListItem {
 // "postCount": 0,
 // "nextPostAt": null
 
-export type ProjectStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'CANCELLED' | 'FAILED' | 'DRAFT';
+export type ProjectStatus =
+  | 'ACTIVE'
+  | 'PAUSED'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'FAILED'
+  | 'DRAFT';
 
 export interface AutoProjectDetailsDto {
   id: number;

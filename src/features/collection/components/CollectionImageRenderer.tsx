@@ -53,7 +53,7 @@ export const CollectionImageRenderer = (
 
   return (
     <div
-      className="relative border border-transparent rounded-lg cursor-pointer group hover:border-gray-300"
+      className="group relative cursor-pointer rounded-lg border border-transparent hover:border-gray-300"
       style={{
         height: height,
         width: width,
@@ -90,27 +90,27 @@ export const CollectionImageRenderer = (
       )}
       {/* --- End Delete Button --- */}
 
-      <Link to={`/posts/${photo.postId}`} className="block w-full h-full">
+      <Link to={`/posts/${photo.postId}`} className="block h-full w-full">
         <img
           key={photo.key || photo.src}
           src={photo.src}
           loading="lazy"
-          className="object-cover w-full h-full rounded-lg"
+          className="h-full w-full rounded-lg object-cover"
           style={{ display: 'block' }}
         />
         {/* Overlay */}
-        <div className="absolute inset-0 flex flex-col items-start justify-end p-4 text-white transition-opacity duration-300 rounded-lg opacity-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:opacity-100">
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           {photo.postLength > 1 && (
-            <div className="absolute flex items-center justify-center p-1 rounded-full pointer-events-auto top-2 left-2 bg-black/40">
+            <div className="pointer-events-auto absolute top-2 left-2 flex items-center justify-center rounded-full bg-black/40 p-1">
               <Images size={14} />
             </div>
           )}
-          <div className="flex items-end justify-between w-full gap-2">
+          <div className="flex w-full items-end justify-between gap-2">
             <div title={`${photo.title}\n${photo.author}`}>
-              <span className="text-sm font-semibold line-clamp-1">
+              <span className="line-clamp-1 text-sm font-semibold">
                 {photo.title}
               </span>
-              <span className="text-xs line-clamp-1">{photo.author}</span>
+              <span className="line-clamp-1 text-xs">{photo.author}</span>
             </div>
             <div className="flex flex-col items-end space-y-0.5">
               <div className="flex items-center space-x-1">

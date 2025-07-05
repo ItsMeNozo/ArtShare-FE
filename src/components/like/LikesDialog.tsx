@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
-import Alert from "@mui/material/Alert";
-import IconButton from "@mui/material/IconButton";
-import { FiX as CloseIcon } from "react-icons/fi";
-import Box from "@mui/material/Box";
-import { fetchPostLikingUsers, fetchBlogLikingUsers } from "./api/likes.api";
-import type { LikingUser } from "./types/user";
-import BoringAvatar from "boring-avatars";
-import { useTheme, Theme } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
-import { TargetType } from "@/utils/constants";
+import { TargetType } from '@/utils/constants';
+import { useMediaQuery } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import ListItemText from '@mui/material/ListItemText';
+import { Theme, useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import BoringAvatar from 'boring-avatars';
+import React, { useEffect, useState } from 'react';
+import { FiX as CloseIcon } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { fetchBlogLikingUsers, fetchPostLikingUsers } from './api/likes.api';
+import type { LikingUser } from './types/user';
 
 interface LikesDialogProps {
   contentId?: number;
@@ -43,7 +43,7 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const theme = useTheme<Theme>();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (!open || !contentId) {
@@ -64,7 +64,7 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
       .then(setLikingUsers)
       .catch((err) => {
         console.error(err);
-        setError(err.message || "Failed to load likes.");
+        setError(err.message || 'Failed to load likes.');
       })
       .finally(() => setLoading(false));
   }, [open, contentId, variant]);
@@ -78,16 +78,16 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
       maxWidth={false}
       fullScreen={fullScreen}
       sx={{
-        "& .MuiDialog-paper": {
+        '& .MuiDialog-paper': {
           width: 400,
-          height: "60vh",
-          mx: "auto",
+          height: '60vh',
+          mx: 'auto',
         },
       }}
     >
       <DialogTitle
         id="likes-dialog-title"
-        sx={{ display: "flex", justifyContent: "space-between", pr: 2 }}
+        sx={{ display: 'flex', justifyContent: 'space-between', pr: 2 }}
       >
         Liked by
         <IconButton
@@ -101,7 +101,7 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
 
       <DialogContent dividers sx={{ p: 0 }}>
         {loading && (
-          <Box sx={{ p: 4, textAlign: "center" }}>
+          <Box sx={{ p: 4, textAlign: 'center' }}>
             <CircularProgress />
           </Box>
         )}
@@ -113,7 +113,7 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
         )}
 
         {!loading && !error && likingUsers.length === 0 && (
-          <Typography variant="body2" sx={{ p: 3, textAlign: "center" }}>
+          <Typography variant="body2" sx={{ p: 3, textAlign: 'center' }}>
             No one has liked this yet.
           </Typography>
         )}
@@ -126,19 +126,19 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
                 sx={{
                   px: 2,
                   py: 1,
-                  cursor: "pointer",
+                  cursor: 'pointer',
                   borderRadius: 1,
-                  "&:hover": {
-                    backgroundColor: "action.hover",
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
                   },
-                  transition: "background-color 0.2s ease-in-out",
+                  transition: 'background-color 0.2s ease-in-out',
                 }}
                 role="button"
                 aria-label={`Navigate to ${u.username}'s profile`}
                 onClick={() => navigate(`/${u.username}`)}
                 tabIndex={0}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+                  if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     navigate(`/${u.username}`);
                   }
@@ -153,11 +153,11 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
                       name={u.username}
                       variant="beam"
                       colors={[
-                        "#84bfc3",
-                        "#fff5d6",
-                        "#ffb870",
-                        "#d96153",
-                        "#000511",
+                        '#84bfc3',
+                        '#fff5d6',
+                        '#ffb870',
+                        '#d96153',
+                        '#000511',
                       ]}
                     />
                   )}

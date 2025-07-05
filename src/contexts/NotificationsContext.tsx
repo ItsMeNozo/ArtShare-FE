@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext } from 'react';
 
 export interface Notification<T> {
   id: string;
@@ -52,7 +52,7 @@ export const useNotifications = () => {
   const context = useContext(NotificationsContext);
   if (context === undefined) {
     throw new Error(
-      "useNotifications must be used within a NotificationsProvider",
+      'useNotifications must be used within a NotificationsProvider',
     );
   }
   return context;

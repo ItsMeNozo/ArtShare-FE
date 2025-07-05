@@ -1,8 +1,8 @@
-import { CircularProgress } from "@mui/material";
-import React from "react";
-import { Photo, RenderPhotoContext, RowsPhotoAlbum } from "react-photo-album";
-import "react-photo-album/rows.css";
-import { ImageRenderer } from "./ImageRenderer";
+import { CircularProgress } from '@mui/material';
+import React from 'react';
+import { Photo, RenderPhotoContext, RowsPhotoAlbum } from 'react-photo-album';
+import 'react-photo-album/rows.css';
+import { ImageRenderer } from './ImageRenderer';
 
 export interface GalleryPhoto extends Photo {
   key: string;
@@ -40,7 +40,7 @@ const IGallery: React.FC<IGalleryProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64 space-x-4">
+      <div className="flex h-64 items-center justify-center space-x-4">
         <CircularProgress size={36} />
         <p>Loading...</p>
       </div>
@@ -48,10 +48,10 @@ const IGallery: React.FC<IGalleryProps> = ({
   }
 
   if (isError && !isLoading && photos.length === 0) {
-    console.error("Error loading initial posts:", error);
+    console.error('Error loading initial posts:', error);
 
     return (
-      <div className="p-4 text-center text-mountain-500">
+      <div className="text-mountain-500 p-4 text-center">
         Oops! Something went wrong while loading the gallery. Please try again
         later.
       </div>
@@ -78,15 +78,15 @@ const IGallery: React.FC<IGalleryProps> = ({
         render={{ image: effectiveRenderPhoto }}
       />
       {isFetchingNextPage && (
-        <div className="flex items-center justify-center my-4 space-x-2">
+        <div className="my-4 flex items-center justify-center space-x-2">
           <CircularProgress size={24} />
           <p>Loading more...</p>
         </div>
       )}
       {isError && !isLoading && photos.length > 0 && (
         <>
-          {console.error("Error fetching more posts:", error)}
-          <div className="py-4 text-center text-mountain-500">
+          {console.error('Error fetching more posts:', error)}
+          <div className="text-mountain-500 py-4 text-center">
             Could not load more posts at this time. Please try again later.
           </div>
         </>

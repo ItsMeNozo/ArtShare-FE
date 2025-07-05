@@ -51,11 +51,11 @@ const UploadForm: React.FC<{
   const [thumbnailCropOpen, setThumbnailCropOpen] = useState(false);
 
   return (
-    <Box className="space-y-3 mx-auto w-full dark:text-white text-left">
+    <Box className="mx-auto w-full space-y-3 text-left dark:text-white">
       {/* Artwork Title Box */}
-      <Box className="space-y-2 dark:bg-mountain-900 rounded-md">
-        <Box className="p-3 border-mountain-300 dark:border-mountain-700 border-b">
-          <Typography className="font-semibold dark:text-white text-base text-left">
+      <Box className="dark:bg-mountain-900 space-y-2 rounded-md">
+        <Box className="border-mountain-300 dark:border-mountain-700 border-b p-3">
+          <Typography className="text-left text-base font-semibold dark:text-white">
             Title
           </Typography>
         </Box>
@@ -89,15 +89,15 @@ const UploadForm: React.FC<{
         </FormControl>
       </Box>
       {/* Artwork Description Box */}
-      <Box className="space-y-2 dark:bg-mountain-900 rounded-md">
+      <Box className="dark:bg-mountain-900 space-y-2 rounded-md">
         {/* Heading with bottom border */}
-        <Box className="p-3 border-mountain-300 dark:border-mountain-700 border-b">
-          <Typography className="font-semibold dark:text-white text-base text-left">
+        <Box className="border-mountain-300 dark:border-mountain-700 border-b p-3">
+          <Typography className="text-left text-base font-semibold dark:text-white">
             Details
           </Typography>
         </Box>
         <Box className="space-y-1 px-3 pb-3">
-          <Typography className="dark:text-mountain-200 text-base text-left">
+          <Typography className="dark:text-mountain-200 text-left text-base">
             Description
           </Typography>
           <Field
@@ -119,7 +119,7 @@ const UploadForm: React.FC<{
 
         {/* Content / Mature Checkbox */}
         <Box className="px-3 pb-3">
-          <Typography className="mb-1 dark:text-mountain-200 text-base text-left">
+          <Typography className="dark:text-mountain-200 mb-1 text-left text-base">
             Content
           </Typography>
           <FormControl component="fieldset" className="space-y-2 px-2">
@@ -133,15 +133,15 @@ const UploadForm: React.FC<{
                   setFieldValue('isMature', checked)
                 }
                 className={`${
-                  isMatureAutoDetected ? 'opacity-50 cursor-not-allowed' : ''
+                  isMatureAutoDetected ? 'cursor-not-allowed opacity-50' : ''
                 }`}
               />
               <label
                 htmlFor="mature-content"
                 className={`text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
                   isMatureAutoDetected
-                    ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                    : 'text-black dark:text-white cursor-pointer'
+                    ? 'cursor-not-allowed text-gray-400 dark:text-gray-500'
+                    : 'cursor-pointer text-black dark:text-white'
                 }`}
               >
                 <span
@@ -165,7 +165,7 @@ const UploadForm: React.FC<{
                     href="/mature-content"
                     className={`hover:underline ${
                       isMatureAutoDetected
-                        ? 'text-gray-400 dark:text-gray-500 pointer-events-none'
+                        ? 'pointer-events-none text-gray-400 dark:text-gray-500'
                         : 'text-blue-600 dark:text-blue-400'
                     }`}
                   >
@@ -200,26 +200,26 @@ const UploadForm: React.FC<{
       )}
 
       <Box className="space-y-2 px-3">
-        <Typography className="dark:text-mountain-200 text-base text-left">
+        <Typography className="dark:text-mountain-200 text-left text-base">
           Thumbnail
         </Typography>
         <Typography
           variant="body2"
-          className="mb-1 text-gray-700 dark:text-mountain-400"
+          className="dark:text-mountain-400 mb-1 text-gray-700"
         >
           Set a thumbnail that stands out for your post.
         </Typography>
         <Box
-          className={`flex flex-col justify-center items-center border ${
-            thumbnail ? 'border-none' : 'border-gray-500 border-dashed'
-          } rounded min-h-32 overflow-hidden bg-mountain-200`}
+          className={`flex flex-col items-center justify-center border ${
+            thumbnail ? 'border-none' : 'border-dashed border-gray-500'
+          } bg-mountain-200 min-h-32 overflow-hidden rounded`}
           component="label"
         >
           {thumbnail ? (
             <img src={thumbnail.url} alt="Thumbnail" className="max-h-64" />
           ) : (
             <>
-              <ImageUpIcon className="text-gray-400 text-4xl" />
+              <ImageUpIcon className="text-4xl text-gray-400" />
               <Typography>Upload file</Typography>
             </>
           )}
@@ -241,7 +241,7 @@ const UploadForm: React.FC<{
             <Tooltip title="Crop">
               <IconButton
                 onClick={() => setThumbnailCropOpen(true)}
-                className="border border-gray-300 dark:border-white text-gray-900 dark:text-white"
+                className="border border-gray-300 text-gray-900 dark:border-white dark:text-white"
               >
                 <MdCrop />
               </IconButton>
@@ -250,7 +250,7 @@ const UploadForm: React.FC<{
             <Tooltip title="Replace">
               <IconButton
                 component="label"
-                className="border border-gray-300 dark:border-white text-gray-900 dark:text-white"
+                className="border border-gray-300 text-gray-900 dark:border-white dark:text-white"
               >
                 <MdPhotoCameraBack />
                 <input
@@ -270,16 +270,16 @@ const UploadForm: React.FC<{
         )}
       </Box>
       {/* Categorization Box */}
-      <Box className="space-y-2 dark:bg-mountain-900 rounded-md">
+      <Box className="dark:bg-mountain-900 space-y-2 rounded-md">
         {/* Heading with bottom border */}
-        <Box className="p-3 border-mountain-300 dark:border-mountain-700 border-b">
-          <Typography className="font-semibold dark:text-white text-base text-left">
+        <Box className="border-mountain-300 dark:border-mountain-700 border-b p-3">
+          <Typography className="text-left text-base font-semibold dark:text-white">
             Categorization
           </Typography>
         </Box>
 
         {/* Art type */}
-        <Box className="flex flex-col space-y-1 pb-3 w-full">
+        <Box className="flex w-full flex-col space-y-1 pb-3">
           {/* Dialog for Selection */}
           <Box className="space-y-1 px-3 pb-3">
             {/** TODO: uncomment this */}

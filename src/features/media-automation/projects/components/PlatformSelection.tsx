@@ -13,14 +13,14 @@ import { Typography } from '@mui/material';
 import { ErrorMessage, useFormikContext } from 'formik';
 import { useEffect, useState } from 'react';
 import { FaFacebookSquare, FaInstagram } from 'react-icons/fa';
+import { PiArrowsClockwise } from 'react-icons/pi';
+import { Link } from 'react-router-dom';
+import { useFacebookAccountInfo } from '../../social-links/hooks/useFacebook';
 import { useFetchLinkedPlatforms } from '../hooks/useFetchLinkedPlatforms';
 import { FormPlatform, ProjectFormValues } from '../types';
 import { Platform } from '../types/platform';
-import { PiArrowsClockwise } from 'react-icons/pi';
 import fb_icon from '/fb_icon.svg';
 import ins_icon from '/ins_icon.svg';
-import { Link } from 'react-router-dom';
-import { useFacebookAccountInfo } from '../../social-links/hooks/useFacebook';
 
 const name = 'platform';
 
@@ -140,7 +140,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
 
   useEffect(() => {
     if (
-      !selectedPlatform &&             // Only auto-select if none is selected yet
+      !selectedPlatform && // Only auto-select if none is selected yet
       fetchedPlatforms.length > 0
     ) {
       const firstPlatform = fetchedPlatforms[0];
@@ -165,27 +165,44 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   const facebookProfile =
     fbAccountInfo && fbAccountInfo.length > 0
       ? {
-        name: fbAccountInfo[0].name,
-        profilePicture:
-          fbAccountInfo[0].picture_url || 'https://i.pravatar.cc/150',
-      }
+          name: fbAccountInfo[0].name,
+          profilePicture:
+            fbAccountInfo[0].picture_url || 'https://i.pravatar.cc/150',
+        }
       : null;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="relative flex flex-col justify-start items-center w-xl h-full">
-        <div className="flex justify-center items-center bg-indigo-50 pl-2 rounded-full w-fit">
-          <Typography variant="body1" component="h1" className='mr-2 font-normal'>
-            {isEditMode ? 'Edit' : 'Create'} <span className='font-semibold'>Automation Project</span>
+    <div className="flex h-full flex-col">
+      <div className="relative flex h-full w-xl flex-col items-center justify-start">
+        <div className="flex w-fit items-center justify-center rounded-full bg-indigo-50 pl-2">
+          <Typography
+            variant="body1"
+            component="h1"
+            className="mr-2 font-normal"
+          >
+            {isEditMode ? 'Edit' : 'Create'}{' '}
+            <span className="font-semibold">Automation Project</span>
           </Typography>
-          <Select disabled={isEditMode} onValueChange={handlePlatformTypeChange} value={selectedPlatform?.name || platformTypeToFetch || ''}>
-            <SelectTrigger className="bg-white rounded-full w-42 data-[size=default]:h-10 font-medium text-lg cursor-pointer">
+          <Select
+            disabled={isEditMode}
+            onValueChange={handlePlatformTypeChange}
+            value={selectedPlatform?.name || platformTypeToFetch || ''}
+          >
+            <SelectTrigger className="w-42 cursor-pointer rounded-full bg-white text-lg font-medium data-[size=default]:h-10">
               <SelectValue placeholder="Choose Platform" />
             </SelectTrigger>
             <SelectContent className="border-mountain-100 w-full">
               {allAvailablePlatformTypes.map((type) => (
-                <SelectItem key={type} value={type} className='text-lg'>
-                  {type === 'FACEBOOK' ? <img src={fb_icon} alt="Facebook" className="inline-block w-6 h-6" /> : type === 'INSTAGRAM' ? <img src={ins_icon} className="inline-block w-6 h-6" /> : null}
+                <SelectItem key={type} value={type} className="text-lg">
+                  {type === 'FACEBOOK' ? (
+                    <img
+                      src={fb_icon}
+                      alt="Facebook"
+                      className="inline-block h-6 w-6"
+                    />
+                  ) : type === 'INSTAGRAM' ? (
+                    <img src={ins_icon} className="inline-block h-6 w-6" />
+                  ) : null}
                   {type.charAt(0) + type.slice(1).toLowerCase()}
                 </SelectItem>
               ))}
@@ -195,20 +212,20 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
             {(errorMsg) => <InlineErrorMessage errorMsg={errorMsg} />}
           </ErrorMessage>
         </div>
-        <div className='flex flex-col justify-center items-center space-y-2 w-full h-full'>
-          <div className='flex justify-center w-full'>
-            {isLoading &&
-              <div className="group relative flex flex-col justify-center items-center p-4 w-xl h-42 text-center cursor-not-allowed">
+        <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+          <div className="flex w-full justify-center">
+            {isLoading && (
+              <div className="group relative flex h-42 w-xl cursor-not-allowed flex-col items-center justify-center p-4 text-center">
                 <p>Loading platforms...</p>
               </div>
-            }
+            )}
             {!isLoading && error && platformTypeToFetch === 'INSTAGRAM' && (
-              <div className="group relative flex flex-col justify-center items-center bg-gray-100 opacity-80 p-4 border border-mountain-200 rounded-3xl w-xl h-42 text-center cursor-not-allowed">
-                <FaInstagram className="mb-2 w-10 h-10 text-gray-500" />
-                <p className="font-semibold text-gray-700 text-sm">
+              <div className="group border-mountain-200 relative flex h-42 w-xl cursor-not-allowed flex-col items-center justify-center rounded-3xl border bg-gray-100 p-4 text-center opacity-80">
+                <FaInstagram className="mb-2 h-10 w-10 text-gray-500" />
+                <p className="text-sm font-semibold text-gray-700">
                   Instagram integration is coming soon!
                 </p>
-                <p className="text-gray-500 text-xs">
+                <p className="text-xs text-gray-500">
                   Please select another platform to continue.
                 </p>
               </div>
@@ -216,35 +233,42 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
             {!isLoading && !error && platformTypeToFetch === 'FACEBOOK' && (
               <>
                 {fetchedPlatforms.length > 0 ? (
-                  <div className="flex flex-col justify-center items-center space-y-2 w-full h-42">
-                    <div className='flex flex-col items-center space-y-1'>
-                      <div className='flex flex-col items-center space-y-2'>
-                        <img src={facebookProfile?.profilePicture} className='rounded-full size-20' />
-                        <span className='font-medium text-sm'>{facebookProfile?.name}</span>
+                  <div className="flex h-42 w-full flex-col items-center justify-center space-y-2">
+                    <div className="flex flex-col items-center space-y-1">
+                      <div className="flex flex-col items-center space-y-2">
+                        <img
+                          src={facebookProfile?.profilePicture}
+                          className="size-20 rounded-full"
+                        />
+                        <span className="text-sm font-medium">
+                          {facebookProfile?.name}
+                        </span>
                       </div>
                     </div>
                     {selectedPlatform && (
-                      <div className='relative flex justify-between items-center bg-white px-2 rounded-full w-full h-12 text-sm'>
-                        <div className='bg-gray-200 p-2 px-4 rounded-full select-none'>
+                      <div className="relative flex h-12 w-full items-center justify-between rounded-full bg-white px-2 text-sm">
+                        <div className="rounded-full bg-gray-200 p-2 px-4 select-none">
                           <p>Target Page</p>
                         </div>
                         <button
                           type="button"
                           key={selectedPlatform.id}
-                          className={`absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center space-x-4 h-12 w-fit transition`}
-                          onClick={() => handlePlatformSelected(selectedPlatform)}
+                          className={`absolute top-1/2 left-1/2 flex h-12 w-fit -translate-x-1/2 -translate-y-1/2 items-center space-x-4 transition`}
+                          onClick={() =>
+                            handlePlatformSelected(selectedPlatform)
+                          }
                         >
-                          <div className='flex items-center space-x-2'>
+                          <div className="flex items-center space-x-2">
                             {selectedPlatform.name === 'FACEBOOK' && (
-                              <FaFacebookSquare className="rounded-full size-4 text-blue-700 shrink-0" />
+                              <FaFacebookSquare className="size-4 shrink-0 rounded-full text-blue-700" />
                             )}
-                            <span className="w-24 text-left line-clamp-1">
+                            <span className="line-clamp-1 w-24 text-left">
                               {selectedPlatform.config.page_name}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2">
                             <div
-                              className={`w-2 h-2 rounded-full ${isTokenExpired(selectedPlatform.token_expires_at) ? 'bg-red-500' : 'bg-green-500'}`}
+                              className={`h-2 w-2 rounded-full ${isTokenExpired(selectedPlatform.token_expires_at) ? 'bg-red-500' : 'bg-green-500'}`}
                             />
                             <span className="text-xs capitalize">
                               {isTokenExpired(selectedPlatform.token_expires_at)
@@ -253,22 +277,26 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
                             </span>
                           </div>
                         </button>
-                        <button disabled={isEditMode} type='button' className='flex items-center space-x-1 hover:bg-gray-200 disabled:hover:bg-white disabled:opacity-50 p-2 rounded-full cursor-pointer disabled:cursor-not-allowed'>
-                          <p className='text-sm'>Change page</p>
-                          <PiArrowsClockwise className='inline-block size-4' />
+                        <button
+                          disabled={isEditMode}
+                          type="button"
+                          className="flex cursor-pointer items-center space-x-1 rounded-full p-2 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+                        >
+                          <p className="text-sm">Change page</p>
+                          <PiArrowsClockwise className="inline-block size-4" />
                         </button>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center space-y-2 bg-mountain-50/80 p-6 border-2 border-gray-300 border-dashed rounded-lg text-center">
+                  <div className="bg-mountain-50/80 flex flex-col items-center space-y-2 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
                     <p className="font-medium">No Facebook Pages Found</p>
-                    <p className="text-gray-600 text-xs">
+                    <p className="text-xs text-gray-600">
                       You haven't connected any Facebook pages yet.
                     </p>
                     <Link
                       to="/auto/social-links"
-                      className="bg-blue-600 hover:bg-blue-700 mt-2 px-5 py-2.5 rounded-lg font-medium text-white text-sm"
+                      className="mt-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
                     >
                       Go to Link Social
                     </Link>
@@ -284,7 +312,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 export default PlatformSelection;

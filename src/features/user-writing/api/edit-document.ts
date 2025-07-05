@@ -1,5 +1,5 @@
-import api from "@/api/baseApi";
-import { Blog } from "@/types/blog";
+import api from '@/api/baseApi';
+import { Blog } from '@/types/blog';
 
 /**
  * Update an existing blog post.

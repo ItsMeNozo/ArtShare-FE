@@ -1,6 +1,6 @@
-import api from "@/api/baseApi";
-import { Collection } from "@/types";
-import { DialogCollection } from "../components/SavePostDialog";
+import api from '@/api/baseApi';
+import { Collection } from '@/types';
+import { DialogCollection } from '../components/SavePostDialog';
 
 export const fetchCollectionsForDialog = async (): Promise<
   DialogCollection[]
@@ -8,7 +8,7 @@ export const fetchCollectionsForDialog = async (): Promise<
   try {
     // Adjust the endpoint as needed
     const response = await api.get<Collection[]>(
-      "/collections?includePosts=true",
+      '/collections?includePosts=true',
     ); // Ensure backend includes posts
 
     // Map the raw API response to the DialogCollection structure
@@ -23,7 +23,7 @@ export const fetchCollectionsForDialog = async (): Promise<
 
     return dialogCollections;
   } catch (error) {
-    console.error("Failed to fetch collections for dialog:", error);
-    throw error || new Error("Could not load collections.");
+    console.error('Failed to fetch collections for dialog:', error);
+    throw error || new Error('Could not load collections.');
   }
 };

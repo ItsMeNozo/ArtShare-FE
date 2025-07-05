@@ -1,11 +1,11 @@
-import { formatCount } from "@/utils/common";
-import { Images } from "lucide-react";
-import { AiOutlineLike } from "react-icons/ai";
-import { BiCommentDetail } from "react-icons/bi";
-import { HiOutlineEye } from "react-icons/hi";
-import { RenderPhotoContext } from "react-photo-album";
-import { Link } from "react-router-dom";
-import { GalleryPhoto } from "./Gallery";
+import { formatCount } from '@/utils/common';
+import { Images } from 'lucide-react';
+import { AiOutlineLike } from 'react-icons/ai';
+import { BiCommentDetail } from 'react-icons/bi';
+import { HiOutlineEye } from 'react-icons/hi';
+import { RenderPhotoContext } from 'react-photo-album';
+import { Link } from 'react-router-dom';
+import { GalleryPhoto } from './Gallery';
 
 export const ImageRenderer = (
   _: unknown,
@@ -14,22 +14,22 @@ export const ImageRenderer = (
   const { photo, height, width, index } = context;
 
   const imageClassName = `w-full h-full object-cover rounded-lg ${
-    photo.is_mature ? "filter blur-md" : ""
+    photo.is_mature ? 'filter blur-md' : ''
   }`;
 
   return (
     <div
-      className="relative overflow-hidden rounded-lg cursor-pointer group"
+      className="group relative cursor-pointer overflow-hidden rounded-lg"
       style={{
         height: height,
         width: width,
       }}
     >
-      <Link to={`/posts/${photo.postId}`} className="block w-full h-full">
+      <Link to={`/posts/${photo.postId}`} className="block h-full w-full">
         <img
           src={photo.src}
           srcSet={
-            Array.isArray(photo.srcSet) ? photo.srcSet.join(", ") : photo.srcSet
+            Array.isArray(photo.srcSet) ? photo.srcSet.join(', ') : photo.srcSet
           }
           alt={photo.alt || `Image ${index}`}
           className={imageClassName}
@@ -37,18 +37,18 @@ export const ImageRenderer = (
 
         {/* Mature Content Warning Overlay */}
         {photo.is_mature && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-white rounded-lg pointer-events-none bg-black/60">
-            <p className="text-sm font-light text-center uppercase">
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/60 p-4 text-white">
+            <p className="text-center text-sm font-light uppercase">
               Mature Content
             </p>
           </div>
         )}
 
         {/* Info Overlay (visible on hover) */}
-        <div className="absolute inset-0 z-10 flex flex-col items-start justify-end p-4 text-white transition-opacity duration-300 rounded-lg opacity-0 bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:opacity-100">
+        <div className="absolute inset-0 z-10 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           {photo.postLength > 1 && (
-            <div className="absolute flex items-center justify-center gap-2 top-2 left-2">
-              <div className="bg-black/40 p-1.5 rounded-full">
+            <div className="absolute top-2 left-2 flex items-center justify-center gap-2">
+              <div className="rounded-full bg-black/40 p-1.5">
                 <Images size={14} />
               </div>
 
@@ -56,18 +56,18 @@ export const ImageRenderer = (
                 <img
                   src="/logo_app_v_101.png"
                   alt="AI Generated"
-                  className="w-6 h-6 border rounded-full border-mountain-700"
+                  className="border-mountain-700 h-6 w-6 rounded-full border"
                 />
               )}
             </div>
           )}
 
-          <div className="flex items-end justify-between w-full gap-2">
+          <div className="flex w-full items-end justify-between gap-2">
             <div title={`${photo.title}\n${photo.author}`}>
-              <span className="text-sm font-semibold line-clamp-1">
+              <span className="line-clamp-1 text-sm font-semibold">
                 {photo.title}
               </span>
-              <span className="text-xs line-clamp-1">{photo.author}</span>
+              <span className="line-clamp-1 text-xs">{photo.author}</span>
             </div>
             <div className="flex flex-col items-end space-y-0.5">
               <div className="flex items-center space-x-1">

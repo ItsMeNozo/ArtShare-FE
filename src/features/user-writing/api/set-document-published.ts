@@ -1,4 +1,4 @@
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
 
 export const updateBlogPublishStatus = async (
   blogId: number,

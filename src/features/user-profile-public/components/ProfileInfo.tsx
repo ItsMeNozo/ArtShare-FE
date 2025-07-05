@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import ProfileStats from "./ProfileStats";
+import type { FC } from 'react';
+import ProfileStats from './ProfileStats';
 
 interface ProfileInfoProps {
   name: string;
@@ -19,9 +19,14 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   userId,
 }) => {
   return (
-    <div className="flex flex-col justify-end pb-4 h-full">
-      <h1 className="font-bold text-mountain-950 dark:text-white text-xl">{name} <span className="font-normal text-mountain-400 text-sm">@{username}</span></h1>
-      <p className="text-mountain-800 dark:text-white text-sm">{bio}</p>
+    <div className="flex h-full flex-col justify-end pb-4">
+      <h1 className="text-mountain-950 text-xl font-bold dark:text-white">
+        {name}{' '}
+        <span className="text-mountain-400 text-sm font-normal">
+          @{username}
+        </span>
+      </h1>
+      <p className="text-mountain-800 text-sm dark:text-white">{bio}</p>
       <ProfileStats
         following={followings_count || 0}
         followers={followers_count || 0}

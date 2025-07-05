@@ -1,52 +1,60 @@
-
 //Components
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Button } from '@mui/material'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Button } from '@mui/material';
 
 //Icons
-import { IoIosArrowForward } from 'react-icons/io'
-import { lightingOptions } from "../../enum"
-import { GoLightBulb } from "react-icons/go"
+import { GoLightBulb } from 'react-icons/go';
+import { IoIosArrowForward } from 'react-icons/io';
+import { lightingOptions } from '../../enum';
 
-const LightingOptions: React.FC<SelectLightingProp> = ({ selectedLighting, onChange }) => {
-    return (
-        <Popover>
-            <PopoverTrigger asChild>
-                <Button className='flex justify-between bg-mountain-100 p-3 rounded-xl w-full font-normal'>
-                    <div className='flex items-center space-x-2'>
-                        <GoLightBulb className='rounded-xs w-5 h-5' />
-                        <p>{selectedLighting.label}</p>
-                    </div>
-                    <IoIosArrowForward />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className='-top-13 left-40 absolute flex flex-col shadow-xl p-0 border-mountain-300'>
-                <div className="p-2 border-mountain-300 border-b">
-                    <p>Lighting Image</p>
+const LightingOptions: React.FC<SelectLightingProp> = ({
+  selectedLighting,
+  onChange,
+}) => {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button className="bg-mountain-100 flex w-full justify-between rounded-xl p-3 font-normal">
+          <div className="flex items-center space-x-2">
+            <GoLightBulb className="h-5 w-5 rounded-xs" />
+            <p>{selectedLighting.label}</p>
+          </div>
+          <IoIosArrowForward />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="border-mountain-300 absolute -top-13 left-40 flex flex-col p-0 shadow-xl">
+        <div className="border-mountain-300 border-b p-2">
+          <p>Lighting Image</p>
+        </div>
+        <div className="custom-scrollbar flex h-48 flex-col justify-between space-y-2 overflow-y-auto px-6 py-4">
+          {lightingOptions.map((option) => {
+            return (
+              <div
+                key={option.value}
+                className={`cursor-pointer} flex w-full flex-col items-center justify-center space-y-2`}
+                onClick={() => onChange(option)}
+              >
+                <div
+                  className={`bg-mountain-100 flex h-14 w-full items-center justify-center rounded-lg ${selectedLighting.value === option.value ? 'rounded-lg ring-2 ring-indigo-400' : ''}`}
+                >
+                  <img
+                    src={option.exampleUrl}
+                    loading="lazy"
+                    className="text-mountain-600 size-5 h-full w-full rounded-lg object-cover"
+                  />
                 </div>
-                <div className="flex flex-col justify-between space-y-2 px-6 py-4 h-48 overflow-y-auto custom-scrollbar">
-                    {lightingOptions.map((option) => {
-                        return (
-                            <div
-                                key={option.value}
-                                className={`flex flex-col justify-center w-full space-y-2 items-center cursor-pointer}`}
-                                onClick={() => onChange(option)}
-                            >
-                                <div className={`flex justify-center items-center w-full bg-mountain-100 rounded-lg h-14 ${selectedLighting.value === option.value ? 'ring-2 ring-indigo-400 rounded-lg' : ''}`}>
-                                    <img src={option.exampleUrl} loading="lazy" className="rounded-lg w-full h-full size-5 object-cover text-mountain-600" />
-                                </div>
-                                <p className="text-mountain-800 text-xs">{option.label}</p>
-                            </div>
-                        )
-                    })}
-                </div>
-            </PopoverContent>
-        </Popover>
-    )
-}
+                <p className="text-mountain-800 text-xs">{option.label}</p>
+              </div>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export default LightingOptions;

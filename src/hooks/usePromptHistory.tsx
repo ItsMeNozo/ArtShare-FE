@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
-import api from "@/api/baseApi";
-import { HistoryFilter } from "@/features/gen-art/enum";
-import { useInfiniteTopScroll } from "./useInfiniteTopScroll";
+import api from '@/api/baseApi';
+import { HistoryFilter } from '@/features/gen-art/enum';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteTopScroll } from './useInfiniteTopScroll';
 
 const PAGE_SIZE = 5;
 
@@ -38,7 +38,7 @@ export const usePromptHistory = () => {
   // Fetch history on mount
   useEffect(() => {
     api
-      .get("/art-generation/prompt-history")
+      .get('/art-generation/prompt-history')
       .then((res) => setPromptResultList(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));

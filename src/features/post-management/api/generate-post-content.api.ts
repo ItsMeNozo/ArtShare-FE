@@ -1,4 +1,4 @@
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
 
 export interface GeneratePostContentResponse {
   title: string;
@@ -10,15 +10,19 @@ export const generatePostContent = async (
   formData: FormData,
 ): Promise<GeneratePostContentResponse> => {
   try {
-    const response = await api.post<GeneratePostContentResponse>("/posts/generate-metadata", formData, {
+    const response = await api.post<GeneratePostContentResponse>(
+      '/posts/generate-metadata',
+      formData,
+      {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
-      });
+      },
+    );
 
     return response.data;
   } catch (error) {
-    console.error("Error generating post content:", error);
+    console.error('Error generating post content:', error);
     throw error;
   }
-}
+};

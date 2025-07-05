@@ -2,8 +2,8 @@
 // or its contents (mapper, DTO, unique functions) could be moved elsewhere.
 // For now, this is the cleaned version of the file you provided.
 
-import api from "@/api/baseApi";
-import { Blog } from "@/types/blog"; // Assuming BlogUser and BlogCategory are part of your main Blog type or defined in @/types/blog
+import api from '@/api/baseApi';
+import { Blog } from '@/types/blog'; // Assuming BlogUser and BlogCategory are part of your main Blog type or defined in @/types/blog
 
 // --- Functions that were NOT duplicates and might still be needed ---
 
@@ -26,11 +26,11 @@ export const createNewBlog = async (
   try {
     // If backend returns a specific DTO for creation, type it here, e.g., api.post<BackendBlogDetailsDto>
     // and then map it. For simplicity, assuming it returns a Blog-compatible structure.
-    const response = await api.post<Blog>("/blogs", blogData); // Or BackendBlogDetailsDto then map
+    const response = await api.post<Blog>('/blogs', blogData); // Or BackendBlogDetailsDto then map
     // If mapping is needed: return mapBackendDetailsToFrontendBlog(response.data);
     return response.data;
   } catch (error) {
-    console.error("Error creating blog:", error);
+    console.error('Error creating blog:', error);
     throw error;
   }
 };
@@ -67,13 +67,11 @@ export const updateExistingBlog = async (
   }
 };
 
-export const deleteBlog = async (
-  blogId: string | number,
-): Promise<void> => {
+export const deleteBlog = async (blogId: string | number): Promise<void> => {
   try {
     await api.delete(`/blogs/${blogId}`);
   } catch (error) {
     console.error(`Error deleting blog with ID ${blogId}:`, error);
     throw error;
   }
-}
+};

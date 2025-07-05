@@ -1,7 +1,7 @@
-import React from "react";
-import { Box, Typography, IconButton, Menu, MenuItem } from "@mui/material";
-import { ImageUpIcon } from "lucide-react";
-import { MdMoreVert } from "react-icons/md";
+import { Box, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { ImageUpIcon } from 'lucide-react';
+import React from 'react';
+import { MdMoreVert } from 'react-icons/md';
 
 interface ThumbnailCardProps {
   thumbnail?: string;
@@ -32,15 +32,15 @@ const ThumbnailCard: React.FC<ThumbnailCardProps> = ({
       sx={{
         width: 90, // width (e.g., 90px)
         height: 160, // height (e.g., 160px) → 9:16 aspect ratio
-        border: "1px dashed gray",
+        border: '1px dashed gray',
         borderRadius: 1,
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#1e1e1e",
-        cursor: "pointer",
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1e1e1e',
+        cursor: 'pointer',
       }}
     >
       {thumbnail ? (
@@ -48,18 +48,18 @@ const ThumbnailCard: React.FC<ThumbnailCardProps> = ({
           <img
             src={thumbnail}
             alt="Thumbnail"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           <IconButton
             size="small"
             onClick={handleMenuClick}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               top: 4,
               right: 4,
-              backgroundColor: "rgba(0,0,0,0.5)",
-              color: "#fff",
-              "&:hover": { backgroundColor: "rgba(0,0,0,0.8)" },
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              color: '#fff',
+              '&:hover': { backgroundColor: 'rgba(0,0,0,0.8)' },
             }}
           >
             <MdMoreVert size={18} />

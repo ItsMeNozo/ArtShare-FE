@@ -1,4 +1,4 @@
-import { User } from "./user";
+import { User } from './user';
 
 /**Supported resources a comment can belong to (extend as you add more). */
 

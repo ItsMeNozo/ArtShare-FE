@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 interface PostMediaProps {
   mediaUrl: string;
-  mediaType: "image" | "video";
+  mediaType: 'image' | 'video';
   altText?: string;
 }
 
@@ -13,10 +13,10 @@ const PostMedia: React.FC<PostMediaProps> = ({
 }) => {
   return (
     <div className="post-media">
-      {mediaType === "image" ? (
+      {mediaType === 'image' ? (
         <img
           src={mediaUrl}
-          alt={altText || "Post media"}
+          alt={altText || 'Post media'}
           className="post-media__image"
         />
       ) : (

@@ -1,15 +1,15 @@
 import {
   Categories,
   DataPopper,
-} from "@/components/carousels/categories/Categories";
-import { CategoryTypeValues } from "@/constants";
-import { useCategories } from "@/hooks/useCategories";
-import { Category } from "@/types";
-import { Button } from "@mui/material";
-import { UseQueryResult } from "@tanstack/react-query";
-import { Ellipsis, LoaderPinwheel } from "lucide-react";
-import { useMemo, useState } from "react";
-import { BsFilter } from "react-icons/bs";
+} from '@/components/carousels/categories/Categories';
+import { CategoryTypeValues } from '@/constants';
+import { useCategories } from '@/hooks/useCategories';
+import { Category } from '@/types';
+import { Button } from '@mui/material';
+import { UseQueryResult } from '@tanstack/react-query';
+import { Ellipsis, LoaderPinwheel } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { BsFilter } from 'react-icons/bs';
 
 interface FilterBarProps {
   selectedCategories: string | null;
@@ -72,9 +72,9 @@ const FilterBar = ({
   const isAllChannelsSelected = selectedCategories === null;
 
   return (
-    <div className="flex items-center w-full gap-6 overflow-x-hidden categories-bar">
+    <div className="categories-bar flex w-full items-center gap-6 overflow-x-hidden">
       <Button
-        className="flex flex-shrink-0 gap-2 dark:bg-mountain-900 shadow-none p-2 rounded-lg min-w-auto aspect-[1/1] font-normal dark:text-mountain-50 normal-case all-channels-btn"
+        className="dark:bg-mountain-900 dark:text-mountain-50 all-channels-btn flex aspect-[1/1] min-w-auto flex-shrink-0 gap-2 rounded-lg p-2 font-normal normal-case shadow-none"
         variant="contained"
         disableElevation
         onClick={handleToggleCP}
@@ -99,20 +99,20 @@ const FilterBar = ({
       />
 
       <Button
-        className={`all-channels-btn flex gap-2 flex-shrink-0 rounded-lg p-2 ${
+        className={`all-channels-btn flex flex-shrink-0 gap-2 rounded-lg p-2 ${
           isAllChannelsSelected
-            ? " dark:bg-mountain-800"
-            : "dark:bg-mountain-900"
-        }  dark:text-mountain-200 normal-case font-normal shadow-none`}
-        variant={isAllChannelsSelected ? "contained" : "outlined"}
+            ? 'dark:bg-mountain-800'
+            : 'dark:bg-mountain-900'
+        } dark:text-mountain-200 font-normal normal-case shadow-none`}
+        variant={isAllChannelsSelected ? 'contained' : 'outlined'}
         onClick={handleAllChannelsClick}
         disableElevation={isAllChannelsSelected}
       >
         <div
-          className={`p-2 rounded aspect-[1/1] ${
+          className={`aspect-[1/1] rounded p-2 ${
             isAllChannelsSelected
-              ? "text-indigo-400 bg-mountain-50 dark:bg-mountain-700 dark:text-primary-400"
-              : "text-mountain-900 bg-mountain-200 dark:bg-mountain-800 dark:text-mountain-300"
+              ? 'bg-mountain-50 dark:bg-mountain-700 dark:text-primary-400 text-indigo-400'
+              : 'text-mountain-900 bg-mountain-200 dark:bg-mountain-800 dark:text-mountain-300'
           } `}
         >
           <LoaderPinwheel size={16} />
@@ -129,7 +129,7 @@ const FilterBar = ({
         />
       </div>
       <Button
-        className="flex-shrink-0 dark:bg-mountain-900 p-2 rounded-lg min-w-auto aspect-[1/1] dark:text-mountain-50 spread-btn"
+        className="dark:bg-mountain-900 dark:text-mountain-50 spread-btn aspect-[1/1] min-w-auto flex-shrink-0 rounded-lg p-2"
         variant="contained"
         disableElevation
         onClick={handleTogglePP}

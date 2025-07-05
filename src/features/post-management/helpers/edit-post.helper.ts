@@ -1,4 +1,4 @@
-import { PostMedia } from "../types/post-media";
+import { PostMedia } from '../types/post-media';
 
 export const getImageUrlsToRetain = (imageMedias: PostMedia[]): string[] => {
   return imageMedias
@@ -51,25 +51,25 @@ export const createFormDataForEdit = ({
   aiCreated,
 }: EditFormDataParams) => {
   const formData = new FormData();
-  formData.append("title", title);
-  if (description !== undefined) formData.append("description", description);
+  formData.append('title', title);
+  if (description !== undefined) formData.append('description', description);
   // TODO: uncomment this
-  formData.append("cate_ids", JSON.stringify(cate_ids));
-  formData.append("video_url", videoUrl ?? "");
+  formData.append('cate_ids', JSON.stringify(cate_ids));
+  formData.append('video_url', videoUrl ?? '');
 
-  if (thumbnailUrl) formData.append("thumbnail_url", thumbnailUrl);
+  if (thumbnailUrl) formData.append('thumbnail_url', thumbnailUrl);
   newImageFiles
     .filter((file) => file.size > 0) // ⛔️ exclude dummy
-    .forEach((file) => formData.append("images", file));
+    .forEach((file) => formData.append('images', file));
 
   if (imageUrlsToRetain.length > 0) {
-    formData.append("existing_image_urls", JSON.stringify(imageUrlsToRetain));
+    formData.append('existing_image_urls', JSON.stringify(imageUrlsToRetain));
   }
 
-  formData.append("is_mature", String(isMature));
-  formData.append("ai_created", String(aiCreated));
+  formData.append('is_mature', String(isMature));
+  formData.append('ai_created', String(aiCreated));
   formData.append(
-    "thumbnail_crop_meta",
+    'thumbnail_crop_meta',
     JSON.stringify({
       ...JSON.parse(thumbnailCropMeta),
       initialThumbnail: initialThumbnail,

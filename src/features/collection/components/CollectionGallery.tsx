@@ -1,11 +1,11 @@
-import IGallery, { GalleryPhoto } from "@/components/gallery/Gallery";
-import React from "react";
-import { RenderPhotoContext } from "react-photo-album";
-import { SelectedCollectionId } from "../types/collection";
+import IGallery, { GalleryPhoto } from '@/components/gallery/Gallery';
+import React from 'react';
+import { RenderPhotoContext } from 'react-photo-album';
+import { SelectedCollectionId } from '../types/collection';
 import {
   CollectionImageRenderer,
   CollectionImageRendererOptions,
-} from "./CollectionImageRenderer";
+} from './CollectionImageRenderer';
 
 interface CollectionGalleryProps {
   photos: GalleryPhoto[];

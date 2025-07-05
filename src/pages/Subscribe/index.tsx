@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
-import { Container, Paper, Typography } from "@mui/material";
+import { Container, Paper, Typography } from '@mui/material';
+import React, { useEffect } from 'react';
 
-const STRIPE_PRICING_TABLE_ID = "prctbl_1RJp0uQfqPbYQ9hYL22Wk88G";
-const STRIPE_PUBLISHABLE_KEY = "pk_test_51RIgmyQfqPbYQ9hYK5N4u4o6zElDPwRMQv2NkcsPtFvCF8cPuzkbiJokvTcoxHaaImQzFpLaovmYgtUKs34lZZdK0095mM8Ykr";
+const STRIPE_PRICING_TABLE_ID = 'prctbl_1RJp0uQfqPbYQ9hYL22Wk88G';
+const STRIPE_PUBLISHABLE_KEY =
+  'pk_test_51RIgmyQfqPbYQ9hYK5N4u4o6zElDPwRMQv2NkcsPtFvCF8cPuzkbiJokvTcoxHaaImQzFpLaovmYgtUKs34lZZdK0095mM8Ykr';
 
 const SubscribePage: React.FC = () => {
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://js.stripe.com/v3/pricing-table.js";
+    const script = document.createElement('script');
+    script.src = 'https://js.stripe.com/v3/pricing-table.js';
     script.async = true;
     document.body.appendChild(script);
 

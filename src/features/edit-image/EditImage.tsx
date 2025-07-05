@@ -1,27 +1,26 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
 //Libs
 
 //Components
-import Panels from "./components/panels/Panels";
+import Panels from './components/panels/Panels';
 
 //Icons
-import { IoCrop } from "react-icons/io5";
-import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
-import { RiText } from "react-icons/ri";
-import { IoShapesOutline } from "react-icons/io5";
-import { PiDiamondsFourLight } from "react-icons/pi";
-import { HiDotsHorizontal } from "react-icons/hi";
-import { MdFlipToFront } from "react-icons/md";
-import { IoIosColorFilter } from "react-icons/io";
-import Moveable from "react-moveable";
-import LayerToolsBar from "./components/tools/LayerToolsBar";
+import { HiDotsHorizontal } from 'react-icons/hi';
+import { HiOutlineAdjustmentsHorizontal } from 'react-icons/hi2';
+import { IoIosColorFilter } from 'react-icons/io';
+import { IoCrop, IoShapesOutline } from 'react-icons/io5';
+import { MdFlipToFront } from 'react-icons/md';
+import { PiDiamondsFourLight } from 'react-icons/pi';
+import { RiText } from 'react-icons/ri';
+import Moveable from 'react-moveable';
+import LayerToolsBar from './components/tools/LayerToolsBar';
 
 const EditImage: React.FC = () => {
   //Images
   const [zoomLevel, setZoomLevel] = useState(1);
   const [activePanel, setActivePanel] = useState<
-    "arrange" | "crop" | "adjust" | "filter" | "text" | null
+    'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null
   >(null);
   const [rotation, setRotation] = useState(0);
   const [opacity, setOpacity] = useState(1);
@@ -44,9 +43,9 @@ const EditImage: React.FC = () => {
 
   const [layers, setLayers] = useState<Layer[]>([
     {
-      type: "image",
+      type: 'image',
       id: crypto.randomUUID(),
-      src: "",
+      src: '',
       zoom: zoomLevel,
       opacity: opacity,
       flipH: flipHorizontal,
@@ -59,7 +58,7 @@ const EditImage: React.FC = () => {
       saturation: saturation,
       hue: hue,
       sepia: sepia,
-      backgroundColor: "#ffffff",
+      backgroundColor: '#ffffff',
     },
   ]);
 
@@ -67,7 +66,7 @@ const EditImage: React.FC = () => {
 
   useEffect(() => {
     const imageLayer = layers.find(
-      (l): l is ImageLayer => l.type === "image" && !!l.src,
+      (l): l is ImageLayer => l.type === 'image' && !!l.src,
     );
     if (!imageLayer) return;
 
@@ -194,7 +193,7 @@ const EditImage: React.FC = () => {
         setLayers((prevLayers) =>
           prevLayers.map((layer) => {
             if (layer.id !== selectedLayerId) return layer;
-            if (layer.type !== "image") return layer;
+            if (layer.type !== 'image') return layer;
             const newZoom =
               e.deltaY < 0
                 ? Math.min(layer.zoom + 0.1, 3)
@@ -205,9 +204,9 @@ const EditImage: React.FC = () => {
         );
       }
     };
-    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
-      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener('wheel', handleWheel);
     };
   }, [selectedLayerId]);
 
@@ -218,13 +217,13 @@ const EditImage: React.FC = () => {
     canvas.width = canvasSize.width;
     canvas.height = canvasSize.height;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     layers.forEach((layer) => {
-      if (layer.type === "image") {
+      if (layer.type === 'image') {
         const img = new Image();
         img.src = layer.src;
 
@@ -252,14 +251,14 @@ const EditImage: React.FC = () => {
           );
           ctx.restore();
         };
-      } else if (layer.type === "text") {
+      } else if (layer.type === 'text') {
         ctx.save();
         ctx.translate(layer.x, layer.y);
         ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
         ctx.font = `${layer.fontSize}px sans-serif`;
         ctx.fillStyle = layer.color;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.fillText(layer.text, 0, 0);
         ctx.restore();
       }
@@ -273,9 +272,9 @@ const EditImage: React.FC = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const link = document.createElement("a");
-      link.download = "edited-image.png";
-      link.href = canvas.toDataURL("image/png");
+      const link = document.createElement('a');
+      link.download = 'edited-image.png';
+      link.href = canvas.toDataURL('image/png');
       link.click();
     }, 300); // ensure all images finish drawing
   };
@@ -285,10 +284,10 @@ const EditImage: React.FC = () => {
   const addText = () => {
     const newTextLayer: TextLayer = {
       id: crypto.randomUUID(),
-      type: "text",
-      text: "Your Text",
+      type: 'text',
+      text: 'Your Text',
       fontSize: 24,
-      color: "#000000",
+      color: '#000000',
       x: 100,
       y: 100,
       rotation: 0,
@@ -300,7 +299,7 @@ const EditImage: React.FC = () => {
   const handleChangeFontSize = (newFontSize: number) => {
     setLayers((prevLayers) =>
       prevLayers.map((layer) =>
-        layer.id === selectedLayerId && layer.type === "text"
+        layer.id === selectedLayerId && layer.type === 'text'
           ? { ...layer, fontSize: newFontSize }
           : layer,
       ),
@@ -310,7 +309,7 @@ const EditImage: React.FC = () => {
   const handleChangeFontFamily = (font: string) => {
     if (!selectedLayerId) return;
     const updatedLayers = layers.map((layer) =>
-      layer.id === selectedLayerId && layer.type === "text"
+      layer.id === selectedLayerId && layer.type === 'text'
         ? { ...layer, fontFamily: font }
         : layer,
     );
@@ -320,7 +319,7 @@ const EditImage: React.FC = () => {
   const handleChangeTextColor = (newColor: string) => {
     if (!selectedLayerId) return;
     const updatedLayers = layers.map((layer) =>
-      layer.id === selectedLayerId && layer.type === "text"
+      layer.id === selectedLayerId && layer.type === 'text'
         ? { ...layer, color: newColor }
         : layer,
     );
@@ -328,8 +327,8 @@ const EditImage: React.FC = () => {
   };
 
   return (
-    <div className="flex p-4 w-full h-[calc(100vh-4rem)] overflow-hidden">
-      <div className="flex space-y-4 bg-mountain-100 border border-mountain-200 rounded-lg w-full h-full overflow-y-hidden">
+    <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden p-4">
+      <div className="bg-mountain-100 border-mountain-200 flex h-full w-full space-y-4 overflow-y-hidden rounded-lg border">
         <LayerToolsBar
           layers={layers}
           zoomLevel={zoomLevel}
@@ -340,26 +339,26 @@ const EditImage: React.FC = () => {
           handleZoomOut={handleZoomOut}
           handleDownload={handleDownload}
         />
-        <div className="relative flex justify-center items-center bg-mountain-200 w-full h-full">
+        <div className="bg-mountain-200 relative flex h-full w-full items-center justify-center">
           <div
             ref={imageContainerRef}
-            className="relative mx-auto w-[540px] h-[540px] overflow-hidden"
+            className="relative mx-auto h-[540px] w-[540px] overflow-hidden"
             style={{
               transform: `scale(${zoomLevel})`,
               backgroundColor:
-                layers[0].type === "image"
+                layers[0].type === 'image'
                   ? layers[0].backgroundColor
-                  : "#ffffff",
+                  : '#ffffff',
             }}
           >
             <div
               style={{
-                position: "relative",
+                position: 'relative',
                 width: `${canvasSize.width}px`,
                 height: `${canvasSize.height}px`,
-                overflow: "hidden",
-                transformOrigin: "top left",
-                border: "1px solid #ccc",
+                overflow: 'hidden',
+                transformOrigin: 'top left',
+                border: '1px solid #ccc',
               }}
             >
               {layers.slice(1).map((layer) => (
@@ -375,25 +374,25 @@ const EditImage: React.FC = () => {
                       translate(${layer.x}px, ${layer.y}px)
                       rotate(${layer.rotation}deg)
                       `,
-                      transformOrigin: "center",
-                      position: "absolute",
+                      transformOrigin: 'center',
+                      position: 'absolute',
                       zIndex: layer.id,
-                      background: "transparent",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      pointerEvents: "auto",
+                      background: 'transparent',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      pointerEvents: 'auto',
                     }}
                     onMouseDown={() => setSelectedLayerId(layer.id)}
                   >
-                    {layer.type === "image" ? (
+                    {layer.type === 'image' ? (
                       <img
                         src={layer.src}
                         alt=""
                         style={{
-                          width: "100%",
-                          height: "100%",
-                          pointerEvents: "none",
+                          width: '100%',
+                          height: '100%',
+                          pointerEvents: 'none',
                           filter: `
                             saturate(${layer.saturation}%)
                             hue-rotate(${layer.hue}deg)
@@ -412,15 +411,15 @@ const EditImage: React.FC = () => {
                     ) : (
                       <div
                         style={{
-                          width: "100%",
-                          height: "100%",
+                          width: '100%',
+                          height: '100%',
                           fontSize: layer.fontSize,
                           color: layer.color,
-                          fontWeight: layer.fontWeight || "normal",
-                          fontFamily: layer.fontFamily || "sans-serif",
-                          textAlign: "center",
-                          whiteSpace: "pre-wrap",
-                          userSelect: "none",
+                          fontWeight: layer.fontWeight || 'normal',
+                          fontFamily: layer.fontFamily || 'sans-serif',
+                          textAlign: 'center',
+                          whiteSpace: 'pre-wrap',
+                          userSelect: 'none',
                           transform: `
                             scaleX(${layer.flipH ? -1 : 1})
                             scaleY(${layer.flipV ? -1 : 1})
@@ -441,7 +440,7 @@ const EditImage: React.FC = () => {
                       rotatable
                       rotationPosition="top"
                       throttleResize={1}
-                      renderDirections={["nw", "ne", "sw", "se"]}
+                      renderDirections={['nw', 'ne', 'sw', 'se']}
                       keepRatio={false}
                       onDrag={({ beforeTranslate }) => {
                         setLayers((prev) =>
@@ -517,62 +516,62 @@ const EditImage: React.FC = () => {
           handleChangeTextColor={handleChangeTextColor}
         />
         {/* Tools Bar */}
-        <div className="z-50 relative flex flex-col flex-none justify-between space-y-2 bg-white border border-mountain-200 rounded-lg rounded-l-none w-20 h-full">
+        <div className="border-mountain-200 relative z-50 flex h-full w-20 flex-none flex-col justify-between space-y-2 rounded-lg rounded-l-none border bg-white">
           <div
             onClick={() =>
-              setActivePanel((prev) => (prev === "arrange" ? null : "arrange"))
+              setActivePanel((prev) => (prev === 'arrange' ? null : 'arrange'))
             }
-            className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
           >
-            <MdFlipToFront className="size-6 text-mountain-600" />
+            <MdFlipToFront className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Arrange</p>
           </div>
           <div
             onClick={() =>
-              setActivePanel((prev) => (prev === "crop" ? null : "crop"))
+              setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
             }
-            className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
           >
-            <IoCrop className="size-6 text-mountain-600" />
+            <IoCrop className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Crop</p>
           </div>
           <div
             onClick={() =>
-              setActivePanel((prev) => (prev === "adjust" ? null : "adjust"))
+              setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
             }
-            className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
           >
-            <HiOutlineAdjustmentsHorizontal className="size-6 text-mountain-600" />
+            <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Adjust</p>
           </div>
           <div
             onClick={() =>
-              setActivePanel((prev) => (prev === "filter" ? null : "filter"))
+              setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
             }
-            className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
           >
-            <IoIosColorFilter className="size-6 text-mountain-600" />
+            <IoIosColorFilter className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Filter</p>
           </div>
           <div
             onClick={() =>
-              setActivePanel((prev) => (prev === "text" ? null : "text"))
+              setActivePanel((prev) => (prev === 'text' ? null : 'text'))
             }
-            className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
           >
-            <RiText className="size-6 text-mountain-600" />
+            <RiText className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Text</p>
           </div>
-          <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
-            <IoShapesOutline className="size-6 text-mountain-600" />
+          <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
+            <IoShapesOutline className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Shape</p>
           </div>
-          <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
-            <PiDiamondsFourLight className="size-6 text-mountain-600" />
+          <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
+            <PiDiamondsFourLight className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">Element</p>
           </div>
-          <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
-            <HiDotsHorizontal className="size-6 text-mountain-600" />
+          <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
+            <HiDotsHorizontal className="text-mountain-600 size-6" />
             <p className="text-mountain-600 text-xs">More</p>
           </div>
         </div>
