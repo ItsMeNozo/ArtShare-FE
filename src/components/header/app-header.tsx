@@ -19,20 +19,22 @@ function findMatchedRoute(pathname: string) {
 
 function buildBreadcrumbTrail(
   route: HeaderRoute | null,
-  params: Record<string, string>
+  params: Record<string, string>,
+  currentUsername?: string
 ): { path: string; label: string }[] {
   const trail = [];
   while (route) {
     let label = route.label;
-
-    // Replace :params in label if needed
     if (route.path.includes(':username') && params.username) {
-      label = params.username;
+      if (params.username === currentUsername) {
+        label = "My Profile";
+      } else {
+        label = `${params.username}'s Profile`;
+      }
     }
-
     trail.unshift({ path: route.path, label });
     if (route.parent) {
-      const parentRoute = routesForHeaders.find((r) => r.path === route!.parent);
+      const parentRoute = routesForHeaders.find((r) => r.path === route?.parent);
       route = parentRoute ?? null;
     } else {
       route = null;
@@ -41,28 +43,28 @@ function buildBreadcrumbTrail(
   return trail;
 }
 
-
-function useBreadcrumbs() {
+function useBreadcrumbs(currentUsername?: string) {
   const location = useLocation();
-  const params = useParams(); // 👈 get dynamic URL segments
+  const params = useParams();
   const matchedRoute = findMatchedRoute(location.pathname);
   if (!matchedRoute) return [];
-  // Convert params to Record<string, string> by replacing undefined with ''
+
   const safeParams: Record<string, string> = Object.fromEntries(
     Object.entries(params).map(([k, v]) => [k, v ?? ''])
   );
-  return buildBreadcrumbTrail(matchedRoute, safeParams);
+
+  return buildBreadcrumbTrail(matchedRoute, safeParams, currentUsername);
 }
 
 const Header: React.FC = () => {
   const { user, loading } = useUser();
+  const breadcrumbs = useBreadcrumbs(user?.username);
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const { setQuery } = useSearch();
   const navigate = useNavigate();
 
-  const breadcrumbs = useBreadcrumbs();
   const hasBack = breadcrumbs.length > 1;
 
   return (
