@@ -53,7 +53,7 @@ const WriteBlog = () => {
           await updateExistingBlog(parseInt(blogId, 10), {
             content,
             title: blogTitle,
-            is_published: false, // Keep as draft
+            isPublished: false, // Keep as draft
           });
           setHasUnsavedChanges(false); // Reset after successful save
           console.log('Auto-saved successfully');
@@ -115,7 +115,7 @@ const WriteBlog = () => {
     fetchBlogDetails(numericBlogId)
       .then((fetchedBlog: Blog) => {
         setBlogTitle(fetchedBlog.title || 'Untitled Document');
-        setIsPublished(fetchedBlog.is_published || false);
+        setIsPublished(fetchedBlog.isPublished || false);
         const contentToSet = fetchedBlog.content || '';
         setInitialFetchedContent(contentToSet);
 
@@ -196,7 +196,7 @@ const WriteBlog = () => {
           await updateExistingBlog(parseInt(blogId, 10), {
             content,
             title: blogTitle,
-            is_published: false,
+            isPublished: false,
           });
           setHasUnsavedChanges(false);
           setSaveStatus('saved');
@@ -251,7 +251,7 @@ const WriteBlog = () => {
 
     const payload: UpdateBlogPayload = {
       title: titleToSave,
-      is_published: true,
+      isPublished: true,
       pictures: images.map((img) => img.src),
       content,
     };

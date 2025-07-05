@@ -3,17 +3,17 @@ export type AutoPostStatus = 'draft' | 'scheduled' | 'posted' | 'canceled';
 export type AutoPost = {
   id: number;
   content: string;
-  image_urls: string[];
-  scheduled_at: Date;
+  imageUrls: string[];
+  scheduledAt: Date;
   status: AutoPostStatus;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export interface EditAutoPostFormValues {
   content: string;
   images: ImageState[];
-  scheduled_at: Date;
+  scheduledAt: Date;
 }
 
 export interface GenAutoPostFormValues {
@@ -35,5 +35,5 @@ export interface ImageState {
 export interface AutoPostFormValues {
   content: string;
   images: ImageState[];
-  scheduled_at: Date | null;
+  scheduledAt: Date | null;
 }

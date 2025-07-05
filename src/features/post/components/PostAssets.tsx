@@ -22,7 +22,7 @@ const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
             className="flex max-h-full w-full justify-center pt-4 hover:cursor-zoom-in md:px-4"
           >
             <PhotoView src={media.url}>
-              {media.media_type === 'image' ? (
+              {media.mediaType === 'image' ? (
                 <img
                   src={media.url}
                   alt={media.description || 'Post asset'}

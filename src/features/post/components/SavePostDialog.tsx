@@ -37,7 +37,7 @@ export interface SavePostDialogProps {
 export interface DialogCollection {
   id: number;
   name: string;
-  thumbnail_url?: string;
+  thumbnailUrl?: string;
   postIds: number[];
 }
 
@@ -319,10 +319,10 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                       }}
                     >
                       {/* Thumbnail Placeholder */}
-                      {collection.thumbnail_url ? (
+                      {collection.thumbnailUrl ? (
                         <Box
                           component="img"
-                          src={`${collection.thumbnail_url}`}
+                          src={`${collection.thumbnailUrl}`}
                           sx={{
                             width: 56,
                             height: 56,

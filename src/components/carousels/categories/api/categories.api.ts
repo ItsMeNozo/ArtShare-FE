@@ -17,7 +17,7 @@ export const categoryService = {
     try {
       const params = {
         page,
-        page_size: pageSize,
+        pageSize,
       };
 
       const response = await api.get<Category[]>(`/${CATEGORIES_API_PATH}`, {

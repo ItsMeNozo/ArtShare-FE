@@ -25,7 +25,7 @@ const Login = () => {
   // Navigate when user state changes after successful login
   useEffect(() => {
     if (user && !loading) {
-      if (!user.is_onboard) {
+      if (!user.isOnboard) {
         navigate('/onboarding');
       } else {
         navigate('/explore');

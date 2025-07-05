@@ -41,7 +41,7 @@ export function AvatarSection({
       return fileUrl;
     },
     onSuccess: async (fileUrl) => {
-      await updateUserProfile({ profile_picture_url: fileUrl });
+      await updateUserProfile({ profilePictureUrl: fileUrl });
       setPreview(fileUrl);
       onUploadSuccess(fileUrl);
       showSnackbar('Avatar updated', 'success');

@@ -24,8 +24,8 @@ export const getCategories = async (
     // Parse dates from string to Date objects
     return response.data.map((cat) => ({
       ...cat,
-      created_at: new Date(cat.created_at as string),
-      updated_at: cat.updated_at ? new Date(cat.updated_at as string) : null,
+      createdAt: new Date(cat.createdAt as string),
+      updatedAt: cat.updatedAt ? new Date(cat.updatedAt as string) : null,
     }));
   } catch (error) {
     console.error('Error in getCategories API call:', error);

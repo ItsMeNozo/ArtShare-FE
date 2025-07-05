@@ -1,6 +1,6 @@
 import Loading from '@/components/loading/Loading';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
-import { getStatusChipProps } from '@/features/media-automation/projects/utils';
+import { getStatusChipProps } from '@/features/media-automation/auto-posts/utils';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import {
   Button,
@@ -150,7 +150,7 @@ const AutoPostsTable = () => {
                       <p className="line-clamp-1 w-96">{row.content}</p>
                     </TableCell>
                     <TableCell align="right">
-                      {row.image_urls?.length || 0}
+                      {row.imageUrls?.length || 0}
                     </TableCell>
                     <TableCell align="right">
                       <span className="flex items-center justify-end gap-2 text-sm">
@@ -161,12 +161,12 @@ const AutoPostsTable = () => {
                       </span>
                     </TableCell>
                     <TableCell align="right">
-                      {row.scheduled_at
-                        ? new Date(row.scheduled_at).toLocaleDateString()
+                      {row.scheduledAt
+                        ? new Date(row.scheduledAt).toLocaleDateString()
                         : 'N/A'}
                     </TableCell>
                     <TableCell align="right">
-                      {new Date(row.created_at).toLocaleDateString()}
+                      {new Date(row.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell align="right" className="space-x-2">
                       <Tooltip title="Edit">

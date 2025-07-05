@@ -4,11 +4,11 @@ export interface UserProfile {
   id: string;
   username?: string;
   email?: string;
-  full_name?: string;
-  profile_picture_url: string | null;
+  fullName?: string;
+  profilePictureUrl: string | null;
   bio?: string | null;
-  followings_count: number;
-  followers_count: number;
+  followingsCount: number;
+  followersCount: number;
   isFollowing: boolean;
   birthday: string | null;
 }

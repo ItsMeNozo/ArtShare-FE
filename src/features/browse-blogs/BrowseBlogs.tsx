@@ -148,14 +148,14 @@ const BrowseBlogs: React.FC = () => {
                   thumbnail={b.pictures?.[0] ?? 'https://placehold.co/600x400'}
                   author={{
                     username: b.user.username,
-                    avatar: b.user.profile_picture_url ?? '',
+                    avatar: b.user.profilePictureUrl ?? '',
                   }}
                   category={b.categories?.[0]?.name ?? ''}
                   timeReading={`${Math.ceil((b.content?.split(/\s+/).length ?? 0) / 200)}m reading`}
-                  dateCreated={b.created_at}
-                  like_count={b.like_count}
-                  comment_count={b.comment_count}
-                  view_count={b.view_count}
+                  dateCreated={b.createdAt}
+                  likeCount={b.likeCount}
+                  commentCount={b.commentCount}
+                  viewCount={b.viewCount}
                 />
               ))}
               {!hasNextPage && allBlogs.length > 0 && (

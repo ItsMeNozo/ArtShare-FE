@@ -55,8 +55,8 @@ export function ProfileForm({
         <Typography>Full Name</Typography>
         <TextField
           fullWidth
-          name="full_name"
-          value={formData.full_name || ''}
+          name="fullName"
+          value={formData.fullName || ''}
           onChange={handleChange}
           disabled={isSubmitting}
           variant="outlined"

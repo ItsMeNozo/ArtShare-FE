@@ -18,7 +18,7 @@ interface Props {
   originalThumbnailUrl: string;
   open: boolean;
   onClose: () => void;
-  onCropped: (croppedFile: Blob, thumbnail_crop_meta: ThumbnailMeta) => void;
+  onCropped: (croppedFile: Blob, thumbnailCropMeta: ThumbnailMeta) => void;
   thumbnailMeta: ThumbnailMeta;
 }
 
@@ -62,14 +62,14 @@ const ImageCropperModal: React.FC<Props> = ({
         originalThumbnailUrl,
         croppedAreaPixels,
       );
-      const thumbnail_crop_meta = {
+      const thumbnailCropMeta = {
         crop,
         zoom,
         aspect,
         croppedAreaPixels,
         selectedAspect,
       };
-      onCropped(cropped, thumbnail_crop_meta);
+      onCropped(cropped, thumbnailCropMeta);
       onClose();
     }
   };

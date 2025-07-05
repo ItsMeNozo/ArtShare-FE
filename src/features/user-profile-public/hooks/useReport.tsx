@@ -22,11 +22,11 @@ export function useReport() {
     }: ReportVariables) => {
       const url = window.location.href;
       const dto: CreateReportDto = {
-        target_id: targetId,
-        target_type: targetType,
+        targetId,
+        targetType,
         reason,
-        target_url: url,
-        target_title: targetTitle,
+        targetUrl: url,
+        targetTitle,
       };
       return submitReport(dto);
     },

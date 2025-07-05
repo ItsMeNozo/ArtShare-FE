@@ -17,13 +17,13 @@ import type { Subject as SubjectType } from './SubjectSelector';
 import SubjectSelector from './SubjectSelector';
 
 interface SubjectPickerProps {
-  cate_ids: number[];
-  setCateIds: (ids: number[]) => void;
+  categoryIds: number[];
+  setCategoryIds: (ids: number[]) => void;
 }
 
 export default function SubjectPicker({
-  cate_ids,
-  setCateIds,
+  categoryIds,
+  setCategoryIds,
 }: SubjectPickerProps) {
   const theme = useTheme(); // 🟢 useTheme hook
 
@@ -54,7 +54,7 @@ export default function SubjectPicker({
       id: cat.id,
       name: cat.name,
       description: cat.description,
-      examples: cat.example_images,
+      examples: cat.exampleImages,
     }));
 
     setAllSubjectsForDisplay(subjects);
@@ -62,18 +62,18 @@ export default function SubjectPicker({
 
   const selectedSubjectObjects = useMemo(
     () =>
-      allSubjectsForDisplay.filter((subject) => cate_ids.includes(subject.id)),
-    [cate_ids, allSubjectsForDisplay],
+      allSubjectsForDisplay.filter((subject) => categoryIds.includes(subject.id)),
+    [categoryIds, allSubjectsForDisplay],
   );
 
   const handleClickAway = () => setOpen(false);
   const handleMainInputFocus = () => setOpen(true);
-  const handleCateIdsChange = (ids: number[]) => setCateIds(ids);
+  const handleCateIdsChange = (ids: number[]) => setCategoryIds(ids);
   const toggleSubjectInPicker = (subject: SubjectType) => {
-    const idsSet = new Set(cate_ids);
+    const idsSet = new Set(categoryIds);
     if (idsSet.has(subject.id)) idsSet.delete(subject.id);
     else if (idsSet.size < 3) idsSet.add(subject.id);
-    setCateIds(Array.from(idsSet));
+    setCategoryIds(Array.from(idsSet));
   };
 
   return (
@@ -149,7 +149,7 @@ export default function SubjectPicker({
             disabled={selectedSubjectObjects.length >= 3 && !search}
             onFocus={handleMainInputFocus}
             slotProps={{
-              input: { readOnly: cate_ids.length >= 3, disableUnderline: true },
+              input: { readOnly: categoryIds.length >= 3, disableUnderline: true },
             }}
             sx={{
               flexGrow: 1,
@@ -179,8 +179,8 @@ export default function SubjectPicker({
               sx={{ borderRadius: 2, overflow: 'hidden', width: '100%' }}
             >
               <SubjectSelector
-                cate_ids={cate_ids}
-                setCateIds={handleCateIdsChange}
+                categoryIds={categoryIds}
+                setCategoryIds={handleCateIdsChange}
                 currentSearchTerm={search}
                 allSubjects={allSubjectsForDisplay}
               />

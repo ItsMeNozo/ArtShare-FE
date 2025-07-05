@@ -10,7 +10,7 @@ import { Blog } from '@/types/blog'; // Assuming BlogUser and BlogCategory are p
 export interface CreateBlogPayload {
   title: string;
   content: string;
-  is_published?: boolean;
+  isPublished?: boolean;
   // Add other fields your backend expects for creation, e.g., category_ids, tags
 }
 
@@ -38,9 +38,9 @@ export const createNewBlog = async (
 export interface UpdateBlogPayload {
   title?: string;
   content?: string;
-  is_published?: boolean;
+  isPublished?: boolean;
   slug?: string;
-  cover_image_url?: string;
+  coverImageUrl?: string;
   pictures?: string[];
   // Add other updatable fields
 }

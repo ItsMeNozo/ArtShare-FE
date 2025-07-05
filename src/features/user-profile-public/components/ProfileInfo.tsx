@@ -5,8 +5,8 @@ interface ProfileInfoProps {
   name: string;
   username: string;
   bio: string;
-  followings_count: number;
-  followers_count: number;
+  followingsCount: number;
+  followersCount: number;
   userId: string;
 }
 
@@ -14,8 +14,8 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
   name,
   username,
   bio,
-  followings_count,
-  followers_count,
+  followingsCount,
+  followersCount,
   userId,
 }) => {
   return (
@@ -28,8 +28,8 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
       </h1>
       <p className="text-mountain-800 text-sm dark:text-white">{bio}</p>
       <ProfileStats
-        following={followings_count || 0}
-        followers={followers_count || 0}
+        following={followingsCount || 0}
+        followers={followersCount || 0}
         userId={userId}
       />
     </div>

@@ -117,7 +117,7 @@ const GenImage: React.FC<GenImageProps> = ({
         <div className="group relative flex h-full">
           <div className="relative flex">
             <img
-              src={result.image_urls[index]}
+              src={result.imageUrls[index]}
               alt={`Image ${result.id}`}
               loading="lazy"
               className="relative flex h-full cursor-pointer object-cover shadow-md"

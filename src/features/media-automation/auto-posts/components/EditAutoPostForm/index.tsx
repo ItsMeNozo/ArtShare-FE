@@ -27,7 +27,7 @@ const EditAutoPostForm = () => {
   const { data: postToEdit, isLoading } = useGetAutoPostDetails(postId);
   const initialValues = useMemo((): AutoPostFormValues => {
     if (postToEdit) {
-      const initialImages: ImageState[] = postToEdit.image_urls.map((url) => ({
+      const initialImages: ImageState[] = postToEdit.imageUrls.map((url) => ({
         id: url,
         status: 'existing',
         url: url,
@@ -36,10 +36,10 @@ const EditAutoPostForm = () => {
       return {
         content: postToEdit.content,
         images: initialImages,
-        scheduled_at: postToEdit.scheduled_at,
+        scheduledAt: postToEdit.scheduledAt,
       };
     }
-    return { content: '', images: [], scheduled_at: new Date() };
+    return { content: '', images: [], scheduledAt: new Date() };
   }, [postToEdit]);
 
   const { mutate: editPost } = useEditAutoPost();
@@ -188,10 +188,10 @@ const EditAutoPostForm = () => {
                   <span className="mr-2">📅</span> Post Scheduling
                 </Typography>
                 <PostScheduleEditor
-                  value={values.scheduled_at}
-                  onChange={(date) => setFieldValue('scheduled_at', date)}
+                  value={values.scheduledAt}
+                  onChange={(date) => setFieldValue('scheduledAt', date)}
                 />
-                <ErrorMessage name="scheduled_at">
+                <ErrorMessage name="scheduledAt">
                   {(msg) => <InlineErrorMessage errorMsg={msg} />}
                 </ErrorMessage>
               </Box>
@@ -241,5 +241,5 @@ const AutoPostSchema = Yup.object().shape({
       MAX_IMAGE_COUNT,
       `You can upload a maximum of ${MAX_IMAGE_COUNT} images.`,
     ),
-  scheduled_at: Yup.date().optional().nullable(),
+  scheduledAt: Yup.date().optional().nullable(),
 });

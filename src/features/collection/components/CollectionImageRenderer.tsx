@@ -115,19 +115,19 @@ export const CollectionImageRenderer = (
             <div className="flex flex-col items-end space-y-0.5">
               <div className="flex items-center space-x-1">
                 <p className="text-xs font-medium">
-                  {formatCount(photo.like_count)}
+                  {formatCount(photo.likeCount)}
                 </p>
                 <AiOutlineLike className="size-3.5" />
               </div>
               <div className="flex items-center space-x-1">
                 <p className="text-xs font-medium">
-                  {formatCount(photo.comment_count)}
+                  {formatCount(photo.commentCount)}
                 </p>
                 <BiCommentDetail className="size-3.5 text-white" />
               </div>
               <div className="flex items-center space-x-1">
                 <p className="text-xs font-medium">
-                  {formatCount(photo.view_count)}
+                  {formatCount(photo.viewCount)}
                 </p>
                 <HiOutlineEye className="size-3.5" />
               </div>

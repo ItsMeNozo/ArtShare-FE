@@ -2,7 +2,7 @@ import api from '@/api/baseApi';
 import { Post } from '@/types';
 
 /**
- * PATCH /posts/:post_id
+ * PATCH /posts/:postId
  *
  * @param postId   numeric ID of the post to update
  * @param formData multipart/form‑data body (same shape as create‑post)

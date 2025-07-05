@@ -24,8 +24,8 @@ interface CreateFormDataParams {
   initialThumbnailUrl?: string;
   isMature?: boolean;
   aiCreated?: boolean;
-  cate_ids?: number[];
-  prompt_id?: number;
+  categoryIds?: number[];
+  promptId?: number;
 }
 
 export const createFormData = ({
@@ -38,28 +38,30 @@ export const createFormData = ({
   initialThumbnailUrl,
   isMature,
   aiCreated,
-  cate_ids,
-  prompt_id,
+  categoryIds,
+  promptId,
 }: CreateFormDataParams) => {
   const formData = new FormData();
   formData.append('title', title);
   if (description) formData.append('description', description);
-  if (videoUrl) formData.append('video_url', videoUrl);
-  formData.append('thumbnail_url', thumbnailUrl);
+  if (videoUrl) formData.append('videoUrl', videoUrl);
+  if (thumbnailUrl) {
+    formData.append('thumbnailUrl', thumbnailUrl);
+  }
   if (imageFiles && imageFiles.length > 0) {
     imageFiles.forEach((file) => formData.append('images', file));
   }
-  formData.append('is_mature', String(isMature));
-  formData.append('ai_created', String(aiCreated));
-  formData.append('cate_ids', JSON.stringify(cate_ids));
+  formData.append('isMature', String(isMature));
+  formData.append('aiCreated', String(aiCreated));
+  formData.append('categoryIds', JSON.stringify(categoryIds));
   formData.append(
-    'thumbnail_crop_meta',
+    'thumbnailCropMeta',
     JSON.stringify({
       ...JSON.parse(thumbnailCropMeta),
       initialThumbnail: initialThumbnailUrl,
     }),
   );
-  if (prompt_id) formData.append('prompt_id', String(prompt_id));
+  if (promptId) formData.append('promptId', String(promptId));
 
   return formData;
 };

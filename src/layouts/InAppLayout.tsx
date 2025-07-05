@@ -3,10 +3,10 @@ import Sidebar from '@/components/sidebar/app-sidebar';
 import React, { useState } from 'react';
 
 const InAppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [expandSideBar, setExpandSideBar] = useState(true);
+  const [expandSidebar, setExpandSidebar] = useState(true);
   return (
     <div className={`relative flex h-screen min-h-0 w-full flex-row`}>
-      <Sidebar expand={expandSideBar} setExpand={setExpandSideBar} />
+      <Sidebar expand={expandSidebar} setExpand={setExpandSidebar} />
       <div
         className={`z-50 flex h-full min-h-0 w-[calc(100vw-16rem)] flex-1 flex-col px-2`}
       >

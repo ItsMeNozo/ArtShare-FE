@@ -5,7 +5,7 @@ export const updateBlogPublishStatus = async (
   isPublished: boolean,
 ) => {
   const response = await api.patch(`/blogs/${blogId}`, {
-    is_published: isPublished,
+    isPublished: isPublished,
   });
   return response.data;
 };

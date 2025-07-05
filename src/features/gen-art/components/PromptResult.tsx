@@ -58,7 +58,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   const handleDownloadAll = async () => {
     const zip = new JSZip();
     await Promise.all(
-      result!.image_urls.map(async (url, index) => {
+      result!.imageUrls.map(async (url, index) => {
         const response = await fetch(url);
         const blob = await response.blob();
         zip.file(`image-${index + 1}.jpg`, blob);
@@ -144,7 +144,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
         )}
       </div>
       <ImageList cols={4} gap={8} sx={{ width: '100%', minHeight: '268px' }}>
-        {result.image_urls.map((__, index) => (
+        {result.imageUrls.map((__, index) => (
           <ImageListItem key={index} className="flex h-full object-cover">
             {result.generating ? (
               <div className="bg-mountain-100 relative flex h-full items-center justify-center rounded-[8px]">
@@ -156,7 +156,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
             ) : (
               <GenImage
                 result={result}
-                otherImages={result.image_urls}
+                otherImages={result.imageUrls}
                 index={index}
                 useToShare={useToShare}
                 // onDelete={onDeleteSingle!}

@@ -9,30 +9,30 @@ const mockUsers: LikingUser[] = [
   {
     id: 'user1',
     username: 'john_doe',
-    full_name: 'John Doe',
-    profile_picture_url: 'https://via.placeholder.com/50/FFA500/FFFFFF?text=JD',
-    is_following: false,
+    fullName: 'John Doe',
+    profilePictureUrl: 'https://via.placeholder.com/50/FFA500/FFFFFF?text=JD',
+    isFollowing: false,
   },
   {
     id: 'user2',
     username: 'jane_smith',
-    full_name: 'Jane Smith',
-    profile_picture_url: null, // User without profile picture
-    is_following: true,
+    fullName: 'Jane Smith',
+    profilePictureUrl: null, // User without profile picture
+    isFollowing: true,
   },
   {
     id: 'user3',
     username: 'test_user_long_name',
-    full_name: null, // User without full name
-    profile_picture_url: 'https://via.placeholder.com/50/008000/FFFFFF?text=TU',
-    is_following: false,
+    fullName: null, // User without full name
+    profilePictureUrl: 'https://via.placeholder.com/50/008000/FFFFFF?text=TU',
+    isFollowing: false,
   },
   {
     id: 'user4',
     username: 'another_tester',
-    full_name: 'Tester Person',
-    profile_picture_url: 'https://via.placeholder.com/50/0000FF/FFFFFF?text=AP',
-    is_following: false,
+    fullName: 'Tester Person',
+    profilePictureUrl: 'https://via.placeholder.com/50/0000FF/FFFFFF?text=AP',
+    isFollowing: false,
   },
 ];
 

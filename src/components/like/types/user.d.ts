@@ -1,13 +1,13 @@
 export interface LikingUser {
   id: string;
   username: string;
-  full_name: string | null;
-  profile_picture_url: string | null;
-  is_following?: boolean;
+  fullName: string | null;
+  profilePictureUrl: string | null;
+  isFollowing?: boolean;
 }
 
 export interface LikeApiResponseItem {
   user: LikingUser;
 
-  created_at?: string;
+  createdAt?: string;
 }

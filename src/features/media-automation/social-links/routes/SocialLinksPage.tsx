@@ -64,7 +64,7 @@ const SocialLinksPage = () => {
       ? {
           name: fbAccountInfo[0].name,
           profilePicture:
-            fbAccountInfo[0].picture_url || 'https://i.pravatar.cc/150',
+            fbAccountInfo[0].pictureUrl || 'https://i.pravatar.cc/150',
         }
       : null;
 
@@ -203,14 +203,14 @@ const SocialLinksPage = () => {
                         <div className="border-mountain-200 flex w-[30%] shrink-0 items-center space-x-2 border-r-1">
                           <img
                             src={
-                              page.picture_url || getPlatformIcon(page.name)!
+                              page.pictureUrl || getPlatformIcon(page.name)!
                             }
                             className="size-8 rounded-full object-cover"
-                            alt={`${page.config.page_name}'s icon`}
+                            alt={`${page.config.pageName}'s icon`}
                           />
                           <div className="flex flex-col">
                             <span className="line-clamp-1 text-base">
-                              {page.config.page_name}
+                              {page.config.pageName}
                             </span>
                             <span className="text-mountain-600 text-xs">
                               {toTitleCase(page.name)}
@@ -236,11 +236,11 @@ const SocialLinksPage = () => {
                         </div>
                       </div>
                       <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center space-x-2">
-                        {page.token_expires_at ? (
+                        {page.tokenExpiresAt ? (
                           <div className="border-mountain-200 text-mountain-600 flex h-10 w-fit items-center space-x-2 rounded-full border px-4 text-sm select-none">
                             <span>Expires at: </span>
                             <span>
-                              {dayjs(page.token_expires_at).format(
+                              {dayjs(page.tokenExpiresAt).format(
                                 'MMM D, YYYY',
                               )}
                             </span>

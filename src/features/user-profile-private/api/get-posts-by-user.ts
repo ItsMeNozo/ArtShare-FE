@@ -16,7 +16,7 @@ export const fetchUserPosts = async (
 ): Promise<Post[]> => {
   try {
     const response = await api.get<Post[]>(
-      `/posts/user/${username}?page=${page}&page_size=${pageSize}`,
+      `/posts/user/${username}?page=${page}&pageSize=${pageSize}`,
     );
     return response.data;
   } catch (error) {

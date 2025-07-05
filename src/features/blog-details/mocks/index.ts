@@ -6,7 +6,7 @@ export const UserComments = [
     },
     comment: 'Really cool blog!',
     dateCreated: '05-02-2025',
-    like_count: 17,
+    likeCount: 17,
     isBlogOwnerLiked: false,
   },
   {
@@ -17,7 +17,7 @@ export const UserComments = [
     comment:
       'In sed ex rutrum, porta tortor ut, mollis odio. Phasellus tristique id quam ut mattis. In egestas vel mi at suscipit. Sed facilisis mollis orci id pharetra.',
     dateCreated: '05-01-2025',
-    like_count: 12,
+    likeCount: 12,
     isBlogOwnerLiked: true,
   },
 ];

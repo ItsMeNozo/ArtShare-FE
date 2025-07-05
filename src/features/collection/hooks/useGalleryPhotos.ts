@@ -30,25 +30,28 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
         const photosPromises = posts
           .filter(
             (post) =>
-              post.thumbnail_url || (post.medias && post.medias.length > 0),
+              post.thumbnailUrl || (post.medias && post.medias.length > 0),
           )
           .map(async (post): Promise<GalleryPhoto | null> => {
-            const imageUrl = post.thumbnail_url || post.medias?.[0]?.url;
+            const imageUrl = post.thumbnailUrl || post.medias?.[0]?.url;
             if (!imageUrl) return null;
 
             try {
-              const dimensions = await getMediaDimensions(imageUrl);
+              const { width, height } = await getMediaDimensions(imageUrl);
               return {
-                key: `post-${post.id}`,
-                src: imageUrl,
-                width: dimensions.width,
-                height: dimensions.height,
-                title: post.title || 'Untitled Post',
-                author: post.user?.username || 'Unknown',
+                src: imageUrl || '',
+                width,
+                height,
+                key: post.id.toString(),
+                title: post.title || '',
                 postId: post.id,
-                postLength: post.medias?.length ?? 0,
-                is_mature: post.is_mature || false,
-                ai_created: post.ai_created || false,
+                postLength: post.medias?.length || 0,
+                author: post.user.username,
+                isMature: post.isMature || false,
+                aiCreated: post.aiCreated || false,
+                likeCount: post.likeCount,
+                commentCount: post.commentCount,
+                viewCount: post.viewCount,
               };
             } catch (dimensionError) {
               console.warn(

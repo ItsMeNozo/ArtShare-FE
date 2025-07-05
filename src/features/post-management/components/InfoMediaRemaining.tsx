@@ -14,17 +14,17 @@ import { AiOutlineInfo } from 'react-icons/ai';
 
 interface InfoMediaRemainingProps {
   currentImageCount: number;
-  MaxImage: number;
+  maxImage: number;
   hasVideo: boolean;
-  MaxVideo: number;
+  maxVideo: number;
   hasAI: boolean;
 }
 
 const InfoMediaRemaining: React.FC<InfoMediaRemainingProps> = ({
   currentImageCount,
-  MaxImage,
+  maxImage,
   hasVideo,
-  MaxVideo,
+  maxVideo,
   hasAI,
 }) => {
   const [open, setOpen] = useState(false);
@@ -46,12 +46,12 @@ const InfoMediaRemaining: React.FC<InfoMediaRemainingProps> = ({
         <div className="flex px-2 py-1">
           <span className="mr-2 font-medium">Up to: </span>
           <Typography className="dark:text-mountain-200 text-base text-gray-900">
-            {currentImageCount}/{MaxImage} images
+            {currentImageCount}/{maxImage} images
           </Typography>
 
           {hasAI && (
             <Typography className="dark:text-mountain-200 text-base text-gray-900">
-              , {hasVideo ? 1 : 0}/{MaxVideo} video
+              , {hasVideo ? 1 : 0}/{maxVideo} video
             </Typography>
           )}
         </div>

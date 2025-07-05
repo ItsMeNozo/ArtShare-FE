@@ -266,22 +266,22 @@ const Post: React.FC = () => {
 
   useEffect(() => {
     if (postData) {
-      setCommentCount(postData.comment_count);
-      setShowMatureContent(!postData.is_mature);
+      setCommentCount(postData.commentCount);
+      setShowMatureContent(!postData.isMature);
     }
   }, [postData]);
 
   const handleCommentAdded = () => {
     setCommentCount((prev) => prev + 1);
     if (postData) {
-      postData.comment_count += 1;
+      postData.commentCount += 1;
       refetchPostData();
     }
   };
   const handleCommentDeleted = () => {
     setCommentCount((prev) => Math.max(prev - 1, 0));
     if (postData) {
-      postData.comment_count -= 1;
+      postData.commentCount -= 1;
       refetchPostData();
     }
   };
@@ -292,7 +292,7 @@ const Post: React.FC = () => {
 
   if (!postId || isNaN(numericPostId)) {
     return (
-      <div className="m-4 flex items-center justify-center">
+      <div className="flex items-center justify-center m-4">
         Invalid Post ID.
       </div>
     );
@@ -300,7 +300,7 @@ const Post: React.FC = () => {
 
   if (isPostLoading || isCommentsLoading) {
     return (
-      <div className="m-4 flex h-screen items-center justify-center text-center">
+      <div className="flex items-center justify-center h-screen m-4 text-center">
         <CircularProgress size={36} />
         <p className="ml-2">Loading...</p>
       </div>
@@ -309,7 +309,7 @@ const Post: React.FC = () => {
 
   if (postError) {
     return (
-      <div className="m-4 flex items-center justify-center">
+      <div className="flex items-center justify-center m-4">
         Error loading post:{' '}
         {(postError as Error).message || 'Failed to fetch post.'}
       </div>
@@ -318,7 +318,7 @@ const Post: React.FC = () => {
 
   if (commentsError && postData) {
     return (
-      <div className="m-4 flex items-center justify-center">
+      <div className="flex items-center justify-center m-4">
         Error loading comments:{' '}
         {(commentsError as Error).message || 'Failed to fetch comments.'}
       </div>
@@ -327,7 +327,7 @@ const Post: React.FC = () => {
 
   if (!postData) {
     return (
-      <div className="m-4 flex items-center justify-center">
+      <div className="flex items-center justify-center m-4">
         Post not found or data is unavailable.
       </div>
     );
@@ -335,17 +335,17 @@ const Post: React.FC = () => {
 
   if (!comments) {
     return (
-      <div className="m-4 flex items-center justify-center">
+      <div className="flex items-center justify-center m-4">
         Comments not found or data is unavailable.
       </div>
     );
   }
 
-  const displayAssets = !postData.is_mature || showMatureContent;
+  const displayAssets = !postData.isMature || showMatureContent;
 
   return (
     <div className="bg-mountain-50 dark:bg-mountain-950 dark:from-mountain-1000 dark:to-mountain-950 no-scrollbar relative h-[calc(100vh-4rem)] flex-grow overflow-y-auto px-4 dark:bg-gradient-to-b">
-      <div className="relative flex h-full flex-col rounded-2xl bg-white p-4 shadow md:hidden">
+      <div className="relative flex flex-col h-full p-4 bg-white shadow rounded-2xl md:hidden">
         <div className="h-full overflow-y-auto rounded-2xl">
           <PostArtist artist={postData!.user} postData={postData!} />
           {displayAssets ? (
@@ -370,8 +370,8 @@ const Post: React.FC = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden h-full flex-row gap-4 md:flex">
-        <div className="sidebar flex h-full flex-grow items-center justify-center overflow-hidden">
+      <div className="flex-row hidden h-full gap-4 md:flex">
+        <div className="flex items-center justify-center flex-grow h-full overflow-hidden sidebar">
           {displayAssets ? (
             <PostAssets medias={postData.medias} />
           ) : (
@@ -379,7 +379,7 @@ const Post: React.FC = () => {
           )}
         </div>
         <div className="relative flex-shrink-0 overflow-hidden rounded-t-3xl bg-white py-0 pl-4 shadow sm:w-[256px] md:w-[384px] lg:w-[448px]">
-          <div className="sidebar flex h-full flex-col gap-4">
+          <div className="flex flex-col h-full gap-4 sidebar">
             <PostArtist artist={postData!.user} postData={postData!} />
             <PostInfo
               postData={postData}

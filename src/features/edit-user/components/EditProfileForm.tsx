@@ -48,9 +48,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     }
 
     const payload = {
-      full_name: raw.full_name,
-      bio: raw.bio,
-      username: raw.username,
+      ...raw,
       birthday: new Date(raw.birthday ?? '').toISOString(),
     };
 
@@ -99,32 +97,32 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     <Box
       component="form"
       onSubmit={handleSubmit(onSubmit)}
-      className="dark:bg-mountain-900 mt-5 max-w-screen rounded-none p-6 dark:rounded-md" // Parent form background
+      className="p-6 mt-5 rounded-none dark:bg-mountain-900 max-w-screen dark:rounded-md" // Parent form background
     >
       {/* Full Name */}
       <Box className="mb-4">
-        <Typography className="text-foreground mb-1 font-medium">
+        <Typography className="mb-1 font-medium text-foreground">
           Full Name <span className="text-rose-500">*</span>
         </Typography>
         <Input
-          id="full_name"
+          id="fullName"
           placeholder="Your Fullname"
-          {...register('full_name', {
+          {...register('fullName', {
             required: 'Full Name is required',
             maxLength: 80,
           })}
           className={customInputClassName}
         />
-        {errors.full_name && (
+        {errors.fullName && (
           <Typography color="error" variant="caption">
-            {errors.full_name.message}
+            {errors.fullName.message}
           </Typography>
         )}
       </Box>
 
       {/* Username */}
       <Box className="mb-4">
-        <Typography className="text-foreground mb-1 font-medium">
+        <Typography className="mb-1 font-medium text-foreground">
           Username <span className="text-rose-500">*</span>
         </Typography>
         <Input
@@ -150,7 +148,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
 
       {/* Birthday */}
       <Box className="mb-4">
-        <Typography className="text-foreground mb-1 font-medium">
+        <Typography className="mb-1 font-medium text-foreground">
           Birthday <span className="text-rose-500">*</span>
         </Typography>
         <Input
@@ -172,7 +170,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
 
       {/* Bio */}
       <Box className="mb-6">
-        <Typography className="text-foreground mb-1 font-medium">
+        <Typography className="mb-1 font-medium text-foreground">
           Bio (optional)
         </Typography>
         <TextareaAutosize
@@ -206,12 +204,12 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="cursor-pointer bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white hover:from-indigo-800 hover:via-purple-800 hover:to-indigo-900"
+          className="text-white cursor-pointer bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 hover:from-indigo-800 hover:via-purple-800 hover:to-indigo-900"
           // The MUI sx prop styling was removed. The classes above replicate a gradient.
           // If you still want the exact MUI sx styling, you'd need to import Button from @mui/material
           // and apply the sx prop as you had it.
         >
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
           Save changes
         </Button>
       </Box>

@@ -78,13 +78,13 @@ export const useUpdatePost = (options: UseUpdatePostOptions) => {
       title: values.title,
       imageUrlsToRetain: getImageUrlsToRetain(imageMedias),
       newImageFiles: getNewImageFiles(imageMedias),
-      cate_ids: values.cate_ids,
+      categoryIds: values.categoryIds,
       thumbnailCropMeta: JSON.stringify(values.thumbnailMeta),
       description: values.description,
       videoUrl: newVideoUrl !== undefined ? newVideoUrl : videoMedia?.url,
       initialThumbnail:
         newInitialThumbnailUrl ??
-        fetchedPost.thumbnail_crop_meta.initialThumbnail,
+        fetchedPost.thumbnailCropMeta.initialThumbnail,
       thumbnailUrl: newThumbnailUrl,
       isMature: values.isMature,
       aiCreated: hasArtNovaImages,

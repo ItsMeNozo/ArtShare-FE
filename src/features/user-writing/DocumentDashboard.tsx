@@ -86,10 +86,10 @@ const DocumentDashboard = () => {
         // Apply date range filtering for "last7days" or "last30days"
         if (order === 'last7days' || order === 'last30days') {
           processedBlogs = processedBlogs.filter((blog) => {
-            // Handle potential null updated_at
-            if (!blog.updated_at) return false;
+            // Handle potential null updatedAt
+            if (!blog.updatedAt) return false;
 
-            const updatedAtDate = new Date(blog.updated_at);
+            const updatedAtDate = new Date(blog.updatedAt);
             const diffInMilliseconds = now.getTime() - updatedAtDate.getTime();
             const diffInDays = Math.floor(
               diffInMilliseconds / (1000 * 60 * 60 * 24),
@@ -105,11 +105,11 @@ const DocumentDashboard = () => {
           });
         }
 
-        // Apply sorting based on updated_at
+        // Apply sorting based on updatedAt
         processedBlogs.sort((a, b) => {
-          // IMPORTANT: Using a.updated_at and b.updated_at for sorting
-          const dateA = new Date(a.updated_at || a.created_at).getTime();
-          const dateB = new Date(b.updated_at || b.created_at).getTime();
+          // IMPORTANT: Using a.updatedAt and b.updatedAt for sorting
+          const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+          const dateB = new Date(b.updatedAt || b.createdAt).getTime();
 
           if (order === 'oldest') {
             return dateA - dateB; // Ascending for oldest update
@@ -140,7 +140,7 @@ const DocumentDashboard = () => {
     try {
       const newBlogPayload: CreateBlogPayload = {
         title: 'Untitled Document',
-        is_published: false,
+        isPublished: false,
         content: '<p></p>',
       };
       const createdBlog = await createNewBlog(newBlogPayload);
@@ -155,7 +155,7 @@ const DocumentDashboard = () => {
     try {
       const payload: CreateBlogPayload = {
         title: 'Untitled Tutorial',
-        is_published: false,
+        isPublished: false,
         content: TUTORIAL_TEMPLATE_HTML,
       };
       const newBlog = await createNewBlog(payload);
@@ -390,7 +390,7 @@ const DocumentDashboard = () => {
                   </p>
                   <div className="flex w-full items-center justify-between">
                     <p className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-300 w-full truncate bg-white px-2 text-left text-xs select-none">
-                      {formatDate(blog.created_at)}
+                      {formatDate(blog.createdAt)}
                     </p>
                     <IconButton
                       onClick={(event) => handleMenuClick(event, blog.id)}

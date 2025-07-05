@@ -52,7 +52,7 @@ export const usePromptHistory = () => {
 
   // Filter and reverse
   const filtered = useMemo(
-    () => promptResultList.filter((r) => isInFilterRange(r.created_at)),
+    () => promptResultList.filter((r) => isInFilterRange(r.createdAt)),
     [promptResultList, historyFilter],
   );
   const reversed = useMemo(() => filtered.slice().reverse(), [filtered]);
@@ -73,7 +73,7 @@ export const usePromptHistory = () => {
 
   // Infinite scroll trigger
   useInfiniteTopScroll(
-    scrollRef,
+    scrollRef as React.RefObject<HTMLElement>,
     displayedResults.length < reversed.length,
     () => setLoadedCount((c) => c + PAGE_SIZE),
     displayedResults.length,

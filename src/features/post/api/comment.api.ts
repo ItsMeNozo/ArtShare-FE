@@ -9,9 +9,9 @@ export const fetchComments = async (
 ): Promise<Comment[]> => {
   const { data } = await api.get<Comment[]>('/comments', {
     params: {
-      target_id: targetId,
-      target_type: targetType,
-      ...(parentCommentId != null && { parent_comment_id: parentCommentId }),
+      targetId,
+      targetType,
+      ...(parentCommentId != null && { parentCommentId }),
     },
   });
   return data;
@@ -19,8 +19,8 @@ export const fetchComments = async (
 export const fetchBlogComments = async (postId: number): Promise<Comment[]> => {
   const { data } = await api.get<Comment[]>('/comments', {
     params: {
-      target_id: postId,
-      target_type: 'BLOG',
+      targetId: postId,
+      targetType: 'BLOG',
     },
   });
   return data;

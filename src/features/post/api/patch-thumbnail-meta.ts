@@ -1,10 +1,10 @@
 import api from '@/api/baseApi';
 
 export type ThumbnailCropMeta = {
-  crop_x: number;
-  crop_y: number;
-  crop_w: number;
-  crop_h: number;
+  cropX: number;
+  cropY: number;
+  cropW: number;
+  cropH: number;
   zoom: number;
   aspect?: number | 'free';
 };

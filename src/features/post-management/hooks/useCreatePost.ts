@@ -65,8 +65,8 @@ export const useCreatePost = (options: UseCreatePostOptions) => {
         initialThumbnailUrl,
         isMature: values.isMature,
         aiCreated: hasArtNovaImages,
-        cate_ids: values.cate_ids,
-        prompt_id: promptId ?? undefined,
+        categoryIds: values.categoryIds,
+        promptId: promptId ?? undefined,
       });
 
       const response = await createPost(formData);

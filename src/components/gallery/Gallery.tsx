@@ -10,11 +10,11 @@ export interface GalleryPhoto extends Photo {
   author: string;
   postLength: number;
   postId: number;
-  is_mature: boolean;
-  ai_created: boolean;
-  like_count?: number;
-  comment_count?: number;
-  view_count?: number;
+  isMature: boolean;
+  aiCreated: boolean;
+  likeCount?: number;
+  commentCount?: number;
+  viewCount?: number;
 }
 
 interface IGalleryProps {

@@ -50,7 +50,7 @@ export function useCollectionsData(): UseCollectionsDataResult {
 
     return Array.from(postMap.values()).sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }, [collections, loading]);
 

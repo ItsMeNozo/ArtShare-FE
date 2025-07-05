@@ -39,11 +39,11 @@ export default function EditUser() {
     <Container disableGutters className={'h-full min-h-screen px-15 pt-6'}>
       <Box>
         <AvatarSection
-          profilePictureUrl={formData.profile_picture_url}
+          profilePictureUrl={formData.profilePictureUrl}
           username={formData.username}
           onUploadSuccess={(newUrl: string) =>
             setFormData((prev) =>
-              prev ? { ...prev, profile_picture_url: newUrl } : prev,
+              prev ? { ...prev, profilePictureUrl: newUrl } : prev,
             )
           }
           // AvatarSection itself might need internal dark mode styling for its elements

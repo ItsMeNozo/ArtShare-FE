@@ -9,12 +9,12 @@ export enum ReportTargetType {
 }
 
 export interface CreateReportDto {
-  target_id: number;
-  target_type: ReportTargetType;
+  targetId: number;
+  targetType: ReportTargetType;
   reason: string;
-  user_id?: string;
-  target_url: string;
-  target_title: string;
+  userId?: string;
+  targetUrl: string;
+  targetTitle: string;
 }
 
 export enum ViewTab {
@@ -47,16 +47,16 @@ export interface ReporterSummary {
  */
 export interface Report {
   id: number;
-  reporter_id: string;
-  moderator_id?: string;
-  target_id: number;
-  target_type: ReportTargetType;
+  reporterId: string;
+  moderatorId?: string;
+  targetId: number;
+  targetType: ReportTargetType;
   reason: string;
   status: string;
-  created_at: string;
-  updated_at?: string;
-  resolved_at?: string;
-  resolution_comment?: string;
+  createdAt: string;
+  updatedAt?: string;
+  resolvedAt?: string;
+  resolutionComment?: string;
   reporter: ReporterSummary;
   moderator?: ReporterSummary;
 }
@@ -103,8 +103,8 @@ export async function updateReportStatus(
 }
 
 export interface ResolveReportDto {
-  resolve_date: string;
-  resolution_comment?: string;
+  resolveDate: string;
+  resolutionComment?: string;
 }
 
 export async function resolveReport(

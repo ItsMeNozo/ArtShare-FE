@@ -38,10 +38,10 @@ export const authenWithGoogle = async (
       if (backendResponse.success) {
         console.log('🔐 Google login successful');
         // Store the access token immediately for Google login
-        if (backendResponse.access_token) {
-          localStorage.setItem('accessToken', backendResponse.access_token);
+        if (backendResponse.accessToken) {
+          localStorage.setItem('accessToken', backendResponse.accessToken);
           api.defaults.headers.common['Authorization'] =
-            `Bearer ${backendResponse.access_token}`;
+            `Bearer ${backendResponse.accessToken}`;
           console.log(
             '🔐 Google login: Token stored in localStorage and auth header set',
           );
@@ -132,10 +132,10 @@ export const signUpWithFacebook = async (
     const backendResponse = await login(token);
     if (backendResponse.success) {
       // Store the access token immediately for Facebook login
-      if (backendResponse.access_token) {
-        localStorage.setItem('accessToken', backendResponse.access_token);
+      if (backendResponse.accessToken) {
+        localStorage.setItem('accessToken', backendResponse.accessToken);
         api.defaults.headers.common['Authorization'] =
-          `Bearer ${backendResponse.access_token}`;
+          `Bearer ${backendResponse.accessToken}`;
       }
       // Clear the flag after successful login
       externalLoginInProgressRef.current = false;

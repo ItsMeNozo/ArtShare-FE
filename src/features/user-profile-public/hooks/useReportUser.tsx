@@ -23,12 +23,12 @@ export function useReportUser() {
     }: ReportUserVariables) => {
       const url = window.location.href;
       const dto: CreateReportDto = {
-        target_id: targetId,
-        user_id: userId,
-        target_type: ReportTargetType.USER,
+        targetId,
+        userId,
+        targetType: ReportTargetType.USER,
         reason,
-        target_url: url,
-        target_title: targetTitle,
+        targetUrl: url,
+        targetTitle,
       };
       console.log('response', dto);
       return submitReport(dto);

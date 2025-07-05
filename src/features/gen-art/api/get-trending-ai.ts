@@ -1,29 +1,47 @@
 import api from '@/api/baseApi';
-interface TrendingItem {
+export interface TrendingItem {
   image: string;
   prompt: string;
   style: string;
   lighting: string;
   camera: string;
-  aspect_ratio: string;
-  model_key: string;
+  aspectRatio: string;
+  modelKey: string;
+}
+
+interface ArtGeneration {
+  imageUrls?: string[];
+  finalPrompt?: string;
+  userPrompt?: string;
+  style?: string;
+  lighting?: string;
+  camera?: string;
+  aspectRatio?: string;
+  modelKey?: string;
+}
+
+interface PostWithArt {
+  artGeneration?: ArtGeneration;
 }
 
 export const getTrendingAiPosts = async (): Promise<TrendingItem[]> => {
   try {
-    const response = await api.get('/posts/ai-trending');
+    const response = await api.get<PostWithArt[]>('/posts/ai-trending');
     const data = response.data;
-    const withArt = data.filter((item: any) => item.art_generation);
-    return withArt.map((item: any): TrendingItem => {
-      const art = item.art_generation;
+    const withArt = data.filter(
+      (item): item is PostWithArt & { artGeneration: ArtGeneration } =>
+        !!item.artGeneration,
+    );
+    return withArt.map((item): TrendingItem => {
+      const art = item.artGeneration;
       return {
-        image: art.image_urls?.[0] ?? 'https://placehold.co/512?text=No+Image',
-        prompt: art.final_prompt ?? art.user_prompt ?? '',
+        image: art.imageUrls?.[0] ?? 'https://placehold.co/512?text=No+Image',
+        prompt: art.finalPrompt ?? art.userPrompt ?? '',
         style: art.style ?? 'Default',
         lighting: art.lighting ?? 'Default',
         camera: art.camera ?? 'Default',
-        aspect_ratio: art.aspect_ratio ?? 'Default',
-        model_key: art.model_key ?? 'Unknown',
+        aspectRatio: art.aspectRatio ?? 'Default',
+        modelKey: art.modelKey ?? 'Unknown',
       };
     });
   } catch (error) {

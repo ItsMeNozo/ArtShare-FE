@@ -145,8 +145,8 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
                 }}
               >
                 <ListItemAvatar>
-                  {u.profile_picture_url ? (
-                    <Avatar src={u.profile_picture_url} />
+                  {u.profilePictureUrl ? (
+                    <Avatar src={u.profilePictureUrl} />
                   ) : (
                     <BoringAvatar
                       size={40}
@@ -166,7 +166,7 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
                 <ListItemText
                   primary={
                     <Typography noWrap fontWeight={500}>
-                      {u.full_name || u.username}
+                      {u.fullName || u.username}
                     </Typography>
                   }
                   secondary={

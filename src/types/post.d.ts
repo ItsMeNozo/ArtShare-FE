@@ -4,23 +4,23 @@ import { User } from './user';
 
 export interface Post {
   id: number;
-  user_id: string;
+  userId: string;
   title: string;
-  created_at: Date;
-  is_published: boolean;
-  is_private: boolean;
-  share_count: number;
-  comment_count: number;
-  like_count: number;
-  view_count: number;
-  thumbnail_url: string;
-  is_mature: boolean;
-  ai_created: boolean;
+  createdAt: Date;
+  isPublished: boolean;
+  isPrivate: boolean;
+  shareCount: number;
+  commentCount: number;
+  likeCount: number;
+  viewCount: number;
+  thumbnailUrl: string;
+  isMature: boolean;
+  aiCreated: boolean;
   user: User;
   description?: string;
-  updated_at?: Date;
-  group_id?: number;
+  updatedAt?: Date;
+  groupId?: number;
   medias: MediaDto[];
   categories?: Category[];
-  thumbnail_crop_meta: ThumbnailMeta;
+  thumbnailCropMeta: ThumbnailMeta;
 }

@@ -17,7 +17,7 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
   const currentUser = auth.currentUser;
-  const isOwner = currentUser && postData.user_id === currentUser.uid;
+  const isOwner = currentUser && postData.userId === currentUser.uid;
 
   const { mutate: deletePostQuery } = useDeletePost({
     onSuccess: () => {
@@ -103,9 +103,9 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
       >
         <div className="flex cursor-pointer gap-4">
           <div className="flex-shrink-0 overflow-hidden rounded-full ring-2 ring-transparent transition-all duration-200 group-hover:ring-blue-500/30">
-            {artist.profile_picture_url ? (
+            {artist.profilePictureUrl ? (
               <img
-                src={artist.profile_picture_url}
+                src={artist.profilePictureUrl}
                 className="h-20 w-20 object-cover"
                 alt={`${artist.username}'s profile`}
               />
@@ -120,7 +120,7 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
           </div>
           <div className="flex flex-col pt-0.5">
             <div className="text-xl font-bold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-              {artist.full_name || 'Unknown fullname'}
+              {artist.fullName || 'Unknown fullname'}
             </div>
             <div className="line-clamp-1 text-sm transition-colors duration-200 group-hover:text-blue-500 dark:group-hover:text-blue-300">
               @{artist.username}

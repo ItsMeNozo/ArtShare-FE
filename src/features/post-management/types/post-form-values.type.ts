@@ -3,14 +3,14 @@ import { ThumbnailMeta } from './crop-meta.type';
 export interface PostFormValues {
   title: string;
   description?: string;
-  cate_ids: number[];
+  categoryIds: number[];
   isMature: boolean;
   thumbnailMeta: ThumbnailMeta;
 }
 
 export const defaultPostFormValues: PostFormValues = {
   title: '',
-  cate_ids: [],
+  categoryIds: [],
   isMature: false,
   thumbnailMeta: {
     crop: { x: 0, y: 0 },

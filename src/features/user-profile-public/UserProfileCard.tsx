@@ -195,7 +195,7 @@ export const UserProfileCard = () => {
   const isProfileIncomplete =
     !profileData.birthday || // Checks if birthday is null, undefined, or an empty string
     !profileData.username || // Checks if username is null, undefined, or an empty string
-    !profileData.full_name; // Checks if full_name is null, undefined, or an empty string
+    !profileData.fullName; // Checks if fullName is null, undefined, or an empty string
 
   if (isProfileIncomplete) {
     return (
@@ -222,17 +222,17 @@ export const UserProfileCard = () => {
   return (
     <div className="flex h-full w-full items-end justify-between pb-4">
       <div className="flex w-full items-end space-x-4">
-        {profileData.profile_picture_url ? (
+        {profileData.profilePictureUrl ? (
           <ProfileHeader
-            name={profileData?.full_name ?? ''}
+            name={profileData?.fullName ?? ''}
             username={profileData.username || ''}
-            avatarUrl={profileData.profile_picture_url}
+            avatarUrl={profileData.profilePictureUrl}
             isFollowing={false}
           />
         ) : (
           <Box display="flex" alignItems="center">
             <ProfileHeader
-              name={profileData?.full_name ?? ''}
+              name={profileData?.fullName ?? ''}
               username={profileData?.username ?? ''}
               isFollowing={false}
             />
@@ -240,11 +240,11 @@ export const UserProfileCard = () => {
         )}
         <div className="flex w-full items-center justify-between">
           <ProfileInfo
-            name={profileData?.full_name ?? ''}
+            name={profileData?.fullName ?? ''}
             username={profileData.username ?? ''}
             bio={profileData.bio || ''}
-            followings_count={profileData.followings_count}
-            followers_count={profileData.followers_count}
+            followingsCount={profileData.followingsCount}
+            followersCount={profileData.followersCount}
             userId={profileData.id}
           />
           <Box className="flex h-10">

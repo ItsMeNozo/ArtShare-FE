@@ -98,7 +98,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   // const handleReconnectClick = () => {
   //   if (platformToReconnect) {
   //     console.log(
-  //       `Reconnecting platform: ${platformToReconnect.config.page_name}`,
+  //       `Reconnecting platform: ${platformToReconnect.config.pageName}`,
   //     );
 
   //     handleReconnect(platformToReconnect);
@@ -110,7 +110,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   //   try {
   //     if (platform) {
   //       console.log(
-  //         `Initiating reconnection for ${platform.name} page: ${platform.config.page_name}`,
+  //         `Initiating reconnection for ${platform.name} page: ${platform.config.pageName}`,
   //       );
   //     }
   //     const currentPageUrl = window.location.href;
@@ -167,7 +167,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
       ? {
           name: fbAccountInfo[0].name,
           profilePicture:
-            fbAccountInfo[0].picture_url || 'https://i.pravatar.cc/150',
+            fbAccountInfo[0].pictureUrl || 'https://i.pravatar.cc/150',
         }
       : null;
 
@@ -263,15 +263,15 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
                               <FaFacebookSquare className="size-4 shrink-0 rounded-full text-blue-700" />
                             )}
                             <span className="line-clamp-1 w-24 text-left">
-                              {selectedPlatform.config.page_name}
+                              {selectedPlatform.config.pageName}
                             </span>
                           </div>
                           <div className="flex items-center space-x-2">
                             <div
-                              className={`h-2 w-2 rounded-full ${isTokenExpired(selectedPlatform.token_expires_at) ? 'bg-red-500' : 'bg-green-500'}`}
+                              className={`h-2 w-2 rounded-full ${isTokenExpired(selectedPlatform.tokenExpiresAt) ? 'bg-red-500' : 'bg-green-500'}`}
                             />
                             <span className="text-xs capitalize">
-                              {isTokenExpired(selectedPlatform.token_expires_at)
+                              {isTokenExpired(selectedPlatform.tokenExpiresAt)
                                 ? 'Expired'
                                 : selectedPlatform.status.toLowerCase()}
                             </span>

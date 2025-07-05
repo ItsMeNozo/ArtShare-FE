@@ -51,15 +51,15 @@ const PostInfo = ({ postData }: PostInfoProps) => {
   const [userLike, setUserLike] = useState<boolean>(
     postData.isLikedByCurrentUser ?? false,
   );
-  const [likeCount, setLikeCount] = useState<number>(postData.like_count);
+  const [likeCount, setLikeCount] = useState<number>(postData.likeCount);
   const [isLiking, setIsLiking] = useState(false);
   const [isFetchingLike] = useState(false);
   const requireAuth = useRequireAuth();
 
   useEffect(() => {
     setUserLike(postData.isLikedByCurrentUser ?? false);
-    setLikeCount(postData.like_count);
-  }, [postData.isLikedByCurrentUser, postData.like_count]);
+    setLikeCount(postData.likeCount);
+  }, [postData.isLikedByCurrentUser, postData.likeCount]);
 
   useEffect(() => {
     const loadCollectionNames = async () => {
@@ -179,10 +179,10 @@ const PostInfo = ({ postData }: PostInfoProps) => {
             </AnyShowMoreText>
             <div className="text-xs text-gray-500 italic">
               Posted{' '}
-              {postData.created_at &&
-              !isNaN(new Date(postData.created_at).getTime()) ? (
+              {postData.createdAt &&
+              !isNaN(new Date(postData.createdAt).getTime()) ? (
                 <ReactTimeAgo
-                  date={new Date(postData.created_at)}
+                  date={new Date(postData.createdAt)}
                   locale="en-US"
                 />
               ) : (
@@ -215,9 +215,9 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               </span>
             </div>
             <div className="text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm">
-              <p className="font-semibold">{postData.comment_count}</p>
+              <p className="font-semibold">{postData.commentCount}</p>
               <span className="text-mountain-600 dark:text-mountain-200">
-                {postData.comment_count > 1 ? ' Comments' : ' Comment'}
+                {postData.commentCount > 1 ? ' Comments' : ' Comment'}
               </span>
             </div>
           </div>

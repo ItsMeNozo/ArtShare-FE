@@ -25,8 +25,8 @@ export interface FollowListModalProps {
   data?: Array<{
     id: string;
     username: string;
-    full_name: string | null;
-    profile_picture_url: string | null;
+    fullName: string | null;
+    profilePictureUrl: string | null;
   }>;
   onClose: () => void;
 }
@@ -98,9 +98,9 @@ const FollowListModal: FC<FollowListModalProps> = ({
                 }}
               >
                 <ListItemAvatar>
-                  {user.profile_picture_url ? (
+                  {user.profilePictureUrl ? (
                     <Avatar
-                      src={user.profile_picture_url}
+                      src={user.profilePictureUrl}
                       alt={user.username}
                     />
                   ) : (
@@ -121,7 +121,7 @@ const FollowListModal: FC<FollowListModalProps> = ({
                 <ListItemText
                   primary={
                     <Typography fontWeight={500}>
-                      {user.full_name || user.username}
+                      {user.fullName || user.username}
                     </Typography>
                   }
                   secondary={

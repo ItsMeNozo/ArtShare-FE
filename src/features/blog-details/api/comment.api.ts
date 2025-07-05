@@ -13,9 +13,9 @@ export const fetchComments = async (
 ): Promise<CommentUI[]> => {
   const { data } = await api.get<CommentUI[]>('/comments', {
     params: {
-      target_id: targetId,
-      target_type: targetType, // Pass targetType to backend
-      ...(parentCommentId != null && { parent_comment_id: parentCommentId }),
+      targetId,
+      targetType, // Pass targetType to backend
+      ...(parentCommentId != null && { parentCommentId }),
     },
   });
   return data;
@@ -23,12 +23,12 @@ export const fetchComments = async (
 
 /**
  * Create a comment or reply.
- * Ensure CreateCommentDto in @/types/comment includes target_type
+ * Ensure CreateCommentDto in @/types/comment includes targetType
  * export interface CreateCommentDto {
  *   content: string;
- *   target_id: number;
- *   target_type: "POST" | "BLOG";
- *   parent_comment_id?: number;
+ *   targetId: number;
+ *   targetType: "POST" | "BLOG";
+ *   parentCommentId?: number;
  * }
  */
 export const createComment = async (
@@ -79,8 +79,8 @@ export const fetchBlogComments = async (
 ): Promise<CommentUI[]> => {
   const { data } = await api.get<CommentUI[]>('/comments', {
     params: {
-      target_id: blogId,
-      target_type: 'BLOG',
+      targetId: blogId,
+      targetType: 'BLOG',
     },
   });
   return data;

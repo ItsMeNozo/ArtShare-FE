@@ -24,9 +24,9 @@ type BlogCardProps = {
   timeReading: string;
   category: string;
   thumbnail: string;
-  like_count: number;
-  comment_count: number;
-  view_count: number;
+  likeCount: number;
+  commentCount: number;
+  viewCount: number;
   className?: string;
 };
 
@@ -39,8 +39,8 @@ const BlogCard: React.FC<BlogCardProps> = ({
   timeReading,
   category,
   thumbnail,
-  like_count,
-  comment_count,
+  likeCount,
+  commentCount,
   className = '',
 }) => {
   const navigate = useNavigate();
@@ -153,13 +153,13 @@ const BlogCard: React.FC<BlogCardProps> = ({
               <Tooltip title="Like">
                 <Button className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 min-w-0 p-1">
                   <AiOutlineLike className="mr-1 size-4" />
-                  <span className="text-sm">{like_count}</span>
+                  <span className="text-sm">{likeCount}</span>
                 </Button>
               </Tooltip>
               <Tooltip title="Comment">
                 <Button className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 min-w-0 p-1">
                   <BiComment className="mr-1 size-4" />
-                  <span className="text-sm">{comment_count}</span>
+                  <span className="text-sm">{commentCount}</span>
                 </Button>
               </Tooltip>
             </div>

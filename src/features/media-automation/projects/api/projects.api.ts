@@ -11,7 +11,7 @@ import {
 export interface SaveAutoProjectPayload {
   title: string;
   description: string;
-  platform_id: number;
+  platformId: number;
 }
 
 export const createAutoProject = async (

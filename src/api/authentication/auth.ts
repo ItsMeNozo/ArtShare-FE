@@ -1,8 +1,5 @@
-import axios from 'axios';
 import api from '../baseApi';
-// Base URL of your NestJS backend API
-const rawUrl = import.meta.env.VITE_BE_URL ?? 'http://localhost:3000';
-const API_BASE_URL = `${rawUrl.replace(/\/+$/, '')}/auth`;
+
 // Function to get user profile by userId
 export const getUserProfile = async (userId: string) => {
   try {
@@ -22,7 +19,7 @@ export const signup = async (
 ) => {
   console.log('🔐 API: Starting signup for user:', { userId, email, username });
   try {
-    const response = await axios.post(`${API_BASE_URL}/register`, {
+    const response = await api.post('/auth/register', {
       userId,
       email,
       password,
@@ -39,7 +36,7 @@ export const signup = async (
 // Function to handle user login (send Firebase token to backend)
 export const login = async (token: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/login`, {
+    const response = await api.post('/auth/login', {
       token,
     });
     return response.data;
@@ -52,7 +49,7 @@ export const login = async (token: string) => {
 // Function to handle user sign out
 export const signout = async (uid: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/signout`, {
+    const response = await api.post('/auth/signout', {
       uid,
     });
     return response.data;
@@ -65,7 +62,7 @@ export const signout = async (uid: string) => {
 // Function to verify token (if you want to check token validity)
 export const verifyToken = async (token: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/verify-token`, {
+    const response = await api.post('/auth/verify-token', {
       token,
     });
     return response.data;
@@ -78,7 +75,7 @@ export const verifyToken = async (token: string) => {
 // Function to handle password reset
 export const forgotPassword = async (email: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/forgot-password`, {
+    const response = await api.post('/auth/forgot-password', {
       email,
     });
     return response.data;

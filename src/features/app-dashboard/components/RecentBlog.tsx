@@ -66,14 +66,14 @@ const RecentBlog = () => {
               }
               author={{
                 username: blog.user.username,
-                avatar: blog.user.profile_picture_url ?? '',
+                avatar: blog.user.profilePictureUrl ?? '',
               }}
               timeReading={`${Math.ceil((blog.content ? blog.content.split(/\s+/).length : 0) / 200)}m reading`}
-              dateCreated={blog.created_at}
+              createdAt={blog.createdAt}
               category={blog.categories?.[0]?.name ?? 'Uncategorized'}
-              like_count={blog.like_count}
-              comment_count={blog.comment_count}
-              view_count={blog.view_count}
+              likeCount={blog.likeCount}
+              commentCount={blog.commentCount}
+              viewCount={blog.viewCount}
             />
           ))}
         </div>
