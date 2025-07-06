@@ -1,4 +1,4 @@
-import { MockModelOptionsData } from "../../mock/Data";
+import { MockModelOptionsData } from "../../data/Data";
 
 interface StyleOptionProps {
   style: (typeof MockModelOptionsData)[0];
@@ -12,10 +12,10 @@ const StyleOption: React.FC<StyleOptionProps> = ({
   onClick,
 }) => (
   <div
-    className="group flex flex-col items-center space-y-2 cursor-pointer w-full"
+    className="group flex flex-col items-center space-y-2 w-full cursor-pointer"
     onClick={onClick}
   >
-    <div className="relative w-full h-32 overflow-hidden rounded-lg">
+    <div className="relative rounded-lg w-full h-32 overflow-hidden">
       <img
         src={style.images[0]}
         loading="lazy"

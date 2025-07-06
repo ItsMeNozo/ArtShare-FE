@@ -63,7 +63,7 @@ const Panels: React.FC<PanelsProp> = ({
   return (
     <div className="z-50">
       {activePanel && (
-        <div className="flex flex-col space-y-2 bg-gradient-to-b from-white to-mountain-50 shadow border border-mountain-200 w-72 h-[calc(100vh-98px)]">
+        <div className="flex flex-col space-y-2 bg-gradient-to-b from-white to-mountain-50 shadow border border-mountain-200 w-72 h-screen">
           <div className="relative flex justify-center items-center bg-white border-mountain-200 border-b-1 h-[5%] font-semibold text-mountain-700 text-sm">
             <X
               className="left-2 absolute size-4 hover:text-red-700"

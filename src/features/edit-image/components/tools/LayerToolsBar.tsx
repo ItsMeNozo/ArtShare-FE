@@ -1,10 +1,10 @@
-import React, { Dispatch, SetStateAction, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ZoomTool from "./Zoom";
 import { Button, Tooltip } from "@mui/material";
 import { Plus } from "lucide-react";
 import Draggable from "react-draggable";
-import { ChromePicker } from "react-color";
 import { MdOutlineSaveAlt } from "react-icons/md";
+import { Sketch } from '@uiw/react-color';
 
 interface LayerToolsBarProp {
   layers: Layer[];
@@ -29,6 +29,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
 }) => {
   const [openColorSettings, setOpenColorSettings] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -82,9 +83,25 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setOpenColorSettings(false); // Close the color picker
+      }
+    }
+
+    if (openColorSettings) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openColorSettings]);
+
   return (
     <div className="z-50 relative flex h-full">
-      <div className="flex flex-col justify-between bg-white border border-mountain-200 rounded-lg rounded-r-none w-28 h-full">
+      <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full">
         <div className="flex flex-col space-y-2">
           {/* Layers Header */}
           <div className="flex justify-center items-center bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
@@ -119,11 +136,10 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                 {layer.type === "image" ? (
                   <img
                     src={layer.src}
-                    className={`rounded-sm w-full h-20 object-cover border-1 ${
-                      selectedLayerId === layer.id
-                        ? "border-indigo-400"
-                        : "border-mountain-200"
-                    }`}
+                    className={`rounded-sm w-full h-20 object-cover border-1 ${selectedLayerId === layer.id
+                      ? "border-indigo-400"
+                      : "border-mountain-200"
+                      }`}
                     alt="Layer Preview"
                   />
                 ) : (
@@ -171,14 +187,14 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
           </Tooltip>
           {openColorSettings && selectedLayerId === layers[0].id && (
             <Draggable handle=".drag-handle">
-              <div className="z-50 absolute bg-white shadow-md border rounded">
-                <div className="bg-indigo-100 px-3 py-1 rounded-t font-semibold text-indigo-700 text-sm cursor-move drag-handle">
-                  🎨 Background Color
+              <div ref={pickerRef} className="z-50 absolute bg-white shadow-md rounded">
+                <div className="bg-mountain-100 px-3 py-1 rounded-t font-normal text-mountain-950 text-sm cursor-move drag-handle">
+                  🎨 Color Picker
                 </div>
                 {layers[0].type === "image" && (
-                  <ChromePicker
+                  <Sketch
                     color={(layers[0] as ImageLayer).backgroundColor}
-                    onChangeComplete={(color) => {
+                    onChange={(color) => {
                       const updated = [...layers];
                       const imageLayer = updated[0] as ImageLayer;
                       imageLayer.backgroundColor = color.hex;
@@ -207,6 +223,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
           </div>
         </div>
       </div>
+      {/* <ToggleFullScreen /> */}
       <ZoomTool
         zoomLevel={zoomLevel}
         handleZoomIn={handleZoomIn}

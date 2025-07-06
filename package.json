@@ -79,6 +79,7 @@
     "@tiptap/react": "^2.2.0",
     "@tiptap/starter-kit": "^2.11.9",
     "@types/react-show-more-text": "^1.4.5",
+    "@uiw/react-color": "^2.6.0",
     "art-share": "file:",
     "axios": "^1.8.4",
     "boring-avatars": "^1.11.2",

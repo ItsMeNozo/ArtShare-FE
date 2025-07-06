@@ -344,7 +344,7 @@ const Post: React.FC = () => {
   const displayAssets = !postData.is_mature || showMatureContent;
 
   return (
-    <div className="relative flex-grow bg-mountain-50 dark:bg-mountain-950 dark:bg-gradient-to-b dark:from-mountain-1000 dark:to-mountain-950 px-4 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar">
+    <div className="relative flex-grow bg-mountain-50 dark:bg-mountain-950 dark:bg-gradient-to-b dark:from-mountain-1000 dark:to-mountain-950 rounded-t-3xl h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar">
       <div className="md:hidden relative flex flex-col bg-white shadow p-4 rounded-2xl h-full">
         <div className="rounded-2xl h-full overflow-y-auto">
           <PostArtist artist={postData!.user} postData={postData!} />
@@ -370,15 +370,15 @@ const Post: React.FC = () => {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden md:flex flex-row gap-4 h-full">
-        <div className="flex flex-grow justify-center items-center h-full overflow-hidden sidebar">
+      <div className="hidden md:flex flex-row h-full">
+        <div className="flex flex-grow justify-center items-center h-full overflow-hidden">
           {displayAssets ? (
             <PostAssets medias={postData.medias} />
           ) : (
             <MatureContentWarning onShow={handleShowMatureContent} />
           )}
         </div>
-        <div className="relative flex-shrink-0 bg-white shadow py-0 pl-4 rounded-t-3xl sm:w-[256px] md:w-[384px] lg:w-[448px] overflow-hidden">
+        <div className="relative flex-shrink-0 bg-white shadow py-0 pl-4 sm:w-[256px] md:w-[384px] lg:w-[448px] overflow-hidden">
           <div className="flex flex-col gap-4 h-full sidebar">
             <PostArtist artist={postData!.user} postData={postData!} />
             <PostInfo

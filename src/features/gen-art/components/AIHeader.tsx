@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 //Icons
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { IoHome } from "react-icons/io5";
+import { PiStarFourFill } from "react-icons/pi";
 
 //Components
 import UserInAppConfigs from "../../../components/popovers/UserInAppConfigs";
@@ -13,16 +15,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Tooltip } from "@mui/material";
+import TrendingPrompt from "./AI/TrendingPrompt";
+import UserButton from "../../../components/header/user-button";
 
 //Context
 import { useUser } from '@/contexts/user/useUser';
-import UserButton from "../../../components/header/user-button";
-import { PiStarFourFill } from "react-icons/pi";
-import { useState } from "react";
-import TrendingPrompt from "./AI/TrendingPrompt";
-import { Tooltip } from "@mui/material";
-import { Button } from "@/components/ui/button";
-
 
 const AIHeader: React.FC = () => {
   const { user, loading } = useUser();
@@ -33,20 +32,16 @@ const AIHeader: React.FC = () => {
   };
 
   return (
-    <nav className={`z-50 w-[calc(100vw-360px)] flex relative justify-between items-center dark:bg-mountain-950 dark:border-b-mountain-700 h-14`}>
+    <nav className={`z-50 w-[calc(100vw-350px)] flex relative justify-between items-center dark:bg-mountain-950 dark:border-b-mountain-700 h-14`}>
       <div className="flex justify-between items-center pr-4 w-full">
-        <div className="flex space-x-2">
-          <Link to="/explore" className="flex items-center bg-mountain-50 hover:bg-mountain-100/80 px-4 border border-mountain-100 rounded-lg h-10">
-            <div className='flex justify-center items-center hover:bg-mountain-100 mr-2 rounded-lg'>
-              <FaArrowLeftLong className='size-5 text-mountain-600' />
-            </div>
-            <div className='flex items-center space-x-2'>
-              <span className='flex font-medium'>
-                Dashboard
-              </span>
-            </div>
-          </Link>
-        </div>
+        <Link to="/explore" className="flex items-center bg-mountain-50 hover:bg-mountain-100/80 px-4 border border border-mountain-100 border-mountain-200 rounded-lg h-10">
+          <div className='flex justify-center items-center hover:bg-mountain-100 mr-2 rounded-lg'>
+            <IoHome className='size-5 text-mountain-600' />
+          </div>
+          <span className='flex font-medium'>
+            Dashboard
+          </span>
+        </Link>
         <div className="flex items-center space-x-4 px-4 border-mountain-200 border-r-1">
           <Dialog open={open} onOpenChange={handleOpenModal}>
             <DialogTrigger asChild>

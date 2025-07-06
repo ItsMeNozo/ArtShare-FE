@@ -21,7 +21,7 @@ import {
   lightingOptions,
   ModelKey,
 } from "./enum";
-import { MockModelOptionsData } from "./mock/Data";
+import { MockModelOptionsData } from "./data/Data";
 
 //API Backend
 import { useQueryClient } from "@tanstack/react-query";
@@ -38,19 +38,6 @@ import { useScrollBottom } from "@/hooks/useScrollBottom";
 import { usePromptHistory } from "@/hooks/usePromptHistory";
 import { useLocation } from "react-router-dom";
 import AIHeader from "@/features/gen-art/components/AIHeader";
-
-{
-  /*
-A stunning realistic scene featuring a woman astronaut curiously peeking out of 
-her dormitory window aboard a futuristic space station, overlooking the breathtaking 
-view of Earth below. The setting showcases a vibrant blue planet adorned with swirling 
-clouds and continents. Surrounding the space station are sleek construction drones actively 
-working, along with various spacecraft gliding gracefully through the cosmos. 
-The artwork is richly detailed and realistic, inspired by the visionary style of Syd Mead, 
-capturing the intricate design of the space station and the dynamic activity in orbit, 
-with stars twinkling in the background creating a sense of vastness in space.
-*/
-}
 
 const PAGE_SIZE = 5;
 

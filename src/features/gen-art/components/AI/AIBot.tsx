@@ -109,7 +109,7 @@ const AIBotPopover = () => {
               clearChat();
               showSnackbar('Started new chat');
             }}
-            className='flex bg-indigo-50 text-indigo-950'
+            className='flex bg-indigo-50 hover:bg-indigo-100 text-indigo-950 cursor-pointer'
           >
             <RiChatNewLine />
             <p>New Chat</p>

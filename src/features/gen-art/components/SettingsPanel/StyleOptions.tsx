@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 
 //Assets
-import { MockModelOptionsData } from "../../mock/Data";
+import { MockModelOptionsData } from "../../data/Data";
 
 //Icons
 import { IoIosArrowForward } from "react-icons/io";

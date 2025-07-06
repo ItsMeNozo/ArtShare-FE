@@ -72,7 +72,7 @@ const FilterBar = ({
   const isAllChannelsSelected = selectedCategories === null;
 
   return (
-    <div className="flex items-center w-full gap-6 overflow-x-hidden categories-bar">
+    <div className="flex items-center gap-6 w-full overflow-x-hidden categories-bar">
       <Button
         className="flex flex-shrink-0 gap-2 dark:bg-mountain-900 shadow-none p-2 rounded-lg min-w-auto aspect-[1/1] font-normal dark:text-mountain-50 normal-case all-channels-btn"
         variant="contained"
@@ -99,21 +99,19 @@ const FilterBar = ({
       />
 
       <Button
-        className={`all-channels-btn flex gap-2 flex-shrink-0 rounded-lg p-2 ${
-          isAllChannelsSelected
-            ? " dark:bg-mountain-800"
-            : "dark:bg-mountain-900"
-        }  dark:text-mountain-200 normal-case font-normal shadow-none`}
+        className={`all-channels-btn flex gap-2 flex-shrink-0 rounded-lg p-2 ${isAllChannelsSelected
+          ? " dark:bg-mountain-800"
+          : "dark:bg-mountain-900"
+          }  dark:text-mountain-200 normal-case font-normal shadow-none`}
         variant={isAllChannelsSelected ? "contained" : "outlined"}
         onClick={handleAllChannelsClick}
         disableElevation={isAllChannelsSelected}
       >
         <div
-          className={`p-2 rounded aspect-[1/1] ${
-            isAllChannelsSelected
-              ? "text-indigo-400 bg-mountain-50 dark:bg-mountain-700 dark:text-primary-400"
-              : "text-mountain-900 bg-mountain-200 dark:bg-mountain-800 dark:text-mountain-300"
-          } `}
+          className={`p-2 rounded aspect-[1/1] ${isAllChannelsSelected
+            ? "text-indigo-400 bg-mountain-50 dark:bg-mountain-700 dark:text-primary-400"
+            : "text-mountain-900 bg-mountain-200 dark:bg-mountain-800 dark:text-mountain-300"
+            } `}
         >
           <LoaderPinwheel size={16} />
         </div>
