@@ -9,7 +9,7 @@ test.describe('Post Creation Integration Tests', () => {
 
     // Login with real credentials
     await helpers.loginWithTestUser();
-    await page.goto('/upload');
+    await page.goto('/posts/new');
   });
 
   test.afterEach(async () => {
@@ -20,11 +20,13 @@ test.describe('Post Creation Integration Tests', () => {
   test('@integration @unsafe Real Post Creation with Image Upload', async ({
     page,
   }) => {
-    // Step 1: Navigate to Upload Post page (already done in beforeEach)
-    await helpers.waitForElement('input[type="file"]');
+    // Step 1: Navigate to Create Post page (already done in beforeEach)
+    await helpers.waitForElement('input[type="file"][accept="image/*"]');
 
     // Step 2: Upload an image
-    const imageUpload = page.locator('input[type="file"]').first();
+    const imageUpload = page
+      .locator('input[type="file"][accept="image/*"]')
+      .first();
     await imageUpload.setInputFiles('tests/fixtures/image1.jpg');
 
     // Step 3: Verify image preview displays
@@ -78,7 +80,9 @@ test.describe('Post Creation Integration Tests', () => {
   test('@integration @unsafe Real Multiple Image Post Creation', async ({
     page,
   }) => {
-    const fileInput = page.locator('input[type="file"]').first();
+    const fileInput = page
+      .locator('input[type="file"][accept="image/*"]')
+      .first();
     const timestamp = new Date().getTime();
 
     // Upload multiple images
@@ -169,7 +173,9 @@ test.describe('Post Creation Integration Tests', () => {
     const timestamp = new Date().getTime();
 
     // Upload file and track the upload
-    const fileInput = page.locator('input[type="file"]').first();
+    const fileInput = page
+      .locator('input[type="file"][accept="image/*"]')
+      .first();
     await fileInput.setInputFiles('tests/fixtures/image1.jpg');
     await helpers.waitForElement('.media-preview');
 
