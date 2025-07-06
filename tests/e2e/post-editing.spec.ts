@@ -190,7 +190,7 @@ test.describe('Post Editing', () => {
 
   test('@unsafe SCRUM-356-5: Mature Content Detection', async ({ page }) => {
     // Navigate to create post page
-    await page.goto('/upload');
+    await page.goto('/posts/new');
 
     // Upload an image that triggers mature content detection
     await page

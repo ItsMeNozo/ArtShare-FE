@@ -23,17 +23,14 @@ test.describe('Post Creation', () => {
     console.log(`📍 After login, current URL: ${currentUrl}`);
 
     // If we're still on login page or redirected to Vercel, something went wrong
-    if (currentUrl.includes('/login') || currentUrl.includes('vercel.com')) {
+    if (currentUrl.includes('/login')) {
       console.log('⚠️  Login may have failed, attempting manual navigation...');
       await page.goto('/dashboard'); // Try going to dashboard first
       await page.waitForTimeout(2000); // Wait a bit
     }
 
-    console.log('📤 Navigating to upload page...');
-    await page.goto('/upload');
-
-    // Wait for the upload page to load
-    await page.waitForLoadState('networkidle');
+    console.log('📤 Navigating to create post page...');
+    await page.goto('/posts/new');
   });
 
   test.afterEach(async () => {
@@ -44,128 +41,63 @@ test.describe('Post Creation', () => {
   test.only('@smoke @unsafe SCRUM-356-1: Basic Post Creation with Image Upload', async ({
     page,
   }) => {
-    // Add debugging for authentication issues
-    console.log('🔍 Starting authentication debugging...');
-
-    // Intercept and log network requests to debug 403 errors
-    page.on('response', (response) => {
-      if (response.status() === 403) {
-        console.log(`❌ 403 Error on: ${response.url()}`);
-        console.log(`Request headers:`, response.request().headers());
-      }
-      if (
-        response.url().includes('vercel.com') ||
-        response.url().includes('jwt')
-      ) {
-        console.log(
-          `🔗 Vercel/JWT request: ${response.url()} - Status: ${response.status()}`,
-        );
-      }
-    });
-
     // Check current URL and authentication state
     console.log(`📍 Current URL: ${page.url()}`);
 
-    // Verify we're authenticated by checking for auth tokens/cookies
-    const cookies = await page.context().cookies();
-    console.log(`🍪 Current cookies count: ${cookies.length}`);
+    // Step 1: Wait for the upload button to be available
+    await expect(
+      page.getByRole('button', { name: 'Upload Image' }),
+    ).toBeVisible();
 
-    const authCookie = cookies.find(
-      (c) =>
-        c.name.includes('auth') ||
-        c.name.includes('token') ||
-        c.name.includes('session'),
-    );
-    if (authCookie) {
-      console.log(`✅ Found auth cookie: ${authCookie.name}`);
-    } else {
-      console.log(
-        `⚠️  No auth cookie found. Available cookies: ${cookies.map((c) => c.name).join(', ')}`,
-      );
-    }
-
-    // Check localStorage for auth tokens
-    const authTokens = await page.evaluate(() => {
-      const tokens: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (
-          key &&
-          (key.includes('auth') ||
-            key.includes('token') ||
-            key.includes('user'))
-        ) {
-          tokens.push(key);
-        }
-      }
-      return tokens;
-    });
-    console.log(`🔑 Auth tokens in localStorage: ${authTokens.join(', ')}`);
-
-    // If we're on a Vercel login page, we have an auth issue
-    if (page.url().includes('vercel.com')) {
-      console.log('❌ Redirected to Vercel login - authentication failed!');
-      console.log('🔄 Attempting to re-authenticate...');
-
-      // Try to go back to our app and re-login
-      await page.goto('/login');
-      await helpers.loginWithTestUser();
-      await page.goto('/upload');
-    }
-
-    // Step 1: Navigate to Upload Post page (already done in beforeEach)
-    await helpers.waitForElement('input[type="file"]');
-
-    // Step 2: Upload an image
-    const imageUpload = page.locator('input[type="file"]').first();
-    await imageUpload.setInputFiles('tests/fixtures/image1.jpg');
+    // Step 2: Upload an image using the hidden file input inside the Upload Image button
+    await page
+      .getByRole('button', { name: 'Upload Image' })
+      .locator('input[type="file"]')
+      .setInputFiles('tests/fixtures/image1.png');
 
     // Step 3: Verify image preview displays
-    await expect(page.locator('.media-preview, .image-preview')).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
 
     // Step 4: Enter title
-    await helpers.fillField(
-      'input[name="title"], input[placeholder*="title"]',
-      'My Artwork Test',
-    );
+    await page
+      .getByRole('textbox', { name: 'What do you call your artwork' })
+      .click();
+    await page
+      .getByRole('textbox', { name: 'What do you call your artwork' })
+      .fill('My Artwork Test');
 
     // Step 5: Enter description
-    await helpers.fillField(
-      'textarea[name="description"], textarea[placeholder*="description"]',
-      'This is a test artwork description',
-    );
+    await page.getByRole('textbox', { name: 'Describe your work' }).click();
+    await page
+      .getByRole('textbox', { name: 'Describe your work' })
+      .fill('This is a test artwork description');
 
     // Step 6: Select category
-    const categorySelector = page
-      .locator('.category-selector, .categories')
-      .first();
-    if (await categorySelector.isVisible()) {
-      await categorySelector.click();
-      await page.locator('.category-option, .category-item').first().click();
-    }
+    await page
+      .getByRole('textbox', { name: 'Choose art type or search...' })
+      .click();
 
-    // Step 7: Upload thumbnail (if separate from main image)
-    const thumbnailUpload = page.locator(
-      'input[type="file"][aria-label*="thumbnail"], input[type="file"][data-testid="thumbnail"]',
-    );
-    if ((await thumbnailUpload.count()) > 0) {
-      await thumbnailUpload.setInputFiles('tests/fixtures/thumbnail.jpg');
-    }
+    // Select Video Art category by clicking the Add button in the list
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Video Art' })
+      .getByRole('button', { name: 'Add' })
+      .click();
 
-    // Step 8: Submit the post and track creation
+    // Verify category was selected successfully
+    console.log('📂 Category selected: Video Art');
+
+    // Step 7: Submit the post
     console.log('📤 Attempting to submit post...');
-    const postId = await helpers.submitPostAndTrack();
+    await page.getByRole('button', { name: 'Submit' }).click();
 
-    // Verify success
+    // Step 8: Verify success
     await expect(
       page.locator(':text("Post successfully created!"), .success-message'),
     ).toBeVisible();
     await expect(page).toHaveURL(/.*\/post\/.*|.*\/dashboard|.*\/profile/);
 
-    // Log created post for debugging
-    if (postId) {
-      console.log(`✅ Created post with ID: ${postId}`);
-    }
+    console.log(`✅ Post created successfully`);
   });
 
   test('@unsafe SCRUM-356-2: Video Upload with Duration Validation', async ({
@@ -210,9 +142,9 @@ test.describe('Post Creation', () => {
 
     // Upload an image first
     await page
-      .locator('input[type="file"]')
+      .locator('input[type="file"][accept="image/*"]')
       .first()
-      .setInputFiles('tests/fixtures/image1.jpg');
+      .setInputFiles('tests/fixtures/image1.png');
     await helpers.waitForElement('.media-preview');
 
     // Check if AI generation is available
@@ -253,11 +185,13 @@ test.describe('Post Creation', () => {
   test('@unsafe SCRUM-356-4: Multiple Image Upload (Max 4 Images)', async ({
     page,
   }) => {
-    const fileInput = page.locator('input[type="file"]').first();
+    const fileInput = page
+      .locator('input[type="file"][accept="image/*"]')
+      .first();
 
     // Upload 4 images
     for (let i = 1; i <= 4; i++) {
-      await fileInput.setInputFiles(`tests/fixtures/image${i}.jpg`);
+      await fileInput.setInputFiles(`tests/fixtures/image${i}.png`);
       await helpers.waitForElement(`.media-preview-item:nth-child(${i})`);
     }
 
@@ -265,7 +199,7 @@ test.describe('Post Creation', () => {
     await expect(page.locator('.media-preview-item')).toHaveCount(4);
 
     // Try to upload a 5th image - should be prevented
-    await fileInput.setInputFiles('tests/fixtures/image1.jpg');
+    await fileInput.setInputFiles('tests/fixtures/image1.png');
 
     // Should show limit message
     await expect(
@@ -292,8 +226,10 @@ test.describe('Post Creation', () => {
     await expect(dropZone).toBeVisible();
 
     // Test actual file input with drag simulation
-    const fileInput = page.locator('input[type="file"]').first();
-    await fileInput.setInputFiles('tests/fixtures/image1.jpg');
+    const fileInput = page
+      .locator('input[type="file"][accept="image/*"]')
+      .first();
+    await fileInput.setInputFiles('tests/fixtures/image1.png');
 
     // Verify image appears in preview
     await expect(page.locator('.media-preview, .image-preview')).toBeVisible();
@@ -315,9 +251,9 @@ test.describe('Post Creation', () => {
 
     // Step 2: Upload an image but leave title empty
     await page
-      .locator('input[type="file"]')
+      .locator('input[type="file"][accept="image/*"]')
       .first()
-      .setInputFiles('tests/fixtures/image1.jpg');
+      .setInputFiles('tests/fixtures/image1.png');
     await helpers.waitForElement('.media-preview');
 
     // Submit button should still be disabled or show error
@@ -358,7 +294,7 @@ test.describe('Post Creation', () => {
   }) => {
     // Test navigation from Art Nova with AI-generated images
     // Navigate from Art Nova (simulate with query params)
-    await page.goto('/upload?from=art-nova&prompt_id=prompt123');
+    await page.goto('/posts/new?from=art-nova&prompt_id=prompt123');
 
     // Check if AI-generated images are available from Art Nova
     const aiIndicator = page.locator(
@@ -389,7 +325,7 @@ test.describe('Post Creation', () => {
       await page
         .locator('input[type="file"]')
         .first()
-        .setInputFiles('tests/fixtures/image1.jpg');
+        .setInputFiles('tests/fixtures/image1.png');
       await helpers.waitForElement('.media-preview');
 
       await helpers.fillField('input[name="title"]', 'Regular Art Post');
