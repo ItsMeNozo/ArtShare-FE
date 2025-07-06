@@ -9,7 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "playwright test --project=e2e-chrome",
-    "test:ui": "playwright test --ui --trace on",
+    "test:ui": "playwright test --ui --project=unsafe --trace on",
     "test:smoke": "playwright test --project=smoke",
     "test:safe": "playwright test --project=safe",
     "test:unsafe": "playwright test --project=unsafe --trace on",
