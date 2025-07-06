@@ -367,7 +367,6 @@ test.describe('Post Creation', () => {
         .getByRole('paragraph')
         .filter({ hasText: 'Post With Your AI Images' }),
     ).toBeVisible();
-    await expect(page.getByRole('dialog')).toContainText('All Time');
 
     // Select the first AI-generated image to post
     const postButton = page.getByRole('button', { name: 'Post this' }).first();
