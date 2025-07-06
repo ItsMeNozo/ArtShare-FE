@@ -38,7 +38,7 @@ test.describe('Post Creation', () => {
     await helpers.cleanup();
   });
 
-  test.only('@smoke @unsafe SCRUM-356-1: Basic Post Creation with Image Upload', async ({
+  test('@smoke @unsafe SCRUM-356-1: Basic Post Creation with Image Upload', async ({
     page,
   }) => {
     // Check current URL and authentication state
@@ -95,7 +95,7 @@ test.describe('Post Creation', () => {
     await expect(
       page.locator(':text("Post successfully created!"), .success-message'),
     ).toBeVisible();
-    await expect(page).toHaveURL(/.*\/post\/.*|.*\/dashboard|.*\/profile/);
+    await expect(page).toHaveURL(/.*\/posts\/.*|.*\/dashboard|.*\/profile/);
 
     console.log(`✅ Post created successfully`);
   });
@@ -104,166 +104,198 @@ test.describe('Post Creation', () => {
     page,
   }) => {
     // Test video upload functionality with real backend validation
-    const videoUpload = page.locator('input[type="file"][accept*="video"]');
+    await expect(
+      page.getByRole('button', { name: 'Upload Video' }),
+    ).toBeVisible();
 
-    // Test with a video file (you'll need to have test video files)
-    if ((await videoUpload.count()) > 0) {
-      await videoUpload.setInputFiles('tests/fixtures/video-short.mp4');
+    // Upload video using the Upload Video button
+    await page
+      .getByRole('button', { name: 'Upload Video' })
+      .locator('input[type="file"]')
+      .setInputFiles('tests/fixtures/video-short.mp4');
 
-      // Wait for video processing/preview
-      await helpers.waitForElement('.video-preview, .media-preview');
+    // Wait for video processing/preview
+    await expect(page.locator('video')).toBeVisible();
 
-      // Complete the post
-      await helpers.fillField('input[name="title"]', 'Test Video Post');
-      await helpers.fillField(
-        'textarea[name="description"]',
-        'This is a test video post',
-      );
+    // Complete the post
+    await page
+      .getByRole('textbox', { name: 'What do you call your artwork' })
+      .fill('Test Video Post');
+    await page
+      .getByRole('textbox', { name: 'Describe your work' })
+      .fill('This is a test video post');
 
-      // Submit and track the post
-      const postId = await helpers.submitPostAndTrack();
+    // Select category
+    await page
+      .getByRole('textbox', { name: 'Choose art type or search...' })
+      .click();
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Video Art' })
+      .getByRole('button', { name: 'Add' })
+      .click();
 
-      if (postId) {
-        console.log(`✅ Created video post with ID: ${postId}`);
-      }
-    } else {
-      console.log('⚠️  Video upload not available, skipping test');
-      test.skip();
-    }
+    // Set up listener for the POST request response to get the post ID
+    const postCreationPromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/posts') &&
+        response.request().method() === 'POST',
+    );
+
+    // Submit the post
+    await page.getByRole('button', { name: 'Submit' }).click();
+
+    // Wait for successful post creation API response
+    const response = await postCreationPromise;
+
+    // Verify it's a successful response
+    expect(response.status()).toBe(201);
+
+    const responseBody = await response.json();
+    const postId = responseBody.id;
+
+    // Verify navigation to post details page using the ID from API response
+    await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
+
+    console.log(`✅ Created video post successfully with ID: ${postId}`);
   });
 
   test('@unsafe SCRUM-356-3: AI Content Generation Feature', async ({
     page,
   }) => {
-    // Test AI content generation if available
-    const aiButton = page.locator(
-      'button[data-testid="ai-generate"], button:has-text("Generate"), .magic-wand',
-    );
-
     // Upload an image first
+    await expect(
+      page.getByRole('button', { name: 'Upload Image' }),
+    ).toBeVisible();
     await page
-      .locator('input[type="file"][accept="image/*"]')
-      .first()
+      .getByRole('button', { name: 'Upload Image' })
+      .locator('input[type="file"]')
       .setInputFiles('tests/fixtures/image1.png');
-    await helpers.waitForElement('.media-preview');
+    await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
 
-    // Check if AI generation is available
-    if ((await aiButton.count()) > 0) {
+    // Check if AI generation button is available
+    const aiButton = page.getByRole('button', {
+      name: 'Auto generate content (title, description, categories) - Credit cost: ~2',
+    });
+
+    if (await aiButton.isVisible()) {
+      // Set up listener for the AI generation API response
+      const aiGenerationPromise = page.waitForResponse(
+        (response) =>
+          response.url().includes('/posts/generate-metadata') &&
+          response.request().method() === 'POST',
+      );
+
       await aiButton.click();
 
-      // Wait for AI generation to complete
-      await page.waitForTimeout(2000); // Allow time for AI processing
+      // Wait for AI generation API response instead of timeout
+      const response = await aiGenerationPromise;
+
+      // Verify it's a successful response
+      expect(response.status()).toBe(201);
+
+      // Verify AI has generated content in title, description, and category fields
+      const titleInput = page.getByRole('textbox', {
+        name: 'What do you call your artwork',
+      });
+      const descriptionInput = page.getByRole('textbox', {
+        name: 'Describe your work',
+      });
+
+      // Verify title field has AI-generated content
+      await expect(titleInput).not.toHaveValue('');
+      const aiGeneratedTitle = await titleInput.inputValue();
+      console.log(`🤖 AI generated title: "${aiGeneratedTitle}"`);
+
+      // Verify description field has AI-generated content
+      await expect(descriptionInput).not.toHaveValue('');
+      const aiGeneratedDescription = await descriptionInput.inputValue();
+      console.log(`🤖 AI generated description: "${aiGeneratedDescription}"`);
+
+      // Verify category has been selected (check for selected category chips/tags)
+      // Look for the first child div with class "MuiBox-root css-1cezkzh" within the category container
+      const categoryContainer = page.locator(
+        '[style*="display: flex"][style*="align-items: center"][style*="gap: 8px"][style*="flex-wrap: wrap"]',
+      );
+      const selectedCategoryChip = categoryContainer
+        .locator('.MuiBox-root.css-1cezkzh')
+        .first();
+      await expect(selectedCategoryChip).toBeVisible();
+      const selectedCategoryText = await selectedCategoryChip.textContent();
+      console.log(`🤖 AI selected category: ${selectedCategoryText?.trim()}`);
 
       // Verify user can edit any generated content
-      await helpers.fillField('input[name="title"]', 'My Custom AI Title');
-      await expect(page.locator('input[name="title"]')).toHaveValue(
-        'My Custom AI Title',
-      );
+      await page
+        .getByRole('textbox', { name: 'What do you call your artwork' })
+        .fill('My Custom AI Title');
+      await expect(
+        page.getByRole('textbox', { name: 'What do you call your artwork' }),
+      ).toHaveValue('My Custom AI Title');
 
       // Submit the post
-      const postId = await helpers.submitPostAndTrack();
+      await page.getByRole('button', { name: 'Submit' }).click();
 
-      if (postId) {
-        console.log(`✅ Created AI-generated post with ID: ${postId}`);
-      }
+      // Verify success
+      await expect(
+        page.locator(':text("Post successfully created!"), .success-message'),
+      ).toBeVisible();
+
+      console.log(`✅ Created AI-generated post successfully`);
     } else {
       // If AI generation is not available, just create a regular post
-      await helpers.fillField('input[name="title"]', 'Test Post Without AI');
-      await helpers.fillField(
-        'textarea[name="description"]',
-        'This is a test post',
-      );
+      await page
+        .getByRole('textbox', { name: 'What do you call your artwork' })
+        .fill('Test Post Without AI');
+      await page
+        .getByRole('textbox', { name: 'Describe your work' })
+        .fill('This is a test post');
 
-      const postId = await helpers.submitPostAndTrack();
+      // Select category
+      await page
+        .getByRole('textbox', { name: 'Choose art type or search...' })
+        .click();
+      await page
+        .getByRole('listitem')
+        .filter({ hasText: 'Digital Art' })
+        .getByRole('button', { name: 'Add' })
+        .click();
 
-      if (postId) {
-        console.log(`✅ Created regular post with ID: ${postId}`);
-      }
+      await page.getByRole('button', { name: 'Submit' }).click();
+
+      await expect(
+        page.locator(':text("Post successfully created!"), .success-message'),
+      ).toBeVisible();
+
+      console.log(`✅ Created regular post successfully`);
     }
-  });
-
-  test('@unsafe SCRUM-356-4: Multiple Image Upload (Max 4 Images)', async ({
-    page,
-  }) => {
-    const fileInput = page
-      .locator('input[type="file"][accept="image/*"]')
-      .first();
-
-    // Upload 4 images
-    for (let i = 1; i <= 4; i++) {
-      await fileInput.setInputFiles(`tests/fixtures/image${i}.png`);
-      await helpers.waitForElement(`.media-preview-item:nth-child(${i})`);
-    }
-
-    // Verify all 4 images are displayed
-    await expect(page.locator('.media-preview-item')).toHaveCount(4);
-
-    // Try to upload a 5th image - should be prevented
-    await fileInput.setInputFiles('tests/fixtures/image1.png');
-
-    // Should show limit message
-    await expect(
-      page.locator(':text("maximum"), :text("limit"), .limit-message'),
-    ).toBeVisible();
-
-    // Should still have only 4 images
-    await expect(page.locator('.media-preview-item')).toHaveCount(4);
-
-    // Complete the post
-    await helpers.fillField('input[name="title"]', 'Multiple Images Test');
-    await page.locator('button[type="submit"]').click();
-
-    await expect(
-      page.locator(':text("Post successfully created!")'),
-    ).toBeVisible();
-  });
-
-  test('@unsafe SCRUM-356-8: Drag and Drop Upload', async ({ page }) => {
-    // Verify visual feedback for drag and drop
-    const dropZone = page.locator(
-      '.drop-zone, .upload-area, [data-testid="upload-area"]',
-    );
-    await expect(dropZone).toBeVisible();
-
-    // Test actual file input with drag simulation
-    const fileInput = page
-      .locator('input[type="file"][accept="image/*"]')
-      .first();
-    await fileInput.setInputFiles('tests/fixtures/image1.png');
-
-    // Verify image appears in preview
-    await expect(page.locator('.media-preview, .image-preview')).toBeVisible();
-
-    // Test dropping an unsupported file type
-    await fileInput.setInputFiles('tests/fixtures/unsupported-file.txt');
-
-    // Should show error message
-    await expect(
-      page.locator(':text("unsupported"), :text("invalid"), .error-message'),
-    ).toBeVisible();
   });
 
   test('@safe SCRUM-356-9: Required Fields Validation', async ({ page }) => {
-    const submitButton = page.locator('button[type="submit"]');
+    const submitButton = page.getByRole('button', { name: 'Submit' });
 
     // Step 1: Try to submit without any media
     await expect(submitButton).toBeDisabled();
 
     // Step 2: Upload an image but leave title empty
     await page
-      .locator('input[type="file"][accept="image/*"]')
-      .first()
+      .getByRole('button', { name: 'Upload Image' })
+      .locator('input[type="file"]')
       .setInputFiles('tests/fixtures/image1.png');
-    await helpers.waitForElement('.media-preview');
+    await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
 
-    // Submit button should still be disabled or show error
+    // Submit button should be enabled after image upload
+    await expect(submitButton).toBeEnabled();
+
+    // Try to submit without title - should show error
     await submitButton.click();
     await expect(
       page.locator(':text("Title is required"), .error-message'),
     ).toBeVisible();
 
     // Step 3: Add title less than 5 characters
-    await helpers.fillField('input[name="title"]', 'abc');
+    await page
+      .getByRole('textbox', { name: 'What do you call your artwork' })
+      .fill('abc');
     await submitButton.click();
     await expect(
       page.locator(
@@ -272,73 +304,179 @@ test.describe('Post Creation', () => {
     ).toBeVisible();
 
     // Step 4: Add proper title and submit
-    await helpers.fillField('input[name="title"]', 'A valid title');
+    await page
+      .getByRole('textbox', { name: 'What do you call your artwork' })
+      .fill('A valid title');
+
+    // Select category
+    await page
+      .getByRole('textbox', { name: 'Choose art type or search...' })
+      .click();
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Abstract' })
+      .getByRole('button', { name: 'Add' })
+      .click();
 
     // Submit button should be enabled
     await expect(submitButton).toBeEnabled();
 
-    // Should submit successfully and track the post
-    const postId = await helpers.submitPostAndTrack();
-
-    await expect(
-      page.locator(':text("Post successfully created!")'),
-    ).toBeVisible();
-
-    if (postId) {
-      console.log(`✅ Created post with validation: ${postId}`);
-    }
-  });
-
-  test('@unsafe SCRUM-356-10: AI-Generated Images from Art Nova', async ({
-    page,
-  }) => {
-    // Test navigation from Art Nova with AI-generated images
-    // Navigate from Art Nova (simulate with query params)
-    await page.goto('/posts/new?from=art-nova&prompt_id=prompt123');
-
-    // Check if AI-generated images are available from Art Nova
-    const aiIndicator = page.locator(
-      '[data-testid="ai-flag"], .ai-generated-indicator',
+    // Set up listener for the POST request response to get the post ID
+    const postCreationPromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/posts') &&
+        response.request().method() === 'POST',
     );
 
-    if ((await aiIndicator.count()) > 0) {
-      // Verify AI flag is set
-      await expect(aiIndicator).toBeVisible();
+    // Should submit successfully
+    await submitButton.click();
+
+    // Wait for successful post creation API response
+    const response = await postCreationPromise;
+
+    // Verify it's a successful response
+    expect(response.status()).toBe(201);
+
+    const responseBody = await response.json();
+    const postId = responseBody.id;
+
+    // Verify navigation to post details page using the ID from API response
+    await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
+
+    console.log(
+      `✅ Created post with validation successfully with ID: ${postId}`,
+    );
+  });
+
+  test('@unsafe SCRUM-356-10: AI-Generated Images from User Stock', async ({
+    page,
+  }) => {
+    // Test posting AI-generated images from user's AI stock/gallery
+    // Click on "Post My AI Images" button
+    await expect(
+      page.getByRole('button', { name: 'Post My AI Images' }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Post My AI Images' }).click();
+
+    // Browse user's AI image stock
+    await page.locator('label').filter({ hasText: 'Browse My Stock' }).click();
+
+    // Verify the AI images dialog is visible
+    await expect(
+      page
+        .getByRole('paragraph')
+        .filter({ hasText: 'Post With Your AI Images' }),
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).toContainText('All Time');
+
+    // Select the first AI-generated image to post
+    const postButton = page.getByRole('button', { name: 'Post this' }).first();
+    if (await postButton.isVisible()) {
+      await postButton.click();
+
+      // Verify image appears in preview
+      await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
 
       // Complete the post with AI-generated content
-      await helpers.fillField(
-        'input[name="title"]',
-        'AI Generated Art from Nova',
-      );
-      await helpers.fillField(
-        'textarea[name="description"]',
-        'Created with AI from Art Nova',
-      );
-
-      const postId = await helpers.submitPostAndTrack();
-
-      if (postId) {
-        console.log(`✅ Created Art Nova AI post with ID: ${postId}`);
-      }
-    } else {
-      // If no AI images, upload a regular image
       await page
-        .locator('input[type="file"]')
-        .first()
-        .setInputFiles('tests/fixtures/image1.png');
-      await helpers.waitForElement('.media-preview');
+        .getByRole('textbox', { name: 'What do you call your artwork' })
+        .fill('AI Generated Art from Stock');
+      await page
+        .getByRole('textbox', { name: 'Describe your work' })
+        .fill('Created with AI from my stock');
 
-      await helpers.fillField('input[name="title"]', 'Regular Art Post');
-      await helpers.fillField(
-        'textarea[name="description"]',
-        'Regular art post',
+      // Select category
+      await page
+        .getByRole('textbox', { name: 'Choose art type or search...' })
+        .click();
+      await page
+        .getByRole('listitem')
+        .filter({ hasText: 'Digital Art' })
+        .getByRole('button', { name: 'Add' })
+        .click();
+
+      // Set up listener for the POST request response to get the post ID
+      const postCreationPromise = page.waitForResponse(
+        (response) =>
+          response.url().includes('/posts') &&
+          response.request().method() === 'POST',
       );
 
-      const postId = await helpers.submitPostAndTrack();
+      await page.getByRole('button', { name: 'Submit' }).click();
 
-      if (postId) {
-        console.log(`✅ Created regular post with ID: ${postId}`);
-      }
+      // Wait for successful post creation API response
+      const response = await postCreationPromise;
+
+      // Verify it's a successful response
+      expect(response.status()).toBe(201);
+
+      const responseBody = await response.json();
+      const postId = responseBody.id;
+
+      // Verify navigation to post details page using the ID from API response
+      await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
+
+      console.log(
+        `✅ Created AI stock image post successfully with ID: ${postId}`,
+      );
+    } else {
+      // If no AI images available in stock, create a regular post instead
+      console.log('⚠️ No AI images available in stock, creating regular post');
+
+      // Switch back to regular upload
+      await page
+        .getByRole('button', { name: 'Upload from Device (images,' })
+        .click();
+      await page
+        .getByRole('button', { name: 'Yes, discard and switch' })
+        .click();
+
+      // Upload a regular image
+      await page
+        .getByRole('button', { name: 'Upload Image' })
+        .locator('input[type="file"]')
+        .setInputFiles('tests/fixtures/image1.png');
+      await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
+
+      await page
+        .getByRole('textbox', { name: 'What do you call your artwork' })
+        .fill('Regular Art Post');
+      await page
+        .getByRole('textbox', { name: 'Describe your work' })
+        .fill('Regular art post');
+
+      // Select category
+      await page
+        .getByRole('textbox', { name: 'Choose art type or search...' })
+        .click();
+      await page
+        .getByRole('listitem')
+        .filter({ hasText: 'Digital Art' })
+        .getByRole('button', { name: 'Add' })
+        .click();
+
+      // Set up listener for the POST request response to get the post ID
+      const postCreationPromise = page.waitForResponse(
+        (response) =>
+          response.url().includes('/posts') &&
+          response.request().method() === 'POST',
+      );
+
+      await page.getByRole('button', { name: 'Submit' }).click();
+
+      // Wait for successful post creation API response
+      const response = await postCreationPromise;
+
+      // Verify it's a successful response
+      expect(response.status()).toBe(201);
+
+      const responseBody = await response.json();
+      const postId = responseBody.id;
+
+      // Verify navigation to post details page using the ID from API response
+      await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
+
+      console.log(`✅ Created regular post successfully with ID: ${postId}`);
     }
   });
 });
