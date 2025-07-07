@@ -11,12 +11,9 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { LockIcon } from 'lucide-react';
 import React from 'react';
-import {
-  FiPlus as AddIcon,
-  FiX as DeleteIcon,
-  FiLock as LockIcon,
-} from 'react-icons/fi';
+import { FiPlus as AddIcon, FiX as DeleteIcon } from 'react-icons/fi';
 import { SelectedCollectionId, SliderItem } from '../types/collection';
 
 const CARD_MIN_WIDTH = 256;
@@ -157,27 +154,6 @@ const renderSliderItem = (
                   }}
                 ></Box>
               )}
-              {isCollection && item.isPrivate && (
-                <Tooltip title="Private">
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: 8,
-                      right: 8,
-                      zIndex: 1,
-                      color: 'white',
-                      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                      borderRadius: '50%',
-                      p: 0.5,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <LockIcon size={12} />
-                  </Box>
-                </Tooltip>
-              )}
             </Box>
             <CardContent sx={{ flexGrow: 1, width: '100%', p: 0, pt: 1.5 }}>
               <Typography
@@ -193,6 +169,27 @@ const renderSliderItem = (
                 {loadingCollections ? '...' : `${item.count} items`}
               </Typography>
             </CardContent>
+            {isCollection && item.isPrivate && (
+              <Tooltip title="Private">
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 12,
+                    right: 12,
+                    zIndex: 1,
+                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    borderRadius: '50%',
+                    p: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <LockIcon size={12} />
+                </Box>
+              </Tooltip>
+            )}
           </CardActionArea>
         </Card>
       );

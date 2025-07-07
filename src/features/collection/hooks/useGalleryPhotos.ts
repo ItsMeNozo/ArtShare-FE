@@ -26,6 +26,8 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
       setIsProcessing(true);
       setProcessingError(null);
 
+      console.log('🚀 ~ ', posts);
+
       try {
         const photosPromises = posts
           .filter(
@@ -34,6 +36,7 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
           )
           .map(async (post): Promise<GalleryPhoto | null> => {
             const imageUrl = post.thumbnailUrl || post.medias?.[0]?.url;
+            console.log('🚀 ~ ', imageUrl);
             if (!imageUrl) return null;
 
             try {

@@ -12,7 +12,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SearchInput } from '@/components/SearchInput';
 import { Collection, Post } from '@/types';
@@ -65,87 +65,80 @@ const CollectionPage: React.FC = () => {
     return collections.map((col) => col.name);
   }, [collections]);
 
-  const {
-    publicPosts,
-    privatePosts,
-    newestPublicThumbnail,
-    newestPrivateThumbnail,
-  } = useMemo(() => {
+  const allPostsData = useMemo(() => {
     if (loadingCollections || !collections) {
       return {
-        publicPosts: [],
-        privatePosts: [],
+        allPublicPosts: [],
+        allPrivatePosts: [],
+        allPostsCombined: [],
         newestPublicThumbnail: undefined,
         newestPrivateThumbnail: undefined,
+        newestCombinedThumbnail: undefined,
       };
     }
 
-    const pubCollections = collections.filter((c) => !c.isPrivate && c.posts);
-    const pubPosts = pubCollections.flatMap((col) => col.posts);
+    const publicCollections = collections.filter((c) => !c.isPrivate);
+    const publicPosts = publicCollections.flatMap((col) => col.posts || []);
     const uniquePublicMap = new Map<number, Post>();
-    pubPosts.forEach((post) => {
-      if (!uniquePublicMap.has(post.id)) {
-        uniquePublicMap.set(post.id, post);
-      }
-    });
-    const uniquePublicPosts = Array.from(uniquePublicMap.values()).sort(
+    publicPosts.forEach((post) => uniquePublicMap.set(post.id, post));
+    const allPublicPosts = Array.from(uniquePublicMap.values()).sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-    const newestPublicPost = uniquePublicPosts[0];
+    const newestPublicPost = allPublicPosts[0];
     const pubThumbnail =
       newestPublicPost?.thumbnailUrl || newestPublicPost?.medias?.[0]?.url;
 
-    const privCollections = collections.filter((c) => c.isPrivate && c.posts);
-    const privPosts = privCollections.flatMap((col) => col.posts);
+    const privateCollections = collections.filter((c) => c.isPrivate);
+    const privatePosts = privateCollections.flatMap((col) => col.posts || []);
     const uniquePrivateMap = new Map<number, Post>();
-    privPosts.forEach((post) => {
-      if (!uniquePrivateMap.has(post.id)) {
-        uniquePrivateMap.set(post.id, post);
-      }
-    });
-    const uniquePrivatePosts = Array.from(uniquePrivateMap.values()).sort(
+    privatePosts.forEach((post) => uniquePrivateMap.set(post.id, post));
+    const allPrivatePosts = Array.from(uniquePrivateMap.values()).sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-    const newestPrivatePost = uniquePrivatePosts[0];
+    const newestPrivatePost = allPrivatePosts[0];
     const privThumbnail =
       newestPrivatePost?.thumbnailUrl || newestPrivatePost?.medias?.[0]?.url;
 
+    const combinedMap = new Map<number, Post>();
+    [...allPublicPosts, ...allPrivatePosts].forEach((post) => {
+      combinedMap.set(post.id, post);
+    });
+    const allPostsCombined = Array.from(combinedMap.values()).sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    const newestCombinedPost = allPostsCombined[0];
+    const combinedThumbnail =
+      newestCombinedPost?.thumbnailUrl || newestCombinedPost?.medias?.[0]?.url;
+
     return {
-      publicPosts: uniquePublicPosts,
-      privatePosts: uniquePrivatePosts,
+      allPublicPosts,
+      allPrivatePosts,
+      allPostsCombined,
       newestPublicThumbnail: pubThumbnail,
       newestPrivateThumbnail: privThumbnail,
+      newestCombinedThumbnail: combinedThumbnail,
     };
-  }, [
-    collections,
-    loadingCollections /* allPosts dependency removed if not used for unassigned */,
-  ]);
+  }, [collections, loadingCollections]);
 
   const filteredPosts = useMemo<Post[]>(() => {
-    console.log(
-      `FILTERED_POSTS: Recalculating. Selected ID: ${selectedCollectionId}, Show Only Private: ${showOnlyPrivate}`,
-    );
     if (loadingCollections) return [];
 
     if (selectedCollectionId === 'all') {
-      return showOnlyPrivate ? privatePosts : publicPosts;
+      return showOnlyPrivate
+        ? allPostsData.allPrivatePosts
+        : allPostsData.allPostsCombined;
     } else {
-      if (currentCollection) {
-        const collectionMatchesFilter =
-          !showOnlyPrivate || currentCollection.isPrivate;
-        return collectionMatchesFilter ? currentCollection.posts || [] : [];
-      }
-      return [];
+      return currentCollection?.posts || [];
     }
   }, [
-    publicPosts,
-    privatePosts,
-    currentCollection,
     selectedCollectionId,
-    loadingCollections,
+    currentCollection,
     showOnlyPrivate,
+    allPostsData,
+    loadingCollections,
   ]);
 
   const {
@@ -175,20 +168,19 @@ const CollectionPage: React.FC = () => {
 
     items.push({ type: 'add' });
 
-    const allPostsTitle = 'all posts';
+    const allPostsTitle = 'all';
     if (!normalizedQuery || allPostsTitle.includes(normalizedQuery)) {
       const countForAllPosts = showOnlyPrivate
-        ? privatePosts.length
-        : publicPosts.length;
+        ? allPostsData.allPrivatePosts.length
+        : allPostsData.allPostsCombined.length;
+
       const thumbnailForAllPosts = showOnlyPrivate
-        ? newestPrivateThumbnail
-        : newestPublicThumbnail;
+        ? allPostsData.newestPrivateThumbnail
+        : allPostsData.newestCombinedThumbnail;
 
       items.push({
         type: 'all',
-
         thumbnailUrl: countForAllPosts > 0 ? thumbnailForAllPosts : undefined,
-
         count: countForAllPosts,
       });
     }
@@ -221,16 +213,17 @@ const CollectionPage: React.FC = () => {
     }
 
     return items;
-  }, [
-    collectionsForDisplay,
+  }, [collectionsForDisplay, allPostsData, searchQuery, showOnlyPrivate]);
 
-    publicPosts.length,
-    privatePosts.length,
-    newestPublicThumbnail,
-    newestPrivateThumbnail,
-    searchQuery,
-    showOnlyPrivate,
-  ]);
+  useEffect(() => {
+    if (!showOnlyPrivate) {
+      return;
+    }
+
+    if (currentCollection && !currentCollection.isPrivate) {
+      setSelectedCollectionId('all');
+    }
+  }, [showOnlyPrivate, currentCollection, setSelectedCollectionId]);
 
   const handleTogglePrivateFilter = useCallback(() => {
     setShowOnlyPrivate((prev) => !prev);
@@ -446,40 +439,17 @@ const CollectionPage: React.FC = () => {
   ]);
 
   const galleryTitle = useMemo(() => {
-    if (
-      loadingCollections &&
-      selectedCollectionId !== 'all' &&
-      !currentCollection
-    ) {
-      return 'Loading...';
-    }
-
     if (selectedCollectionId === 'all') {
       return 'All';
     }
-
     if (currentCollection) {
-      const collectionMatchesFilter =
-        !showOnlyPrivate || currentCollection.isPrivate;
-
-      if (collectionMatchesFilter) {
-        return currentCollection.name;
-      } else {
-        return 'All';
-      }
+      return currentCollection.name;
     }
-
-    console.warn(
-      'GalleryTitle: Fallback reached, currentCollection likely undefined for selected ID',
-      selectedCollectionId,
-    );
-    return showOnlyPrivate ? 'Private Collections' : 'All Collections';
-  }, [
-    selectedCollectionId,
-    currentCollection,
-    loadingCollections,
-    showOnlyPrivate,
-  ]);
+    if (loadingCollections) {
+      return 'Loading...';
+    }
+    return 'All Collections';
+  }, [selectedCollectionId, currentCollection, loadingCollections]);
 
   const galleryItemCountText = useMemo(() => {
     if (loadingCollections) return 'Loading...';
@@ -501,14 +471,10 @@ const CollectionPage: React.FC = () => {
         mb={4}
         flexWrap="wrap"
       >
-        {/* Left Side: Title */}
         <Typography variant="h6" component="h1" fontWeight="normal" noWrap>
           Collections
         </Typography>
-
-        {/* Right Side: Filter & Search */}
         <Stack direction="row" alignItems="center" spacing={2}>
-          {/* Filter Toggle Button */}
           <Tooltip
             title={
               showOnlyPrivate
@@ -531,13 +497,11 @@ const CollectionPage: React.FC = () => {
                 bgcolor: 'background.paper',
               }}
             >
-              {/* Show Lock icon when filtering, LockOpen/Apps when not */}
               {!showOnlyPrivate ? (
                 <LockIcon fontSize={16} />
               ) : (
                 <AllIcon fontSize={16} />
               )}
-              {/* Optionally add text - might make button too wide */}
               <Typography
                 variant="caption"
                 sx={{
@@ -546,13 +510,10 @@ const CollectionPage: React.FC = () => {
                   lineHeight: 1,
                 }}
               >
-                {/* Text also depends on the current state */}
                 {showOnlyPrivate ? 'All' : 'Private Only'}
               </Typography>
             </ToggleButton>
           </Tooltip>
-
-          {/* Search Input */}
           <SearchInput
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
@@ -578,10 +539,7 @@ const CollectionPage: React.FC = () => {
         <CollectionTitle
           title={galleryTitle}
           itemCountText={galleryItemCountText}
-          isEditable={
-            typeof selectedCollectionId === 'number' &&
-            (!showOnlyPrivate || !!currentCollection?.isPrivate)
-          }
+          isEditable={typeof selectedCollectionId === 'number'}
           isPrivate={!!currentCollection?.isPrivate}
           isLoading={
             loadingCollections &&
@@ -615,7 +573,7 @@ const CollectionPage: React.FC = () => {
         existingCollectionNames={collections.map((c) => c.name)}
       />
 
-      {/* --- Delete Confirmation Dialog --- */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
@@ -635,11 +593,9 @@ const CollectionPage: React.FC = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          {/* Added padding */}
           <Button onClick={handleCloseDeleteDialog} variant="outlined">
             Cancel
           </Button>
-          {/* Call the confirmation handler */}
           <Button
             onClick={handleConfirmDeleteCollection}
             variant="contained"
