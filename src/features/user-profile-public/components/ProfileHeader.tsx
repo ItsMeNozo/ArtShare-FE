@@ -14,24 +14,22 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({
   avatarUrl,
 }) => {
   return (
-    <div className="flex items-start justify-between">
-      <div className="flex items-center gap-3">
-        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-black">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={`${name}'s profile picture`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <Avatar
-              name={username || "Unknown"}
-              colors={["#84bfc3", "#fff5d6", "#ffb870", "#d96153", "#000511"]}
-              variant="beam"
-              size={160} // matches w-40 (160px)
-            />
-          )}
-        </div>
+    <div className="flex items-center">
+      <div className="flex justify-center items-center bg-white/30 shadow-md backdrop-blur-md p-1 rounded-full w-36 h-36">
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={`${name}'s profile picture`}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <Avatar
+            name={username || "Unknown"}
+            colors={["#84bfc3", "#fff5d6", "#ffb870", "#d96153", "#000511"]}
+            variant="beam"
+            size={128} // matches w-40 (160px)
+          />
+        )}
       </div>
     </div>
   );

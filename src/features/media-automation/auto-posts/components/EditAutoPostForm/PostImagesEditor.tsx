@@ -68,11 +68,10 @@ const PostImagesEditor = ({
 
   return (
     <Box
-      className={`border-mountain-200 flex h-fit w-xl flex-col rounded-lg border bg-white ${
-        isInvalid ? 'border-red-500' : 'border-mountain-200'
-      }`}
+      className={`border-mountain-200 flex h-fit w-xl flex-col rounded-lg border bg-white ${isInvalid ? 'border-red-500' : 'border-mountain-200'
+        }`}
     >
-      <div className="border-mountain-200 text-mountain-800 flex h-12 items-center justify-between gap-2 rounded-t-md border-b bg-white px-2">
+      <div className="flex justify-between items-center gap-2 bg-white p-2 border-mountain-200 border-b rounded-t-md h-12 text-mountain-800">
         <div className="flex items-center space-x-2">
           <span>Number of Images: {images.length}</span>
         </div>
@@ -84,25 +83,25 @@ const PostImagesEditor = ({
         {images.map((image) => (
           <div
             key={image.id}
-            className="group relative aspect-video w-full overflow-hidden bg-white p-2"
+            className="group relative bg-white p-2 w-full aspect-video overflow-hidden"
           >
             <img
               src={image.url}
               alt={`Post image preview`}
-              className="h-full w-full rounded-md object-cover"
+              className="rounded-md w-full h-full object-cover"
             />
             {image.status === 'existing' && (
-              <span className="absolute top-3 left-3 rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white">
+              <span className="top-3 left-3 absolute bg-blue-500 px-2 py-1 rounded-full font-bold text-white text-xs">
                 Saved
               </span>
             )}
-            {/* <div className="absolute top-2 right-2 hidden cursor-pointer rounded-full bg-white p-2 group-hover:flex">
+            {/* <div className="hidden top-2 right-2 absolute group-hover:flex bg-white p-2 rounded-full cursor-pointer">
               <Edit className="size-4" />
             </div> */}
 
             <div
               onClick={() => handleRemoveImage(image.id)}
-              className="absolute right-3 bottom-3 hidden cursor-pointer rounded-full bg-white p-2 text-red-500 shadow-md group-hover:flex hover:bg-red-50"
+              className="hidden right-3 bottom-3 absolute group-hover:flex bg-white hover:bg-red-50 shadow-md p-2 rounded-full text-red-500 cursor-pointer"
             >
               <Trash2 className="size-4" />
             </div>
@@ -110,17 +109,17 @@ const PostImagesEditor = ({
         ))}
       </div>
       {images.length === 0 ? (
-        <div className="flex w-full justify-center p-2">
+        <div className="flex justify-center p-2 w-full">
           <label
             htmlFor="imageUpload"
-            className="border-mountain-200 text-mountain-950 mx-2 flex w-48 cursor-pointer flex-col items-center space-y-2 rounded-md border bg-white px-4 py-2 text-center text-sm font-medium shadow-sm"
+            className="flex flex-col items-center space-y-2 bg-white shadow-sm mx-2 px-4 py-2 border border-mountain-200 rounded-md w-48 font-medium text-mountain-950 text-sm text-center cursor-pointer"
           >
             <Upload />
             <p>Upload From Device</p>
           </label>
           <label
             htmlFor="imageUpload"
-            className="border-mountain-200 text-mountain-950 mx-2 flex w-48 cursor-pointer flex-col items-center space-y-2 rounded-md border bg-white px-4 py-2 text-center text-sm font-medium shadow-sm"
+            className="flex flex-col items-center space-y-2 bg-white shadow-sm mx-2 px-4 py-2 border border-mountain-200 rounded-md w-48 font-medium text-mountain-950 text-sm text-center cursor-pointer"
           >
             <RiImageCircleAiFill className="size-6" />
             <p>Browse Your Stock</p>
@@ -128,18 +127,18 @@ const PostImagesEditor = ({
         </div>
       ) : (
         images.length < MAX_IMAGE_COUNT && (
-          <div className="flex w-full justify-center gap-4 p-4">
+          <div className="flex justify-center gap-4 p-4 w-full">
             <button
               type="button"
               onClick={handleClearAll}
-              className="flex w-1/3 cursor-pointer items-center justify-center gap-2 rounded-md border border-red-200 bg-red-100 px-4 py-2 text-center text-sm font-medium text-red-700 shadow-sm hover:bg-red-200"
+              className="flex justify-center items-center gap-2 bg-red-100 hover:bg-red-200 shadow-sm px-4 py-2 border border-red-200 rounded-md w-1/3 font-medium text-red-700 text-sm text-center cursor-pointer"
             >
               <Trash2 className="size-4" />
               <span>Clear All</span>
             </button>
             <label
               htmlFor="imageUpload"
-              className="border-mountain-200 text-mountain-950 hover:bg-mountain-50 flex w-2/3 cursor-pointer items-center justify-center gap-2 rounded-md border bg-white px-4 py-2 text-center text-sm font-medium shadow-sm"
+              className="flex justify-center items-center gap-2 bg-white hover:bg-mountain-50 shadow-sm px-4 py-2 border border-mountain-200 rounded-md w-2/3 font-medium text-mountain-950 text-sm text-center cursor-pointer"
             >
               <Upload />
               <span>Add More</span>

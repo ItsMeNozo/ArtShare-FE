@@ -15,7 +15,7 @@ import { GoLightBulb } from "react-icons/go"
 const LightingOptions: React.FC<SelectLightingProp> = ({ selectedLighting, onChange }) => {
     return (
         <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger asChild>
                 <Button className='flex justify-between bg-mountain-100 p-3 rounded-xl w-full font-normal'>
                     <div className='flex items-center space-x-2'>
                         <GoLightBulb className='rounded-xs w-5 h-5' />
