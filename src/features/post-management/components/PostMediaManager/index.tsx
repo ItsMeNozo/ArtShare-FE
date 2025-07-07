@@ -327,9 +327,7 @@ export default function PostMediaManager({
                     onAddVideo={handleVideoAdded}
                   />
                 ) : (
-                  <SelectAiImagesPanel
-                    handleImageFilesChange={handleImagesAdded}
-                  />
+                  <SelectAiImagesPanel />
                 )}
               </Box>
               {/* Carousel */}
