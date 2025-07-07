@@ -87,10 +87,16 @@ export class TestHelpers {
    * Login with test user credentials
    */
   async loginWithTestUser() {
-    await this.loginWithEmail(
-      testData.validUser.email,
-      testData.validUser.password,
-    );
+    const email = testData.validUser.email;
+    const password = testData.validUser.password;
+
+    if (!email || !password) {
+      throw new Error(
+        'Test credentials not configured. Please set TEST_USER_EMAIL and TEST_USER_PASSWORD environment variables.',
+      );
+    }
+
+    await this.loginWithEmail(email, password);
   }
 
   /**
@@ -561,8 +567,8 @@ export class TestHelpers {
 
 export const testData = {
   validUser: {
-    email: process.env.TEST_USER_EMAIL || 'panngoc21@clc.fitus.edu.vn',
-    password: process.env.TEST_USER_PASSWORD || 'Test@123',
+    email: process.env.TEST_USER_EMAIL,
+    password: process.env.TEST_USER_PASSWORD,
     username: 'testuser',
     fullName: 'Test User',
     bio: 'This is a test user bio for automation testing.',
@@ -584,7 +590,7 @@ export const testData = {
       token: 'mock-jwt-token',
       user: {
         id: 1,
-        email: process.env.TEST_USER_EMAIL || 'panngoc21@clc.fitus.edu.vn',
+        email: process.env.TEST_USER_EMAIL,
         is_onboard: true,
       },
       message: 'Login successful',
