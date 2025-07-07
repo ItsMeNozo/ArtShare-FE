@@ -40,6 +40,7 @@ interface MediaSelectorPanelProps {
   setHasArtNovaImages: React.Dispatch<React.SetStateAction<boolean>>;
   isMatureAutoDetected: boolean;
   handleIsMatureAutoDetected: React.Dispatch<React.SetStateAction<boolean>>;
+  onMediasChanged?: () => void;
 }
 
 export default function PostMediaManager({
@@ -50,6 +51,7 @@ export default function PostMediaManager({
   setHasArtNovaImages,
   isMatureAutoDetected,
   handleIsMatureAutoDetected,
+  onMediasChanged,
 }: MediaSelectorPanelProps) {
   const { showSnackbar } = useSnackbar();
 
@@ -147,8 +149,6 @@ export default function PostMediaManager({
     // combine with existing files
     const combinedMedias = [...postMedias, ...matureProcessedImageMedias];
 
-    console.log('Combined Medias:', combinedMedias);
-
     // image count
     const imageCount = combinedMedias.filter(
       (media) => media.type === MEDIA_TYPE.IMAGE,
@@ -158,6 +158,8 @@ export default function PostMediaManager({
       return;
     }
     setPostMedias(combinedMedias);
+
+    onMediasChanged?.();
 
     // first time adding a media
     if (postMedias.length === 0) {
@@ -192,6 +194,7 @@ export default function PostMediaManager({
     ];
     const combinedMedias = [...postMedias, ...newVideoMedia];
     setPostMedias(combinedMedias);
+    onMediasChanged?.();
 
     // auto-thumbnail logic
     if (postMedias.length === 0) {
@@ -218,6 +221,7 @@ export default function PostMediaManager({
   const handleRemoveMediaPreview = (media: PostMedia) => {
     const { url, file } = media;
     setPostMedias((prev) => prev.filter((media) => media.file !== file));
+    onMediasChanged?.();
 
     if (url?.startsWith('blob:')) {
       URL.revokeObjectURL(url);

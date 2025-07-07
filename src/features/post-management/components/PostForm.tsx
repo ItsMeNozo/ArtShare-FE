@@ -1,17 +1,17 @@
+import { UnsavedChangesProtector } from '@/components/UnsavedChangesProtector';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { useSubscriptionInfo } from '@/hooks/useSubscription';
+import { MEDIA_TYPE } from '@/utils/constants';
 import { Box, Button, Tooltip } from '@mui/material';
 import { Form, Formik, FormikHelpers, FormikProps } from 'formik';
 import React, { useState } from 'react';
-import UploadForm from './PostEditor'; // Adjust import path as needed
-
-import { useSubscriptionInfo } from '@/hooks/useSubscription';
-import { MEDIA_TYPE } from '@/utils/constants';
 import { FaMagic } from 'react-icons/fa';
 import * as Yup from 'yup';
 import { useGeneratePostContent } from '../hooks/useGeneratePostContent';
 import { ThumbnailMeta } from '../types/crop-meta.type';
 import { PostFormValues } from '../types/post-form-values.type';
 import { PostMedia } from '../types/post-media';
+import PostEditor from './PostEditor'; // Adjust import path as needed
 import MediaSelection from './PostMediaManager';
 
 export interface PostFormProps {
@@ -47,8 +47,8 @@ const PostForm: React.FC<PostFormProps> = ({
   const { showSnackbar } = useSnackbar();
   const { data: subscriptionInfo } = useSubscriptionInfo();
   const [isMatureAutoDetected, setIsMatureAutoDetected] = useState(false);
-
-  const isUploadMediaValid = postMedias.length > 0;
+  const [mediasTouched, setMediasTouched] = useState(false);
+  const [thumbnailTouched, setThumbnailTouched] = useState(false);
 
   const { mutate: generateContent } = useGeneratePostContent({
     onError: (errorMessage: string) => {
@@ -127,7 +127,9 @@ const PostForm: React.FC<PostFormProps> = ({
     <Formik
       initialValues={initialFormValues}
       validationSchema={postValidationSchema}
-      onSubmit={onSubmit}
+      onSubmit={async (values, formikActions) =>
+        await onSubmit(values, formikActions)
+      }
       // enableReinitialize // Important for forms whose initial values load asynchronously
     >
       {(formikProps: FormikProps<PostFormValues>) => {
@@ -135,95 +137,106 @@ const PostForm: React.FC<PostFormProps> = ({
           values,
           errors,
           touched,
-          // handleChange,
+          dirty,
           handleBlur,
           setFieldValue,
           isSubmitting,
+          isValid,
         } = formikProps;
 
+        const isAllDirty = mediasTouched || thumbnailTouched || dirty;
+
+        const isValidToSubmit = isAllDirty && !isSubmitting && isValid;
+
         return (
-          <Form className="dark:bg-mountain-950 h-full w-full">
-            <Box
-              className="flex h-[calc(100vh-4rem)] w-full gap-3 p-4"
-              style={{ overflow: 'hidden' }}
-            >
-              {/* LEFT COLUMN */}
-              <MediaSelection
-                postMedias={postMedias}
-                setPostMedias={setPostMedias}
-                onThumbnailAddedOrRemoved={(file: File | null) =>
-                  handleThumbnailAddedOrRemoved(file, setFieldValue)
-                }
-                hasArtNovaImages={hasArtNovaImages}
-                setHasArtNovaImages={setHasArtNovaImages}
-                isMatureAutoDetected={isMatureAutoDetected}
-                handleIsMatureAutoDetected={(val) => {
-                  setIsMatureAutoDetected(val); // Update local state for potential UI cues
-                  if (values.isMature !== val) {
-                    setFieldValue('isMature', val);
+          <>
+            <UnsavedChangesProtector isDirty={isValidToSubmit} />
+            <Form className="dark:bg-mountain-950 h-full w-full">
+              <Box
+                className="flex h-[calc(100vh-4rem)] w-full gap-3 p-4"
+                style={{ overflow: 'hidden' }}
+              >
+                {/* LEFT COLUMN */}
+                <MediaSelection
+                  postMedias={postMedias}
+                  setPostMedias={setPostMedias}
+                  onThumbnailAddedOrRemoved={(file: File | null) =>
+                    handleThumbnailAddedOrRemoved(file, setFieldValue)
                   }
-                }}
-              />
-              {/* RIGHT COLUMN: FORM FIELDS & ACTIONS */}
-              <Box className="flex w-[40%] flex-col space-y-3">
-                {/* Form fields */}
-                <Box className="custom-scrollbar relative w-full overflow-y-auto rounded-md pr-4">
-                  <Tooltip
-                    title="Auto generate content (title, description, categories) - Credit cost: ~2"
-                    arrow
-                    placement="left"
-                  >
-                    <Button
-                      className="sticky top-2 z-50 ml-auto flex h-12 w-12 min-w-0 transform items-center justify-center rounded-full bg-gradient-to-b from-blue-400 to-purple-400 p-0 shadow-md duration-300 ease-in-out hover:scale-105 hover:cursor-pointer"
-                      onClick={() => handleGenerateContent(setFieldValue)}
-                    >
-                      <FaMagic className="size-5 text-white" />
-                    </Button>
-                  </Tooltip>
-                  <UploadForm
-                    values={values}
-                    setFieldValue={setFieldValue}
-                    thumbnail={thumbnail}
-                    setThumbnail={setThumbnail}
-                    originalThumbnail={originalThumbnail}
-                    onThumbnailAddedOrRemoved={(file: File | null) =>
-                      handleThumbnailAddedOrRemoved(file, setFieldValue)
+                  hasArtNovaImages={hasArtNovaImages}
+                  setHasArtNovaImages={setHasArtNovaImages}
+                  isMatureAutoDetected={isMatureAutoDetected}
+                  handleIsMatureAutoDetected={(val) => {
+                    setIsMatureAutoDetected(val);
+                    if (values.isMature !== val) {
+                      setFieldValue('isMature', val);
                     }
-                    errors={errors}
-                    touched={touched}
-                    handleBlur={handleBlur}
-                    isMatureAutoDetected={isMatureAutoDetected}
-                  />
-                </Box>
-                <hr className="border-mountain-300 dark:border-mountain-700 w-full border-t-1" />
-                {/* Bottom actions */}
-                <Box className="mt-auto flex w-full justify-end bg-none pr-4">
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={!isUploadMediaValid || isSubmitting}
-                    className="ml-auto rounded-md"
-                    sx={{
-                      textTransform: 'none',
-                      background: !isUploadMediaValid
-                        ? 'linear-gradient(to right, #9ca3af, #6b7280)' // Tailwind's gray-400 to gray-500
-                        : 'linear-gradient(to right, #3730a3, #5b21b6, #4c1d95)', // indigo-violet gradient
-                      color: 'white',
-                      opacity: !isUploadMediaValid ? 0.6 : 1,
-                      pointerEvents: !isUploadMediaValid ? 'none' : 'auto',
-                      '&:hover': {
-                        background: !isUploadMediaValid
-                          ? 'linear-gradient(to right, #9ca3af, #6b7280)'
-                          : 'linear-gradient(to right, #312e81, #4c1d95, #3b0764)',
-                      },
-                    }}
-                  >
-                    Submit
-                  </Button>
+                  }}
+                  onMediasChanged={() => setMediasTouched(true)}
+                />
+                {/* RIGHT COLUMN: FORM FIELDS & ACTIONS */}
+                <Box className="flex w-[40%] flex-col space-y-3">
+                  {/* Form fields */}
+                  <Box className="custom-scrollbar relative w-full overflow-y-auto rounded-md pr-4">
+                    <Tooltip
+                      title="Auto generate content (title, description, categories) - Credit cost: ~2"
+                      arrow
+                      placement="left"
+                    >
+                      <Button
+                        className="sticky top-2 z-50 ml-auto flex h-12 w-12 min-w-0 transform items-center justify-center rounded-full bg-gradient-to-b from-blue-400 to-purple-400 p-0 shadow-md duration-300 ease-in-out hover:scale-105 hover:cursor-pointer"
+                        onClick={() => handleGenerateContent(setFieldValue)}
+                      >
+                        <FaMagic className="size-5 text-white" />
+                      </Button>
+                    </Tooltip>
+                    <PostEditor
+                      values={values}
+                      setFieldValue={setFieldValue}
+                      thumbnail={thumbnail}
+                      setThumbnail={setThumbnail}
+                      originalThumbnail={originalThumbnail}
+                      onThumbnailAddedOrRemoved={(file: File | null) => {
+                        handleThumbnailAddedOrRemoved(file, setFieldValue);
+                        setThumbnailTouched(true);
+                      }}
+                      errors={errors}
+                      touched={touched}
+                      handleBlur={handleBlur}
+                      isMatureAutoDetected={isMatureAutoDetected}
+                      onThumbnailChange={() => setThumbnailTouched(true)}
+                    />
+                  </Box>
+                  <hr className="border-mountain-300 dark:border-mountain-700 w-full border-t-1" />
+                  {/* Bottom actions */}
+                  <Box className="mt-auto flex w-full justify-end bg-none pr-4">
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={!isValidToSubmit}
+                      className="ml-auto rounded-md"
+                      // sx={{
+                      //   textTransform: 'none',
+                      //   background: isValidToSubmit
+                      //     ? 'linear-gradient(to right, #3730a3, #5b21b6, #4c1d95)' // indigo-violet gradient
+                      //     : 'linear-gradient(to right, #9ca3af, #6b7280)', // Tailwind's gray-400 to gray-500
+                      //   color: 'white',
+                      //   opacity: isValidToSubmit ? 1 : 0.6,
+                      //   pointerEvents: isValidToSubmit ? 'auto' : 'none',
+                      //   '&:hover': {
+                      //     background: isValidToSubmit
+                      //       ? 'linear-gradient(to right, #312e81, #4c1d95, #3b0764)'
+                      //       : 'linear-gradient(to right, #9ca3af, #6b7280)',
+                      //   },
+                      // }}
+                    >
+                      Submit
+                    </Button>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </Form>
+            </Form>
+          </>
         );
       }}
     </Formik>

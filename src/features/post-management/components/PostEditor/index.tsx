@@ -37,6 +37,7 @@ const PostEditor: React.FC<{
   touched: FormikTouched<PostFormValues>;
   handleBlur: FormikHandlers['handleBlur'];
   isMatureAutoDetected: boolean;
+  onThumbnailChange?: () => void;
 }> = ({
   values,
   setFieldValue,
@@ -47,6 +48,7 @@ const PostEditor: React.FC<{
   errors,
   touched,
   isMatureAutoDetected,
+  onThumbnailChange,
 }) => {
   const [thumbnailCropOpen, setThumbnailCropOpen] = useState(false);
 
@@ -194,6 +196,8 @@ const PostEditor: React.FC<{
             });
 
             setFieldValue('thumbnailMeta', thumbnail_crop_meta);
+
+            onThumbnailChange?.();
           }}
         />
       )}

@@ -79,7 +79,7 @@ const EditPostPage: React.FC = () => {
 
   /** ─────────────────── submit ─────────────────── */
 
-  const { mutate: updatePost } = useUpdatePost({
+  const { mutateAsync: updatePost } = useUpdatePost({
     onSuccess: (updatedPost) => {
       navigate(`/posts/${updatedPost.id}`);
     },
@@ -104,7 +104,7 @@ const EditPostPage: React.FC = () => {
       return;
     }
 
-    updatePost(
+    await updatePost(
       {
         postId: parseInt(postId!),
         values,

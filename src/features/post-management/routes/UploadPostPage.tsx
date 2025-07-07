@@ -27,7 +27,7 @@ const UploadPostPage: React.FC = () => {
     null,
   );
 
-  const { mutate: createPost } = useCreatePost({
+  const { mutateAsync: createPost } = useCreatePost({
     onSuccess: (createdPost) => {
       navigate(`/posts/${createdPost.id}`);
       showSnackbar('Post successfully created!', 'success');
@@ -61,7 +61,7 @@ const UploadPostPage: React.FC = () => {
       return;
     }
 
-    createPost(
+    await createPost(
       {
         values,
         postMedias,
