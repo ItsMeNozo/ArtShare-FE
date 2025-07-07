@@ -2,7 +2,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { MdAdd, MdClose } from 'react-icons/md';
+import { MdClose } from 'react-icons/md';
 import { RiImageCircleAiLine } from 'react-icons/ri';
 import { TbDeviceDesktop } from 'react-icons/tb';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -27,6 +27,7 @@ import {
 } from '../../helpers/media-upload.helper';
 import { useCheckMaturity } from '../../hooks/useIsMature';
 import { PostMedia } from '../../types/post-media';
+import AddMoreMediaButton from './AddMoreMediaButton';
 import InfoMediaRemaining from './InfoMediaRemaining';
 import MediaPreviewer from './MediaPreviewer';
 import SelectAiImagesPanel from './SelectAiImagesPanel';
@@ -171,7 +172,10 @@ export default function PostMediaManager({
   const handleVideoAdded = async (event: ChangeEvent<HTMLInputElement>) => {
     const videoFiles = event.target.files;
     if (!videoFiles || videoFiles.length === 0) return;
-    if (videoFiles.length > MAX_VIDEO) {
+    if (
+      postMedias.filter((media) => media.type === MEDIA_TYPE.VIDEO).length >=
+      MAX_VIDEO
+    ) {
       showSnackbar(`You can only upload up to ${MAX_VIDEO} video.`, 'error');
       return;
     }
@@ -333,7 +337,9 @@ export default function PostMediaManager({
               {/* Carousel */}
               <Box
                 className="custom-scrollbar flex h-fit space-x-2 pt-3"
-                sx={{ flexShrink: 0, overflowX: 'hidden' }}
+                sx={{
+                  flexShrink: 0,
+                }}
               >
                 {postMedias.map((media, i) => (
                   <Box
@@ -371,24 +377,15 @@ export default function PostMediaManager({
                     </IconButton>
                   </Box>
                 ))}
-                <Box
-                  className="border-mountain-600 flex h-[80px] w-[80px] cursor-pointer items-center justify-center rounded-md border text-gray-900 dark:text-white"
-                  component="label"
+                <AddMoreMediaButton
                   hidden={
                     (imageCount === 0 && !hasVideo) ||
-                    imageCount === MAX_IMAGES ||
+                    (imageCount === MAX_IMAGES && hasVideo) ||
                     hasArtNovaImages
                   }
-                >
-                  <MdAdd size={32} />
-                  <input
-                    accept="image/*"
-                    type="file"
-                    multiple
-                    hidden
-                    onChange={handleImagesAdded}
-                  />
-                </Box>
+                  handleImagesAdded={handleImagesAdded}
+                  handleVideoAdded={handleVideoAdded}
+                />
               </Box>
             </Box>
           );
