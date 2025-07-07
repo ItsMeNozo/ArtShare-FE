@@ -155,6 +155,7 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         <Box className="flex flex-1 flex-col overflow-hidden border-l border-gray-300 dark:border-gray-700">
           {allSubjects.map((category) => (
             <CategoryPreviewer
+              key={category.id}
               category={category}
               hidden={category.name != hovered?.name}
             />

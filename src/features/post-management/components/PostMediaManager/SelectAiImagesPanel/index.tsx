@@ -7,18 +7,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button, Typography } from '@mui/material';
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import { IoSparkles } from 'react-icons/io5';
 import { RiImageCircleAiFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { MediaPreviewContainer } from '../MediaPreviewContainer';
 import BrowsePromptHistory from './BrowsePromptHistory';
 
-interface SelectAiImagesPanelProps {
-  handleImageFilesChange: (event: ChangeEvent<HTMLInputElement>) => void;
-}
-
-const SelectAiImagesPanel: React.FC<SelectAiImagesPanelProps> = () => {
+const SelectAiImagesPanel: React.FC = () => {
   return (
     <MediaPreviewContainer>
       <Dialog>
