@@ -107,11 +107,8 @@ test.describe('Authentication Flow', () => {
       await page.goto('/login');
 
       // Fill in login form
-      await helpers.fillField(
-        'input[type="email"]',
-        'panngoc21@clc.fitus.edu.vn',
-      );
-      await helpers.fillField('input[type="password"]', 'Test@123');
+      await helpers.fillField('input[type="email"]', 'testuser@example.com');
+      await helpers.fillField('input[type="password"]', 'TestPassword123');
 
       // Submit form
       await helpers.clickAndWait('button[type="submit"]', {
@@ -147,7 +144,7 @@ test.describe('Authentication Flow', () => {
 
       // Fill invalid email
       await helpers.fillField('input[type="email"]', 'invalid-email');
-      await helpers.fillField('input[type="password"]', 'Test@123');
+      await helpers.fillField('input[type="password"]', 'TestPassword123');
 
       // Submit form
       await page.click('button[type="submit"]');
@@ -171,7 +168,7 @@ test.describe('Authentication Flow', () => {
       );
 
       if ((await toggleButton.count()) > 0) {
-        await helpers.fillField('input[type="password"]', 'Test@123');
+        await helpers.fillField('input[type="password"]', 'TestPassword123');
 
         // Click toggle button
         await toggleButton.click();
@@ -193,14 +190,14 @@ test.describe('Authentication Flow', () => {
 
       // Fill registration form
       await helpers.fillField('input[type="email"]', testEmail);
-      await helpers.fillField('input[type="password"]', 'Test@123');
+      await helpers.fillField('input[type="password"]', 'TestPassword123');
 
       // Fill confirm password if exists
       const confirmPasswordField = page.locator(
         'input[name*="confirm"], input[name*="repeat"]',
       );
       if ((await confirmPasswordField.count()) > 0) {
-        await confirmPasswordField.fill('Test@123');
+        await confirmPasswordField.fill('TestPassword123');
       }
 
       // Fill additional fields if they exist
@@ -241,10 +238,7 @@ test.describe('Authentication Flow', () => {
     test('@safe should show error for weak password', async ({ page }) => {
       await page.goto('/signup');
 
-      await helpers.fillField(
-        'input[type="email"]',
-        'panngoc21@clc.fitus.edu.vn',
-      );
+      await helpers.fillField('input[type="email"]', 'testuser@example.com');
       await helpers.fillField('input[type="password"]', '123');
 
       // Submit form
@@ -264,10 +258,7 @@ test.describe('Authentication Flow', () => {
       await page.goto('/forgot-password');
 
       // Fill email
-      await helpers.fillField(
-        'input[type="email"]',
-        'panngoc21@clc.fitus.edu.vn',
-      );
+      await helpers.fillField('input[type="email"]', 'testuser@example.com');
 
       // Submit form
       await helpers.clickAndWait('button[type="submit"]', {
@@ -300,7 +291,7 @@ test.describe('Authentication Flow', () => {
   test.describe('Session Management', () => {
     test('@unsafe should logout successfully', async () => {
       // First login with real credentials
-      await helpers.loginWithEmail('panngoc21@clc.fitus.edu.vn', 'Test@123');
+      await helpers.loginWithEmail('testuser@example.com', 'TestPassword123');
 
       // Verify logged in
       const isAuthBefore = await helpers.isAuthenticated();
@@ -318,7 +309,7 @@ test.describe('Authentication Flow', () => {
       page,
     }) => {
       // Login with real credentials
-      await helpers.loginWithEmail('panngoc21@clc.fitus.edu.vn', 'Test@123');
+      await helpers.loginWithEmail('testuser@example.com', 'TestPassword123');
 
       // Refresh page
       await page.reload();

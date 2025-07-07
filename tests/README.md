@@ -124,8 +124,8 @@ Create a `.env.test` file for test-specific environment variables:
 
 ```env
 VITE_BE_URL=http://localhost:3000
-TEST_USER_EMAIL=panngoc21@clc.fitus.edu.vn
-TEST_USER_PASSWORD=Test@123
+TEST_USER_EMAIL=
+TEST_USER_PASSWORD=
 ```
 
 ## 🎮 Running Tests
