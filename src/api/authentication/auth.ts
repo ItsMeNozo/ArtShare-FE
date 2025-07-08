@@ -87,7 +87,7 @@ export const forgotPassword = async (email: string) => {
 
 export const checkEmailExists = async (email: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/email-exists`, {
+    const response = await api.post(`/auth/email-exists`, {
       email,
     });
     return response.data;

@@ -2,7 +2,7 @@ import { Collection } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCollectionsWithPosts } from '../api/collection.api';
 
-export const COLLECTIONS_QUERY_KEY = ['collections', 'list'];
+export const COLLECTIONS_QUERY_KEY = ['collections'];
 const STALE_TIME = 1000 * 60 * 5;
 
 export function useCollectionsData(options: { enabled?: boolean } = {}) {

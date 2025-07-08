@@ -20,7 +20,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   addPostToCollection,
   removePostFromCollection,
+  updateCollection,
 } from '@/features/collection/api/collection.api';
+import { useQueryClient } from '@tanstack/react-query';
 import { SearchInput } from '../../../components/SearchInput';
 import { fetchCollectionsForDialog } from '../api/collection.api';
 
@@ -28,6 +30,7 @@ export interface SavePostDialogProps {
   open: boolean;
   onClose: () => void;
   postId: number;
+  postThumbnail?: string;
   initialCollections?: DialogCollection[];
   onNavigateToCreate: () => void;
   createDisabled?: boolean;
@@ -42,10 +45,12 @@ export interface DialogCollection {
 }
 
 export const SavePostDialog = (props: SavePostDialogProps) => {
+  const queryClient = useQueryClient();
   const {
     onClose,
     open,
     postId,
+    postThumbnail,
     onNavigateToCreate,
     createDisabled = false,
     createDisabledReason = '',
@@ -112,16 +117,25 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
 
     const originalCollections = [...collections];
     const collection = collections[collectionIndex];
-    const isCurrentlyAdded = collection.postIds.includes(postId);
-    const optimisticAction = isCurrentlyAdded ? 'remove' : 'add';
+    const isRemoving = collection.postIds.includes(postId);
+    const isAdding = !isRemoving;
+    const optimisticAction = isAdding ? 'add' : 'remove';
 
     setCollections((prevCollections) =>
       prevCollections.map((col) => {
         if (col.id === collectionId) {
-          const newPostIds = isCurrentlyAdded
+          const newPostIds = isRemoving
             ? col.postIds.filter((id) => id !== postId)
             : [...col.postIds, postId];
-          return { ...col, postIds: newPostIds };
+
+          let newThumbnailUrl = col.thumbnailUrl;
+          if (isAdding && postThumbnail) {
+            newThumbnailUrl = postThumbnail;
+          } else if (isRemoving && col.thumbnailUrl === postThumbnail) {
+            newThumbnailUrl = undefined;
+          }
+
+          return { ...col, postIds: newPostIds, thumbnailUrl: newThumbnailUrl };
         }
         return col;
       }),
@@ -130,9 +144,21 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
     try {
       if (optimisticAction === 'add') {
         await addPostToCollection(collectionId, postId);
+        await updateCollection(collectionId, {
+          thumbnailUrl: postThumbnail || collection.thumbnailUrl,
+        });
       } else {
         await removePostFromCollection(collectionId, postId);
+        await updateCollection(collectionId, {
+          thumbnailUrl:
+            collection.thumbnailUrl === postThumbnail
+              ? ''
+              : collection.thumbnailUrl,
+        });
       }
+      queryClient.invalidateQueries({
+        queryKey: ['collections', 'list-dialog'],
+      });
       console.log(
         `API: ${optimisticAction === 'add' ? 'Added' : 'Removed'} post ${postId} successfully.`,
       );
@@ -452,7 +478,6 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
             onClick={handleClose}
             disabled={!!togglingCollectionId || isLoading}
           >
-            {' '}
             {/* Use the main close handler */}
             Done
           </Button>

@@ -347,7 +347,7 @@ const GenImage: React.FC<GenImageProps> = ({
                     expanded={false}
                     truncatedEndingComponent={'... '}
                   >
-                    {result.user_prompt.replace(/\n/g, ' ')}
+                    {result.userPrompt.replace(/\n/g, ' ')}
                   </AnyShowMoreText>
                 </div>
               </div>
@@ -366,8 +366,8 @@ const GenImage: React.FC<GenImageProps> = ({
                   <div className="flex items-center space-x-2">
                     <IoIosSquareOutline className="size-5" />
                     <p className="text-mountain-600">
-                      {result.aspect_ratio.charAt(0).toUpperCase() +
-                        result.aspect_ratio.slice(1).toLowerCase()}
+                      {result.aspectRatio.charAt(0).toUpperCase() +
+                        result.aspectRatio.slice(1).toLowerCase()}
                     </p>
                   </div>
                 </div>

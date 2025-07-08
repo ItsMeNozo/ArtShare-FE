@@ -1,29 +1,29 @@
 import { useFocusContext } from '@/contexts/focus/useFocusText';
-import { Collection, Post } from '@/types';
+import { Post } from '@/types';
 import { Button, CardContent, Divider } from '@mui/material';
 import { Bookmark, MessageSquareText, Share2 } from 'lucide-react';
-import { ElementType, useCallback, useEffect, useState } from 'react';
+import { ElementType, useEffect, useState } from 'react';
 import ShowMoreText from 'react-show-more-text';
 import ReactTimeAgo from 'react-time-ago';
 
-import { CreateCollectionDialog } from '@/features/collection/components/CreateCollectionDialog';
+import {
+  CreateCollectionDialog,
+  CreateCollectionFormData,
+} from '@/features/collection/components/CreateCollectionDialog';
 import { SavePostDialog } from './SavePostDialog';
 
 import { LikesDialog } from '@/components/like/LikesDialog';
 import { useUser } from '@/contexts/user/useUser';
 import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
 import { fetchCollectionsForDialog } from '../api/collection.api';
-// 👉 Like/unlike API helpers
+
+import { createCollection } from '@/features/collection/api/collection.api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { TargetType } from '@/utils/constants';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
 import { likePost, unlikePost } from '../api/post.api';
-
-interface SimpleCollection {
-  id: number;
-  name: string;
-}
 
 const AnyShowMoreText: ElementType = ShowMoreText as unknown as ElementType;
 
@@ -31,23 +31,19 @@ type PostInfoProps = {
   postData: Post & {
     isLikedByCurrentUser?: boolean;
   };
-  commentCount: number; // Accept the comment count as prop
-  setCommentCount: React.Dispatch<React.SetStateAction<number>>; // Accept setState function for comment count
+  commentCount: number;
+  setCommentCount: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const PostInfo = ({ postData }: PostInfoProps) => {
+  const queryClient = useQueryClient();
   const { postCommentsRef } = useFocusContext();
   const { showSnackbar } = useSnackbar();
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isLikesDialogOpen, setIsLikesDialogOpen] = useState(false);
-  const [simpleCollections, setSimpleCollections] = useState<
-    SimpleCollection[]
-  >([]);
-  const [isLoadingCollections, setIsLoadingCollections] = useState(false);
-  const [collectionError, setCollectionError] = useState<string | null>(null);
   const user = useUser();
-  // Like-state & API integration
+
   const [userLike, setUserLike] = useState<boolean>(
     postData.isLikedByCurrentUser ?? false,
   );
@@ -61,23 +57,27 @@ const PostInfo = ({ postData }: PostInfoProps) => {
     setLikeCount(postData.likeCount);
   }, [postData.isLikedByCurrentUser, postData.likeCount]);
 
-  useEffect(() => {
-    const loadCollectionNames = async () => {
-      setIsLoadingCollections(true);
-      setCollectionError(null);
-      try {
-        const fetchedCollections = await fetchCollectionsForDialog();
-        setSimpleCollections(fetchedCollections);
-      } catch (error) {
-        setCollectionError(
-          error instanceof Error ? error.message : 'Could not load list.',
-        );
-      } finally {
-        setIsLoadingCollections(false);
-      }
-    };
-    loadCollectionNames();
-  }, [postData.id]);
+  const collectionsQueryKey = ['collections', 'list-dialog'];
+  const {
+    data: simpleCollections = [],
+    isLoading: isLoadingCollections,
+    error: collectionError,
+  } = useQuery({
+    queryKey: collectionsQueryKey,
+    queryFn: fetchCollectionsForDialog,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const createCollectionMutation = useMutation({
+    mutationFn: (formData: CreateCollectionFormData) =>
+      createCollection(formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: collectionsQueryKey });
+      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      handleCloseCreateDialog();
+      handleOpenSaveDialog();
+    },
+  });
 
   const handleOpenSaveDialog = () => {
     setIsCreateDialogOpen(false);
@@ -92,20 +92,10 @@ const PostInfo = ({ postData }: PostInfoProps) => {
   };
   const handleCloseCreateDialog = () => setIsCreateDialogOpen(false);
 
-  const handleCollectionCreated = useCallback(
-    (newCollection: Collection) => {
-      setSimpleCollections((prev) => [
-        ...prev,
-        { id: newCollection.id, name: newCollection.name },
-      ]);
-      if (collectionError) setCollectionError(null);
-      setIsCreateDialogOpen(false);
-      setIsSaveDialogOpen(true);
-    },
-    [collectionError],
-  );
+  const handleCollectionCreated = (formData: CreateCollectionFormData) => {
+    createCollectionMutation.mutate(formData);
+  };
 
-  // Like / Unlike handler (optimistic update)
   const handleLikeClick = () =>
     requireAuth('like this post', async () => {
       if (!user) {
@@ -263,6 +253,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
       {/* SavePostDialog */}
       <SavePostDialog
         postId={postData.id}
+        postThumbnail={postData.thumbnailUrl || postData.thumbnailUrl}
         open={isSaveDialogOpen}
         onClose={handleCloseSaveDialog}
         onNavigateToCreate={handleNavigateToCreate}
@@ -275,6 +266,8 @@ const PostInfo = ({ postData }: PostInfoProps) => {
         onClose={handleCloseCreateDialog}
         onSuccess={handleCollectionCreated}
         existingCollectionNames={existingCollectionNames}
+        isSubmitting={createCollectionMutation.isPending}
+        error={createCollectionMutation.error?.message || null}
       />
       {/* Likes Dialog */}
       <LikesDialog

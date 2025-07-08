@@ -39,7 +39,7 @@ type BlogItemProps = {
   author: Author;
   title: string;
   content: string;
-  createdAt: string;
+  dateCreated: string;
   timeReading: string;
   category: string;
   thumbnail: string;
@@ -55,7 +55,7 @@ const BlogItem: React.FC<BlogItemProps> = ({
   author,
   title,
   content,
-  createdAt,
+  dateCreated,
   timeReading,
   category,
   thumbnail,
@@ -149,8 +149,8 @@ const BlogItem: React.FC<BlogItemProps> = ({
               </p>
               <span className="text-gray-500 dark:text-gray-500">•</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {createdAt && !isNaN(new Date(createdAt).getTime()) ? (
-                  <ReactTimeAgo date={new Date(createdAt)} locale="en-US" />
+                {dateCreated && !isNaN(new Date(dateCreated).getTime()) ? (
+                  <ReactTimeAgo date={new Date(dateCreated)} locale="en-US" />
                 ) : (
                   'Unknown time'
                 )}

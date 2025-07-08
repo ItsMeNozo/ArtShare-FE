@@ -14,8 +14,9 @@ export const fetchCollectionsForDialog = async (): Promise<
       (collection) => ({
         id: collection.id,
         name: collection.name,
-        // Extract just the post IDs from the nested post objects
         postIds: collection.posts?.map((post) => post.id) || [],
+        thumbnailUrl:
+          collection.thumbnailUrl || collection.posts?.[0]?.thumbnailUrl || '',
       }),
     );
 
