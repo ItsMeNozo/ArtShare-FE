@@ -42,6 +42,7 @@ const EditImage: React.FC = () => {
   const [canvasSize] = useState({ width: 540, height: 540 });
 
   //Texts
+  const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
   const layerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const moveableRef = useRef<Moveable>(null);
 
@@ -196,7 +197,7 @@ const EditImage: React.FC = () => {
             hue,
             sepia,
             width,
-            height
+            height,
           } = layer;
           // Calculate layer size
           const drawWidth = width ?? img.naturalWidth;
@@ -226,7 +227,7 @@ const EditImage: React.FC = () => {
         };
       } else if (layer.type === "text") {
         ctx.save();
-        ctx.translate(layer.x, layer.y);
+        ctx.translate(layer.x + layer.width / 2, layer.y);
         ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
         ctx.font = `${layer.fontSize}px ${layer.fontFamily || "sans-serif"}`;
         ctx.fillStyle = layer.color;
@@ -253,20 +254,56 @@ const EditImage: React.FC = () => {
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
+  const getFittingFontSize = (
+    text: string,
+    maxWidth: number,
+    maxHeight: number,
+    fontFamily = "Arial",
+    startingFontSize = 20
+  ): number => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return startingFontSize;
+
+    let fontSize = startingFontSize;
+    const lineHeightFactor = 1.2;
+
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    let textWidth = ctx.measureText(text).width;
+
+    while (
+      (textWidth > maxWidth || fontSize * lineHeightFactor > maxHeight) &&
+      fontSize > 5
+    ) {
+      fontSize -= 1;
+      ctx.font = `${fontSize}px ${fontFamily}`;
+      textWidth = ctx.measureText(text).width;
+    }
+
+    return fontSize;
+  };
+
   const addText = () => {
+    const defaultText = "Your Text";
+    const maxWidth = 300; // Width of your text box
+    const maxHeight = 100; // Height of your text box
+
+    const fittedFontSize = getFittingFontSize(defaultText, maxWidth, maxHeight);
+
     const newTextLayer: TextLayer = {
       id: crypto.randomUUID(),
       type: "text",
-      text: "Your Text",
-      fontSize: 24,
+      text: defaultText,
+      fontSize: fittedFontSize,
       color: "#000000",
       x: 100,
       y: 100,
       rotation: 0,
       opacity: 1,
-      width: canvasSize.width,
-      height: canvasSize.height
+      width: maxWidth,
+      height: maxHeight
     };
+
     setLayers((prev) => [...prev, newTextLayer]);
   };
 
@@ -300,6 +337,29 @@ const EditImage: React.FC = () => {
     setLayers(updatedLayers);
   };
 
+  const handleTextChange = (id: string, newText: string) => {
+    setLayers((prev) =>
+      prev.map((layer) => {
+        if (layer.id === id && layer.type === "text") {
+          const fittedFontSize = getFittingFontSize(
+            newText,
+            layer.width,
+            layer.height,
+            layer.fontFamily || "Arial",
+            20
+          );
+
+          return {
+            ...layer,
+            text: newText,
+            fontSize: fittedFontSize,
+          };
+        }
+        return layer;
+      })
+    );
+  };
+
   return (
     <div className="group relative flex flex-col w-full h-full">
       {/* Floating Button */}
@@ -326,6 +386,7 @@ const EditImage: React.FC = () => {
             handleDownload={handleDownload}
           />
           <div className="relative flex justify-center items-center bg-mountain-200 w-full h-full">
+
             <div
               ref={imageContainerRef}
               className="relative mx-auto overflow-hidden"
@@ -336,8 +397,8 @@ const EditImage: React.FC = () => {
                   layers[0].type === "image"
                     ? layers[0].backgroundColor
                     : "#ffffff",
-                width: 540,
-                height: 540
+                width: canvasSize.width,
+                height: canvasSize.height
               }}
             >
               <div
@@ -399,8 +460,40 @@ const EditImage: React.FC = () => {
                           }}
                           draggable={false}
                         />
+                      ) : editingLayerId === layer.id ? (
+                        <textarea
+                          autoFocus
+                          value={layer.text}
+                          onChange={(e) => handleTextChange(layer.id, e.target.value)}
+                          onBlur={() => setEditingLayerId(null)}
+                          onFocus={(e) => {
+                            const val = e.target.value;
+                            e.target.setSelectionRange(val.length, val.length);
+                          }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            fontSize: layer.fontSize,
+                            color: layer.color,
+                            fontWeight: layer.fontWeight || "normal",
+                            fontFamily: layer.fontFamily || "sans-serif",
+                            textAlign: "center",
+                            background: "transparent",
+                            border: "none",
+                            resize: "none",
+                            outline: "none",
+                            overflow: "hidden",
+                            whiteSpace: "pre-wrap",
+                            transform: `
+                              scaleX(${layer.flipH ? -1 : 1})
+                              scaleY(${layer.flipV ? -1 : 1})
+                            `,
+                            opacity: layer.opacity,
+                          }}
+                        />
                       ) : (
                         <div
+                          onDoubleClick={() => setEditingLayerId(layer.id)}
                           style={{
                             width: "100%",
                             height: "100%",
@@ -411,12 +504,14 @@ const EditImage: React.FC = () => {
                             textAlign: "center",
                             whiteSpace: "pre-wrap",
                             userSelect: "none",
+                            cursor: "text",
                             transform: `
-                            scaleX(${layer.flipH ? -1 : 1})
-                            scaleY(${layer.flipV ? -1 : 1})
+                              scaleX(${layer.flipH ? -1 : 1})
+                              scaleY(${layer.flipV ? -1 : 1})
                             `,
                             opacity: layer.opacity,
                           }}
+                          className="cursor-pointer"
                         >
                           {layer.text}
                         </div>

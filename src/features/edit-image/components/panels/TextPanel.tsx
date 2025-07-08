@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@mui/material";
-import { useState } from "react";
-import { ChromePicker } from "react-color";
+import { useEffect, useRef, useState } from "react";
 import { IoText } from "react-icons/io5";
 import Draggable from "react-draggable";
+import { Sketch } from "@uiw/react-color";
 
 type PanelsProp = {
   selectedLayer: TextLayer | undefined;
@@ -21,6 +21,22 @@ const TextPanel: React.FC<PanelsProp> = ({
   handleChangeTextColor,
 }) => {
   const [settingColor, setSettingColor] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setSettingColor(false); // Close the color picker
+      }
+    }
+
+    if (settingColor) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [settingColor]);
   return (
     <>
       <div
@@ -85,13 +101,13 @@ const TextPanel: React.FC<PanelsProp> = ({
         </div>
         {settingColor && (
           <Draggable handle=".drag-handle">
-            <div className="z-50 absolute bg-white shadow-md border rounded">
-              <div className="bg-indigo-100 px-3 py-1 rounded-t font-semibold text-indigo-700 text-sm cursor-move drag-handle">
-                🎨 Background Color
+            <div ref={pickerRef} className="z-50 absolute bg-white shadow-md rounded">
+              <div className="bg-mountain-100 px-3 py-1 rounded-t font-normal text-mountain-950 text-sm cursor-move drag-handle">
+                🎨 Color Picker
               </div>
-              <ChromePicker
+              <Sketch
                 color={selectedLayer?.color}
-                onChangeComplete={(color) => handleChangeTextColor(color.hex)}
+                onChange={(color) => handleChangeTextColor(color.hex)}
               />
             </div>
           </Draggable>

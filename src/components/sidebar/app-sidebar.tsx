@@ -175,7 +175,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
           <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
               { icon: RiImageAiLine, label: 'Image Generation', href: '/image/tool/text-to-image' },
-              { icon: RiImageEditLine, label: 'Image Editor', href: '/image/tool/editor' },
+              { icon: RiImageEditLine, label: 'Image Editor', href: '/image/tool/editor/new' },
             ].map((item) => {
               const isActive =
                 pathname === item.href ||

@@ -11,9 +11,10 @@ import UserButton from "../../../components/header/user-button";
 
 //Context
 import { useUser } from '@/contexts/user/useUser';
+import { LuFile } from "react-icons/lu";
 interface EditHeaderProps {
-  hideTopBar: boolean;
-  setHideTopBar: React.Dispatch<React.SetStateAction<boolean>>;
+  hideTopBar?: boolean;
+  setHideTopBar?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EditHeader: React.FC<EditHeaderProps> = ({ hideTopBar, setHideTopBar }) => {
@@ -34,10 +35,16 @@ const EditHeader: React.FC<EditHeaderProps> = ({ hideTopBar, setHideTopBar }) =>
               Dashboard
             </span>
           </Link>
+          <Button
+            onClick={() => { }}
+            className="flex justify-center items-center bg-mountain-50 hover:bg-mountain-100 border border-mountain-200 rounded-lg w-32 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
+            <LuFile className="size-4" />
+            New Edit
+          </Button>
         </div>
         <div className="flex items-center space-x-4 px-4 border-mountain-200 border-r-1">
           <Button
-            onClick={() => setHideTopBar((prev) => !prev)}
+            onClick={() => setHideTopBar?.((prev) => !prev)}
             className="flex justify-center items-center bg-mountain-50 hover:bg-mountain-100 border border-mountain-200 rounded-lg w-32 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
             <BiExpandAlt className="size-4" />
             Full Screen

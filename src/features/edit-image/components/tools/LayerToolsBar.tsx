@@ -223,7 +223,6 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
           </div>
         </div>
       </div>
-      {/* <ToggleFullScreen /> */}
       <ZoomTool
         zoomLevel={zoomLevel}
         handleZoomIn={handleZoomIn}

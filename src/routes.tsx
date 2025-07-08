@@ -8,6 +8,7 @@ import GuestRoute from '@/components/routes/guest-route';
 import RootLayout from '@/layouts';
 import OnboardingRoute from './components/ProtectedItems/OnboardingRoute';
 import UserSubscription from './features/user-profile-private/UserSubscription';
+import BrowseImage from './features/edit-image/BrowseImage';
 
 const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
@@ -223,6 +224,7 @@ const routeConfig: RouteObject[] = [
         children: [
           { path: '/docs/:blogId', element: <MyWriting /> },
           { path: '/image/tool/editor', element: <ImageEditor /> },
+          { path: '/image/tool/editor/new', element: <BrowseImage /> },
           { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
         ],
       },
