@@ -87,3 +87,15 @@ export const forgotPassword = async (email: string) => {
     throw error; // Handle error accordingly
   }
 };
+
+export const checkEmailExists = async(email: string) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/email-exists`, {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error check email exists:", error);
+    throw error; 
+  }
+}
