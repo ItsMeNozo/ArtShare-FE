@@ -1,12 +1,12 @@
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Box } from '@mui/material';
-import { PostMedia } from '../types/post-media';
+import { PostMedia } from '../../types/post-media';
 
-interface MediaPreviewProps {
+interface MediaPreviewerProps {
   media: PostMedia;
 }
 
-const MediaPreview: React.FC<MediaPreviewProps> = ({ media }) => {
+const MediaPreviewer: React.FC<MediaPreviewerProps> = ({ media }) => {
   return media.type === MEDIA_TYPE.IMAGE ? (
     <img
       src={media.url}
@@ -30,4 +30,4 @@ const MediaPreview: React.FC<MediaPreviewProps> = ({ media }) => {
   );
 };
 
-export default MediaPreview;
+export default MediaPreviewer;

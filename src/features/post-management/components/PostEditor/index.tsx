@@ -11,7 +11,7 @@ import { MdCrop, MdPhotoCameraBack } from 'react-icons/md';
 
 import InlineErrorMessage from '@/components/InlineErrorMessage';
 import { Checkbox } from '@/components/ui/checkbox';
-import ImageCropperModal from '@/components/ui/image-cropper-modal';
+import ImageCropperModal from '@/features/post-management/components/PostEditor/ImageCropperModal';
 import { MEDIA_TYPE } from '@/utils/constants';
 import {
   ErrorMessage,
@@ -22,11 +22,11 @@ import {
   FormikTouched,
 } from 'formik';
 import { ImageUpIcon } from 'lucide-react';
-import { PostFormValues } from '../types/post-form-values.type';
-import { PostMedia } from '../types/post-media';
-import SubjectPicker from './SubjectPicker';
+import { PostFormValues } from '../../types/post-form-values.type';
+import { PostMedia } from '../../types/post-media';
+import SelectCategorySection from './SelectCategorySection';
 
-const UploadForm: React.FC<{
+const PostEditor: React.FC<{
   values: PostFormValues;
   setFieldValue: FormikHelpers<PostFormValues>['setFieldValue'];
   onThumbnailAddedOrRemoved: (file: File | null) => void;
@@ -37,6 +37,7 @@ const UploadForm: React.FC<{
   touched: FormikTouched<PostFormValues>;
   handleBlur: FormikHandlers['handleBlur'];
   isMatureAutoDetected: boolean;
+  onThumbnailChange?: () => void;
 }> = ({
   values,
   setFieldValue,
@@ -47,6 +48,7 @@ const UploadForm: React.FC<{
   errors,
   touched,
   isMatureAutoDetected,
+  onThumbnailChange,
 }) => {
   const [thumbnailCropOpen, setThumbnailCropOpen] = useState(false);
 
@@ -185,7 +187,6 @@ const UploadForm: React.FC<{
           open={thumbnailCropOpen}
           onClose={() => setThumbnailCropOpen(false)}
           onCropped={(blob, thumbnailCropMeta) => {
-            console.log('Cropped thumbnail meta:', thumbnailCropMeta);
             setThumbnail({
               file: new File([blob], 'cropped_thumbnail.png', {
                 type: 'image/png',
@@ -195,6 +196,8 @@ const UploadForm: React.FC<{
             });
 
             setFieldValue('thumbnailMeta', thumbnailCropMeta);
+
+            onThumbnailChange?.();
           }}
         />
       )}
@@ -283,7 +286,7 @@ const UploadForm: React.FC<{
           {/* Dialog for Selection */}
           <Box className="space-y-1 px-3 pb-3">
             {/** TODO: uncomment this */}
-            <SubjectPicker
+            <SelectCategorySection
               categoryIds={values.categoryIds}
               setCategoryIds={(val) => setFieldValue('categoryIds', val)}
             />
@@ -294,4 +297,4 @@ const UploadForm: React.FC<{
   );
 };
 
-export default UploadForm;
+export default PostEditor;

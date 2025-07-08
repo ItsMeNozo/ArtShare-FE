@@ -1,7 +1,7 @@
+import { useUser } from '@/contexts/user';
 import { ReportTargetType } from '@/features/user-profile-public/api/report.api';
 import ReportDialog from '@/features/user-profile-public/components/ReportDialog';
 import { useReport } from '@/features/user-profile-public/hooks/useReport';
-import { auth } from '@/firebase';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { Post, User } from '@/types';
 import { extractReportErrorMessage } from '@/utils/error.util';
@@ -16,8 +16,9 @@ import { PostMenu } from './PostMenu';
 const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
-  const currentUser = auth.currentUser;
-  const isOwner = currentUser && postData.userId === currentUser.uid;
+  const { user: currentUser } = useUser();
+
+  const isOwner = currentUser && postData.userId === currentUser.id;
 
   const { mutate: deletePostQuery } = useDeletePost({
     onSuccess: () => {

@@ -1,21 +1,21 @@
 import Loading from '@/components/loading/Loading';
+import { useGetPostDetails } from '@/features/post/hooks/useGetPostDetails';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Box } from '@mui/material';
 import { FormikHelpers } from 'formik';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostDetails } from '../post/hooks/useGetPostDetails';
-import { useUpdatePost } from './hooks/useUpdatePost';
-import PostForm from './PostForm';
-import { PostFormValues } from './types/post-form-values.type';
-import { PostMedia } from './types/post-media';
+import PostForm from '../components/PostForm';
+import { useUpdatePost } from '../hooks/useUpdatePost';
+import { PostFormValues } from '../types/post-form-values.type';
+import { PostMedia } from '../types/post-media';
 
 /**
  * EditPostPage – fully‑screen page that reuses UploadPost components
  * Route: /posts/:postId/edit
  */
-const EditPost: React.FC = () => {
+const EditPostPage: React.FC = () => {
   /** ──────────────────── fetch post data ─────────────────── */
   const { postId } = useParams<{ postId: string }>();
   const {
@@ -70,7 +70,7 @@ const EditPost: React.FC = () => {
     }
     return {
       title: fetchedPost.title,
-      description: fetchedPost.description,
+      description: fetchedPost.description || '',
       categoryIds: fetchedPost.categories?.map((c) => c.id) ?? [],
       isMature: fetchedPost.isMature,
       thumbnailMeta: fetchedPost.thumbnailCropMeta,
@@ -79,7 +79,7 @@ const EditPost: React.FC = () => {
 
   /** ─────────────────── submit ─────────────────── */
 
-  const { mutate: updatePost } = useUpdatePost({
+  const { mutateAsync: updatePost } = useUpdatePost({
     onSuccess: (updatedPost) => {
       navigate(`/posts/${updatedPost.id}`);
     },
@@ -104,7 +104,7 @@ const EditPost: React.FC = () => {
       return;
     }
 
-    updatePost(
+    await updatePost(
       {
         postId: parseInt(postId!),
         values,
@@ -152,4 +152,4 @@ const EditPost: React.FC = () => {
   );
 };
 
-export default EditPost;
+export default EditPostPage;

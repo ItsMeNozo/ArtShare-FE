@@ -2,14 +2,14 @@ import { Button, Typography } from '@mui/material';
 import { ChangeEvent } from 'react';
 import { BsImageFill } from 'react-icons/bs';
 import { RiFileVideoFill } from 'react-icons/ri';
-import { MediaPreviewContainer } from './media-preview-container';
+import { MediaPreviewContainer } from './MediaPreviewContainer';
 
-interface UploadFromDeviceProps {
+interface SelectDeviceMediaPanelProps {
   onAddImages: (event: ChangeEvent<HTMLInputElement>) => void;
   onAddVideo: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const UploadFromDevice: React.FC<UploadFromDeviceProps> = ({
+const SelectDeviceMediaPanel: React.FC<SelectDeviceMediaPanelProps> = ({
   onAddImages,
   onAddVideo,
 }) => {
@@ -79,4 +79,4 @@ const UploadFromDevice: React.FC<UploadFromDeviceProps> = ({
   );
 };
 
-export default UploadFromDevice;
+export default SelectDeviceMediaPanel;

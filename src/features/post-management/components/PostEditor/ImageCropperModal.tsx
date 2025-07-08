@@ -34,12 +34,35 @@ const ImageCropperModal: React.FC<Props> = ({
   const [aspect, setAspect] = useState<number | undefined>(undefined);
   const [selectedAspect, setSelectedAspect] = useState(DEFAULT_ASPECT_LABEL);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  console.log('ImageCropperModal rendered with thumbnailMeta:', thumbnailMeta);
-  console.log('originalThumbnailUrl:', originalThumbnailUrl);
+  const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates on unmounted component
+    const img = new Image();
+
+    img.onload = () => {
+      // Only update state if the component is still mounted
+      if (isMounted) {
+        console.log('Image loaded successfully');
+        setLoadedImage(img);
+      }
+    };
+
+    img.onerror = (err) => {
+      console.error('Failed to load image:', originalThumbnailUrl, err);
+    };
+
+    img.crossOrigin = 'anonymous';
+
+    img.src = originalThumbnailUrl;
+
+    return () => {
+      isMounted = false;
+    };
+  }, [originalThumbnailUrl]);
 
   useEffect(() => {
     if (!open) return;
-    console.log('ImageCropperModal opened with thumbnailMeta:', thumbnailMeta);
     setCrop(thumbnailMeta.crop ?? DEFAULT_CROP);
     setZoom(thumbnailMeta.zoom ?? DEFAULT_ZOOM);
     setSelectedAspect(thumbnailMeta.selectedAspect ?? DEFAULT_ASPECT_LABEL);
@@ -57,11 +80,9 @@ const ImageCropperModal: React.FC<Props> = ({
   }, [open, originalThumbnailUrl, thumbnailMeta]);
 
   const cropImageAndSave = async () => {
-    if (croppedAreaPixels) {
-      const cropped = await getCroppedImg(
-        originalThumbnailUrl,
-        croppedAreaPixels,
-      );
+    console.log('cropping image with crop', loadedImage);
+    if (croppedAreaPixels && loadedImage) {
+      const cropped = await getCroppedImg(loadedImage, croppedAreaPixels);
       const thumbnailCropMeta = {
         crop,
         zoom,
@@ -92,7 +113,7 @@ const ImageCropperModal: React.FC<Props> = ({
       }}
     >
       <DialogTitle className="flex items-center justify-between">
-        <Typography variant="h6">Crop Image</Typography>
+        <Typography>Crop Image</Typography>
         <IconButton onClick={onClose} size="small">
           <MdClose size={20} />
         </IconButton>

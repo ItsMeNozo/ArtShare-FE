@@ -1,63 +1,64 @@
-// src/hooks/useIsMature.ts
-import {
-  detectAdultImages,
-  DetectAdultImagesResponse,
-} from '@/api/detect-adult-images.api';
-import { useState } from 'react';
+import { detectAdultImages } from '@/api/detect-adult-images.api';
+import { useLoading } from '@/contexts/Loading/useLoading';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { extractApiErrorMessage } from '@/utils/error.util';
+import { useMutation } from '@tanstack/react-query';
 import { PostMedia } from '../types/post-media';
 
-interface UseIsMatureReturn {
-  checkMaturityForNewItems: (
-    newMediaItems: PostMedia[],
-  ) => Promise<PostMedia[]>;
-  isLoading: boolean;
-  isError: boolean;
+interface UseCheckMaturityOptions {
+  onSuccess?: (processedMedia: PostMedia[]) => void;
+  onError?: (errorMessage: string) => void;
+  onSettled?: () => void;
 }
 
-export default function useIsMature(): UseIsMatureReturn {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
+export const useCheckMaturity = ({
+  onSuccess,
+  onError,
+  onSettled,
+}: UseCheckMaturityOptions = {}) => {
+  const { showLoading, hideLoading } = useLoading();
+  const { showSnackbar } = useSnackbar();
 
-  const checkMaturityForNewItems = async (newMediaItems: PostMedia[]) => {
-    if (!newMediaItems || newMediaItems.length === 0) {
-      return [];
-    }
+  return useMutation({
+    mutationFn: checkMaturityFn,
 
-    setIsLoading(true);
+    onMutate: () => {
+      showLoading('Checking for sensitive content...');
+    },
 
-    const imageMediasToProcess: PostMedia[] = [...newMediaItems];
+    onSettled: () => {
+      hideLoading();
+      onSettled?.();
+    },
 
-    if (imageMediasToProcess.length === 0) {
-      setIsLoading(false);
-      return newMediaItems;
-    }
+    onSuccess: (processedMedia) => {
+      onSuccess?.(processedMedia);
+    },
 
-    const filesToDetect: File[] = imageMediasToProcess.map(
-      (media) => media.file!,
-    );
-    let processedImageMedias: PostMedia[] = [...imageMediasToProcess];
+    onError: (error) => {
+      const message = extractApiErrorMessage(
+        error,
+        'Failed to check for sensitive content.',
+      );
+      showSnackbar(message, 'error');
+      onError?.(message);
+    },
+  });
+};
 
-    try {
-      const detectionResults: DetectAdultImagesResponse[] =
-        await detectAdultImages(filesToDetect);
+const checkMaturityFn = async (
+  newMediaItems: PostMedia[],
+): Promise<PostMedia[]> => {
+  const filesToDetect: File[] = newMediaItems.map((media) => media.file!);
 
-      processedImageMedias = imageMediasToProcess.map((mediaItem, index) => ({
-        ...mediaItem,
-        isMature: detectionResults[index].isAdult,
-      }));
-    } catch (err) {
-      console.error('Error in detectAdultImages:', err);
-      setIsError(true);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-    return processedImageMedias;
-  };
+  if (filesToDetect.length === 0) {
+    return newMediaItems;
+  }
 
-  return {
-    checkMaturityForNewItems,
-    isLoading,
-    isError,
-  };
-}
+  const detectionResults = await detectAdultImages(filesToDetect);
+
+  return newMediaItems.map((mediaItem, index) => ({
+    ...mediaItem,
+    isMature: detectionResults[index].isAdult,
+  }));
+};

@@ -8,6 +8,7 @@ import {
   Paper,
   Popper,
   TextField,
+  Typography,
   useTheme, // <-- add useTheme
 } from '@mui/material';
 import { UseQueryResult } from '@tanstack/react-query';
@@ -16,15 +17,15 @@ import { MdClose } from 'react-icons/md';
 import type { Subject as SubjectType } from './SubjectSelector';
 import SubjectSelector from './SubjectSelector';
 
-interface SubjectPickerProps {
+interface SelectCategorySectionProps {
   categoryIds: number[];
   setCategoryIds: (ids: number[]) => void;
 }
 
-export default function SubjectPicker({
+export default function SelectCategorySection({
   categoryIds,
   setCategoryIds,
-}: SubjectPickerProps) {
+}: SelectCategorySectionProps) {
   const theme = useTheme(); // 🟢 useTheme hook
 
   // derive border colors from your MUI theme
@@ -81,12 +82,11 @@ export default function SubjectPicker({
   return (
     <AsyncWrapper loading={isLoading} error={isError}>
       <Box sx={{ position: 'relative', width: '100%' }} ref={anchorRef}>
-        <p className="dark:text-mountain-200 mb-1 text-sm text-gray-800">
+        <Typography className="dark:text-mountain-200 mb-1 text-sm text-gray-800">
           How would you categorize this work? (Choose up to 3)
-        </p>
+        </Typography>
 
-        {/* wrapper styled like MUI InputBase-root */}
-        <div
+        <Box
           onClick={handleMainInputFocus}
           style={{
             display: 'flex',
@@ -166,7 +166,7 @@ export default function SubjectPicker({
               },
             }}
           />
-        </div>
+        </Box>
 
         <Popper
           open={open}

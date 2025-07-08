@@ -1,12 +1,9 @@
-// SubjectSelector.tsx
-
-import { Button } from '@mui/material'; // MUI components for internal use if any
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box, Button, Typography } from '@mui/material'; // MUI components for internal use if any
+import React, { useCallback, useMemo, useState } from 'react';
 import { MdAdd, MdClose } from 'react-icons/md';
 
 // This is a type for Subject, which is a simplified version of Category to display on the UI.
 export type Subject = {
-  // Exporting for SubjectPicker
   id: number;
   name: string;
   description?: string | null;
@@ -60,11 +57,9 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
     [categoryIds, setCategoryIds],
   );
 
-  // Your original SubjectRow with its original styling
   const SubjectRow = React.memo(
     ({
       subject,
-      // isSelected prop is now derived inside SubjectRow or passed based on the main isSelected function
       toggle,
       handleHover,
     }: {
@@ -111,27 +106,6 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   );
   SubjectRow.displayName = 'SubjectRowFromSelector';
 
-  // Effect to update 'hovered' when 'categoryIds' or 'allSubjects' change
-  useEffect(() => {
-    if (allSubjects.length > 0) {
-      const currentSelectedSubjects = allSubjects.filter((s) =>
-        categoryIds.includes(s.id),
-      );
-      if (currentSelectedSubjects.length > 0) {
-        if (!hovered || !categoryIds.includes(hovered.id)) {
-          setHovered(currentSelectedSubjects[0]);
-        }
-      } else if (
-        allSubjects.length > 0 &&
-        (!hovered || !allSubjects.find((s) => s.id === hovered.id))
-      ) {
-        setHovered(allSubjects[0]);
-      }
-    } else if (allSubjects.length === 0) {
-      setHovered(undefined);
-    }
-  }, [categoryIds, allSubjects, hovered]);
-
   const filteredSubjects = useMemo(() => {
     const searchTerm = currentSearchTerm.toLowerCase();
     if (!searchTerm) return allSubjects;
@@ -139,44 +113,28 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   }, [allSubjects, currentSearchTerm]);
 
   const remainingSlots = 3 - categoryIds.length;
-  // --- End: Logic mostly from your original SubjectSelector ---
 
-  // This root div is the content of the Popper.
-  // It should define its own size and internal layout.
-  // The Tailwind classes for colors (bg-white dark:bg-mountain-950 etc.) should match your app's theme for dropdowns.
   return (
-    <div
-      className="dark:bg-mountain-900 flex max-h-[70vh] w-[820px] flex-col rounded-lg bg-white p-3 text-black dark:text-white"
+    <Box
+      className="dark:bg-mountain-900 flex h-[40vh] w-[820px] flex-col rounded-lg bg-white p-3 text-black dark:text-white"
       style={{ scrollbarGutter: 'stable' }} /* reserve scroll‑bar width */
     >
-      {' '}
-      {/* Removed the specific title "How would you categorize..." - that's now in SubjectPicker's context */}
-      {/* Removed the "Top Selection Bar" with chips and search - that's now in SubjectPicker */}
-      {/* Main layout (two columns) - this is what was originally in your SubjectSelector's main layout div */}
-      <div className="flex flex-grow flex-row gap-4 overflow-hidden">
-        {' '}
-        {/* Ensure this takes up available space */}
+      <Box className="flex flex-grow flex-row gap-4 overflow-hidden">
         {/* Left column: List of subjects */}
-        {/* Apply your original styling for this column's wrapper */}
-        <div className="flex h-full w-2/5 flex-col pr-2">
-          {' '}
-          {/* e.g. 40% width for more space */}
-          {/* Your original "CHOOSE ANOTHER..." text */}
-          <p className="mb-3 py-1.5 text-sm text-gray-700 dark:text-gray-400">
+        <Box className="w-2/5 overflow-y-auto pr-2">
+          <Typography className="mb-3 py-1.5 text-sm text-gray-700 dark:text-gray-400">
             CHOOSE ANOTHER {remainingSlots} ART TYPE
             {remainingSlots !== 1 ? 'S' : ''}
-          </p>
+          </Typography>
           {allSubjects.length === 0 && !currentSearchTerm ? (
             <p className="py-4 text-center text-sm text-gray-500 italic dark:text-gray-400">
               Loading art types...
             </p>
           ) : filteredSubjects.length > 0 ? (
-            // Your original list styling
             <ul
               className="custom-scroll flex-1 space-y-2 overflow-y-auto pr-1"
               style={{ scrollbarGutter: 'stable' }}
             >
-              {' '}
               {filteredSubjects.map((subject) => (
                 <SubjectRow
                   key={subject.id}
@@ -192,49 +150,17 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
               No art types match "{currentSearchTerm}".
             </p>
           )}
-        </div>
+        </Box>
         {/* Right preview panel */}
-        {/* Apply your original styling for this column's wrapper */}
-        <div className="flex h-full w-3/5 flex-col overflow-hidden border-l border-gray-300 dark:border-gray-700">
-          {/* Your original preview panel structure and styling */}
-          {hovered ? (
-            // The div below was your "bg-gray-100 dark:bg-mountain-950 p-5 border ..."
-            <div className="custom-scroll flex h-[357px] flex-col overflow-y-auto rounded-md p-3 md:p-4">
-              <div className="mb-3">
-                <h3 className="text-lg font-semibold md:text-xl">
-                  {hovered.name}
-                </h3>
-                <p className="text-xs break-words text-gray-600 md:text-sm dark:text-gray-300">
-                  {hovered.description}
-                </p>
-              </div>
-              {hovered.examples !== undefined ? (
-                <>
-                  <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
-                    Examples
-                  </p>
-                  {hovered.examples.length > 0 ? (
-                    <div className="custom-scroll-x flex max-w-full gap-2 overflow-x-auto pb-1 md:gap-3">
-                      {hovered.examples.map((url, idx) => (
-                        <img
-                          key={idx}
-                          src={url}
-                          alt={`Example ${idx + 1} for ${hovered.name}`}
-                          // Your original image classes
-                          className="h-28 w-28 flex-shrink-0 rounded object-cover md:h-32 md:w-32"
-                          loading="lazy"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-xs text-gray-500 italic md:text-sm dark:text-gray-400">
-                      No examples available for this art type.
-                    </p>
-                  )}
-                </>
-              ) : null}
-            </div>
-          ) : (
+        <Box className="flex flex-1 flex-col overflow-hidden border-l border-gray-300 dark:border-gray-700">
+          {allSubjects.map((category) => (
+            <CategoryPreviewer
+              key={category.id}
+              category={category}
+              hidden={category.name != hovered?.name}
+            />
+          ))}
+          {!hovered && (
             <div className="dark:bg-mountain-900 flex h-full items-center justify-center rounded-md bg-gray-50">
               <p className="text-sm text-gray-400 dark:text-gray-500">
                 {allSubjects.length > 0
@@ -243,10 +169,56 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
               </p>
             </div>
           )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
 export default SubjectSelector;
+
+interface CategoryPreviewerProps {
+  category: Subject;
+  hidden?: boolean;
+}
+
+const CategoryPreviewer = React.memo(
+  ({ category, hidden }: CategoryPreviewerProps) => {
+    const { name, description = '', examples = [] } = category;
+    return (
+      <Box
+        className="custom-scroll h-[357px] flex-col overflow-y-auto rounded-md p-3 md:p-4"
+        display={hidden ? 'none' : 'flex'}
+      >
+        <Box className="mb-3">
+          <h3 className="text-lg font-semibold md:text-xl">{name}</h3>
+          <p className="text-xs break-words text-gray-600 md:text-sm dark:text-gray-300">
+            {description}
+          </p>
+        </Box>
+        <Box>
+          <Typography className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+            Examples
+          </Typography>
+          {examples.length > 0 ? (
+            <div className="custom-scroll-x flex max-w-full gap-2 overflow-x-auto pb-1 md:gap-3">
+              {examples.map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  alt={`Example ${idx + 1} for ${name}`}
+                  className="h-28 w-28 flex-shrink-0 rounded object-cover md:h-32 md:w-32"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          ) : (
+            <Typography className="text-xs text-gray-500 italic md:text-sm dark:text-gray-400">
+              No examples available for this art type.
+            </Typography>
+          )}
+        </Box>
+      </Box>
+    );
+  },
+);

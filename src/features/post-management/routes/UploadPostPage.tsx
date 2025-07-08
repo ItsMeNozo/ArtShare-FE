@@ -5,15 +5,15 @@ import { MEDIA_TYPE } from '@/utils/constants';
 import { fetchImageFileFromUrl } from '@/utils/fetch-media.utils';
 import { FormikHelpers } from 'formik';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useCreatePost } from './hooks/useCreatePost';
-import PostForm from './PostForm';
+import PostForm from '../components/PostForm';
+import { useCreatePost } from '../hooks/useCreatePost';
 import {
-  defaultPostFormValues,
   PostFormValues,
-} from './types/post-form-values.type';
-import { PostMedia } from './types/post-media';
+  defaultPostFormValues,
+} from '../types/post-form-values.type';
+import { PostMedia } from '../types/post-media';
 
-const UploadPost: React.FC = () => {
+const UploadPostPage: React.FC = () => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
   const location = useLocation();
@@ -27,7 +27,7 @@ const UploadPost: React.FC = () => {
     null,
   );
 
-  const { mutate: createPost } = useCreatePost({
+  const { mutateAsync: createPost } = useCreatePost({
     onSuccess: (createdPost) => {
       navigate(`/posts/${createdPost.id}`);
       showSnackbar('Post successfully created!', 'success');
@@ -61,7 +61,7 @@ const UploadPost: React.FC = () => {
       return;
     }
 
-    createPost(
+    await createPost(
       {
         values,
         postMedias,
@@ -142,4 +142,4 @@ const UploadPost: React.FC = () => {
   );
 };
 
-export default UploadPost;
+export default UploadPostPage;

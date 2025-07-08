@@ -4,6 +4,7 @@ import { Paper, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import React, { memo, useMemo, useState } from 'react';
 import { RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
+import { useNavigate } from 'react-router-dom';
 import FilterBar from './components/FilterBar';
 import { useGetPosts } from './hooks/useGetPosts';
 import { ExploreTab } from './types';
@@ -14,6 +15,11 @@ const Explore: React.FC = () => {
     null,
   );
   const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
+  const navigate = useNavigate();
+
+  const handlePhotoClick = (photoId: number) => {
+    navigate(`/posts/${photoId}`);
+  };
 
   const {
     data: postsData,
@@ -68,6 +74,7 @@ const Explore: React.FC = () => {
           targetRowHeight={256}
           rowConstraints={{ singleRowMaxHeight: 256 }}
           render={{ image: ImageRenderer }}
+          onClick={({ photo }) => handlePhotoClick(photo.postId)}
         />
       </InfiniteScroll>
 

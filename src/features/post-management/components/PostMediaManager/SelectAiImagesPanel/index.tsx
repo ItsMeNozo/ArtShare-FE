@@ -7,18 +7,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button, Typography } from '@mui/material';
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import { IoSparkles } from 'react-icons/io5';
 import { RiImageCircleAiFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
+import { MediaPreviewContainer } from '../MediaPreviewContainer';
 import BrowsePromptHistory from './BrowsePromptHistory';
-import { MediaPreviewContainer } from './media-preview-container';
 
-interface PostAiImagesProps {
-  handleImageFilesChange: (event: ChangeEvent<HTMLInputElement>) => void;
-}
-
-const PostAiImages: React.FC<PostAiImagesProps> = () => {
+const SelectAiImagesPanel: React.FC = () => {
   return (
     <MediaPreviewContainer>
       <Dialog>
@@ -74,4 +70,4 @@ const PostAiImages: React.FC<PostAiImagesProps> = () => {
     </MediaPreviewContainer>
   );
 };
-export default PostAiImages;
+export default SelectAiImagesPanel;
