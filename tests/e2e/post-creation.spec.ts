@@ -135,6 +135,12 @@ test.describe('Post Creation', () => {
       .getByRole('button', { name: 'Add' })
       .click();
 
+    // Verify category was selected
+    console.log('📂 Verifying category selection...');
+
+    // Wait a bit for category to be properly registered
+    await page.waitForTimeout(1000);
+
     // Set up listener for the POST request response to get the post ID
     const postCreationPromise = page.waitForResponse(
       (response) =>
@@ -142,8 +148,19 @@ test.describe('Post Creation', () => {
         response.request().method() === 'POST',
     );
 
+    // Ensure submit button is visible and enabled before clicking
+    const submitButton = page.getByRole('button', { name: 'Submit' });
+    await expect(submitButton).toBeVisible();
+    await expect(submitButton).toBeEnabled();
+
+    console.log('🚀 Submit button is ready, clicking now...');
+
+    // Close any open tooltips or popovers that might block the submit button
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(500);
+
     // Submit the post
-    await page.getByRole('button', { name: 'Submit' }).click();
+    await submitButton.click();
 
     // Wait for successful post creation API response
     const response = await postCreationPromise;
@@ -160,7 +177,7 @@ test.describe('Post Creation', () => {
     console.log(`✅ Created video post successfully with ID: ${postId}`);
   });
 
-  test('@unsafe SCRUM-356-3: AI Content Generation Feature', async ({
+  test('@unsafe @ai SCRUM-356-3: AI Content Generation Feature', async ({
     page,
   }) => {
     // Upload an image first
@@ -232,15 +249,36 @@ test.describe('Post Creation', () => {
         page.getByRole('textbox', { name: 'What do you call your artwork' }),
       ).toHaveValue('My Custom AI Title');
 
+      // Set up listener for the POST request response to get the post ID
+      const postCreationPromise = page.waitForResponse(
+        (response) =>
+          response.url().includes('/posts') &&
+          response.request().method() === 'POST',
+      );
+
+      // Close any open tooltips or popovers that might block the submit button
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(500);
+
       // Submit the post
-      await page.getByRole('button', { name: 'Submit' }).click();
+      const submitButton = page.getByRole('button', { name: 'Submit' });
+      await submitButton.click();
 
-      // Verify success
-      await expect(
-        page.locator(':text("Post successfully created!"), .success-message'),
-      ).toBeVisible();
+      // Wait for successful post creation API response
+      const postResponse = await postCreationPromise;
 
-      console.log(`✅ Created AI-generated post successfully`);
+      // Verify it's a successful response
+      expect(postResponse.status()).toBe(201);
+
+      const responseBody = await postResponse.json();
+      const postId = responseBody.id;
+
+      // Verify navigation to post details page using the ID from API response
+      await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
+
+      console.log(
+        `✅ Created AI-generated post successfully with ID: ${postId}`,
+      );
     } else {
       // If AI generation is not available, just create a regular post
       await page
@@ -260,13 +298,28 @@ test.describe('Post Creation', () => {
         .getByRole('button', { name: 'Add' })
         .click();
 
+      // Set up listener for the POST request response to get the post ID
+      const postCreationPromise = page.waitForResponse(
+        (response) =>
+          response.url().includes('/posts') &&
+          response.request().method() === 'POST',
+      );
+
       await page.getByRole('button', { name: 'Submit' }).click();
 
-      await expect(
-        page.locator(':text("Post successfully created!"), .success-message'),
-      ).toBeVisible();
+      // Wait for successful post creation API response
+      const response = await postCreationPromise;
 
-      console.log(`✅ Created regular post successfully`);
+      // Verify it's a successful response
+      expect(response.status()).toBe(201);
+
+      const responseBody = await response.json();
+      const postId = responseBody.id;
+
+      // Verify navigation to post details page using the ID from API response
+      await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
+
+      console.log(`✅ Created regular post successfully with ID: ${postId}`);
     }
   });
 
@@ -370,6 +423,10 @@ test.describe('Post Creation', () => {
 
     // Select the first AI-generated image to post
     const postButton = page.getByRole('button', { name: 'Post this' }).first();
+
+    // Wait for AI images to load and Post button to be visible
+    await expect(postButton).toBeVisible();
+
     if (await postButton.isVisible()) {
       await postButton.click();
 
@@ -401,7 +458,12 @@ test.describe('Post Creation', () => {
           response.request().method() === 'POST',
       );
 
-      await page.getByRole('button', { name: 'Submit' }).click();
+      // Ensure submit button is visible and enabled before clicking
+      const submitButton = page.getByRole('button', { name: 'Submit' });
+      await expect(submitButton).toBeVisible();
+      await expect(submitButton).toBeEnabled();
+
+      await submitButton.click();
 
       // Wait for post creation API response and handle potential errors
       const response = await postCreationPromise;
@@ -488,7 +550,12 @@ test.describe('Post Creation', () => {
           response.request().method() === 'POST',
       );
 
-      await page.getByRole('button', { name: 'Submit' }).click();
+      // Ensure submit button is visible and enabled before clicking
+      const submitButton = page.getByRole('button', { name: 'Submit' });
+      await expect(submitButton).toBeVisible();
+      await expect(submitButton).toBeEnabled();
+
+      await submitButton.click();
 
       // Wait for successful post creation API response
       const response = await postCreationPromise;

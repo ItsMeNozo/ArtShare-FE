@@ -136,12 +136,20 @@ export class TestDataCleanup {
   private async getAuthToken(): Promise<string | null> {
     try {
       return await this.page.evaluate(() => {
-        return (
-          localStorage.getItem('authToken') ||
-          localStorage.getItem('access_token') ||
-          sessionStorage.getItem('authToken') ||
-          sessionStorage.getItem('access_token')
-        );
+        try {
+          return (
+            localStorage.getItem('authToken') ||
+            localStorage.getItem('access_token') ||
+            sessionStorage.getItem('authToken') ||
+            sessionStorage.getItem('access_token')
+          );
+        } catch (error) {
+          console.warn(
+            'Could not access storage for auth token:',
+            error.message,
+          );
+          return null;
+        }
       });
     } catch (error) {
       console.warn('Could not get auth token:', error);

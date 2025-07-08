@@ -110,21 +110,29 @@ export class TestHelpers {
     // Clear any route mocks
     await this.page.unrouteAll();
 
-    // Clear browser storage
-    await this.page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-      // Clear any indexed DB if used
-      if (window.indexedDB) {
-        indexedDB.databases().then((databases) => {
-          databases.forEach((db) => {
-            if (db.name) {
-              indexedDB.deleteDatabase(db.name);
-            }
-          });
-        });
-      }
-    });
+    // Clear browser storage - handle SecurityError gracefully
+    try {
+      await this.page.evaluate(() => {
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+          // Clear any indexed DB if used
+          if (window.indexedDB) {
+            indexedDB.databases().then((databases) => {
+              databases.forEach((db) => {
+                if (db.name) {
+                  indexedDB.deleteDatabase(db.name);
+                }
+              });
+            });
+          }
+        } catch (error) {
+          console.warn('Could not clear storage:', error.message);
+        }
+      });
+    } catch (error) {
+      console.warn('Could not access page storage:', error.message);
+    }
 
     // Clear cookies
     await this.page.context().clearCookies();
@@ -244,12 +252,20 @@ export class TestHelpers {
     try {
       // Get auth token for API calls
       const authToken = await this.page.evaluate(() => {
-        return (
-          localStorage.getItem('authToken') ||
-          localStorage.getItem('access_token') ||
-          sessionStorage.getItem('authToken') ||
-          sessionStorage.getItem('access_token')
-        );
+        try {
+          return (
+            localStorage.getItem('authToken') ||
+            localStorage.getItem('access_token') ||
+            sessionStorage.getItem('authToken') ||
+            sessionStorage.getItem('access_token')
+          );
+        } catch (error) {
+          console.warn(
+            'Could not access storage for auth token:',
+            error.message,
+          );
+          return null;
+        }
       });
 
       if (!authToken) {
@@ -515,10 +531,21 @@ export class TestHelpers {
     }
 
     // If no logout button found, clear storage and reload
-    await this.page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-    });
+    try {
+      await this.page.evaluate(() => {
+        try {
+          localStorage.clear();
+          sessionStorage.clear();
+        } catch (error) {
+          console.warn('Could not clear storage during logout:', error.message);
+        }
+      });
+    } catch (error) {
+      console.warn(
+        'Could not access page storage during logout:',
+        error.message,
+      );
+    }
     await this.page.reload();
   }
 

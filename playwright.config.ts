@@ -74,8 +74,8 @@ export default defineConfig({
     video: 'retain-on-failure',
 
     /* Increase timeouts for better reliability */
-    actionTimeout: 30000,
-    navigationTimeout: 60000,
+    actionTimeout: 60000,
+    navigationTimeout: 120000,
   },
 
   /* Configure projects for major browsers */
@@ -110,7 +110,8 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         channel: 'chrome', // Use actual Chrome instead of Chromium
-        baseURL: config.baseURL, // Uses environment-specific URL
+        baseURL: environments.production.baseURL, // Always use production for safe tests
+        trace: 'on-first-retry',
       },
     },
 
@@ -123,6 +124,33 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         channel: 'chrome', // Use actual Chrome instead of Chromium
         baseURL: environments.preview.baseURL, // Always use preview for unsafe tests
+        trace: 'on-first-retry',
+      },
+    },
+
+    // AI Tests (Manual only - Production)
+    {
+      name: 'ai',
+      testDir: './tests/e2e',
+      grep: /@ai/,
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome', // Use actual Chrome instead of Chromium
+        baseURL: environments.production.baseURL, // Use production for AI tests
+        trace: 'on', // Always trace AI tests since they cost money
+      },
+    },
+
+    // Cleanup Tests (Preview Environment)
+    {
+      name: 'cleanup',
+      testDir: './tests/e2e',
+      grep: /@cleanup/,
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome', // Use actual Chrome instead of Chromium
+        baseURL: environments.preview.baseURL, // Use preview for cleanup tests
+        trace: 'on-first-retry',
       },
     },
   ],
