@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
 import { RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
+import useMeasure from 'react-use-measure';
 import { useSearchPosts } from '../../hooks/useSearchPosts';
 import MediumFilters from './MediumFilters';
 
@@ -14,6 +15,7 @@ interface PostSearchResultsProps {
 }
 
 const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
+  const [ref, { width }] = useMeasure();
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
 
@@ -37,7 +39,10 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
 
   return (
     <Box className="relative flex h-screen flex-col p-2 pb-48">
-      <div className="dark:bg-mountain-950 dark:border-mountain-800 absolute top-0 left-0 z-50 flex h-16 bg-white dark:border-b">
+      <div
+        ref={ref}
+        className="dark:bg-mountain-950 dark:border-mountain-800 absolute top-0 left-0 z-50 flex h-16 bg-white dark:border-b"
+      >
         {/* Left side - Filter */}
         <div className="absolute top-1/2 left-4 flex -translate-y-1/2 transform items-center space-x-4">
           <div
@@ -82,23 +87,26 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
           </div>
         </div>
       )}
-      <InfiniteScroll
-        data={galleryPhotos}
-        isLoading={isLoadingPosts}
-        isFetchingNextPage={isFetchingNextPage}
-        isError={isPostsError}
-        error={postsError}
-        hasNextPage={hasNextPage}
-        fetchNextPage={fetchNextPage}
-      >
-        <RowsPhotoAlbum
-          photos={galleryPhotos}
-          spacing={8}
-          targetRowHeight={256}
-          rowConstraints={{ singleRowMaxHeight: 256 }}
-          render={{ image: ImageRenderer }}
-        />
-      </InfiniteScroll>
+      {width > 0 && (
+        <InfiniteScroll
+          data={galleryPhotos}
+          isLoading={isLoadingPosts}
+          isFetchingNextPage={isFetchingNextPage}
+          isError={isPostsError}
+          error={postsError}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+        >
+          <RowsPhotoAlbum
+            photos={galleryPhotos}
+            defaultContainerWidth={width}
+            spacing={8}
+            targetRowHeight={256}
+            rowConstraints={{ singleRowMaxHeight: 256 }}
+            render={{ image: ImageRenderer }}
+          />
+        </InfiniteScroll>
+      )}
     </Box>
   );
 };
