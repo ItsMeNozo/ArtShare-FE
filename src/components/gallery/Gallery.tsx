@@ -2,6 +2,7 @@ import { CircularProgress } from '@mui/material';
 import React from 'react';
 import { Photo, RenderPhotoContext, RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
+import useMeasure from 'react-use-measure';
 import { ImageRenderer } from './ImageRenderer';
 
 export interface GalleryPhoto extends Photo {
@@ -38,6 +39,7 @@ const IGallery: React.FC<IGalleryProps> = ({
   error,
   renderPhoto,
 }) => {
+  const [ref, { width }] = useMeasure();
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center space-x-4">
@@ -69,14 +71,17 @@ const IGallery: React.FC<IGalleryProps> = ({
   const effectiveRenderPhoto = renderPhoto ? renderPhoto : ImageRenderer;
 
   return (
-    <div className="relative pb-20">
-      <RowsPhotoAlbum
-        rowConstraints={{ singleRowMaxHeight: 256 }}
-        spacing={8}
-        targetRowHeight={256}
-        photos={photos}
-        render={{ image: effectiveRenderPhoto }}
-      />
+    <div ref={ref} className="relative pb-20">
+      {width > 0 && (
+        <RowsPhotoAlbum
+          defaultContainerWidth={width}
+          rowConstraints={{ singleRowMaxHeight: 256 }}
+          spacing={8}
+          targetRowHeight={256}
+          photos={photos}
+          render={{ image: effectiveRenderPhoto }}
+        />
+      )}
       {isFetchingNextPage && (
         <div className="my-4 flex items-center justify-center space-x-2">
           <CircularProgress size={24} />
