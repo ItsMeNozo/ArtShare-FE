@@ -4,10 +4,10 @@ import { Category } from '@/types';
 import { Button } from '@mui/material';
 import { UseQueryResult } from '@tanstack/react-query';
 import { Ellipsis, LoaderPinwheel } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { BsFilter } from 'react-icons/bs';
-import { AttributeSelector } from './AttributeSelector';
-import { MediumSelector } from './MediumSelector';
+import AttributeFilters from './AttributeFilters';
+import MediumFilters from './MediumFilters';
 import { MediumSlider } from './MediumSlider';
 
 interface FilterBarProps {
@@ -27,23 +27,11 @@ const FilterBar = ({
   isAi,
   setIsAi,
 }: FilterBarProps) => {
-  const [openCP, setOpenCP] = useState(false);
-  const [openPP, setOpenPP] = useState(false);
-  const [anchorElCP, setAnchorElCP] = useState<null | HTMLElement>(null);
-  const [anchorElPP, setAnchorElPP] = useState<null | HTMLElement>(null);
-
   const {
     data: allCategories,
     isLoading: isLoadingAllCategories,
     isError: isErrorAllCategories,
   }: UseQueryResult<Category[]> = useCategories({ page: 1, pageSize: 200 });
-
-  const attributeCategories = useMemo(() => {
-    if (!allCategories) return [];
-    return allCategories.filter(
-      (cat) => cat.type === CategoryTypeValues.ATTRIBUTE,
-    );
-  }, [allCategories]);
 
   const mediumCategories = useMemo(() => {
     if (!allCategories) return [];
@@ -56,48 +44,34 @@ const FilterBar = ({
     setSelectedMedium(mediumName);
   };
 
-  const handleToggleCP = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorElCP(event.currentTarget);
-    setOpenCP((prevOpen) => !prevOpen);
-  };
-
-  const handleTogglePP = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorElPP(event.currentTarget);
-    setOpenPP((prevOpen) => !prevOpen);
-  };
-
   const handleAllMediumsClick = () => {
     setSelectedMedium(null);
-
-    if (openCP) setOpenCP(false);
   };
 
   const isAllChannelsSelected = selectedMedium === null;
 
   return (
     <div className="categories-bar flex w-full items-center gap-6 overflow-x-hidden">
-      <Button
-        className="dark:bg-mountain-900 dark:text-mountain-50 all-channels-btn flex aspect-[1/1] min-w-auto flex-shrink-0 gap-2 rounded-lg p-2 font-normal normal-case shadow-none"
-        variant="contained"
-        disableElevation
-        onClick={handleToggleCP}
-        disabled={isLoadingAllCategories}
-      >
-        {isLoadingAllCategories ? (
-          <LoaderPinwheel size={16} className="animate-spin" />
-        ) : (
-          <Ellipsis />
-        )}
-      </Button>
-      <MediumSelector
-        open={openCP}
-        anchorEl={anchorElCP}
-        onClose={() => setOpenCP(false)}
-        onSelectMedium={(medium) => setSelectedMedium(medium)}
+      <MediumFilters
         selectedMedium={selectedMedium}
-        data={mediumCategories}
-        placement="bottom-start"
-      />
+        setSelectedMedium={setSelectedMedium}
+      >
+        {({ onClick, isLoading }) => (
+          <Button
+            className="dark:bg-mountain-900 dark:text-mountain-50 all-channels-btn flex aspect-[1/1] min-w-auto flex-shrink-0 gap-2 rounded-lg p-2 font-normal normal-case shadow-none"
+            variant="contained"
+            disableElevation
+            onClick={onClick}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <LoaderPinwheel size={16} className="animate-spin" />
+            ) : (
+              <Ellipsis />
+            )}
+          </Button>
+        )}
+      </MediumFilters>
 
       <Button
         className={`all-channels-btn flex flex-shrink-0 gap-2 rounded-lg p-2 ${
@@ -129,31 +103,25 @@ const FilterBar = ({
           isError={isErrorAllCategories}
         />
       </div>
-      <Button
-        className="dark:bg-mountain-900 dark:text-mountain-50 spread-btn aspect-[1/1] min-w-auto flex-shrink-0 rounded-lg p-2"
-        variant="contained"
-        disableElevation
-        onClick={handleTogglePP}
-        disabled={isLoadingAllCategories || mediumCategories.length === 0}
-      >
-        {isLoadingAllCategories ? (
-          <LoaderPinwheel size={16} className="animate-spin" />
-        ) : (
-          <BsFilter size={24} />
-        )}
-      </Button>
-      <AttributeSelector
-        open={openPP}
-        onClose={() => setOpenPP(false)}
-        onSave={(attributes) => setSelectedAttributes(attributes as string[])}
-        anchorEl={anchorElPP}
-        data={attributeCategories}
-        selectedData={selectedAttributes}
-        placement="bottom-end"
-        showClearAllButton={true}
+
+      <AttributeFilters
+        selectedAttributes={selectedAttributes}
+        setSelectedAttributes={setSelectedAttributes}
         isAi={isAi}
         setIsAi={setIsAi}
-      />
+      >
+        {({ onClick, isLoading }) => (
+          <Button
+            className="dark:bg-mountain-900 dark:text-mountain-50 spread-btn aspect-[1/1] min-w-auto flex-shrink-0 rounded-lg p-2"
+            variant="contained"
+            disableElevation
+            onClick={onClick}
+            disabled={isLoading}
+          >
+            <BsFilter size={24} />
+          </Button>
+        )}
+      </AttributeFilters>
     </div>
   );
 };

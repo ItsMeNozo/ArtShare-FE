@@ -4,21 +4,24 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 
 interface UseSearchPostsParams {
   finalQuery: string | null;
-  selectedMediums?: string[];
+  medium?: string | null;
+  attributes?: string[];
   enabled?: boolean;
 }
 
 export const useSearchPosts = (params: UseSearchPostsParams) => {
-  const { finalQuery, selectedMediums, enabled = true } = params;
+  const { finalQuery, medium, attributes = [], enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ['postSearch', finalQuery, selectedMediums],
+    queryKey: ['postSearch', finalQuery, medium, attributes],
 
     queryFn: async ({ pageParam = 1 }) => {
+      const filter = attributes.concat(medium ? [medium] : []);
+
       const apiResponse = await searchPosts({
         page: pageParam,
         q: finalQuery!,
-        // filter: selectedMediums,
+        filter,
       });
 
       return postsToPhotos(apiResponse);

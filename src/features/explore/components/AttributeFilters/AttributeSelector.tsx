@@ -12,7 +12,7 @@ import React, { useEffect, useState } from 'react';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { FiSearch } from 'react-icons/fi';
 import { TiDeleteOutline } from 'react-icons/ti';
-import './scrollbar.css';
+import '../scrollbar.css';
 
 interface AttributeSelectorProps {
   open: boolean;
@@ -82,7 +82,7 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
         <Fade {...TransitionProps} timeout={350}>
           <Paper
             className={cn(
-              'custom-scrollbar max-h-[60vh] w-72 overflow-y-auto rounded-lg',
+              'custom-scrollbar max-h-[400px] w-72 overflow-y-auto rounded-lg',
               className,
             )}
           >
