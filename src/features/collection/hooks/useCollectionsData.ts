@@ -1,65 +1,26 @@
-import { Collection, Post } from '@/types';
-import { useEffect, useMemo, useState } from 'react';
+import { Collection } from '@/types';
+import { useQuery } from '@tanstack/react-query';
 import { fetchCollectionsWithPosts } from '../api/collection.api';
 
-export interface UseCollectionsDataResult {
-  collections: Collection[];
-  allPosts: Post[];
-  loading: boolean;
-  error: string | null;
-  setCollections: React.Dispatch<React.SetStateAction<Collection[]>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
-}
+export const COLLECTIONS_QUERY_KEY = ['collections', 'list'];
+const STALE_TIME = 1000 * 60 * 5;
 
-export function useCollectionsData(): UseCollectionsDataResult {
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+export function useCollectionsData(options: { enabled?: boolean } = {}) {
+  const { enabled = true } = options;
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const fetchedCollections = await fetchCollectionsWithPosts();
-        setCollections(fetchedCollections);
-      } catch (err) {
-        console.error('Error loading collection data:', err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'An unknown error occurred loading collections.',
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data, error, isLoading, isError } = useQuery({
+    queryKey: COLLECTIONS_QUERY_KEY,
+    queryFn: fetchCollectionsWithPosts,
+    staleTime: STALE_TIME,
+    enabled,
+  });
 
-    loadData();
-  }, []);
-
-  const allPosts = useMemo<Post[]>(() => {
-    if (loading) return [];
-
-    const postMap = new Map<number, Post>();
-    collections.forEach((collection) => {
-      (collection.posts || []).forEach((post) => {
-        postMap.set(post.id, post);
-      });
-    });
-
-    return Array.from(postMap.values()).sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-  }, [collections, loading]);
+  const collections: Collection[] = data ?? [];
 
   return {
     collections,
-    allPosts,
-    loading,
+    isLoading,
+    isError,
     error,
-    setCollections,
-    setError,
   };
 }

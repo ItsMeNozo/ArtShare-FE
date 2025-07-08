@@ -94,7 +94,6 @@ export const CollectionImageRenderer = (
         <img
           key={photo.key || photo.src}
           src={photo.src}
-          loading="lazy"
           className="h-full w-full rounded-lg object-cover"
           style={{ display: 'block' }}
         />

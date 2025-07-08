@@ -7,9 +7,7 @@ export const fetchCollectionsForDialog = async (): Promise<
 > => {
   try {
     // Adjust the endpoint as needed
-    const response = await api.get<Collection[]>(
-      '/collections?includePosts=true',
-    ); // Ensure backend includes posts
+    const response = await api.get<Collection[]>('/collections'); // Ensure backend includes posts
 
     // Map the raw API response to the DialogCollection structure
     const dialogCollections: DialogCollection[] = response.data.map(

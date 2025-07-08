@@ -17,15 +17,16 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { SearchInput } from '@/components/SearchInput';
 import { Collection, Post } from '@/types';
 import { FiGlobe as AllIcon, FiLock as LockIcon } from 'react-icons/fi';
-import {
-  deleteCollection,
-  removePostFromCollection,
-  updateCollection,
-} from './api/collection.api';
 import { CollectionGallery } from './components/CollectionGallery';
 import { CollectionSlider } from './components/CollectionSlider';
 import { CollectionTitle } from './components/CollectionTitle';
 import { CreateCollectionDialog } from './components/CreateCollectionDialog';
+import {
+  useCreateCollection,
+  useDeleteCollection,
+  useRemovePostFromCollection,
+  useUpdateCollection,
+} from './hooks/useCollectionMutations';
 import { useCollectionsData } from './hooks/useCollectionsData';
 import { useGalleryPhotos } from './hooks/useGalleryPhotos';
 import {
@@ -39,7 +40,6 @@ const CollectionPage: React.FC = () => {
   const [selectedCollectionId, setSelectedCollectionId] =
     useState<SelectedCollectionId>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [actionError, setActionError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
@@ -49,17 +49,22 @@ const CollectionPage: React.FC = () => {
 
   const {
     collections,
-    loading: loadingCollections,
     error: collectionsError,
-    setCollections,
-    setError: setCollectionsError,
+    isLoading: loadingCollections,
   } = useCollectionsData();
 
-  const currentCollection = useMemo<Collection | undefined>(() => {
-    return typeof selectedCollectionId === 'number'
-      ? collections.find((c) => c.id === selectedCollectionId)
-      : undefined;
-  }, [collections, selectedCollectionId]);
+  const createCollectionMutation = useCreateCollection();
+  const updateCollectionMutation = useUpdateCollection();
+  const deleteCollectionMutation = useDeleteCollection();
+  const removePostMutation = useRemovePostFromCollection();
+
+  const currentCollection = useMemo<Collection | undefined>(
+    () =>
+      typeof selectedCollectionId === 'number'
+        ? collections.find((c) => c.id === selectedCollectionId)
+        : undefined,
+    [collections, selectedCollectionId],
+  );
 
   const existingCollectionNames = useMemo(() => {
     return collections.map((col) => col.name);
@@ -141,11 +146,8 @@ const CollectionPage: React.FC = () => {
     loadingCollections,
   ]);
 
-  const {
-    galleryPhotos,
-    isProcessing: isProcessingPhotos,
-    processingError: photosError,
-  } = useGalleryPhotos(filteredPosts);
+  const { galleryPhotos, isProcessing: isProcessingPhotos } =
+    useGalleryPhotos(filteredPosts);
 
   const collectionsForDisplay = useMemo<CollectionDisplayInfo[]>(() => {
     if (loadingCollections) return [];
@@ -229,14 +231,9 @@ const CollectionPage: React.FC = () => {
     setShowOnlyPrivate((prev) => !prev);
   }, []);
 
-  const handleCollectionSelect = useCallback(
-    (id: SelectedCollectionId) => {
-      setSelectedCollectionId(id);
-      setActionError(null);
-      setCollectionsError(null);
-    },
-    [setCollectionsError],
-  );
+  const handleCollectionSelect = useCallback((id: SelectedCollectionId) => {
+    setSelectedCollectionId(id);
+  }, []);
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
@@ -244,7 +241,6 @@ const CollectionPage: React.FC = () => {
 
   const handleAddCollectionClick = useCallback(() => {
     setIsCreateDialogOpen(true);
-    setActionError(null);
   }, []);
 
   const handleCloseCreateDialog = useCallback(() => {
@@ -257,20 +253,18 @@ const CollectionPage: React.FC = () => {
   };
 
   const handleCreateCollection = useCallback(
-    async (newCollection: Collection) => {
-      setActionError(null);
-
-      setCollections((prevCollections) => [...prevCollections, newCollection]);
-
-      setSelectedCollectionId(newCollection.id);
-
-      handleCloseCreateDialog();
+    async (newCollectionData: { name: string; isPrivate: boolean }) => {
+      createCollectionMutation.mutate(newCollectionData, {
+        onSuccess: (newCollection) => {
+          setSelectedCollectionId(newCollection.id);
+          handleCloseCreateDialog();
+        },
+      });
     },
-    [setCollections, handleCloseCreateDialog],
+    [createCollectionMutation],
   );
 
   const handleEditRequest = useCallback(() => {
-    setActionError(null);
     setIsTitleEditing(true);
   }, []);
 
@@ -279,104 +273,34 @@ const CollectionPage: React.FC = () => {
   }, []);
 
   const handleSaveTitle = useCallback(
-    async (newName: string): Promise<void> => {
+    async (newName: string) => {
       if (!currentCollection) return;
-
-      setActionError(null);
-
-      try {
-        const updatedCollectionFromApi = await updateCollection(
-          currentCollection.id,
-          { name: newName },
-        );
-
-        setCollections((prevCollections) =>
-          prevCollections.map((col) =>
-            col.id === updatedCollectionFromApi.id
-              ? { ...col, name: updatedCollectionFromApi.name }
-              : col,
-          ),
-        );
-
-        setIsTitleEditing(false);
-      } catch (err) {
-        console.error('Error renaming collection via API:', err);
-        const errorMsg =
-          err instanceof Error ? err.message : 'Failed to rename collection.';
-
-        setActionError(errorMsg);
-
-        throw err;
-      }
+      await updateCollectionMutation.mutateAsync({
+        id: currentCollection.id,
+        data: { name: newName },
+      });
+      setIsTitleEditing(false);
     },
-    [currentCollection, setCollections, setActionError],
+    [currentCollection, updateCollectionMutation],
   );
 
   const handleSetPrivacy = useCallback(
-    async (isPrivate: boolean): Promise<void> => {
+    async (isPrivate: boolean) => {
       if (!currentCollection) return;
-
-      setActionError(null);
-
-      try {
-        const updatedCollectionFromApi = await updateCollection(
-          currentCollection.id,
-          { isPrivate },
-        );
-
-        setCollections((prevCollections) =>
-          prevCollections.map((col) =>
-            col.id === updatedCollectionFromApi.id
-              ? { ...col, isPrivate: updatedCollectionFromApi.isPrivate }
-              : col,
-          ),
-        );
-      } catch (err) {
-        console.error('Error updating collection privacy via API:', err);
-        const errorMsg =
-          err instanceof Error
-            ? err.message
-            : 'Failed to update collection privacy.';
-
-        setActionError(errorMsg);
-
-        throw err;
-      }
+      await updateCollectionMutation.mutateAsync({
+        id: currentCollection.id,
+        data: { isPrivate },
+      });
     },
-    [currentCollection, setCollections, setActionError],
+    [currentCollection, updateCollectionMutation],
   );
 
   const handleRemovePost = useCallback(
-    async (postId: number) => {
+    (postId: number) => {
       if (typeof selectedCollectionId !== 'number') return;
-
-      setActionError(null);
-      const originalCollections = collections;
-
-      setCollections((prevCollections) =>
-        prevCollections.map((col) => {
-          if (col.id === selectedCollectionId) {
-            return {
-              ...col,
-              posts: (col.posts || []).filter((p) => p.id !== postId),
-            };
-          }
-          return col;
-        }),
-      );
-
-      try {
-        await removePostFromCollection(selectedCollectionId, postId);
-      } catch (err) {
-        console.error(`Error removing post ${postId}:`, err);
-        const errorMsg =
-          err instanceof Error ? err.message : 'Failed to remove post.';
-        setActionError(errorMsg);
-        setCollections(originalCollections);
-        alert(`Error removing post: ${errorMsg}`);
-      }
+      removePostMutation.mutate({ collectionId: selectedCollectionId, postId });
     },
-    [selectedCollectionId, collections, setCollections],
+    [selectedCollectionId, removePostMutation],
   );
 
   const handleRemoveCollection = useCallback(
@@ -392,73 +316,37 @@ const CollectionPage: React.FC = () => {
 
       setCollectionToDelete(collection);
       setIsDeleteDialogOpen(true);
-      setActionError(null);
     },
     [collections],
   );
 
-  const handleConfirmDeleteCollection = useCallback(async () => {
+  const handleConfirmDeleteCollection = useCallback(() => {
     if (!collectionToDelete) return;
-
-    const collectionIdToRemove = collectionToDelete.id;
-    const originalCollections = [...collections];
-
-    handleCloseDeleteDialog();
-
-    setCollections((prev) => prev.filter((c) => c.id !== collectionIdToRemove));
-
-    if (selectedCollectionId === collectionIdToRemove) {
-      setSelectedCollectionId('all');
-    }
-
-    try {
-      await deleteCollection(collectionIdToRemove);
-
-      console.log(`Collection ${collectionIdToRemove} deleted successfully.`);
-    } catch (err) {
-      console.error('Error deleting collection:', err);
-      const errorMsg =
-        err instanceof Error ? err.message : 'Failed to delete collection.';
-      setActionError(errorMsg);
-
-      setCollections(originalCollections);
-
-      if (
-        selectedCollectionId === 'all' &&
-        originalCollections.some((c) => c.id === collectionIdToRemove)
-      ) {
-        setSelectedCollectionId(collectionIdToRemove);
-      }
-    }
-  }, [
-    collectionToDelete,
-    collections,
-    setCollections,
-    selectedCollectionId,
-    setActionError,
-  ]);
+    deleteCollectionMutation.mutate(collectionToDelete.id, {
+      onSuccess: () => {
+        if (selectedCollectionId === collectionToDelete.id) {
+          setSelectedCollectionId('all');
+        }
+        handleCloseDeleteDialog();
+      },
+    });
+  }, [collectionToDelete, deleteCollectionMutation, selectedCollectionId]);
 
   const galleryTitle = useMemo(() => {
-    if (selectedCollectionId === 'all') {
-      return 'All';
-    }
-    if (currentCollection) {
-      return currentCollection.name;
-    }
-    if (loadingCollections) {
-      return 'Loading...';
-    }
-    return 'All Collections';
-  }, [selectedCollectionId, currentCollection, loadingCollections]);
+    if (selectedCollectionId === 'all') return 'All';
+    if (currentCollection) return currentCollection.name;
+    return 'Loading...';
+  }, [selectedCollectionId, currentCollection]);
 
-  const galleryItemCountText = useMemo(() => {
-    if (loadingCollections) return 'Loading...';
-    if (isProcessingPhotos) return 'Processing...';
-    return `${galleryPhotos.length} items`;
-  }, [loadingCollections, isProcessingPhotos, galleryPhotos.length]);
+  const galleryItemCountText = `${galleryPhotos.length} items`;
 
   const isGalleryLoading = loadingCollections || isProcessingPhotos;
-  const displayError = collectionsError || photosError || actionError;
+  const anyMutationError =
+    createCollectionMutation.error ||
+    updateCollectionMutation.error ||
+    deleteCollectionMutation.error ||
+    removePostMutation.error;
+  const displayError = collectionsError || anyMutationError;
 
   return (
     <Container maxWidth="xl" className="h-screen py-3">
@@ -541,12 +429,8 @@ const CollectionPage: React.FC = () => {
           itemCountText={galleryItemCountText}
           isEditable={typeof selectedCollectionId === 'number'}
           isPrivate={!!currentCollection?.isPrivate}
-          isLoading={
-            loadingCollections &&
-            !currentCollection &&
-            selectedCollectionId !== 'all'
-          }
-          error={actionError}
+          isLoading={updateCollectionMutation.isPending}
+          error={updateCollectionMutation.error?.message ?? null}
           onSave={handleSaveTitle}
           onSetPrivacy={handleSetPrivacy}
           isEditing={isTitleEditing}
@@ -561,7 +445,7 @@ const CollectionPage: React.FC = () => {
         photos={galleryPhotos}
         isLoading={isGalleryLoading}
         isError={!!displayError && !isGalleryLoading}
-        error={displayError && !isGalleryLoading ? displayError : null}
+        error={displayError ? (displayError as Error).message : null}
         onRemovePost={handleRemovePost}
         selectedCollectionId={selectedCollectionId}
       />
@@ -571,6 +455,8 @@ const CollectionPage: React.FC = () => {
         onClose={handleCloseCreateDialog}
         onSuccess={handleCreateCollection}
         existingCollectionNames={collections.map((c) => c.name)}
+        isSubmitting={createCollectionMutation.isPending}
+        error={createCollectionMutation.error?.message}
       />
 
       {/* Delete Confirmation Dialog */}
