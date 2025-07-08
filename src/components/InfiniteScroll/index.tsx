@@ -54,7 +54,7 @@ export const InfiniteScroll = ({
   }
 
   return (
-    <Box className="flex-1 overflow-y-auto">
+    <Box className="flex-1 overflow-y-auto sidebar">
       {children}
 
       {data.length === 0 && (
@@ -84,7 +84,7 @@ export const InfiniteScroll = ({
       )}
 
       {!isLoading && !hasNextPage && data.length > 0 && (
-        <Box className="my-2 text-center text-lg">
+        <Box className="my-2 text-lg text-center">
           <Typography variant="body2" color="text.secondary">
             You have reached the end.
           </Typography>

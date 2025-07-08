@@ -61,13 +61,8 @@ const ProjectEditorPage = () => {
   }
 
   return (
-    <Box className="p-3 flex-1">
-      <Typography variant="h4" component="h1" gutterBottom>
-        {isEditMode ? 'Edit Project' : 'Create a New Project'}
-      </Typography>
-
+    <Box className="relative flex justify-center items-center p-4 w-full h-full">
       {isLoadingProject && <Loading />}
-
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmitForm}
@@ -77,70 +72,65 @@ const ProjectEditorPage = () => {
         {(formikProps: FormikProps<ProjectFormValues>) => {
           const { dirty, isSubmitting } = formikProps;
           return (
-            <Form className="flex flex-col items-center w-full h-full p-2 bg-white">
-              <div className="flex gap-6">
-                {/* General Info Section */}
-                <div className="flex flex-col space-y-4">
-                  <h2 className="text-lg font-semibold capitalize">
-                    🧠 General Info
-                  </h2>
-                  <div className="flex flex-col items-center space-y-4 w-xl">
-                    <Box className="w-full">
-                      <Typography className="flex w-full mb-1 gap-1 font-medium text-left">
-                        Project Name
-                        <span className="text-red-600">*</span>
-                      </Typography>
-                      <Field
-                        name="projectName" // Connects to Formik state
-                        as={TextField}
-                        className="w-full rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500"
-                        placeholder="Enter your project name"
-                      />
-                      <ErrorMessage name="projectName">
-                        {(errorMsg) => (
-                          <InlineErrorMessage errorMsg={errorMsg} />
-                        )}
-                      </ErrorMessage>
-                    </Box>
-                    <Box className="w-full">
-                      <Typography className="flex w-full mb-1 gap-1 font-medium text-left">
-                        Description
-                        <span className="text-red-600">*</span>
-                      </Typography>
-                      <Field
-                        name="description"
-                        as={TextField}
-                        multiline
-                        rows={4}
-                        className="w-full rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 esize-none"
-                        placeholder="Enter your project description"
-                      />
-                      <ErrorMessage name="description">
-                        {(errorMsg) => (
-                          <FormHelperText error className="flex items-start">
-                            <MdErrorOutline
-                              size="1.5em"
-                              style={{
-                                marginRight: '0.4em',
-                              }}
-                            />
-                            {errorMsg}
-                          </FormHelperText>
-                        )}
-                      </ErrorMessage>
-                    </Box>
-                  </div>
+            <Form className="flex flex-col items-center space-y-4 w-full h-full">
+              <div className='flex justify-center bg-gradient-to-br from-blue-100 to-indigo-50 p-2 rounded-lg w-full h-64'>
+                <PlatformSelection isEditMode={isEditMode} />
+              </div>
+              {/* General Info Section */}
+              <div className="flex flex-col space-y-4 w-xl">
+                <div className="flex flex-col items-center space-y-4 w-xl">
+                  <Box className="w-full">
+                    <Typography className="flex gap-1 mb-1 w-full font-medium text-left">
+                      Project Name
+                      <span className="text-red-600">*</span>
+                    </Typography>
+                    <Field
+                      name="projectName" // Connects to Formik state
+                      as={TextField}
+                      className="rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 w-full"
+                      placeholder="Enter your project name"
+                    />
+                    <ErrorMessage name="projectName">
+                      {(errorMsg) => (
+                        <InlineErrorMessage errorMsg={errorMsg} />
+                      )}
+                    </ErrorMessage>
+                  </Box>
+                  <Box className="w-full">
+                    <Typography className="flex gap-1 mb-1 w-full font-medium text-left">
+                      Description
+                      <span className="text-red-600">*</span>
+                    </Typography>
+                    <Field
+                      name="description"
+                      as={TextField}
+                      multiline
+                      rows={4}
+                      className="rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 w-full esize-none"
+                      placeholder="Enter your project description"
+                    />
+                    <ErrorMessage name="description">
+                      {(errorMsg) => (
+                        <FormHelperText error className="flex items-start">
+                          <MdErrorOutline
+                            size="1.5em"
+                            style={{
+                              marginRight: '0.4em',
+                            }}
+                          />
+                          {errorMsg}
+                        </FormHelperText>
+                      )}
+                    </ErrorMessage>
+                  </Box>
                 </div>
-
-                <div className="flex bg-mountain-200 w-0.5 h-full" />
-
-                <PlatformSelection />
               </div>
               <Button
                 type="submit"
                 startIcon={<FaSave />}
                 disabled={!dirty || isSubmitting}
                 className={`
+                  absolute bottom-4
                   hover:cursor-pointer
                   w-48 h-10
                 text-white font-medium

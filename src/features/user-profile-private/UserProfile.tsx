@@ -13,50 +13,46 @@ const UserProfile = () => {
   };
 
   return (
-    <Box className="sm:px-2 md:px-3 lg:px-3 py-3 bg-white dark:bg-mountain-1000 text-white">
+    <Box className="dark:bg-mountain-1000 bg-gradient-to-b from-mountain-50 to-white rounded-t-3xl h-[calc(100vh-4rem)] sidebar">
       {/* Container for Posts + Profile Sidebar */}
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           gap: 4,
-          minHeight: "100vh",
+          height: "100%",
         }}
-        className="shadow p-2 rounded-md"
+        className="p-2 pl-6 rounded-t-3xl"
       >
         {/* TOP SECTION: Profile card */}
-        <Box
-          className="bg-[#E4E6EB] dark:bg-mountain-950 p-8 rounded-lg rounded-t-3xl w-full"
-          sx={{
-            overflowY: "auto",
-          }}
-        >
-          <UserProfileCard />
-        </Box>
-
+        <div className="relative flex flex-col justify-end bg-white dark:bg-mountain-950 border border-mountain-200 rounded-3xl w-full h-72 shrink-0">
+          <div className="top-0 left-0 absolute bg-gradient-to-b from-indigo-200 dark:from-mountain-950 to-purple-100 dark:to-mountain-1000 rounded-t-3xl w-full h-32" />
+          <div className="z-50 flex justify-start items-center px-4 w-full h-full">
+            <UserProfileCard />
+          </div>
+          <Tabs
+            value={selectedTab}
+            onChange={handleTabChange}
+            textColor="inherit"
+            indicatorColor="primary"
+            sx={{
+              minHeight: 0,
+              ".MuiTabs-flexContainer": { gap: 2 },
+            }}
+            className="z-50 flex px-6 border-mountain-200 border-t-1 rounded-b-3xl w-full h-12 shrink-0"
+          >
+            <Tab
+              label="All posts"
+              sx={{ textTransform: "none", minHeight: 0, minWidth: 0 }}
+            />
+            <Tab
+              label="All blogs"
+              sx={{ textTransform: "none", minHeight: 0, minWidth: 0 }}
+            />
+          </Tabs>
+        </div>
         {/* BOTTOM SECTION: Posts */}
         <Box sx={{ width: "100%" }}>
-          <Box sx={{ mb: 3 }}>
-            <Tabs
-              value={selectedTab}
-              onChange={handleTabChange}
-              textColor="inherit"
-              indicatorColor="primary"
-              sx={{
-                minHeight: 0,
-                ".MuiTabs-flexContainer": { gap: 2 },
-              }}
-            >
-              <Tab
-                label="All posts"
-                sx={{ textTransform: "none", minHeight: 0, minWidth: 0 }}
-              />
-              <Tab
-                label="All blogs"
-                sx={{ textTransform: "none", minHeight: 0, minWidth: 0 }}
-              />
-            </Tabs>
-          </Box>
           {selectedTab === 0 && <UserPosts />}
           {selectedTab === 1 && <UserBlogs />}
         </Box>

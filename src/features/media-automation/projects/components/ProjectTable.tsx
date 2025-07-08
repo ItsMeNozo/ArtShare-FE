@@ -26,6 +26,7 @@ import {
   Order,
   SortableKeys,
 } from '../types/automation-project';
+import { AiFillEdit } from 'react-icons/ai';
 
 const headCells: readonly HeadCell[] = [
   {
@@ -81,7 +82,7 @@ function ProjectTableHead(props: EnhancedTableProps) {
 
   return (
     <TableHead>
-      <TableRow className="border-b-2 border-mountain-100">
+      <TableRow className="border-mountain-100 border-b-2">
         <TableCell padding="checkbox">
           <Checkbox
             color="primary"
@@ -288,7 +289,7 @@ export default function ProjectTable({
   };
 
   return (
-    <div className="flex border border-mountain-200 rounded-3xl w-full h-[calc(100vh-14rem)]">
+    <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-[calc(100vh-14rem)]">
       <div className="flex flex-col justify-between w-full">
         <div className="flex flex-col flex-grow overflow-hidden">
           <EnhancedTableToolbar
@@ -325,7 +326,20 @@ export default function ProjectTable({
             {!isLoading && projects?.length > 0 && (
               <Table
                 stickyHeader
-                sx={{ minWidth: 750 }}
+                sx={{
+                  minWidth: 750,
+                  '& .MuiTableCell-head': {
+                    backgroundColor: '#e5e5e5',
+                    fontWeight: 'bold',
+                    borderBottom: '2px solid #e5e7eb',
+                  },
+                  '& .MuiTableRow-root:hover': {
+                    backgroundColor: '#f0f4f8',
+                  },
+                  '& .MuiTableCell-body': {
+                    borderBottom: '1px solid #e5e7eb',
+                  },
+                }}
                 size={dense ? 'small' : 'medium'}
               >
                 <ProjectTableHead
@@ -348,7 +362,7 @@ export default function ProjectTable({
                           navigate(`/auto/projects/${row.id}/details`)
                         }
                         sx={{ cursor: 'pointer' }}
-                        className="border-b-2 hover:bg-mountain-50 border-mountain-100"
+                        className="hover:bg-mountain-50 border-mountain-100 border-b-2"
                       >
                         <TableCell padding="checkbox">
                           <Checkbox
@@ -366,7 +380,7 @@ export default function ProjectTable({
                         <TableCell align="right">
                           <div className="flex flex-wrap justify-end gap-2">
                             {
-                              <div className="px-2 py-1 rounded bg-mountain-100">
+                              <div className="bg-mountain-100 px-2 py-1 rounded">
                                 {/* CHANGE: Using the helper function here */}
                                 {formatToTitleCase(row.platform.name)}
                               </div>
@@ -375,7 +389,7 @@ export default function ProjectTable({
                         </TableCell>
                         <TableCell align="right">{row.postCount}</TableCell>
                         <TableCell align="right">
-                          <span className="flex items-center justify-end gap-2 text-sm">
+                          <span className="flex justify-end items-center gap-2 text-sm">
                             <span
                               className={`w-2 h-2 rounded-full ${getStatusColor(
                                 row.status,
@@ -397,25 +411,25 @@ export default function ProjectTable({
                         >
                           <Tooltip title="Edit">
                             <Button
-                              className="font-normal bg-indigo-50 border-1 border-mountain-200"
+                              className="bg-indigo-50 border-1 border-mountain-200 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/auto/projects/${row.id}/edit`);
                               }}
                             >
-                              Edit
+                              <AiFillEdit className="size-5 text-indigo-600" />
                             </Button>
                           </Tooltip>
                           <Tooltip title="Delete">
                             <Button
                               color="error"
-                              className="font-normal bg-red-50 border-1 border-mountain-200"
+                              className="bg-red-50 border-1 border-mountain-200 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onDelete([row.id]);
                               }}
                             >
-                              Delete
+                              <IoTrashBin className="size-5 text-red-600" />
                             </Button>
                           </Tooltip>
                         </TableCell>
@@ -435,7 +449,7 @@ export default function ProjectTable({
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          className="flex-shrink-0 overflow-hidden border-t-2 border-mountain-100"
+          className="flex-shrink-0 border-mountain-100 border-t-2 overflow-hidden"
         />
       </div>
     </div>

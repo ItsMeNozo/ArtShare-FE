@@ -133,18 +133,12 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/:username',
     label: 'My Profile',
-    description: 'This place is yours',
+    description: 'This place is yours to showcase your creations',
   },
   {
     path: '/auto/social-links',
     label: 'Link Socials',
     description: 'Connect social accounts to enable automated posting',
-  },
-  {
-    path: '/auto/:slug/posts/new',
-    label: 'Create Posts For Workflow',
-    description: '',
-    parent: '/auto/:slug/details',
   },
   {
     path: '/auto/projects',
@@ -154,13 +148,31 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/auto/projects/new',
     label: 'New Workflow',
-    description: 'Create new workflow for automative upload',
+    description: 'Create new workflow for automatic upload',
     parent: '/auto/projects',
   },
   {
-    path: '/auto/:slug/details',
+    path: '/auto/projects/:id/edit',
+    label: 'Edit Workflow',
+    description: 'Create new workflow for automatic upload',
+    parent: '/auto/projects',
+  },
+  {
+    path: '/auto/projects/:id/details',
     label: 'Details',
     description: 'Manage your automated content workflows',
     parent: '/auto/projects',
+  },
+  {
+    path: '/auto/projects/:id/posts/:postId/edit',
+    label: 'Edit Post',
+    description: '',
+    parent: '/auto/projects/:id/details',
+  },
+  {
+    path: '/auto/projects/:id/posts/new',
+    label: 'Create Post',
+    description: '',
+    parent: '/auto/projects/:id/details',
   },
 ];

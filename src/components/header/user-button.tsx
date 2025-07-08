@@ -705,7 +705,7 @@ const UserButton: React.FC<{
       <div className="flex items-center space-x-2">
         <Link
           to="/signup"
-          className="hidden xs:flex justify-center items-center space-x-2 border border-mountain-950 dark:border-mountain-500 rounded-2xl w-24 xl:w-26 h-9 text-muted-foreground dark:text-gray-300 text-sm hover:bg-gray-100 dark:hover:bg-mountain-700"
+          className="hidden xs:flex justify-center items-center space-x-2 hover:bg-gray-100 dark:hover:bg-mountain-700 border border-mountain-950 dark:border-mountain-500 rounded-2xl w-24 xl:w-26 h-9 text-muted-foreground dark:text-gray-300 text-sm"
         >
           <BsPen />
           <p>Sign Up</p>
@@ -723,45 +723,45 @@ const UserButton: React.FC<{
 
   // Show Messages and Updates for logged-in users
   return (
-    <div className="flex items-center space-x-2 relative">
+    <div className="relative flex items-center space-x-2">
       <div className="relative">
         <Button
           onClick={toggleNotifications}
-          className={`flex bg-white dark:bg-slate-700 items-center border-[0.5px] border-mountain-200 dark:border-slate-600 mr-2 h-8 w-8 rounded-full justify-center hover:bg-gray-100 dark:hover:bg-slate-600 ${
-            location.pathname === '/messages'
-              ? 'dark:text-mountain-50 text-mountain-950' // Active: light text on dark, dark text on light
-              : 'dark:text-mountain-500 text-mountain-700' // Inactive: lighter text on dark, darker text on light
-          }`}
+          className={`flex bg-white dark:bg-slate-700 items-center border-[0.5px] border-mountain-200 dark:border-slate-600 mr-2 h-10 w-10 rounded-full justify-center hover:bg-gray-100 dark:hover:bg-slate-600 ${location.pathname === '/messages'
+            ? 'dark:text-mountain-50 text-mountain-950' // Active: light text on dark, dark text on light
+            : 'dark:text-mountain-500 text-mountain-700' // Inactive: lighter text on dark, darker text on light
+            }`}
+          sx={{
+            minWidth: '2.5rem',
+          }}
         >
           {' '}
           <FaBell />
           {unreadCount > 0 && (
             <span
-              className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white"
+              className="-top-1 -right-1 absolute flex justify-center items-center bg-red-600 rounded-full w-4 h-4 font-bold text-white text-xs"
               style={{ minWidth: '1rem', lineHeight: '1rem' }}
             >
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </Button>
-
         <div
           ref={notificationRef}
-          className={`${
-            isNotificationOpen ? 'visible opacity-100' : 'invisible opacity-0'
-          } transition-all duration-300 ease-out absolute top-full mt-2 max-h-96 bg-white dark:bg-slate-700 rounded-xl shadow-2xl border border-mountain-200 dark:border-slate-600 z-50 overflow-hidden w-[calc(100vw-2rem)] xs:w-80 right-[-150px] xs:right-0`}
+          className={`${isNotificationOpen ? 'visible opacity-100' : 'invisible opacity-0'
+            } transition-all duration-300 ease-out absolute top-full mt-2 max-h-96 bg-white dark:bg-slate-700 rounded-xl shadow-2xl border border-mountain-200 dark:border-slate-600 z-50 overflow-hidden w-[calc(100vw-2rem)] xs:w-80 right-[-150px] xs:right-0`}
         >
           {' '}
           {/* Header */}
-          <div className="sticky top-0 bg-white dark:bg-slate-700 border-b border-mountain-200 dark:border-slate-600 px-4 py-3 z-10">
-            <div className="flex items-center justify-between">
+          <div className="top-0 z-10 sticky bg-white dark:bg-slate-700 px-4 py-3 border-mountain-200 dark:border-slate-600 border-b">
+            <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
                 <FaBell className="text-indigo-600 dark:text-indigo-400" />{' '}
-                <h4 className="text-sm font-semibold text-mountain-950 dark:text-mountain-50">
+                <h4 className="font-semibold text-mountain-950 dark:text-mountain-50 text-sm">
                   Notifications
                 </h4>
                 {unreadCount > 0 && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                  <span className="inline-flex items-center bg-indigo-100 dark:bg-indigo-900 px-2 py-1 rounded-full font-medium text-indigo-800 dark:text-indigo-200 text-xs">
                     {unreadCount}
                   </span>
                 )}
@@ -770,7 +770,7 @@ const UserButton: React.FC<{
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 font-medium transition-colors px-2 py-1 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                  className="hover:bg-indigo-50 dark:hover:bg-indigo-900/20 px-2 py-1 rounded font-medium text-indigo-600 hover:text-indigo-800 dark:hover:text-indigo-200 dark:text-indigo-400 text-xs transition-colors"
                 >
                   Mark all read
                 </button>
@@ -780,14 +780,14 @@ const UserButton: React.FC<{
           {/* Notifications List */}
           <div className="max-h-80 overflow-y-auto custom-scrollbar">
             {notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 px-4">
-                <div className="w-12 h-12 bg-mountain-100 dark:bg-slate-600 rounded-full flex items-center justify-center mb-3">
-                  <FaBell className="text-xl text-mountain-400 dark:text-mountain-300" />
+              <div className="flex flex-col justify-center items-center px-4 py-8">
+                <div className="flex justify-center items-center bg-mountain-100 dark:bg-slate-600 mb-3 rounded-full w-12 h-12">
+                  <FaBell className="text-mountain-400 dark:text-mountain-300 text-xl" />
                 </div>
-                <h3 className="text-sm font-medium text-mountain-950 dark:text-mountain-50 mb-1">
+                <h3 className="mb-1 font-medium text-mountain-950 dark:text-mountain-50 text-sm">
                   All caught up!
                 </h3>
-                <p className="text-xs text-mountain-500 dark:text-mountain-300 text-center">
+                <p className="text-mountain-500 dark:text-mountain-300 text-xs text-center">
                   You're all up to date.
                 </p>
               </div>
@@ -823,11 +823,10 @@ const UserButton: React.FC<{
                   return (
                     <div
                       key={notif.id}
-                      className={`relative px-4 py-3 transition-all duration-200 ${getNotificationBg()} ${
-                        isReportResolved
-                          ? 'cursor-default opacity-90'
-                          : 'hover:bg-mountain-50 dark:hover:bg-slate-600/50 cursor-pointer'
-                      }`}
+                      className={`relative px-4 py-3 transition-all duration-200 ${getNotificationBg()} ${isReportResolved
+                        ? 'cursor-default opacity-90'
+                        : 'hover:bg-mountain-50 dark:hover:bg-slate-600/50 cursor-pointer'
+                        }`}
                       onClick={() =>
                         !isReportResolved &&
                         handleNotificationClick(notif, navigate, markAsRead)
@@ -836,24 +835,24 @@ const UserButton: React.FC<{
                       <div className="flex items-start space-x-3">
                         {/* Icon */}
                         <div className="flex-shrink-0 mt-0.5">
-                          <div className="w-6 h-6 rounded-full bg-mountain-100 dark:bg-slate-600 flex items-center justify-center">
+                          <div className="flex justify-center items-center bg-mountain-100 dark:bg-slate-600 rounded-full w-6 h-6">
                             {getNotificationIcon()}
                           </div>
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
+                          <div className="flex justify-between items-start">
                             <div className="flex-1 mr-2">
-                              <p className="text-xs font-medium text-mountain-950 dark:text-mountain-50 leading-relaxed text-left">
+                              <p className="font-medium text-mountain-950 dark:text-mountain-50 text-xs text-left leading-relaxed">
                                 {formatNotificationMessage(notif)}
                               </p>
                               <div className="flex items-center space-x-2 mt-1">
-                                <time className="text-xs text-mountain-500 dark:text-mountain-300">
+                                <time className="text-mountain-500 dark:text-mountain-300 text-xs">
                                   {formatDaysAgo(notif.createdAt)}
                                 </time>
                                 {!notif.isRead && (
-                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                  <span className="inline-flex items-center bg-indigo-100 dark:bg-indigo-900 px-1.5 py-0.5 rounded font-medium text-indigo-800 dark:text-indigo-200 text-xs">
                                     New
                                   </span>
                                 )}
@@ -870,7 +869,7 @@ const UserButton: React.FC<{
                                   );
                                   markAsRead(notif.id);
                                 }}
-                                className="flex-shrink-0 text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 px-2 py-1 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all duration-200"
+                                className="flex-shrink-0 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 px-2 py-1 rounded-md font-medium text-indigo-600 hover:text-indigo-700 dark:hover:text-indigo-300 dark:text-indigo-400 text-xs transition-all duration-200"
                                 title="Mark as read"
                               >
                                 ✕

@@ -86,38 +86,38 @@ const ProjectsPage = () => {
   const combinedError = fetchError || deleteError;
 
   return (
-    <div className="flex flex-col w-full h-screen p-4 space-y-4">
-      <div className="flex w-full gap-x-12">
+    <div className="flex flex-col space-y-4 p-4 w-full h-screen">
+      <div className="flex gap-x-12 w-full">
         <div
           onClick={navigateToCreateProject}
-          className="flex items-center justify-center w-1/3 p-4 space-x-2 shadow-md cursor-pointer bg-mountain-50 hover:bg-mountain-50/80 rounded-3xl h-28"
+          className="flex justify-center items-center space-x-2 bg-white hover:bg-mountain-50/80 shadow-md p-4 rounded-3xl w-1/3 h-28 cursor-pointer"
         >
           <MdOutlineAddBox className="size-8" />
-          <p className="text-lg font-medium">Create New Project</p>
+          <p className="font-medium text-lg">Create New Project</p>
         </div>
-        <div className="flex items-center justify-center w-2/3 space-x-2 h-28">
-          <div className="flex items-center justify-between w-1/3 h-full p-4 bg-teal-100 rounded-3xl">
+        <div className="flex justify-center items-center space-x-2 w-2/3 h-28">
+          <div className="flex justify-between items-center bg-teal-100 p-4 rounded-3xl w-1/3 h-full">
             <div className="flex flex-col space-y-1">
-              <p className="text-xs text-mountain-800">Active Projects</p>
-              <p className="text-2xl font-medium capitalize">
+              <p className="text-mountain-800 text-xs">Active Projects</p>
+              <p className="font-medium text-2xl capitalize">
                 {summaryStats.active} projects
               </p>
             </div>
-            <FaCalendarCheck className="text-teal-600 size-10" />
+            <FaCalendarCheck className="size-10 text-teal-600" />
           </div>
-          <div className="flex items-center justify-between w-1/3 h-full p-4 bg-amber-100 rounded-3xl">
+          <div className="flex justify-between items-center bg-amber-100 p-4 rounded-3xl w-1/3 h-full">
             <div className="flex flex-col space-y-1">
-              <p className="text-xs text-mountain-800">Completed</p>
-              <p className="text-2xl font-medium capitalize">
+              <p className="text-mountain-800 text-xs">Completed</p>
+              <p className="font-medium text-2xl capitalize">
                 {summaryStats.completed} projects
               </p>
             </div>
             <FaCalendarDays className="size-10 text-amber-600" />
           </div>
-          <div className="flex items-center justify-between w-1/3 h-full p-4 bg-rose-100 rounded-3xl">
+          <div className="flex justify-between items-center bg-rose-100 p-4 rounded-3xl w-1/3 h-full">
             <div className="flex flex-col space-y-1">
-              <p className="text-xs text-mountain-800">Cancelled / Failed</p>
-              <p className="text-2xl font-medium capitalize">
+              <p className="text-mountain-800 text-xs">Cancelled / Failed</p>
+              <p className="font-medium text-2xl capitalize">
                 {summaryStats.cancelledOrFailed} project
               </p>
             </div>
@@ -127,7 +127,7 @@ const ProjectsPage = () => {
       </div>
 
       {combinedError && (
-        <div className="p-3 text-red-500 bg-red-100 rounded-md">
+        <div className="bg-red-100 p-3 rounded-md text-red-500">
           {combinedError.message || 'An unexpected error occurred.'}
         </div>
       )}

@@ -21,7 +21,7 @@ export default function MediaUploadTab({
       onClick={onClick}
       className={`flex items-center bg-gradient-to-r rounded-full border-1 border-mountain-200 shadow-sm justify-start px-3 w-1/2 transition-all duration-300 ${isActive
         ? "bg-indigo-700 to-purple-400 text-white"
-        : "bg-mountain-50 hover:bg-mountain-100 text-mountain-800"
+        : "bg-white hover:brightness-95 text-mountain-800"
         }`}
       sx={{
         height: 40,

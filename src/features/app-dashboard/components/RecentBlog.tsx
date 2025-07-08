@@ -34,7 +34,7 @@ const RecentBlog = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center w-full h-full sidebar text-red-500">
+      <div className="flex justify-center items-center w-full h-full text-red-500 sidebar">
         <p>Error loading recent blogs: {(error as Error).message}</p>
       </div>
     );
@@ -50,10 +50,9 @@ const RecentBlog = () => {
 
   return (
     // Removed outer loading check as useQuery's isLoading handles it
-    <div className="flex rounded-t-3xl h-screen overflow-hidden">
-      <div className="relative flex flex-col flex-1 pb-22 w-full h-full">
-        <div ref={blogAreaRef} className="flex flex-col gap-y-4 space-y-12 p-4">
-          {/* Use the fetched blogs data */}
+    <div className="flex pb-20 rounded-t-3xl h-fit overflow-hidden">
+      <div className="relative flex flex-col flex-1 w-full h-full">
+        <div ref={blogAreaRef} className="flex flex-col gap-y-4 space-y-6 py-4">
           {blogs.map((blog) => (
             <BlogItem
               key={blog.id}
