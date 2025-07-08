@@ -153,7 +153,7 @@ const BrowseBlogs: React.FC = () => {
                   }}
                   category={b.categories?.[0]?.name ?? ''}
                   timeReading={`${Math.ceil((b.content?.split(/\s+/).length ?? 0) / 200)}m reading`}
-                  dateCreated={b.createdAt}
+                  createdAt={b.createdAt}
                   likeCount={b.likeCount}
                   commentCount={b.commentCount}
                   viewCount={b.viewCount}
