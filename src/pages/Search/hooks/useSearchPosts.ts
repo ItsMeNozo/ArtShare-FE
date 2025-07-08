@@ -6,11 +6,12 @@ interface UseSearchPostsParams {
   finalQuery: string | null;
   medium?: string | null;
   attributes?: string[];
+  isAi?: boolean;
   enabled?: boolean;
 }
 
 export const useSearchPosts = (params: UseSearchPostsParams) => {
-  const { finalQuery, medium, attributes = [], enabled = true } = params;
+  const { finalQuery, medium, attributes = [], isAi, enabled = true } = params;
 
   return useInfiniteQuery({
     queryKey: ['postSearch', finalQuery, medium, attributes],
@@ -22,6 +23,7 @@ export const useSearchPosts = (params: UseSearchPostsParams) => {
         page: pageParam,
         q: finalQuery!,
         filter,
+        isAi,
       });
 
       return postsToPhotos(apiResponse);

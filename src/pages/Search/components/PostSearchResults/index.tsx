@@ -34,6 +34,7 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
     finalQuery,
     medium: selectedMedium,
     attributes: selectedAttributes,
+    isAi,
     enabled: !!finalQuery && finalQuery.length > 0,
   });
 
