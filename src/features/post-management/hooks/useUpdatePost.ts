@@ -1,20 +1,20 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useUploadPostMedias } from "./useUploadPostMedias";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useUploadPostMedias } from './useUploadPostMedias';
 
+import { useLoading } from '@/contexts/Loading/useLoading';
+import { postKeys } from '@/lib/react-query/query-keys';
+import { Post } from '@/types';
+import { extractApiErrorMessage } from '@/utils/error.util';
+import { updatePost } from '../api/update-post';
 import {
   createFormDataForEdit,
   getImageUrlsToRetain,
   getNewImageFiles,
   getNewlyUploadedRequiredFile,
   getNewVideoFile,
-} from "../helpers/edit-post.helper";
-import { PostFormValues } from "../types/post-form-values.type";
-import { PostMedia } from "../types/post-media";
-import { Post } from "@/types";
-import { useLoading } from "@/contexts/Loading/useLoading";
-import { updatePost } from "../api/update-post";
-import { extractApiErrorMessage } from "@/utils/error.util";
-import { postKeys } from "@/lib/react-query/query-keys";
+} from '../helpers/edit-post.helper';
+import { PostFormValues } from '../types/post-form-values.type';
+import { PostMedia } from '../types/post-media';
 
 interface UpdatePostVariables {
   postId: number;
@@ -50,7 +50,7 @@ export const useUpdatePost = (options: UseUpdatePostOptions) => {
     } = variables;
 
     // --- All async logic from the old handleSubmit is now here ---
-    const videoMedia = postMedias.find((media) => media.type === "video");
+    const videoMedia = postMedias.find((media) => media.type === 'video');
     const newVideoFile = getNewVideoFile(videoMedia);
     const newThumbnailFile = getNewlyUploadedRequiredFile(thumbnail);
     const newOriginalThumbnailFile =
@@ -64,15 +64,15 @@ export const useUpdatePost = (options: UseUpdatePostOptions) => {
         newOriginalThumbnailFile
           ? handleUploadImageFile(
               newOriginalThumbnailFile,
-              "original_thumbnail",
+              'original_thumbnail',
             )
           : Promise.resolve(undefined),
         newThumbnailFile
-          ? handleUploadImageFile(newThumbnailFile, "thumbnail")
+          ? handleUploadImageFile(newThumbnailFile, 'thumbnail')
           : Promise.resolve(undefined),
       ]);
 
-    const imageMedias = postMedias.filter((media) => media.type === "image");
+    const imageMedias = postMedias.filter((media) => media.type === 'image');
 
     const body = createFormDataForEdit({
       title: values.title,
@@ -96,7 +96,7 @@ export const useUpdatePost = (options: UseUpdatePostOptions) => {
 
   return useMutation<Post, Error, UpdatePostVariables>({
     mutationFn: updatePostMutationFn,
-    onMutate: () => showLoading("Updating post..."),
+    onMutate: () => showLoading('Updating post...'),
     onSettled: () => hideLoading(),
 
     onSuccess: (updatedPost) => {
@@ -111,7 +111,7 @@ export const useUpdatePost = (options: UseUpdatePostOptions) => {
     },
 
     onError: (error) => {
-      const message = extractApiErrorMessage(error, "Failed to update post");
+      const message = extractApiErrorMessage(error, 'Failed to update post');
       options?.onError?.(message);
     },
   });

@@ -34,12 +34,35 @@ const ImageCropperModal: React.FC<Props> = ({
   const [aspect, setAspect] = useState<number | undefined>(undefined);
   const [selectedAspect, setSelectedAspect] = useState(DEFAULT_ASPECT_LABEL);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  console.log('ImageCropperModal rendered with thumbnailMeta:', thumbnailMeta);
-  console.log('originalThumbnailUrl:', originalThumbnailUrl);
+  const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates on unmounted component
+    const img = new Image();
+
+    img.onload = () => {
+      // Only update state if the component is still mounted
+      if (isMounted) {
+        console.log('Image loaded successfully');
+        setLoadedImage(img);
+      }
+    };
+
+    img.onerror = (err) => {
+      console.error('Failed to load image:', originalThumbnailUrl, err);
+    };
+
+    img.crossOrigin = 'anonymous';
+
+    img.src = originalThumbnailUrl;
+
+    return () => {
+      isMounted = false;
+    };
+  }, [originalThumbnailUrl]);
 
   useEffect(() => {
     if (!open) return;
-    console.log('ImageCropperModal opened with thumbnailMeta:', thumbnailMeta);
     setCrop(thumbnailMeta.crop ?? DEFAULT_CROP);
     setZoom(thumbnailMeta.zoom ?? DEFAULT_ZOOM);
     setSelectedAspect(thumbnailMeta.selectedAspect ?? DEFAULT_ASPECT_LABEL);
@@ -57,11 +80,9 @@ const ImageCropperModal: React.FC<Props> = ({
   }, [open, originalThumbnailUrl, thumbnailMeta]);
 
   const cropImageAndSave = async () => {
-    if (croppedAreaPixels) {
-      const cropped = await getCroppedImg(
-        originalThumbnailUrl,
-        croppedAreaPixels,
-      );
+    console.log('cropping image with crop', loadedImage);
+    if (croppedAreaPixels && loadedImage) {
+      const cropped = await getCroppedImg(loadedImage, croppedAreaPixels);
       const thumbnail_crop_meta = {
         crop,
         zoom,
@@ -92,7 +113,7 @@ const ImageCropperModal: React.FC<Props> = ({
       }}
     >
       <DialogTitle className="flex items-center justify-between">
-        <Typography variant="h6">Crop Image</Typography>
+        <Typography>Crop Image</Typography>
         <IconButton onClick={onClose} size="small">
           <MdClose size={20} />
         </IconButton>
@@ -108,7 +129,7 @@ const ImageCropperModal: React.FC<Props> = ({
         }}
       >
         <div
-          className="w-full relative  overflow-hidden"
+          className="relative w-full overflow-hidden"
           style={{ height: 320, minHeight: 280 }}
         >
           <Cropper
@@ -127,9 +148,9 @@ const ImageCropperModal: React.FC<Props> = ({
           />
         </div>
 
-        <div className="text-sm px-6 pb-4 flex flex-col gap-3 dark:text-white">
+        <div className="flex flex-col gap-3 px-6 pb-4 text-sm dark:text-white">
           <div>
-            <label className="block mb-1 font-medium">
+            <label className="mb-1 block font-medium">
               {' '}
               {/* Added block and margin for better label spacing */}
               Zoom: {zoom.toFixed(1)}x{' '}
@@ -144,16 +165,16 @@ const ImageCropperModal: React.FC<Props> = ({
               onChange={(e) => {
                 setZoom(Number(e.target.value));
               }}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700" // Added dark mode bg
+              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700" // Added dark mode bg
             />
             {/* Simplified labels for min and max */}
-            <div className="flex justify-between text-xs mt-1 text-gray-500 dark:text-gray-400">
+            <div className="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
               <span>Min (1x)</span>
               <span>Max (3x)</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 mt-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {aspectOptions.map((option) => (
               <Button
                 key={option.label}

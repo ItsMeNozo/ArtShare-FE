@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useSnackbar } from "@/hooks/useSnackbar";
+import { useSnackbar } from '@/hooks/useSnackbar';
+import React, { useEffect, useState } from 'react';
 
-import { useLocation, useNavigate } from "react-router-dom";
-import { fetchImageFileFromUrl } from "@/utils/fetch-media.utils";
-import { PostMedia } from "./types/post-media";
-import { MEDIA_TYPE } from "@/utils/constants";
-import PostForm from "./PostForm";
-import { FormikHelpers } from "formik";
+import { MEDIA_TYPE } from '@/utils/constants';
+import { fetchImageFileFromUrl } from '@/utils/fetch-media.utils';
+import { FormikHelpers } from 'formik';
+import { useLocation, useNavigate } from 'react-router-dom';
+import PostForm from '../components/PostForm';
+import { useCreatePost } from '../hooks/useCreatePost';
 import {
-  defaultPostFormValues,
   PostFormValues,
-} from "./types/post-form-values.type";
-import { useCreatePost } from "./hooks/useCreatePost";
+  defaultPostFormValues,
+} from '../types/post-form-values.type';
+import { PostMedia } from '../types/post-media';
 
-const UploadPost: React.FC = () => {
+const UploadPostPage: React.FC = () => {
   const navigate = useNavigate();
   const { showSnackbar } = useSnackbar();
   const location = useLocation();
@@ -27,13 +27,13 @@ const UploadPost: React.FC = () => {
     null,
   );
 
-  const { mutate: createPost } = useCreatePost({
+  const { mutateAsync: createPost } = useCreatePost({
     onSuccess: (createdPost) => {
       navigate(`/posts/${createdPost.id}`);
-      showSnackbar("Post successfully created!", "success");
+      showSnackbar('Post successfully created!', 'success');
     },
     onError: (errorMessage) => {
-      showSnackbar(errorMessage, "error");
+      showSnackbar(errorMessage, 'error');
     },
   });
 
@@ -42,26 +42,26 @@ const UploadPost: React.FC = () => {
     formikActions: FormikHelpers<PostFormValues>,
   ) => {
     if (postMedias.length === 0) {
-      showSnackbar("At least one image or video is required.", "error");
+      showSnackbar('At least one image or video is required.', 'error');
       formikActions.setSubmitting(false);
       return;
     }
     if (!thumbnail || !originalThumbnail) {
-      showSnackbar("Thumbnail is required.", "error");
+      showSnackbar('Thumbnail is required.', 'error');
       formikActions.setSubmitting(false);
       return;
     }
 
     if (hasArtNovaImages && !promptId) {
-      showSnackbar("something went wrong, please try again.", "error");
+      showSnackbar('something went wrong, please try again.', 'error');
       console.error(
-        "AI generated images are selected but no prompt ID is provided.",
+        'AI generated images are selected but no prompt ID is provided.',
       );
       formikActions.setSubmitting(false);
       return;
     }
 
-    createPost(
+    await createPost(
       {
         values,
         postMedias,
@@ -86,7 +86,7 @@ const UploadPost: React.FC = () => {
         const aiImageMedias = selectedPrompt.image_urls.map((url) => ({
           type: MEDIA_TYPE.IMAGE,
           url: url,
-          file: new File([], "temp_image.png", { type: "image/png" }), // Placeholder file
+          file: new File([], 'temp_image.png', { type: 'image/png' }), // Placeholder file
         }));
         setPostMedias(aiImageMedias);
 
@@ -111,7 +111,7 @@ const UploadPost: React.FC = () => {
         };
         updatePostMediasFileAsync();
       } catch (err) {
-        console.error("Error fetching images from S3", err);
+        console.error('Error fetching images from S3', err);
       }
     };
 
@@ -142,4 +142,4 @@ const UploadPost: React.FC = () => {
   );
 };
 
-export default UploadPost;
+export default UploadPostPage;

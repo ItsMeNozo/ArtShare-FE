@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Outlet, RouteObject, useRoutes } from 'react-router-dom';
+import { createBrowserRouter, Outlet, RouteObject } from 'react-router-dom';
 
 // Layouts & Wrappers
 import ProtectedAuthRoute from '@/components/ProtectedItems/ProtectedAuthRoute';
@@ -34,8 +34,14 @@ const BrowseBlogs = lazy(() => import('@/features/browse-blogs/BrowseBlogs'));
 const BlogDetails = lazy(() => import('@/features/blog-details/BlogDetails'));
 const Search = lazy(() => import('@/pages/Search'));
 const Post = lazy(() => import('@/features/post'));
-const EditPost = lazy(() => import('@/features/post-management/EditPost'));
-const UploadPost = lazy(() => import('@/features/post-management/UploadPost'));
+
+const UploadPostPage = lazy(
+  () => import('@/features/post-management/routes/UploadPostPage'),
+);
+const EditPostPage = lazy(
+  () => import('@/features/post-management/routes/EditPostPage'),
+);
+
 const Collection = lazy(() => import('@/features/collection'));
 const UserProfile = lazy(
   () => import('@/features/user-profile-private/UserProfile'),
@@ -171,8 +177,8 @@ const routeConfig: RouteObject[] = [
         ),
         children: [
           { path: '/edit-user', element: <EditUser /> },
-          { path: '/post/:postId/edit', element: <EditPost /> },
-          { path: '/posts/new', element: <UploadPost /> },
+          { path: '/post/:postId/edit', element: <EditPostPage /> },
+          { path: '/posts/new', element: <UploadPostPage /> },
           { path: '/collections', element: <Collection /> },
           { path: '/docs', element: <DocumentDashboard /> },
           { path: '/app-subscription', element: <UserSubscription /> },
@@ -232,6 +238,4 @@ const routeConfig: RouteObject[] = [
   },
 ];
 
-export function AppRoutes() {
-  return useRoutes(routeConfig);
-}
+export const router = createBrowserRouter(routeConfig);
