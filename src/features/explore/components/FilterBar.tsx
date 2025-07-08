@@ -6,7 +6,7 @@ import { UseQueryResult } from '@tanstack/react-query';
 import { Ellipsis, LoaderPinwheel } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
-import { AttributesSelector } from './AttributesSelector';
+import { AttributeSelector } from './AttributeSelector';
 import { MediumSelector } from './MediumSelector';
 import { MediumSlider } from './MediumSlider';
 
@@ -142,7 +142,7 @@ const FilterBar = ({
           <BsFilter size={24} />
         )}
       </Button>
-      <AttributesSelector
+      <AttributeSelector
         open={openPP}
         onClose={() => setOpenPP(false)}
         onSave={(attributes) => setSelectedAttributes(attributes as string[])}

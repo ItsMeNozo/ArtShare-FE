@@ -14,7 +14,7 @@ import { FiSearch } from 'react-icons/fi';
 import { TiDeleteOutline } from 'react-icons/ti';
 import './scrollbar.css';
 
-interface AttributesSelectorProps {
+interface AttributeSelectorProps {
   open: boolean;
   anchorEl: HTMLElement | null;
   onClose: () => void;
@@ -28,7 +28,7 @@ interface AttributesSelectorProps {
   setIsAi: (isAi: boolean) => void;
 }
 
-export const AttributesSelector: React.FC<AttributesSelectorProps> = ({
+export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
   open,
   anchorEl,
   onClose,
