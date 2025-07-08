@@ -54,7 +54,7 @@ export const InfiniteScroll = ({
   }
 
   return (
-    <Box className="flex-1 overflow-y-auto">
+    <Box className="sidebar flex-1 overflow-y-auto">
       {children}
 
       {data.length === 0 && (

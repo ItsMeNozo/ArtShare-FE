@@ -47,7 +47,7 @@ const BrowseBlogs: React.FC = () => {
   };
 
   return (
-    <div className="dark:bg-mountain-950 flex h-screen overflow-hidden rounded-t-3xl bg-white">
+    <div className="dark:bg-mountain-950 flex h-screen overflow-hidden rounded-t-3xl">
       <div className="flex min-h-screen flex-1 flex-col">
         <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 sticky top-0 z-60 border-b-1 bg-white p-4 shadow-sm">
           <div className="flex items-center space-x-4">
@@ -60,7 +60,7 @@ const BrowseBlogs: React.FC = () => {
                 borderRadius: '9999px',
                 gap: 2,
               }}
-              className="bg-mountain-50 dark:bg-mountain-800"
+              className="bg-mountain-50 dark:bg-mountain-800 w-64"
             >
               <ToggleButtonGroup
                 size="small"
@@ -75,6 +75,7 @@ const BrowseBlogs: React.FC = () => {
                     px: 2,
                     textTransform: 'none',
                     fontWeight: 500,
+                    backgroundColor: 'white',
                   },
                   '.MuiToggleButton-root.Mui-selected': {
                     backgroundColor: 'primary.main',
@@ -87,16 +88,16 @@ const BrowseBlogs: React.FC = () => {
               >
                 <ToggleButton
                   value="trending"
-                  className="border-mountain-200 border dark:text-gray-300"
+                  className="border-mountain-200 w-32 border dark:text-gray-300"
                 >
-                  <AiFillFire className="text-mountain-400 dark:text-mountain-300 mr-1 size-4" />
+                  <AiFillFire className="dark:text-mountain-300 mr-1 size-4" />
                   Trending
                 </ToggleButton>
                 <ToggleButton
                   value="following"
-                  className="border-mountain-200 border dark:text-gray-300"
+                  className="border-mountain-200 w-32 border dark:text-gray-300"
                 >
-                  <IoHeartCircleOutline className="text-mountain-400 dark:text-mountain-300 mr-1 size-4" />
+                  <IoHeartCircleOutline className="dark:text-mountain-300 mr-1 size-4" />
                   Following
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -112,7 +113,7 @@ const BrowseBlogs: React.FC = () => {
                   setTab(null);
                 }}
                 placeholder="Search"
-                className="dark:bg-mountain-800 dark:border-mountain-700 w-full rounded-2xl border-gray-200 bg-white pr-8 pl-8 text-gray-900 placeholder-gray-500 shadow-inner dark:text-gray-100 dark:placeholder-gray-400"
+                className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-700 w-full rounded-2xl border-gray-200 pr-8 pl-8 text-gray-900 placeholder-gray-500 shadow-inner dark:text-gray-100 dark:placeholder-gray-400"
               />
               <TiDeleteOutline
                 className={`text-mountain-600 dark:text-mountain-400 hover:text-mountain-700 dark:hover:text-mountain-300 absolute right-2 h-5 w-5 cursor-pointer ${
@@ -127,7 +128,7 @@ const BrowseBlogs: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="dark:bg-mountain-950 sidebar flex min-h-screen flex-col gap-4 space-y-8 overflow-auto bg-white p-4 pb-20">
+        <div className="dark:bg-mountain-950 sidebar flex min-h-screen flex-col gap-4 space-y-8 overflow-auto py-0 pb-24 pl-4">
           <InfiniteScroll
             data={allBlogs}
             isLoading={isLoading}
@@ -137,7 +138,7 @@ const BrowseBlogs: React.FC = () => {
             hasNextPage={!!hasNextPage}
             fetchNextPage={fetchNextPage}
           >
-            <div className="flex flex-col gap-4 p-4">
+            <div className="flex flex-col gap-4 overflow-hidden py-4 pr-4">
               {allBlogs.map((b) => (
                 <BlogItem
                   key={b.id}

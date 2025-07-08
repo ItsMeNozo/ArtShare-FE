@@ -1,13 +1,4 @@
 import api from '@/api/baseApi';
-export interface TrendingItem {
-  image: string;
-  prompt: string;
-  style: string;
-  lighting: string;
-  camera: string;
-  aspectRatio: string;
-  modelKey: string;
-}
 
 interface ArtGeneration {
   imageUrls?: string[];
@@ -22,6 +13,12 @@ interface ArtGeneration {
 
 interface PostWithArt {
   artGeneration?: ArtGeneration;
+  user?: {
+    id: string;
+    username: string;
+    fullName: string;
+    profilePictureUrl: string | null;
+  };
 }
 
 export const getTrendingAiPosts = async (): Promise<TrendingItem[]> => {
@@ -34,6 +31,7 @@ export const getTrendingAiPosts = async (): Promise<TrendingItem[]> => {
     );
     return withArt.map((item): TrendingItem => {
       const art = item.artGeneration;
+      const user = item.user;
       return {
         image: art.imageUrls?.[0] ?? 'https://placehold.co/512?text=No+Image',
         prompt: art.finalPrompt ?? art.userPrompt ?? '',
@@ -42,6 +40,12 @@ export const getTrendingAiPosts = async (): Promise<TrendingItem[]> => {
         camera: art.camera ?? 'Default',
         aspectRatio: art.aspectRatio ?? 'Default',
         modelKey: art.modelKey ?? 'Unknown',
+        author: {
+          id: user?.id ?? '',
+          username: user?.username ?? 'Unknown',
+          fullName: user?.fullName ?? '',
+          profilePictureUrl: user?.profilePictureUrl ?? null,
+        },
       };
     });
   } catch (error) {

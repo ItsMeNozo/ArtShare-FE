@@ -22,7 +22,7 @@ export default function MediaUploadTab({
       className={`border-mountain-200 flex w-1/2 items-center justify-start rounded-full border-1 bg-gradient-to-r px-3 shadow-sm transition-all duration-300 ${
         isActive
           ? 'bg-indigo-700 to-purple-400 text-white'
-          : 'hover:bg-mountain-100 text-mountain-800 bg-white'
+          : 'text-mountain-800 bg-white hover:brightness-95'
       }`}
       sx={{
         height: 40,

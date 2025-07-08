@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-//Libs
-
 //Components
 import Panels from './components/panels/Panels';
 
@@ -14,6 +12,7 @@ import { MdFlipToFront } from 'react-icons/md';
 import { PiDiamondsFourLight } from 'react-icons/pi';
 import { RiText } from 'react-icons/ri';
 import Moveable from 'react-moveable';
+import EditHeader from './components/EditHeader';
 import LayerToolsBar from './components/tools/LayerToolsBar';
 
 const EditImage: React.FC = () => {
@@ -327,73 +326,75 @@ const EditImage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden p-4">
-      <div className="bg-mountain-100 border-mountain-200 flex h-full w-full space-y-4 overflow-y-hidden rounded-lg border">
-        <LayerToolsBar
-          layers={layers}
-          zoomLevel={zoomLevel}
-          selectedLayerId={selectedLayerId}
-          setLayers={setLayers}
-          setSelectedLayerId={setSelectedLayerId}
-          handleZoomIn={handleZoomIn}
-          handleZoomOut={handleZoomOut}
-          handleDownload={handleDownload}
-        />
-        <div className="bg-mountain-200 relative flex h-full w-full items-center justify-center">
-          <div
-            ref={imageContainerRef}
-            className="relative mx-auto h-[540px] w-[540px] overflow-hidden"
-            style={{
-              transform: `scale(${zoomLevel})`,
-              backgroundColor:
-                layers[0].type === 'image'
-                  ? layers[0].backgroundColor
-                  : '#ffffff',
-            }}
-          >
+    <div className="flex h-full w-full flex-col px-2">
+      <EditHeader />
+      <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden p-4">
+        <div className="bg-mountain-100 border-mountain-200 flex h-full w-full space-y-4 overflow-y-hidden rounded-lg border">
+          <LayerToolsBar
+            layers={layers}
+            zoomLevel={zoomLevel}
+            selectedLayerId={selectedLayerId}
+            setLayers={setLayers}
+            setSelectedLayerId={setSelectedLayerId}
+            handleZoomIn={handleZoomIn}
+            handleZoomOut={handleZoomOut}
+            handleDownload={handleDownload}
+          />
+          <div className="bg-mountain-200 relative flex h-full w-full items-center justify-center">
             <div
+              ref={imageContainerRef}
+              className="relative mx-auto h-[540px] w-[540px] overflow-hidden"
               style={{
-                position: 'relative',
-                width: `${canvasSize.width}px`,
-                height: `${canvasSize.height}px`,
-                overflow: 'hidden',
-                transformOrigin: 'top left',
-                border: '1px solid #ccc',
+                transform: `scale(${zoomLevel})`,
+                backgroundColor:
+                  layers[0].type === 'image'
+                    ? layers[0].backgroundColor
+                    : '#ffffff',
               }}
             >
-              {layers.slice(1).map((layer) => (
-                <div key={layer.id}>
-                  <div
-                    ref={(el) => {
-                      layerRefs.current[layer.id] = el;
-                    }}
-                    style={{
-                      width: layer.width,
-                      height: layer.height,
-                      transform: `
+              <div
+                style={{
+                  position: 'relative',
+                  width: `${canvasSize.width}px`,
+                  height: `${canvasSize.height}px`,
+                  overflow: 'hidden',
+                  transformOrigin: 'top left',
+                  border: '1px solid #ccc',
+                }}
+              >
+                {layers.slice(1).map((layer) => (
+                  <div key={layer.id}>
+                    <div
+                      ref={(el) => {
+                        layerRefs.current[layer.id] = el;
+                      }}
+                      style={{
+                        width: layer.width,
+                        height: layer.height,
+                        transform: `
                       translate(${layer.x}px, ${layer.y}px)
                       rotate(${layer.rotation}deg)
                       `,
-                      transformOrigin: 'center',
-                      position: 'absolute',
-                      zIndex: layer.id,
-                      background: 'transparent',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      pointerEvents: 'auto',
-                    }}
-                    onMouseDown={() => setSelectedLayerId(layer.id)}
-                  >
-                    {layer.type === 'image' ? (
-                      <img
-                        src={layer.src}
-                        alt=""
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          pointerEvents: 'none',
-                          filter: `
+                        transformOrigin: 'center',
+                        position: 'absolute',
+                        zIndex: layer.id,
+                        background: 'transparent',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        pointerEvents: 'auto',
+                      }}
+                      onMouseDown={() => setSelectedLayerId(layer.id)}
+                    >
+                      {layer.type === 'image' ? (
+                        <img
+                          src={layer.src}
+                          alt=""
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            pointerEvents: 'none',
+                            filter: `
                             saturate(${layer.saturation}%)
                             hue-rotate(${layer.hue}deg)
                             brightness(${layer.brightness}%)
@@ -401,181 +402,184 @@ const EditImage: React.FC = () => {
                             opacity(${layer.opacity})
                             sepia(${layer.sepia}%)
                             `,
-                          transform: `
+                            transform: `
                             scaleX(${layer.flipH ? -1 : 1})
                             scaleY(${layer.flipV ? -1 : 1})
                             `,
+                          }}
+                          draggable={false}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            fontSize: layer.fontSize,
+                            color: layer.color,
+                            fontWeight: layer.fontWeight || 'normal',
+                            fontFamily: layer.fontFamily || 'sans-serif',
+                            textAlign: 'center',
+                            whiteSpace: 'pre-wrap',
+                            userSelect: 'none',
+                            transform: `
+                            scaleX(${layer.flipH ? -1 : 1})
+                            scaleY(${layer.flipV ? -1 : 1})
+                            `,
+                            opacity: layer.opacity,
+                          }}
+                        >
+                          {layer.text}
+                        </div>
+                      )}
+                    </div>
+                    {selectedLayerId === layer.id && (
+                      <Moveable
+                        ref={moveableRef}
+                        target={layerRefs.current[layer.id]}
+                        draggable
+                        resizable
+                        rotatable
+                        rotationPosition="top"
+                        throttleResize={1}
+                        renderDirections={['nw', 'ne', 'sw', 'se']}
+                        keepRatio={false}
+                        onDrag={({ beforeTranslate }) => {
+                          setLayers((prev) =>
+                            prev.map((l) =>
+                              l.id === layer.id
+                                ? {
+                                    ...l,
+                                    x: beforeTranslate[0],
+                                    y: beforeTranslate[1],
+                                  }
+                                : l,
+                            ),
+                          );
                         }}
-                        draggable={false}
+                        onResize={({ width, height, drag, target }) => {
+                          target.style.width = `${width}px`;
+                          target.style.height = `${height}px`;
+                          target.style.transform = drag.transform;
+                        }}
+                        onResizeEnd={({ lastEvent }) => {
+                          if (!lastEvent) return;
+                          const { width, height, drag } = lastEvent;
+                          setLayers((prev) =>
+                            prev.map((l) =>
+                              l.id === layer.id
+                                ? {
+                                    ...l,
+                                    width,
+                                    height,
+                                    x: drag.beforeTranslate[0],
+                                    y: drag.beforeTranslate[1],
+                                  }
+                                : l,
+                            ),
+                          );
+                        }}
+                        onRotate={({ rotation }) => {
+                          setLayers((prev) =>
+                            prev.map((l) =>
+                              l.id === layer.id ? { ...l, rotation } : l,
+                            ),
+                          );
+                        }}
                       />
-                    ) : (
-                      <div
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          fontSize: layer.fontSize,
-                          color: layer.color,
-                          fontWeight: layer.fontWeight || 'normal',
-                          fontFamily: layer.fontFamily || 'sans-serif',
-                          textAlign: 'center',
-                          whiteSpace: 'pre-wrap',
-                          userSelect: 'none',
-                          transform: `
-                            scaleX(${layer.flipH ? -1 : 1})
-                            scaleY(${layer.flipV ? -1 : 1})
-                            `,
-                          opacity: layer.opacity,
-                        }}
-                      >
-                        {layer.text}
-                      </div>
                     )}
                   </div>
-                  {selectedLayerId === layer.id && (
-                    <Moveable
-                      ref={moveableRef}
-                      target={layerRefs.current[layer.id]}
-                      draggable
-                      resizable
-                      rotatable
-                      rotationPosition="top"
-                      throttleResize={1}
-                      renderDirections={['nw', 'ne', 'sw', 'se']}
-                      keepRatio={false}
-                      onDrag={({ beforeTranslate }) => {
-                        setLayers((prev) =>
-                          prev.map((l) =>
-                            l.id === layer.id
-                              ? {
-                                  ...l,
-                                  x: beforeTranslate[0],
-                                  y: beforeTranslate[1],
-                                }
-                              : l,
-                          ),
-                        );
-                      }}
-                      onResize={({ width, height, drag, target }) => {
-                        target.style.width = `${width}px`;
-                        target.style.height = `${height}px`;
-                        target.style.transform = drag.transform;
-                      }}
-                      onResizeEnd={({ lastEvent }) => {
-                        if (!lastEvent) return;
-                        const { width, height, drag } = lastEvent;
-                        setLayers((prev) =>
-                          prev.map((l) =>
-                            l.id === layer.id
-                              ? {
-                                  ...l,
-                                  width,
-                                  height,
-                                  x: drag.beforeTranslate[0],
-                                  y: drag.beforeTranslate[1],
-                                }
-                              : l,
-                          ),
-                        );
-                      }}
-                      onRotate={({ rotation }) => {
-                        setLayers((prev) =>
-                          prev.map((l) =>
-                            l.id === layer.id ? { ...l, rotation } : l,
-                          ),
-                        );
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
+          {/* Settings Panel */}
+          <Panels
+            activePanel={activePanel!}
+            selectedLayerId={selectedLayerId!}
+            layers={layers}
+            handleLayerXPosition={handleLayerXPosition}
+            handleLayerYPosition={handleLayerYPosition}
+            handleRotationChange={handleRotationChange}
+            handleOpacityChange={handleOpacityChange}
+            toggleFlipHorizontal={toggleFlipHorizontal}
+            toggleFlipVertical={toggleFlipVertical}
+            handleDuplicate={handleDuplicate}
+            updateSelectedLayer={updateSelectedLayer}
+            setActivePanel={setActivePanel}
+            handleSaturation={handleSaturation}
+            handleBrightness={handleBrightness}
+            handleContrast={handleContrast}
+            handleHue={handleHue}
+            handleSepia={handleSepia}
+            addText={addText}
+            handleChangeFontSize={handleChangeFontSize}
+            handleChangeFontFamily={handleChangeFontFamily}
+            handleChangeTextColor={handleChangeTextColor}
+          />
+          {/* Tools Bar */}
+          <div className="border-mountain-200 relative z-50 flex h-full w-20 flex-none flex-col justify-between space-y-2 rounded-lg rounded-l-none border bg-white">
+            <div
+              onClick={() =>
+                setActivePanel((prev) =>
+                  prev === 'arrange' ? null : 'arrange',
+                )
+              }
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+            >
+              <MdFlipToFront className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Arrange</p>
+            </div>
+            <div
+              onClick={() =>
+                setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
+              }
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+            >
+              <IoCrop className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Crop</p>
+            </div>
+            <div
+              onClick={() =>
+                setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
+              }
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+            >
+              <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Adjust</p>
+            </div>
+            <div
+              onClick={() =>
+                setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
+              }
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+            >
+              <IoIosColorFilter className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Filter</p>
+            </div>
+            <div
+              onClick={() =>
+                setActivePanel((prev) => (prev === 'text' ? null : 'text'))
+              }
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+            >
+              <RiText className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Text</p>
+            </div>
+            <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
+              <IoShapesOutline className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Shape</p>
+            </div>
+            <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
+              <PiDiamondsFourLight className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">Element</p>
+            </div>
+            <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
+              <HiDotsHorizontal className="text-mountain-600 size-6" />
+              <p className="text-mountain-600 text-xs">More</p>
+            </div>
+          </div>
+          <canvas ref={canvasRef} className="hidden" />
         </div>
-        {/* Settings Panel */}
-        <Panels
-          activePanel={activePanel!}
-          selectedLayerId={selectedLayerId!}
-          layers={layers}
-          handleLayerXPosition={handleLayerXPosition}
-          handleLayerYPosition={handleLayerYPosition}
-          handleRotationChange={handleRotationChange}
-          handleOpacityChange={handleOpacityChange}
-          toggleFlipHorizontal={toggleFlipHorizontal}
-          toggleFlipVertical={toggleFlipVertical}
-          handleDuplicate={handleDuplicate}
-          updateSelectedLayer={updateSelectedLayer}
-          setActivePanel={setActivePanel}
-          handleSaturation={handleSaturation}
-          handleBrightness={handleBrightness}
-          handleContrast={handleContrast}
-          handleHue={handleHue}
-          handleSepia={handleSepia}
-          addText={addText}
-          handleChangeFontSize={handleChangeFontSize}
-          handleChangeFontFamily={handleChangeFontFamily}
-          handleChangeTextColor={handleChangeTextColor}
-        />
-        {/* Tools Bar */}
-        <div className="border-mountain-200 relative z-50 flex h-full w-20 flex-none flex-col justify-between space-y-2 rounded-lg rounded-l-none border bg-white">
-          <div
-            onClick={() =>
-              setActivePanel((prev) => (prev === 'arrange' ? null : 'arrange'))
-            }
-            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
-          >
-            <MdFlipToFront className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Arrange</p>
-          </div>
-          <div
-            onClick={() =>
-              setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
-            }
-            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
-          >
-            <IoCrop className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Crop</p>
-          </div>
-          <div
-            onClick={() =>
-              setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
-            }
-            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
-          >
-            <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Adjust</p>
-          </div>
-          <div
-            onClick={() =>
-              setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
-            }
-            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
-          >
-            <IoIosColorFilter className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Filter</p>
-          </div>
-          <div
-            onClick={() =>
-              setActivePanel((prev) => (prev === 'text' ? null : 'text'))
-            }
-            className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
-          >
-            <RiText className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Text</p>
-          </div>
-          <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
-            <IoShapesOutline className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Shape</p>
-          </div>
-          <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
-            <PiDiamondsFourLight className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">Element</p>
-          </div>
-          <div className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none">
-            <HiDotsHorizontal className="text-mountain-600 size-6" />
-            <p className="text-mountain-600 text-xs">More</p>
-          </div>
-        </div>
-        <canvas ref={canvasRef} className="hidden" />
       </div>
     </div>
   );

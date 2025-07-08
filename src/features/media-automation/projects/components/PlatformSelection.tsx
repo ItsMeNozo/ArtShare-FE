@@ -98,7 +98,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   // const handleReconnectClick = () => {
   //   if (platformToReconnect) {
   //     console.log(
-  //       `Reconnecting platform: ${platformToReconnect.config.pageName}`,
+  //       `Reconnecting platform: ${platformToReconnect.config.page_name}`,
   //     );
 
   //     handleReconnect(platformToReconnect);
@@ -110,7 +110,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   //   try {
   //     if (platform) {
   //       console.log(
-  //         `Initiating reconnection for ${platform.name} page: ${platform.config.pageName}`,
+  //         `Initiating reconnection for ${platform.name} page: ${platform.config.page_name}`,
   //       );
   //     }
   //     const currentPageUrl = window.location.href;
