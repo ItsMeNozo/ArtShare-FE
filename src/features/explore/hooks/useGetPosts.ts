@@ -6,31 +6,28 @@ import { postsToPhotos } from '../utils';
 interface UseGetPostOptions {
   tab: ExploreTab;
   attributes?: string[];
-  mediums?: string[];
+  medium?: string | null;
   isAi?: boolean;
-  isMature?: boolean;
   enabled?: boolean;
 }
 
 export function useGetPosts({
   tab,
   attributes = [],
-  mediums = [],
+  medium,
   isAi = false,
-  isMature = false,
   enabled = true,
 }: UseGetPostOptions) {
   return useInfiniteQuery({
-    queryKey: ['posts', 'list', tab, attributes, mediums, isAi, isMature],
+    queryKey: ['posts', 'list', tab, attributes, medium, isAi],
     queryFn: async ({ pageParam = 1 }) => {
       const tabParam = tab === 'Trending' ? 'trending' : 'following';
-      const filterParams: string[] = mediums.concat(attributes);
+      const filterParams: string[] = attributes.concat(medium ? [medium] : []);
 
       const apiResponse = await getPosts(tabParam, {
         page: pageParam,
         filter: filterParams,
         isAi,
-        isMature,
       });
 
       return postsToPhotos(apiResponse);

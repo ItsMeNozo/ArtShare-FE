@@ -1,7 +1,3 @@
-import {
-  Categories,
-  DataPopper,
-} from '@/components/carousels/categories/Categories';
 import { CategoryTypeValues } from '@/constants';
 import { useCategories } from '@/hooks/useCategories';
 import { Category } from '@/types';
@@ -10,19 +6,26 @@ import { UseQueryResult } from '@tanstack/react-query';
 import { Ellipsis, LoaderPinwheel } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
+import { AttributesSelector } from './AttributesSelector';
+import { MediumSelector } from './MediumSelector';
+import { MediumSlider } from './MediumSlider';
 
 interface FilterBarProps {
-  selectedCategories: string | null;
-  setSelectedCategories: (category: string | null) => void;
-  selectedMediums: string[];
-  setSelectedMediums: (mediums: string[]) => void;
+  selectedAttributes: string[];
+  setSelectedAttributes: (attributes: string[]) => void;
+  selectedMedium: string | null;
+  setSelectedMedium: (medium: string | null) => void;
+  isAi: boolean;
+  setIsAi: (isAi: boolean) => void;
 }
 
 const FilterBar = ({
-  selectedCategories,
-  setSelectedCategories,
-  selectedMediums,
-  setSelectedMediums,
+  selectedAttributes,
+  setSelectedAttributes,
+  selectedMedium,
+  setSelectedMedium,
+  isAi,
+  setIsAi,
 }: FilterBarProps) => {
   const [openCP, setOpenCP] = useState(false);
   const [openPP, setOpenPP] = useState(false);
@@ -49,8 +52,8 @@ const FilterBar = ({
     );
   }, [allCategories]);
 
-  const handleCategoriesChange = (categoryName: string | null) => {
-    setSelectedCategories(categoryName);
+  const handleMediumChange = (mediumName: string | null) => {
+    setSelectedMedium(mediumName);
   };
 
   const handleToggleCP = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -63,13 +66,13 @@ const FilterBar = ({
     setOpenPP((prevOpen) => !prevOpen);
   };
 
-  const handleAllChannelsClick = () => {
-    setSelectedCategories(null);
+  const handleAllMediumsClick = () => {
+    setSelectedMedium(null);
 
     if (openCP) setOpenCP(false);
   };
 
-  const isAllChannelsSelected = selectedCategories === null;
+  const isAllChannelsSelected = selectedMedium === null;
 
   return (
     <div className="categories-bar flex w-full items-center gap-6 overflow-x-hidden">
@@ -86,16 +89,14 @@ const FilterBar = ({
           <Ellipsis />
         )}
       </Button>
-      <DataPopper
+      <MediumSelector
         open={openCP}
         anchorEl={anchorElCP}
         onClose={() => setOpenCP(false)}
-        onSave={(category) => setSelectedCategories(category as string | null)}
-        selectedData={selectedCategories}
-        data={attributeCategories}
+        onSelectMedium={(medium) => setSelectedMedium(medium)}
+        selectedMedium={selectedMedium}
+        data={mediumCategories}
         placement="bottom-start"
-        renderItem="category"
-        selectionMode="single"
       />
 
       <Button
@@ -105,7 +106,7 @@ const FilterBar = ({
             : 'dark:bg-mountain-900'
         } dark:text-mountain-200 font-normal normal-case shadow-none`}
         variant={isAllChannelsSelected ? 'contained' : 'outlined'}
-        onClick={handleAllChannelsClick}
+        onClick={handleAllMediumsClick}
         disableElevation={isAllChannelsSelected}
       >
         <div
@@ -120,10 +121,10 @@ const FilterBar = ({
         <span className="flex-shrink-0">All Channels</span>
       </Button>
       <div className="flex-grow overflow-x-auto">
-        <Categories
-          onSelectCategory={handleCategoriesChange}
-          selectedCategory={selectedCategories}
-          data={attributeCategories}
+        <MediumSlider
+          onSelectCategory={handleMediumChange}
+          selectedCategory={selectedMedium}
+          data={mediumCategories}
           isLoading={isLoadingAllCategories}
           isError={isErrorAllCategories}
         />
@@ -141,17 +142,17 @@ const FilterBar = ({
           <BsFilter size={24} />
         )}
       </Button>
-      <DataPopper
+      <AttributesSelector
         open={openPP}
         onClose={() => setOpenPP(false)}
-        onSave={(mediums) => setSelectedMediums(mediums as string[])}
+        onSave={(attributes) => setSelectedAttributes(attributes as string[])}
         anchorEl={anchorElPP}
-        data={mediumCategories}
-        selectedData={selectedMediums}
+        data={attributeCategories}
+        selectedData={selectedAttributes}
         placement="bottom-end"
-        renderItem="prop"
-        selectionMode="multiple"
         showClearAllButton={true}
+        isAi={isAi}
+        setIsAi={setIsAi}
       />
     </div>
   );
