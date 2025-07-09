@@ -12,7 +12,7 @@
     "test": "playwright test --project=e2e-chrome",
     "test:ui": "playwright test --ui  --trace on",
     "test:smoke": "playwright test --project=smoke",
-    "test:safe": "playwright test --project=safe",
+    "test:safe": "playwright test --project=safe --trace on",
     "test:unsafe": "playwright test --project=unsafe --trace on",
     "test:ai": "playwright test --grep @ai --trace on",
     "test:cleanup": "playwright test --project=cleanup --trace on",
