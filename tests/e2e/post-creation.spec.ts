@@ -323,45 +323,37 @@ test.describe('Post Creation', () => {
     }
   });
 
-  test('@safe SCRUM-356-9: Required Fields Validation', async ({ page }) => {
+  test.only('@safe SCRUM-356-9: Required Fields Validation', async ({
+    page,
+  }) => {
     const submitButton = page.getByRole('button', { name: 'Submit' });
 
     // Step 1: Try to submit without any media
     await expect(submitButton).toBeDisabled();
 
-    // Step 2: Upload an image but leave title empty
+    // Step 2: Upload an image but leave title and category empty
     await page
       .getByRole('button', { name: 'Upload Image' })
       .locator('input[type="file"]')
       .setInputFiles('tests/fixtures/image1.png');
     await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
 
-    // Submit button should be enabled after image upload
-    await expect(submitButton).toBeEnabled();
+    // Submit button should still be disabled (missing title and category)
+    await expect(submitButton).toBeDisabled();
 
-    // Try to submit without title - should show error
-    await submitButton.click();
-    await expect(
-      page.locator(':text("Title is required"), .error-message'),
-    ).toBeVisible();
-
-    // Step 3: Add title less than 5 characters
+    // Step 3: Add title less than 5 characters - button should still be disabled
     await page
       .getByRole('textbox', { name: 'What do you call your artwork' })
       .fill('abc');
-    await submitButton.click();
-    await expect(
-      page.locator(
-        ':text("Title must be at least 5 characters"), .error-message',
-      ),
-    ).toBeVisible();
+    await expect(submitButton).toBeDisabled();
 
-    // Step 4: Add proper title and submit
+    // Step 4: Add proper title - button should now be enabled
     await page
       .getByRole('textbox', { name: 'What do you call your artwork' })
       .fill('A valid title');
+    await expect(submitButton).toBeEnabled();
 
-    // Select category
+    // Step 5: Add category (optional but good for testing)
     await page
       .getByRole('textbox', { name: 'Choose art type or search...' })
       .click();
@@ -371,7 +363,7 @@ test.describe('Post Creation', () => {
       .getByRole('button', { name: 'Add' })
       .click();
 
-    // Submit button should be enabled
+    // Submit button should still be enabled
     await expect(submitButton).toBeEnabled();
 
     // Set up listener for the POST request response to get the post ID

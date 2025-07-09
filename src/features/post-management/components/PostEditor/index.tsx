@@ -58,7 +58,7 @@ const PostEditor: React.FC<{
       <Box className="dark:bg-mountain-900 space-y-2 rounded-md">
         <Box className="border-mountain-300 dark:border-mountain-700 border-b p-3">
           <Typography className="text-left text-base font-semibold dark:text-white">
-            Title
+            Title <span className="text-red-500">*</span>
           </Typography>
         </Box>
 
