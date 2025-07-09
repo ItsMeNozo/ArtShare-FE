@@ -177,9 +177,7 @@ test.describe('Post Creation', () => {
     console.log(`✅ Created video post successfully with ID: ${postId}`);
   });
 
-  test('@unsafe @ai SCRUM-356-3: AI Content Generation Feature', async ({
-    page,
-  }) => {
+  test('@ai SCRUM-356-3: AI Content Generation Feature', async ({ page }) => {
     // Upload an image first
     await expect(
       page.getByRole('button', { name: 'Upload Image' }),
@@ -357,9 +355,11 @@ test.describe('Post Creation', () => {
     await page
       .getByRole('textbox', { name: 'Choose art type or search...' })
       .click();
+
+    // Select the first category from the list
     await page
-      .getByRole('listitem')
-      .filter({ hasText: 'Abstract' })
+      .locator('ul.custom-scroll.flex-1.space-y-2.overflow-y-auto.pr-1 li')
+      .first()
       .getByRole('button', { name: 'Add' })
       .click();
 
