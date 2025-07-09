@@ -11,10 +11,9 @@ import { ExploreTab } from './types';
 
 const Explore: React.FC = () => {
   const [tab, setTab] = useState<ExploreTab>('Trending');
-  const [selectedCategories, setSelectedCategories] = useState<string | null>(
-    null,
-  );
-  const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
+  const [selectedMedium, setSelectedMedium] = useState<string | null>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+  const [isAi, setIsAi] = useState(false);
   const navigate = useNavigate();
 
   const handlePhotoClick = (photoId: number) => {
@@ -32,9 +31,8 @@ const Explore: React.FC = () => {
   } = useGetPosts({
     tab,
     attributes: [],
-    mediums: selectedMediums,
+    medium: selectedMedium,
     isAi: false,
-    isMature: false,
   });
 
   const handleTabChange = (
@@ -52,10 +50,12 @@ const Explore: React.FC = () => {
     <div className="relative flex h-full min-h-0 flex-col">
       <div className="dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 sticky z-10 flex flex-col gap-4 rounded-t-3xl bg-gradient-to-t from-white px-4 py-1 pt-3 dark:bg-gradient-to-t">
         <FilterBar
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          selectedMediums={selectedMediums}
-          setSelectedMediums={setSelectedMediums}
+          selectedMedium={selectedMedium}
+          setSelectedMedium={setSelectedMedium}
+          selectedAttributes={selectedAttributes}
+          setSelectedAttributes={setSelectedAttributes}
+          isAi={isAi}
+          setIsAi={setIsAi}
         />
       </div>
 
