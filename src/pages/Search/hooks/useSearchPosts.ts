@@ -14,7 +14,7 @@ export const useSearchPosts = (params: UseSearchPostsParams) => {
   const { finalQuery, medium, attributes = [], isAi, enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ['postSearch', finalQuery, medium, attributes],
+    queryKey: ['postSearch', finalQuery, medium, attributes, isAi],
 
     queryFn: async ({ pageParam = 1 }) => {
       const filter = attributes.concat(medium ? [medium] : []);

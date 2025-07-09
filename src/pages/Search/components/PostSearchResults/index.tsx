@@ -114,7 +114,7 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
           />
         </div>
       )} */}
-      {(selectedAttributes.length === 0 || selectedMedium) && (
+      {selectedAttributes.length === 0 && !selectedMedium && (
         <div className="mb-2 flex h-12 w-full items-center justify-center">
           <div className="text-mountain-400 dark:text-mountain-500">
             Tips: Want more specific results? Try adding filters.
