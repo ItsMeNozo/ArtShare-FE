@@ -32,7 +32,7 @@ const Explore: React.FC = () => {
     tab,
     attributes: [],
     medium: selectedMedium,
-    isAi: false,
+    isAi,
   });
 
   const handleTabChange = (
