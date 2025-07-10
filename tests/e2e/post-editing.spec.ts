@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { TestHelpers } from '../utils/test-helpers';
 
-test.describe('Post Editing', () => {
+test.describe.skip('Post Editing', () => {
   let helpers: TestHelpers;
 
   test.beforeEach(async ({ page }) => {

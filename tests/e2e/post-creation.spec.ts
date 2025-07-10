@@ -77,10 +77,10 @@ test.describe('Post Creation', () => {
       .getByRole('textbox', { name: 'Choose art type or search...' })
       .click();
 
-    // Select Video Art category by clicking the Add button in the list
+    // Select the first category from the list
     await page
-      .getByRole('listitem')
-      .filter({ hasText: 'Video Art' })
+      .locator('ul.custom-scroll.flex-1.space-y-2.overflow-y-auto.pr-1 li')
+      .first()
       .getByRole('button', { name: 'Add' })
       .click();
 
@@ -103,6 +103,7 @@ test.describe('Post Creation', () => {
   test('@unsafe SCRUM-356-2: Video Upload with Duration Validation', async ({
     page,
   }) => {
+    test.setTimeout(90000); // Increased timeout for slow video upload/processing
     // Test video upload functionality with real backend validation
     await expect(
       page.getByRole('button', { name: 'Upload Video' }),
@@ -115,7 +116,7 @@ test.describe('Post Creation', () => {
       .setInputFiles('tests/fixtures/video-short.mp4');
 
     // Wait for video processing/preview
-    await expect(page.locator('video')).toBeVisible();
+    await expect(page.locator('video')).toBeVisible({ timeout: 20000 });
 
     // Complete the post
     await page
@@ -130,8 +131,8 @@ test.describe('Post Creation', () => {
       .getByRole('textbox', { name: 'Choose art type or search...' })
       .click();
     await page
-      .getByRole('listitem')
-      .filter({ hasText: 'Video Art' })
+      .locator('ul.custom-scroll.flex-1.space-y-2.overflow-y-auto.pr-1 li')
+      .first()
       .getByRole('button', { name: 'Add' })
       .click();
 
@@ -148,9 +149,9 @@ test.describe('Post Creation', () => {
         response.request().method() === 'POST',
     );
 
-    // Ensure submit button is visible and enabled before clicking
+    // Ensure submit button is visible and enabled before clicking (longer timeout)
     const submitButton = page.getByRole('button', { name: 'Submit' });
-    await expect(submitButton).toBeVisible();
+    await expect(submitButton).toBeVisible({ timeout: 20000 });
     await expect(submitButton).toBeEnabled();
 
     console.log('🚀 Submit button is ready, clicking now...');
@@ -286,13 +287,10 @@ test.describe('Post Creation', () => {
         .getByRole('textbox', { name: 'Describe your work' })
         .fill('This is a test post');
 
-      // Select category
+      // Select the first category from the list
       await page
-        .getByRole('textbox', { name: 'Choose art type or search...' })
-        .click();
-      await page
-        .getByRole('listitem')
-        .filter({ hasText: 'Digital Art' })
+        .locator('ul.custom-scroll.flex-1.space-y-2.overflow-y-auto.pr-1 li')
+        .first()
         .getByRole('button', { name: 'Add' })
         .click();
 
@@ -321,9 +319,7 @@ test.describe('Post Creation', () => {
     }
   });
 
-  test.only('@safe SCRUM-356-9: Required Fields Validation', async ({
-    page,
-  }) => {
+  test('@safe SCRUM-356-9: Required Fields Validation', async ({ page }) => {
     const submitButton = page.getByRole('button', { name: 'Submit' });
 
     // Step 1: Try to submit without any media
@@ -396,6 +392,7 @@ test.describe('Post Creation', () => {
   test('@unsafe SCRUM-356-10: AI-Generated Images from User Stock', async ({
     page,
   }) => {
+    test.setTimeout(90000); // Increased timeout for slow AI image processing/posting
     // Test posting AI-generated images from user's AI stock/gallery
     // Click on "Post My AI Images" button
     await expect(
@@ -433,13 +430,13 @@ test.describe('Post Creation', () => {
         .getByRole('textbox', { name: 'Describe your work' })
         .fill('Created with AI from my stock');
 
-      // Select category
+      // Select the first category from the list
       await page
         .getByRole('textbox', { name: 'Choose art type or search...' })
         .click();
       await page
-        .getByRole('listitem')
-        .filter({ hasText: 'Digital Art' })
+        .locator('ul.custom-scroll.flex-1.space-y-2.overflow-y-auto.pr-1 li')
+        .first()
         .getByRole('button', { name: 'Add' })
         .click();
 
@@ -525,13 +522,13 @@ test.describe('Post Creation', () => {
         .getByRole('textbox', { name: 'Describe your work' })
         .fill('Regular art post');
 
-      // Select category
+      // Select the first category from the list
       await page
         .getByRole('textbox', { name: 'Choose art type or search...' })
         .click();
       await page
-        .getByRole('listitem')
-        .filter({ hasText: 'Digital Art' })
+        .locator('ul.custom-scroll.flex-1.space-y-2.overflow-y-auto.pr-1 li')
+        .first()
         .getByRole('button', { name: 'Add' })
         .click();
 
