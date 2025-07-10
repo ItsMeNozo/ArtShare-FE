@@ -125,8 +125,8 @@ const renderCategoryItemForPopper = (
   onClick: () => void,
 ) => {
   const imageUrl =
-    item.example_images && item.example_images.length > 0
-      ? item.example_images[0]
+    item.exampleImages && item.exampleImages.length > 0
+      ? item.exampleImages[0]
       : undefined;
 
   return (

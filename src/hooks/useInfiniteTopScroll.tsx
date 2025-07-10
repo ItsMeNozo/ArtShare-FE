@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 export function useInfiniteTopScroll(
   ref: React.RefObject<HTMLElement>,
@@ -30,8 +30,8 @@ export function useInfiniteTopScroll(
       }
     };
 
-    element.addEventListener("scroll", handleScroll, { passive: true });
-    return () => element.removeEventListener("scroll", handleScroll);
+    element.addEventListener('scroll', handleScroll, { passive: true });
+    return () => element.removeEventListener('scroll', handleScroll);
   }, [ref, canLoadMore, onLoadMore, threshold]);
 
   useLayoutEffect(() => {

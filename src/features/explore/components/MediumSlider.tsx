@@ -24,8 +24,8 @@ export const MediumSlider: React.FC<MediumSliderProps> = ({
   const renderCategoryItemInSlider = (category: Category) => {
     const isSelected = selectedCategory === category.name;
     const imageUrl =
-      category.example_images && category.example_images.length > 0
-        ? category.example_images[0]
+      category.exampleImages && category.exampleImages.length > 0
+        ? category.exampleImages[0]
         : undefined;
 
     return (

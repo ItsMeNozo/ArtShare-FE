@@ -1,5 +1,5 @@
-import api from "@/api/baseApi";
-import axios from "axios";
+import api from '@/api/baseApi';
+import axios from 'axios';
 
 export interface CreateCheckoutSessionPayload {
   planId: string;
@@ -9,7 +9,7 @@ export interface CreateCheckoutSessionPayload {
 
 export interface CreateCheckoutSessionResponse {
   url: string;
-  type: "checkout" | "portal";
+  type: 'checkout' | 'portal';
 }
 
 export const createCheckoutSession = async (
@@ -22,12 +22,12 @@ export const createCheckoutSession = async (
       payload,
     );
     if (!response.data?.url) {
-      throw new Error("Received invalid session data from server.");
+      throw new Error('Received invalid session data from server.');
     }
     return response.data;
   } catch (error) {
     console.error(`API Error calling ${endpoint}:`, error);
-    let errorMessage = "Could not initiate checkout.";
+    let errorMessage = 'Could not initiate checkout.';
     if (axios.isAxiosError(error)) {
       errorMessage =
         error.response?.data?.message || error.message || errorMessage;
@@ -44,11 +44,11 @@ export const createCustomerPortalSession = async (): Promise<{
   const endpoint = `/api/stripe/create-customer-portal-session`;
   try {
     const response = await api.post<{ url: string }>(endpoint);
-    if (!response.data?.url) throw new Error("Invalid portal session data.");
+    if (!response.data?.url) throw new Error('Invalid portal session data.');
     return response.data;
   } catch (error) {
     console.error(`API Error calling ${endpoint}:`, error);
-    let errorMessage = "Could not open customer portal.";
+    let errorMessage = 'Could not open customer portal.';
     if (axios.isAxiosError(error)) {
       errorMessage =
         error.response?.data?.message || error.message || errorMessage;

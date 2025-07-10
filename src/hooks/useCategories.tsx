@@ -1,7 +1,7 @@
-import { getCategories } from "@/api/category";
-import { CategoryTypeValues } from "@/constants";
-import { Category } from "@/types/category";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { getCategories } from '@/api/category';
+import { CategoryTypeValues } from '@/constants';
+import { Category } from '@/types/category';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 export interface UseCategoriesOptions {
   page?: number;
@@ -15,7 +15,7 @@ export function useCategories(
 ): UseQueryResult<Category[]> {
   const { page = 1, pageSize = 25, type, searchQuery } = options;
   return useQuery<Category[]>({
-    queryKey: ["categories", { page, pageSize, type, searchQuery }],
+    queryKey: ['categories', { page, pageSize, type, searchQuery }],
 
     queryFn: () => getCategories({ page, pageSize, type, searchQuery }),
 

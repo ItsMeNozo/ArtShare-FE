@@ -1,11 +1,11 @@
 // src/components/ProfileStats.tsx
-import { FC, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
+import { FC, useState } from 'react';
 import {
   getFollowersListByUserId,
   getFollowingsListByUserId,
-} from "../api/follow.api";
-import FollowListModal from "./FollowListModal";
+} from '../api/follow.api';
+import FollowListModal from './FollowListModal';
 
 interface ProfileStatsProps {
   userId: string;
@@ -18,7 +18,7 @@ const ProfileStats: FC<ProfileStatsProps> = ({
   following,
   followers,
 }) => {
-  const [openModal, setOpenModal] = useState<null | "followings" | "followers">(
+  const [openModal, setOpenModal] = useState<null | 'followings' | 'followers'>(
     null,
   );
 
@@ -27,7 +27,7 @@ const ProfileStats: FC<ProfileStatsProps> = ({
     isFetching: isFetchingFollowings,
     refetch: refetchFollowings,
   } = useQuery({
-    queryKey: ["followingsList", userId],
+    queryKey: ['followingsList', userId],
     queryFn: async () => (await getFollowingsListByUserId(userId)).data,
     enabled: false,
   });
@@ -37,26 +37,26 @@ const ProfileStats: FC<ProfileStatsProps> = ({
     isFetching: isFetchingFollowers,
     refetch: refetchFollowers,
   } = useQuery({
-    queryKey: ["followersList", userId],
+    queryKey: ['followersList', userId],
     queryFn: async () => (await getFollowersListByUserId(userId)).data,
     enabled: false,
   });
 
   const openFollowingsModal = async () => {
-    setOpenModal("followings");
+    setOpenModal('followings');
     try {
       await refetchFollowings();
     } catch (err) {
-      console.error("Failed to load followings:", err);
+      console.error('Failed to load followings:', err);
     }
   };
 
   const openFollowersModal = async () => {
-    setOpenModal("followers");
+    setOpenModal('followers');
     try {
       await refetchFollowers();
     } catch (err) {
-      console.error("Failed to load followers:", err);
+      console.error('Failed to load followers:', err);
     }
   };
 
@@ -67,27 +67,31 @@ const ProfileStats: FC<ProfileStatsProps> = ({
       <div className="flex items-center gap-2 text-sm">
         <div
           onClick={openFollowingsModal}
-          className="group flex items-center py-1 rounded-md transition-colors duration-200 cursor-pointer"
+          className="group flex cursor-pointer items-center rounded-md py-1 transition-colors duration-200"
         >
-          <span className="font-bold text-mountain-600 dark:text-white">
+          <span className="text-mountain-600 font-bold dark:text-white">
             {following}
           </span>
-          <span className="ml-1 text-mountain-600 dark:text-gray-500 group-hover:underline">Following</span>
+          <span className="text-mountain-600 ml-1 group-hover:underline dark:text-gray-500">
+            Following
+          </span>
         </div>
         <span>•</span>
         <div
           onClick={openFollowersModal}
-          className="group flex items-center py-1 rounded-md transition-colors duration-200 cursor-pointer"
+          className="group flex cursor-pointer items-center rounded-md py-1 transition-colors duration-200"
         >
-          <span className="font-bold text-mountain-600 dark:text-white">
+          <span className="text-mountain-600 font-bold dark:text-white">
             {followers}
           </span>
-          <span className="ml-1 text-mountain-600 dark:text-gray-500 group-hover:underline">Followers</span>
+          <span className="text-mountain-600 ml-1 group-hover:underline dark:text-gray-500">
+            Followers
+          </span>
         </div>
       </div>
 
       <FollowListModal
-        open={openModal === "followings"}
+        open={openModal === 'followings'}
         title="Following"
         loading={isFetchingFollowings}
         data={followingsList || []}
@@ -95,7 +99,7 @@ const ProfileStats: FC<ProfileStatsProps> = ({
       />
 
       <FollowListModal
-        open={openModal === "followers"}
+        open={openModal === 'followers'}
         title="Followers"
         loading={isFetchingFollowers}
         data={followersList || []}

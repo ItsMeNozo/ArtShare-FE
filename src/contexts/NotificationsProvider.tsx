@@ -271,10 +271,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         const existing: Notification<ReportResolvedPayload>[] = res.data;
         const freshNotifications: Notification<ReportResolvedPayload>[] =
-            existing.filter(
-              (notification: Notification<ReportResolvedPayload>) =>
-                notification.type !== 'report_created',
-            );
+          existing.filter(
+            (notification: Notification<ReportResolvedPayload>) =>
+              notification.type !== 'report_created',
+          );
 
         // Merge with any notifications received via socket while loading
         setNotifications((prev) => {

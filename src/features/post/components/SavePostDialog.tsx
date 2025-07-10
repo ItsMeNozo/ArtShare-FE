@@ -1,33 +1,36 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import DialogTitle from "@mui/material/DialogTitle";
-import Dialog from "@mui/material/Dialog";
 import {
+  Alert,
+  Box,
   Button,
+  CircularProgress,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  Box,
   IconButton,
-  Typography,
-  DialogActions,
   Skeleton,
-  CircularProgress,
   Snackbar,
-  Alert,
   Tooltip,
-} from "@mui/material";
-import { CheckIcon, PlusCircleIcon, X } from "lucide-react";
+  Typography,
+} from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import { CheckIcon, PlusCircleIcon, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { SearchInput } from "../../../components/SearchInput";
-import { fetchCollectionsForDialog } from "../api/collection.api";
 import {
   addPostToCollection,
   removePostFromCollection,
-} from "@/features/collection/api/collection.api";
+  updateCollection,
+} from '@/features/collection/api/collection.api';
+import { useQueryClient } from '@tanstack/react-query';
+import { SearchInput } from '../../../components/SearchInput';
+import { fetchCollectionsForDialog } from '../api/collection.api';
 
 export interface SavePostDialogProps {
   open: boolean;
   onClose: () => void;
   postId: number;
+  postThumbnail?: string;
   initialCollections?: DialogCollection[];
   onNavigateToCreate: () => void;
   createDisabled?: boolean;
@@ -37,20 +40,22 @@ export interface SavePostDialogProps {
 export interface DialogCollection {
   id: number;
   name: string;
-  thumbnail_url?: string;
+  thumbnailUrl?: string;
   postIds: number[];
 }
 
 export const SavePostDialog = (props: SavePostDialogProps) => {
+  const queryClient = useQueryClient();
   const {
     onClose,
     open,
     postId,
+    postThumbnail,
     onNavigateToCreate,
     createDisabled = false,
-    createDisabledReason = "",
+    createDisabledReason = '',
   } = props;
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [collections, setCollections] = useState<DialogCollection[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -66,18 +71,18 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
         setFetchError(null);
         setToggleError(null);
         setCollections([]);
-        setSearchQuery("");
+        setSearchQuery('');
         setTogglingCollectionId(null);
 
         try {
-          console.log("Fetching collections for dialog...");
+          console.log('Fetching collections for dialog...');
           const fetchedData = await fetchCollectionsForDialog();
           setCollections(fetchedData);
-          console.log("Collections fetched:", fetchedData);
+          console.log('Collections fetched:', fetchedData);
         } catch (err) {
-          console.error("Error in fetchCollectionsForDialog:", err);
+          console.error('Error in fetchCollectionsForDialog:', err);
           const errorMsg =
-            err instanceof Error ? err.message : "Could not load collections.";
+            err instanceof Error ? err.message : 'Could not load collections.';
           setFetchError(errorMsg);
         } finally {
           setIsLoading(false);
@@ -104,41 +109,62 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
 
     const collectionIndex = collections.findIndex((c) => c.id === collectionId);
     if (collectionIndex === -1) {
-      console.error("Collection not found locally:", collectionId);
+      console.error('Collection not found locally:', collectionId);
       setTogglingCollectionId(null);
-      setToggleError("An unexpected error occurred. Collection not found.");
+      setToggleError('An unexpected error occurred. Collection not found.');
       return;
     }
 
     const originalCollections = [...collections];
     const collection = collections[collectionIndex];
-    const isCurrentlyAdded = collection.postIds.includes(postId);
-    const optimisticAction = isCurrentlyAdded ? "remove" : "add";
+    const isRemoving = collection.postIds.includes(postId);
+    const isAdding = !isRemoving;
+    const optimisticAction = isAdding ? 'add' : 'remove';
 
     setCollections((prevCollections) =>
       prevCollections.map((col) => {
         if (col.id === collectionId) {
-          const newPostIds = isCurrentlyAdded
+          const newPostIds = isRemoving
             ? col.postIds.filter((id) => id !== postId)
             : [...col.postIds, postId];
-          return { ...col, postIds: newPostIds };
+
+          let newThumbnailUrl = col.thumbnailUrl;
+          if (isAdding && postThumbnail) {
+            newThumbnailUrl = postThumbnail;
+          } else if (isRemoving && col.thumbnailUrl === postThumbnail) {
+            newThumbnailUrl = undefined;
+          }
+
+          return { ...col, postIds: newPostIds, thumbnailUrl: newThumbnailUrl };
         }
         return col;
       }),
     );
 
     try {
-      if (optimisticAction === "add") {
+      if (optimisticAction === 'add') {
         await addPostToCollection(collectionId, postId);
+        await updateCollection(collectionId, {
+          thumbnailUrl: postThumbnail || collection.thumbnailUrl,
+        });
       } else {
         await removePostFromCollection(collectionId, postId);
+        await updateCollection(collectionId, {
+          thumbnailUrl:
+            collection.thumbnailUrl === postThumbnail
+              ? ''
+              : collection.thumbnailUrl,
+        });
       }
+      queryClient.invalidateQueries({
+        queryKey: ['collections', 'list-dialog'],
+      });
       console.log(
-        `API: ${optimisticAction === "add" ? "Added" : "Removed"} post ${postId} successfully.`,
+        `API: ${optimisticAction === 'add' ? 'Added' : 'Removed'} post ${postId} successfully.`,
       );
     } catch (err) {
       console.error(
-        `API Error ${optimisticAction === "add" ? "adding to" : "removing from"} collection ${collectionId}:`,
+        `API Error ${optimisticAction === 'add' ? 'adding to' : 'removing from'} collection ${collectionId}:`,
         err,
       );
       const errorMsg =
@@ -185,9 +211,9 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
           sx={{
             m: 0,
             p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
           <span>Add to Collection</span>
@@ -206,10 +232,10 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
           dividers={true}
           sx={{
             p: 0,
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "300px",
-            width: "100%",
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '300px',
+            width: '100%',
           }}
         >
           {/* Search Input */}
@@ -228,11 +254,11 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
             tabIndex={-1}
             component="div"
             sx={{
-              overflowY: "auto",
+              overflowY: 'auto',
               flexGrow: 1,
               p: 0,
-              borderTop: "1px solid",
-              borderColor: "divider",
+              borderTop: '1px solid',
+              borderColor: 'divider',
             }}
           >
             {/* === Loading State === */}
@@ -242,8 +268,8 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                   <Box
                     key={index}
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 2,
                       py: 1.5,
                     }}
@@ -273,12 +299,12 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
             {showFetchError && (
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   p: 4,
-                  flexDirection: "column",
-                  height: "100%",
+                  flexDirection: 'column',
+                  height: '100%',
                 }}
               >
                 <Typography color="error" textAlign="center">
@@ -306,32 +332,32 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                     <Box
                       key={collection.id}
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: 2,
                         p: 2,
                         px: { xs: 2, sm: 3 },
-                        borderBottom: "1px solid",
-                        borderColor: "divider",
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
                         opacity: isTogglingThis ? 0.7 : 1,
-                        pointerEvents: isTogglingThis ? "none" : "auto",
-                        "&:last-child": { borderBottom: 0 },
+                        pointerEvents: isTogglingThis ? 'none' : 'auto',
+                        '&:last-child': { borderBottom: 0 },
                       }}
                     >
                       {/* Thumbnail Placeholder */}
-                      {collection.thumbnail_url ? (
+                      {collection.thumbnailUrl ? (
                         <Box
                           component="img"
-                          src={`${collection.thumbnail_url}`}
+                          src={`${collection.thumbnailUrl}`}
                           sx={{
                             width: 56,
                             height: 56,
                             borderRadius: 1,
-                            objectFit: "cover",
+                            objectFit: 'cover',
                             flexShrink: 0,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            bgcolor: "grey.200",
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            bgcolor: 'grey.200',
                           }}
                         />
                       ) : (
@@ -340,9 +366,9 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                             width: 56,
                             height: 56,
                             borderRadius: 1,
-                            border: "1px solid",
-                            borderColor: "divider",
-                            bgcolor: "grey.200",
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            bgcolor: 'grey.200',
                           }}
                         />
                       )}
@@ -358,13 +384,13 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {collection.postIds.length} post
-                          {collection.postIds.length !== 1 ? "s" : ""}
+                          {collection.postIds.length !== 1 ? 's' : ''}
                         </Typography>
                       </Box>
                       {/* Action Button */}
                       <Button
                         size="small"
-                        variant={isAdded ? "outlined" : "contained"}
+                        variant={isAdded ? 'outlined' : 'contained'}
                         startIcon={
                           isTogglingThis ? (
                             <CircularProgress size={16} color="inherit" />
@@ -384,29 +410,29 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                         }
                         sx={{
                           flexShrink: 0,
-                          textTransform: "none",
-                          fontWeight: "normal",
-                          minWidth: "85px",
+                          textTransform: 'none',
+                          fontWeight: 'normal',
+                          minWidth: '85px',
                         }}
                       >
                         {isTogglingThis
                           ? isAdded
-                            ? "Adding"
-                            : "Removing"
+                            ? 'Adding'
+                            : 'Removing'
                           : isAdded
-                            ? "Added"
-                            : "Add"}
+                            ? 'Added'
+                            : 'Add'}
                       </Button>
                     </Box>
                   );
                 })
               ) : (
                 <Typography
-                  sx={{ textAlign: "center", color: "text.secondary", p: 4 }}
+                  sx={{ textAlign: 'center', color: 'text.secondary', p: 4 }}
                 >
                   {searchQuery
-                    ? "No collections found matching your search"
-                    : "No collections created yet."}
+                    ? 'No collections found matching your search'
+                    : 'No collections created yet.'}
                 </Typography>
               ))}
           </DialogContentText>
@@ -417,9 +443,9 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
           sx={{
             p: { xs: 2, sm: 3 },
             pt: 2,
-            borderTop: "1px solid",
-            borderColor: "divider",
-            justifyContent: "space-between",
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            justifyContent: 'space-between',
           }}
         >
           {/* Button now calls the new handler */}
@@ -441,7 +467,7 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
                   isLoading ||
                   !!fetchError
                 }
-                sx={{ textTransform: "none", fontWeight: "normal", mr: "auto" }}
+                sx={{ textTransform: 'none', fontWeight: 'normal', mr: 'auto' }}
               >
                 Create new collection
               </Button>
@@ -452,7 +478,6 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
             onClick={handleClose}
             disabled={!!togglingCollectionId || isLoading}
           >
-            {" "}
             {/* Use the main close handler */}
             Done
           </Button>
@@ -463,12 +488,12 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
         open={!!toggleError}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity="error"
-          sx={{ width: "100%" }}
+          sx={{ width: '100%' }}
         >
           {toggleError}
         </Alert>

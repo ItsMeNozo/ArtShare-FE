@@ -1,20 +1,20 @@
 //Components
-import AdjustmentSlider from "../../components/sliders/AdjustmentSlider";
+import AdjustmentSlider from '../../components/sliders/AdjustmentSlider';
 
 //Icons
-import { X } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
-import CropPanel from "./CropPanel";
-import FilterPanel from "./FilterPanel";
-import ArrangePanel from "./ArrangePanel";
-import TextPanel from "./TextPanel";
+import { X } from 'lucide-react';
+import { Dispatch, SetStateAction } from 'react';
+import ArrangePanel from './ArrangePanel';
+import CropPanel from './CropPanel';
+import FilterPanel from './FilterPanel';
+import TextPanel from './TextPanel';
 
 type PanelsProp = {
   selectedLayerId: string;
   activePanel: string;
   layers: Layer[];
   setActivePanel: Dispatch<
-    SetStateAction<"arrange" | "crop" | "adjust" | "filter" | "text" | null>
+    SetStateAction<'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null>
   >;
   handleLayerXPosition: (newXPos: number) => void;
   handleLayerYPosition: (newYPos: number) => void;
@@ -58,21 +58,21 @@ const Panels: React.FC<PanelsProp> = ({
   handleChangeTextColor,
 }) => {
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
-  const isNonTextLayer = selectedLayer?.type === "image" || !selectedLayer;
-  const isTextLayer = selectedLayer?.type === "text" || !selectedLayer;
+  const isNonTextLayer = selectedLayer?.type === 'image' || !selectedLayer;
+  const isTextLayer = selectedLayer?.type === 'text' || !selectedLayer;
   return (
     <div className="z-50">
       {activePanel && (
-        <div className="flex flex-col space-y-2 bg-gradient-to-b from-white to-mountain-50 shadow border border-mountain-200 w-72 h-[calc(100vh-98px)]">
-          <div className="relative flex justify-center items-center bg-white border-mountain-200 border-b-1 h-[5%] font-semibold text-mountain-700 text-sm">
+        <div className="to-mountain-50 border-mountain-200 flex h-[calc(100vh-98px)] w-72 flex-col space-y-2 border bg-gradient-to-b from-white shadow">
+          <div className="border-mountain-200 text-mountain-700 relative flex h-[5%] items-center justify-center border-b-1 bg-white text-sm font-semibold">
             <X
-              className="left-2 absolute size-4 hover:text-red-700"
+              className="absolute left-2 size-4 hover:text-red-700"
               onClick={() => setActivePanel(null)}
             />
             <p className="capitalize">{activePanel}</p>
           </div>
-          <div className="custom-scrollbar-left flex flex-col space-y-4 px-6 py-4 max-h-[82%] overflow-y-auto">
-            {activePanel == "crop" && (
+          <div className="custom-scrollbar-left flex max-h-[82%] flex-col space-y-4 overflow-y-auto px-6 py-4">
+            {activePanel == 'crop' && (
               <CropPanel
                 layers={layers}
                 selectedLayerId={selectedLayerId}
@@ -85,10 +85,10 @@ const Panels: React.FC<PanelsProp> = ({
                 handleRotationChange={handleRotationChange}
               />
             )}
-            {activePanel == "arrange" && (
+            {activePanel == 'arrange' && (
               <ArrangePanel layers={layers} selectedLayerId={selectedLayerId} />
             )}
-            {activePanel === "adjust" &&
+            {activePanel === 'adjust' &&
               (isNonTextLayer ? (
                 <>
                   <AdjustmentSlider
@@ -97,7 +97,7 @@ const Panels: React.FC<PanelsProp> = ({
                     onChange={handleSaturation}
                     min={0}
                     max={200}
-                    gradientColors={["#808080", "#ff0000"]}
+                    gradientColors={['#808080', '#ff0000']}
                   />
                   <AdjustmentSlider
                     label="Hue"
@@ -106,14 +106,14 @@ const Panels: React.FC<PanelsProp> = ({
                     min={-180}
                     max={180}
                     gradientColors={[
-                      "#808080",
-                      "#ff0000",
-                      "#ffff00",
-                      "#00ff00",
-                      "#00ffff",
-                      "#0000ff",
-                      "#ff00ff",
-                      "#ff0000",
+                      '#808080',
+                      '#ff0000',
+                      '#ffff00',
+                      '#00ff00',
+                      '#00ffff',
+                      '#0000ff',
+                      '#ff00ff',
+                      '#ff0000',
                     ]}
                   />
                   <AdjustmentSlider
@@ -132,16 +132,16 @@ const Panels: React.FC<PanelsProp> = ({
                   />
                 </>
               ) : (
-                <div className="text-mountain-500 text-xs text-center italic">
+                <div className="text-mountain-500 text-center text-xs italic">
                   This tab is not used for text layers. Please choose any
                   non-text layers to continue.
                 </div>
               ))}
-            {activePanel === "filter" &&
+            {activePanel === 'filter' &&
               (isNonTextLayer ? (
                 <FilterPanel
                   layers={
-                    layers.filter((l) => l.type === "image") as ImageLayer[]
+                    layers.filter((l) => l.type === 'image') as ImageLayer[]
                   }
                   selectedLayerId={selectedLayerId}
                   handleSaturation={handleSaturation}
@@ -151,12 +151,12 @@ const Panels: React.FC<PanelsProp> = ({
                   handleSepia={handleSepia}
                 />
               ) : (
-                <div className="text-mountain-500 text-xs text-center italic">
+                <div className="text-mountain-500 text-center text-xs italic">
                   This tab is not used for text layers. Please choose any
                   non-text layers to continue.
                 </div>
               ))}
-            {activePanel === "text" &&
+            {activePanel === 'text' &&
               (isTextLayer ? (
                 <TextPanel
                   selectedLayer={selectedLayer}
@@ -166,7 +166,7 @@ const Panels: React.FC<PanelsProp> = ({
                   addText={addText}
                 />
               ) : (
-                <div className="text-mountain-500 text-xs text-center italic">
+                <div className="text-mountain-500 text-center text-xs italic">
                   This tab is not used for image layer. Please continue with
                   non-image layer.
                 </div>

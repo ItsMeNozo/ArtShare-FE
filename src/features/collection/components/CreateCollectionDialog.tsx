@@ -1,17 +1,15 @@
-import { Collection } from "@/types";
-import { Alert, CircularProgress, Paper } from "@mui/material";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import IconButton from "@mui/material/IconButton";
-import Input from "@mui/material/Input";
-import { X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { createCollection } from "../api/collection.api";
+import { Alert, CircularProgress, Paper } from '@mui/material';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
+import Input from '@mui/material/Input';
+import { X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 export interface CreateCollectionFormData {
   name: string;
@@ -21,8 +19,10 @@ export interface CreateCollectionFormData {
 export interface CreateCollectionDialogProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: (newCollection: Collection) => void;
+  onSuccess: (data: CreateCollectionFormData) => void;
   existingCollectionNames: string[];
+  isSubmitting: boolean;
+  error?: string | null;
 }
 
 export const CreateCollectionDialog = ({
@@ -30,30 +30,32 @@ export const CreateCollectionDialog = ({
   onClose,
   onSuccess,
   existingCollectionNames,
+  isSubmitting,
+  error: submissionError,
 }: CreateCollectionDialogProps) => {
-  const [collectionName, setCollectionName] = useState("");
+  const [collectionName, setCollectionName] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
-      setCollectionName("");
+      setCollectionName('');
       setIsPrivate(false);
-      setIsLoading(false);
-      setError(null);
+      setValidationError(null);
     }
   }, [open]);
 
+  const displayError = validationError || submissionError;
+
   const handleInternalClose = () => {
-    if (isLoading) return;
+    if (isSubmitting) return;
     onClose();
   };
 
-  const handleCreateClick = async () => {
+  const handleCreateClick = () => {
     const trimmedName = collectionName.trim();
     if (!trimmedName) {
-      setError("Collection name cannot be empty.");
+      setValidationError('Collection name cannot be empty.');
       return;
     }
 
@@ -63,41 +65,22 @@ export const CreateCollectionDialog = ({
     );
 
     if (isDuplicate) {
-      setError(`A collection named "${trimmedName}" already exists.`);
+      setValidationError(`A collection named "${trimmedName}" already exists.`);
       return;
     }
 
-    setError(null);
-    setIsLoading(true);
-
-    const formData: CreateCollectionFormData = {
+    setValidationError(null);
+    onSuccess({
       name: trimmedName,
       isPrivate: isPrivate,
-    };
-
-    try {
-      const newCollection = await createCollection(formData);
-      console.log("Collection created successfully:", newCollection);
-
-      onSuccess(newCollection);
-
-      handleInternalClose();
-    } catch (err) {
-      console.error("Failed to create collection:", err);
-
-      setError(
-        (err as Error).message ||
-          "An unexpected error occurred. Please try again.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCollectionName(e.target.value);
-    if (error) {
-      setError(null);
+
+    if (validationError) {
+      setValidationError(null);
     }
   };
 
@@ -114,9 +97,9 @@ export const CreateCollectionDialog = ({
         sx={{
           m: 0,
           p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <span>Create New Collection</span>
@@ -124,16 +107,15 @@ export const CreateCollectionDialog = ({
           aria-label="close"
           onClick={handleInternalClose}
           sx={{ color: (theme) => theme.palette.grey[500] }}
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
           <X size={20} />
         </IconButton>
       </DialogTitle>
       <DialogContent dividers sx={{ p: { xs: 2, sm: 3 } }}>
-        {/* Display Error Message */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }} className="bg-red-400">
-            {error}
+        {displayError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {displayError}
           </Alert>
         )}
 
@@ -141,22 +123,22 @@ export const CreateCollectionDialog = ({
           component="form"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!isLoading && collectionName.trim()) {
+            if (!isSubmitting) {
               handleCreateClick();
             }
           }}
           sx={{
-            p: "2px 4px",
+            p: '2px 4px',
             mb: 2,
-            display: "flex",
-            alignItems: "center",
-            borderRadius: "16px",
-            border: "1px solid",
-            boxShadow: "none",
-            bgcolor: "background.paper",
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: '16px',
+            border: '1px solid',
+            borderColor: displayError ? 'error.main' : 'divider',
+            boxShadow: 'none',
+            bgcolor: 'background.paper',
             height: 40,
           }}
-          className={`${error ? "border-red-400" : ""} `}
         >
           <Input
             placeholder="Collection name"
@@ -167,7 +149,7 @@ export const CreateCollectionDialog = ({
             onChange={handleNameChange}
             autoFocus
             required
-            disabled={isLoading}
+            disabled={isSubmitting}
           />
         </Paper>
         <FormControlLabel
@@ -177,30 +159,30 @@ export const CreateCollectionDialog = ({
               onChange={(e) => setIsPrivate(e.target.checked)}
               color="primary"
               size="small"
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
           }
           label="Make this collection private"
-          sx={{ display: "block" }}
+          sx={{ display: 'block' }}
         />
       </DialogContent>
       <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 2 }}>
         <Button
           variant="text"
           onClick={handleInternalClose}
-          disabled={isLoading}
+          disabled={isSubmitting}
         >
           Cancel
         </Button>
         <Button
           variant="contained"
           onClick={handleCreateClick}
-          disabled={!collectionName.trim() || isLoading}
+          disabled={!collectionName.trim() || isSubmitting}
           startIcon={
-            isLoading ? <CircularProgress size={20} color="inherit" /> : null
+            isSubmitting ? <CircularProgress size={20} color="inherit" /> : null
           }
         >
-          {isLoading ? "Creating..." : "Create"}
+          {isSubmitting ? 'Creating...' : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>

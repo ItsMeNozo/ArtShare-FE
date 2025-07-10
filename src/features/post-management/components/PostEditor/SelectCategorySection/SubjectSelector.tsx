@@ -11,20 +11,20 @@ export type Subject = {
 };
 
 interface SubjectSelectorProps {
-  cate_ids: number[];
-  setCateIds: (value: number[]) => void;
+  categoryIds: number[];
+  setCategoryIds: (value: number[]) => void;
   currentSearchTerm: string; // Search term from SubjectPicker
   allSubjects: Subject[];
 }
 
 const SubjectSelector: React.FC<SubjectSelectorProps> = ({
-  cate_ids,
-  setCateIds,
+  categoryIds,
+  setCategoryIds,
   currentSearchTerm,
   allSubjects,
 }) => {
-  // Using cate_ids directly for selected state logic, no separate 'selected' state needed here for IDs.
-  // 'selectedSubjects' can be derived for display if needed, or just use allSubjects and filter by cate_ids.
+  // Using categoryIds directly for selected state logic, no separate 'selected' state needed here for IDs.
+  // 'selectedSubjects' can be derived for display if needed, or just use allSubjects and filter by categoryIds.
   const [hovered, setHovered] = useState<Subject | undefined>();
 
   const handleHover = useCallback(
@@ -34,13 +34,13 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
 
   // --- Start: Logic mostly from your original SubjectSelector ---
   const isSelected = useCallback(
-    (subject: Subject) => cate_ids.includes(subject.id), // Check against cate_ids prop
-    [cate_ids],
+    (subject: Subject) => categoryIds.includes(subject.id), // Check against categoryIds prop
+    [categoryIds],
   );
 
   const toggleSubject = useCallback(
     (subjectToToggle: Subject) => {
-      const currentIds = new Set(cate_ids);
+      const currentIds = new Set(categoryIds);
       if (currentIds.has(subjectToToggle.id)) {
         currentIds.delete(subjectToToggle.id);
       } else {
@@ -51,10 +51,10 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
           return;
         }
       }
-      setCateIds(Array.from(currentIds));
+      setCategoryIds(Array.from(currentIds));
       // The search input is now in SubjectPicker, so no setSearch("") here.
     },
-    [cate_ids, setCateIds],
+    [categoryIds, setCategoryIds],
   );
 
   const SubjectRow = React.memo(
@@ -68,7 +68,7 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
       handleHover: (s: Subject) => void;
     }) => {
       const subjectIsSelected = isSelected(subject); // Use the main isSelected function
-      const isDisabled = cate_ids.length >= 3 && !subjectIsSelected;
+      const isDisabled = categoryIds.length >= 3 && !subjectIsSelected;
 
       return (
         <li
@@ -112,7 +112,7 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({
     return allSubjects.filter((s) => s.name.toLowerCase().includes(searchTerm));
   }, [allSubjects, currentSearchTerm]);
 
-  const remainingSlots = 3 - cate_ids.length;
+  const remainingSlots = 3 - categoryIds.length;
 
   return (
     <Box

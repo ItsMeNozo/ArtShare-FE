@@ -83,7 +83,7 @@ const UploadPostPage: React.FC = () => {
 
     const fetchFilesFromUrls = async () => {
       try {
-        const aiImageMedias = selectedPrompt.image_urls.map((url) => ({
+        const aiImageMedias = selectedPrompt.imageUrls.map((url) => ({
           type: MEDIA_TYPE.IMAGE,
           url: url,
           file: new File([], 'temp_image.png', { type: 'image/png' }), // Placeholder file

@@ -1,4 +1,4 @@
-import { User } from "./user";
+import { User } from './user';
 
 /**Supported resources a comment can belong to (extend as you add more). */
 
@@ -11,24 +11,24 @@ export interface Comment {
   id: number;
 
   /** FK to Users table – always present even though `user` is expanded below */
-  user_id: string;
+  userId: string;
 
   /** If this is a reply, you get the parent’s id; otherwise null */
 
-  parent_comment_id: number | null;
+  parentCommentId: number | null;
 
   /** The resource being commented on (e.g. a post’s id) */
-  target_id: number;
+  targetId: number;
 
   /** Resource type – use the `TargetType` union above */
-  target_type: TargetType;
+  targetType: TargetType;
 
   /** The comment body */
   content: string;
 
-  created_at: Date;
-  updated_at: Date;
-  like_count: number;
+  createdAt: Date;
+  updatedAt: Date;
+  likeCount: number;
 
   /** Expanded author record (already defined in ./user) */
 
@@ -36,16 +36,16 @@ export interface Comment {
 
   /** Threaded replies – can be empty */
   replies: Comment[];
-  reply_count: number;
+  replyCount: number;
 }
 // @/types/comment.ts  (or keep it next to the API file)
 
 /** Payload sent to POST /comments/create */
 export interface CreateCommentDto {
   content: string;
-  target_id: number;
-  target_type: TargetType; // "POST" | "PHOTO" | ...
-  parent_comment_id?: number; // present only when replying
+  targetId: number;
+  targetType: TargetType; // "POST" | "PHOTO" | ...
+  parentCommentId?: number; // present only when replying
 }
 /** BE model + extra “view‑state” props the UI needs */
 export interface CommentUI extends Comment {

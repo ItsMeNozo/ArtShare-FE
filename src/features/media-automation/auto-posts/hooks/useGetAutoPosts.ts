@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Order } from '../../projects/types/automation-project';
 import { getAutoPosts } from '../api/auto-posts.api';
 import { AutoPostStatus } from '../types';
-import { autoPostKeys } from '../utilts/autoPostKeys';
+import { autoPostKeys } from '../utils/autoPostKeys';
 
 export interface UseGetAutoPostsOptions {
   projectId: number | undefined;

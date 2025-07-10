@@ -297,9 +297,9 @@ export default function PostMediaManager({
               >
                 <InfoMediaRemaining
                   currentImageCount={imageCount}
-                  MaxImage={MAX_IMAGES}
+                  maxImage={MAX_IMAGES}
                   hasVideo={hasVideo}
-                  MaxVideo={MAX_VIDEO}
+                  maxVideo={MAX_VIDEO}
                   hasAI={tabValue !== TabValue.BROWSE_GENAI}
                 />
                 <Tooltip title="Marked as an AI Post. Its prompt may appear in trending suggestions for others to reuse.">

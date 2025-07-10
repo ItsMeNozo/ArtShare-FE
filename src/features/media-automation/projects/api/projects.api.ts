@@ -11,7 +11,7 @@ import {
 export interface SaveAutoProjectPayload {
   title: string;
   description: string;
-  platform_id: number;
+  platformId: number;
 }
 
 export const createAutoProject = async (
@@ -56,5 +56,23 @@ export const getProjects = async (
 ): Promise<PaginatedResponse<AutoProjectListItem>> => {
   const queryParams = getQueryParams(params);
   const response = await api.get(`/auto-project${queryParams}`);
+  return response.data;
+};
+
+export const pauseProject = async (
+  projectId: number,
+): Promise<AutoProjectDetailsDto> => {
+  const response = await api.patch<AutoProjectDetailsDto>(
+    `/auto-project/${projectId}/pause`,
+  );
+  return response.data;
+};
+
+export const resumeProject = async (
+  projectId: number,
+): Promise<AutoProjectDetailsDto> => {
+  const response = await api.patch<AutoProjectDetailsDto>(
+    `/auto-project/${projectId}/resume`,
+  );
   return response.data;
 };

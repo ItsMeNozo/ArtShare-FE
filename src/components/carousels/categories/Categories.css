@@ -1,7 +1,7 @@
 .react-horizontal-scrolling-menu--scroll-container::-webkit-scrollbar {
-    display: none;
-  }
-  .react-horizontal-scrolling-menu--scroll-container {
-    scrollbarwidth: none;
-    -ms-overflow-style: none;
-  }
+  display: none;
+}
+.react-horizontal-scrolling-menu--scroll-container {
+  scrollbarwidth: none;
+  -ms-overflow-style: none;
+}

@@ -1,13 +1,13 @@
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion';
 
-import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface TabProps {
-  text: string
-  selected: boolean
-  setSelected: (text: string) => void
-  discount?: boolean
+  text: string;
+  selected: boolean;
+  setSelected: (text: string) => void;
+  discount?: boolean;
 }
 
 export function Tab({
@@ -20,29 +20,29 @@ export function Tab({
     <button
       onClick={() => setSelected(text)}
       className={cn(
-        "relative w-fit px-4 py-2 text-sm font-medium capitalize cursor-pointer",
-        "text-foreground transition-colors",
-        discount && "flex items-center justify-center gap-2.5"
+        'relative w-fit cursor-pointer px-4 py-2 text-sm font-medium capitalize',
+        'text-foreground transition-colors',
+        discount && 'flex items-center justify-center gap-2.5',
       )}
     >
-      <span className="z-10 relative">{text}</span>
+      <span className="relative z-10">{text}</span>
       {selected && (
         <motion.span
           layoutId="tab"
-          className="z-0 absolute inset-0 bg-background shadow-sm border border-mountain-100 rounded-full"
+          className="bg-background border-mountain-100 absolute inset-0 z-0 rounded-full border shadow-sm"
         />
       )}
       {discount && (
         <Badge
           variant="secondary"
           className={cn(
-            "relative z-10 bg-muted text-mountain-400 whitespace-nowrap shadow-none",
-            selected && "text-mountain-600"
+            'bg-muted text-mountain-400 relative z-10 whitespace-nowrap shadow-none',
+            selected && 'text-mountain-600',
           )}
         >
           Save 20%
         </Badge>
       )}
     </button>
-  )
+  );
 }

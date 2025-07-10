@@ -1,4 +1,4 @@
-import { PostMedia } from "../types/post-media";
+import { PostMedia } from '../types/post-media';
 
 export const getImageUrlsToRetain = (imageMedias: PostMedia[]): string[] => {
   return imageMedias
@@ -27,7 +27,7 @@ interface EditFormDataParams {
   title: string;
   imageUrlsToRetain: string[];
   newImageFiles: File[];
-  cate_ids: number[];
+  categoryIds: number[];
   thumbnailCropMeta: string;
   description?: string;
   videoUrl?: string;
@@ -41,7 +41,7 @@ export const createFormDataForEdit = ({
   title,
   imageUrlsToRetain,
   newImageFiles,
-  cate_ids,
+  categoryIds,
   thumbnailCropMeta,
   description,
   videoUrl,
@@ -51,25 +51,25 @@ export const createFormDataForEdit = ({
   aiCreated,
 }: EditFormDataParams) => {
   const formData = new FormData();
-  formData.append("title", title);
-  if (description !== undefined) formData.append("description", description);
+  formData.append('title', title);
+  if (description !== undefined) formData.append('description', description);
   // TODO: uncomment this
-  formData.append("cate_ids", JSON.stringify(cate_ids));
-  formData.append("video_url", videoUrl ?? "");
+  formData.append('categoryIds', JSON.stringify(categoryIds));
+  formData.append('videoUrl', videoUrl ?? '');
 
-  if (thumbnailUrl) formData.append("thumbnail_url", thumbnailUrl);
+  if (thumbnailUrl) formData.append('thumbnailUrl', thumbnailUrl);
   newImageFiles
     .filter((file) => file.size > 0) // ⛔️ exclude dummy
-    .forEach((file) => formData.append("images", file));
+    .forEach((file) => formData.append('images', file));
 
   if (imageUrlsToRetain.length > 0) {
-    formData.append("existing_image_urls", JSON.stringify(imageUrlsToRetain));
+    formData.append('existingImageUrls', JSON.stringify(imageUrlsToRetain));
   }
 
-  formData.append("is_mature", String(isMature));
-  formData.append("ai_created", String(aiCreated));
+  formData.append('isMature', String(isMature));
+  formData.append('aiCreated', String(aiCreated));
   formData.append(
-    "thumbnail_crop_meta",
+    'thumbnailCropMeta',
     JSON.stringify({
       ...JSON.parse(thumbnailCropMeta),
       initialThumbnail: initialThumbnail,

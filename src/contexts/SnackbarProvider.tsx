@@ -1,21 +1,21 @@
-import React, { useState, ReactNode } from "react";
-import { Snackbar, Alert, SnackbarOrigin } from "@mui/material";
-import { SnackbarContext } from "@/hooks/useSnackbar";
+import { SnackbarContext } from '@/hooks/useSnackbar';
+import { Alert, Snackbar, SnackbarOrigin } from '@mui/material';
+import React, { ReactNode, useState } from 'react';
 
 // Define a default anchor origin
 const DEFAULT_ANCHOR_ORIGIN: SnackbarOrigin = {
-  vertical: "bottom",
-  horizontal: "center",
+  vertical: 'bottom',
+  horizontal: 'center',
 };
 
 export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState<
-    "success" | "info" | "warning" | "error"
-  >("info");
+    'success' | 'info' | 'warning' | 'error'
+  >('info');
   const [actionNode, setActionNode] = useState<ReactNode>(null);
   // State to hold the anchorOrigin for the current snackbar
   const [currentAnchorOrigin, setCurrentAnchorOrigin] =
@@ -23,7 +23,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const showSnackbar = (
     msg: string,
-    sev: "success" | "info" | "warning" | "error" = "info",
+    sev: 'success' | 'info' | 'warning' | 'error' = 'info',
     action?: ReactNode,
     anchor?: SnackbarOrigin, // Receive anchorOrigin
   ) => {
@@ -56,7 +56,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({
           severity={severity}
           variant="standard"
           action={actionNode}
-          sx={{ width: "100%" }}
+          sx={{ width: '100%' }}
         >
           {message}
         </Alert>

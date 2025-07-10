@@ -1,8 +1,8 @@
-import api from "@/api/baseApi";
-import { PaginatedResponse } from "@/api/types/paginated-response.type";
-import { Blog } from "@/types/blog";
-import qs from "qs";
-import { BlogTab } from "../types";
+import api from '@/api/baseApi';
+import { PaginatedResponse } from '@/api/types/paginated-response.type';
+import { Blog } from '@/types/blog';
+import qs from 'qs';
+import { BlogTab } from '../types';
 
 interface FetchBlogsParams {
   page?: number;

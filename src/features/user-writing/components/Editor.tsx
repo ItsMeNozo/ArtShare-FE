@@ -1,40 +1,44 @@
-import { useEditor, EditorContent } from "@tiptap/react";
-import Bold from "@tiptap/extension-bold";
-import BulletList from "@tiptap/extension-bullet-list";
-import Color from "@tiptap/extension-color";
-import Document from "@tiptap/extension-document";
-import FontFamily from "@tiptap/extension-font-family";
-import Heading from "@tiptap/extension-heading";
-import Highlight from "@tiptap/extension-highlight";
-import Link from "@tiptap/extension-link";
-import ListItem from "@tiptap/extension-list-item";
-import Gapcursor from "@tiptap/extension-gapcursor";
-import Italic from "@tiptap/extension-italic";
-import Image from "@tiptap/extension-image";
-import ImageResize from "tiptap-extension-resize-image";
-import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import TableRow from "@tiptap/extension-table-row";
-import TaskItem from "@tiptap/extension-task-item";
-import TaskList from "@tiptap/extension-task-list";
-import Text from "@tiptap/extension-text";
-import TextAlign from "@tiptap/extension-text-align";
-import TextStyle from "@tiptap/extension-text-style";
-import Paragraph from "@tiptap/extension-paragraph";
-import History from "@tiptap/extension-history";
-import Underline from "@tiptap/extension-underline";
-import OrderedList from "@tiptap/extension-ordered-list";
-import Youtube from "@tiptap/extension-youtube";
-import Placeholder from "@tiptap/extension-placeholder";
-import { FontSizeExtension } from "../extensions/font-size";
-import { LineHeightExtension } from "../extensions/line-height";
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { useEditorStore } from "../stores/use-editor-store";
-import { Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { EditorView } from "@tiptap/pm/view";
-import { Mark, MarkType, ResolvedPos } from "@tiptap/pm/model";
-import "./Editor.css";
+import Bold from '@tiptap/extension-bold';
+import BulletList from '@tiptap/extension-bullet-list';
+import Color from '@tiptap/extension-color';
+import Document from '@tiptap/extension-document';
+import FontFamily from '@tiptap/extension-font-family';
+import Gapcursor from '@tiptap/extension-gapcursor';
+import Heading from '@tiptap/extension-heading';
+import Highlight from '@tiptap/extension-highlight';
+import History from '@tiptap/extension-history';
+import Image from '@tiptap/extension-image';
+import Italic from '@tiptap/extension-italic';
+import Link from '@tiptap/extension-link';
+import ListItem from '@tiptap/extension-list-item';
+import OrderedList from '@tiptap/extension-ordered-list';
+import Paragraph from '@tiptap/extension-paragraph';
+import Placeholder from '@tiptap/extension-placeholder';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
+import Text from '@tiptap/extension-text';
+import TextAlign from '@tiptap/extension-text-align';
+import TextStyle from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
+import Youtube from '@tiptap/extension-youtube';
+import {
+  Mark,
+  MarkType,
+  Node as ProseMirrorNode,
+  ResolvedPos,
+} from '@tiptap/pm/model';
+import { EditorView } from '@tiptap/pm/view';
+import { EditorContent, useEditor } from '@tiptap/react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
+import ImageResize from 'tiptap-extension-resize-image';
+import { FontSizeExtension } from '../extensions/font-size';
+import { LineHeightExtension } from '../extensions/line-height';
+import { useEditorStore } from '../stores/use-editor-store';
+import './Editor.css';
 
 interface EditorProps {
   onChange?: () => void;
@@ -227,7 +231,7 @@ const LinkEditModal = ({
   onSave,
   position,
 }: LinkModalProps) => {
-  const [url, setUrl] = useState(currentUrl || "");
+  const [url, setUrl] = useState(currentUrl || '');
 
   if (!isOpen) return null;
 
@@ -237,16 +241,16 @@ const LinkEditModal = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSave();
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       onClose();
     }
   };
 
   return (
     <div
-      className="fixed bg-white dark:bg-mountain-800 border border-gray-200 dark:border-mountain-600 rounded-md shadow-lg p-3 z-50 min-w-80"
+      className="dark:bg-mountain-800 dark:border-mountain-600 fixed z-50 min-w-80 rounded-md border border-gray-200 bg-white p-3 shadow-lg"
       style={{ left: `${position.x}px`, top: `${position.y}px` }}
     >
       <div className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -258,19 +262,19 @@ const LinkEditModal = ({
         onChange={(e) => setUrl(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Enter URL..."
-        className="w-full px-3 py-2 border border-gray-300 dark:border-mountain-600 rounded-md text-sm bg-white dark:bg-mountain-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+        className="dark:border-mountain-600 dark:bg-mountain-700 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-gray-100 dark:placeholder-gray-400 dark:focus:ring-blue-400"
         autoFocus
       />
       <div className="mt-2 flex gap-2">
         <button
           onClick={handleSave}
-          className="px-3 py-1 bg-blue-500 dark:bg-blue-600 text-white text-sm rounded hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
+          className="rounded bg-blue-500 px-3 py-1 text-sm text-white transition-colors hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
         >
           Save
         </button>
         <button
           onClick={onClose}
-          className="px-3 py-1 bg-gray-300 dark:bg-mountain-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-400 dark:hover:bg-mountain-500 transition-colors"
+          className="dark:bg-mountain-600 dark:hover:bg-mountain-500 rounded bg-gray-300 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-400 dark:text-gray-200"
         >
           Cancel
         </button>
@@ -289,7 +293,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
     view: EditorView | null;
   }>({
     isOpen: false,
-    url: "",
+    url: '',
     position: { x: 0, y: 0 },
     linkRange: null,
     view: null,
@@ -299,7 +303,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
     {
       immediatelyRender: true,
       editable: true,
-      content: "",
+      content: '',
       extensions: [
         Bold,
         BulletList,
@@ -313,8 +317,8 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
         History,
         ListItem,
         LineHeightExtension.configure({
-          types: ["heading", "paragraph"],
-          defaultLineHeight: "normal",
+          types: ['heading', 'paragraph'],
+          defaultLineHeight: 'normal',
         }),
         Paragraph,
         Italic,
@@ -327,11 +331,11 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
         TaskList,
         TaskItem.configure({ nested: true }),
         Text,
-        TextAlign.configure({ types: ["heading", "paragraph"] }),
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
         TextStyle,
         Underline,
         OrderedList,
-        Placeholder.configure({ placeholder: "Write something …" }),
+        Placeholder.configure({ placeholder: 'Write something …' }),
         Youtube.configure({
           inline: true,
           controls: true,
@@ -341,15 +345,15 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
           openOnClick: false,
           autolink: true,
           HTMLAttributes: {
-            target: "_blank",
-            rel: "noopener noreferrer",
+            target: '_blank',
+            rel: 'noopener noreferrer',
           },
         }),
       ],
       editorProps: {
         attributes: {
           class: `focus:outline-none print:border-0 bg-white dark:bg-mountain-800 border border-[#C7C7C7] dark:border-mountain-600 flex flex-col min-h-full w-[816px] cursor-text reset-tailwind p-10 text-gray-900 dark:text-gray-100`,
-          style: "all:revert;",
+          style: 'all:revert;',
         },
         handleClick: (view, pos, event) => {
           const { schema, doc } = view.state;
@@ -360,7 +364,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
 
           if (link && (event.ctrlKey || event.metaKey)) {
             event.preventDefault();
-            window.open(link.attrs.href, "_blank", "noopener,noreferrer");
+            window.open(link.attrs.href, '_blank', 'noopener,noreferrer');
             return true;
           }
           return false;
@@ -382,33 +386,33 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
             if (link) {
               event.preventDefault();
 
-              const contextMenu = document.createElement("div");
+              const contextMenu = document.createElement('div');
               // Check if dark mode is active
               const isDarkMode =
-                document.documentElement.classList.contains("dark");
+                document.documentElement.classList.contains('dark');
               contextMenu.className = isDarkMode
-                ? "fixed bg-mountain-800 border border-mountain-600 rounded-md shadow-lg p-1 z-50"
-                : "fixed bg-white border border-gray-200 rounded-md shadow-lg p-1 z-50";
+                ? 'fixed bg-mountain-800 border border-mountain-600 rounded-md shadow-lg p-1 z-50'
+                : 'fixed bg-white border border-gray-200 rounded-md shadow-lg p-1 z-50';
               contextMenu.style.left = `${event.clientX}px`;
               contextMenu.style.top = `${event.clientY}px`;
 
               // Open Link option
-              const openButton = document.createElement("button");
+              const openButton = document.createElement('button');
               openButton.className = isDarkMode
-                ? "block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-mountain-700 rounded"
-                : "block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded";
-              openButton.innerHTML = "🔗 Open Link";
+                ? 'block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-mountain-700 rounded'
+                : 'block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded';
+              openButton.innerHTML = '🔗 Open Link';
               openButton.onclick = () => {
-                window.open(link.attrs.href, "_blank", "noopener,noreferrer");
+                window.open(link.attrs.href, '_blank', 'noopener,noreferrer');
                 document.body.removeChild(contextMenu);
               };
 
               // Edit Link option
-              const editButton = document.createElement("button");
+              const editButton = document.createElement('button');
               editButton.className = isDarkMode
-                ? "block w-full text-left px-3 py-2 text-sm hover:bg-blue-800/30 text-blue-400 rounded"
-                : "block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue-600 rounded";
-              editButton.innerHTML = "✏️ Edit Link";
+                ? 'block w-full text-left px-3 py-2 text-sm hover:bg-blue-800/30 text-blue-400 rounded'
+                : 'block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue-600 rounded';
+              editButton.innerHTML = '✏️ Edit Link';
               editButton.onclick = () => {
                 const linkRange = findLinkRange(doc, pos.pos, link);
                 setLinkModal({
@@ -422,11 +426,11 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
               };
 
               // Remove Link option
-              const unlinkButton = document.createElement("button");
+              const unlinkButton = document.createElement('button');
               unlinkButton.className = isDarkMode
-                ? "block w-full text-left px-3 py-2 text-sm hover:bg-red-800/30 text-red-400 rounded"
-                : "block w-full text-left px-3 py-2 text-sm hover:bg-red-50 text-red-600 rounded";
-              unlinkButton.innerHTML = "🔓 Remove Link";
+                ? 'block w-full text-left px-3 py-2 text-sm hover:bg-red-800/30 text-red-400 rounded'
+                : 'block w-full text-left px-3 py-2 text-sm hover:bg-red-50 text-red-600 rounded';
+              unlinkButton.innerHTML = '🔓 Remove Link';
               unlinkButton.onclick = () => {
                 const $pos = view.state.doc.resolve(pos.pos);
                 const markRange = getMarkRange($pos, schema.marks.link);
@@ -460,10 +464,10 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
                 if (document.body.contains(contextMenu)) {
                   document.body.removeChild(contextMenu);
                 }
-                document.removeEventListener("click", removeMenu);
+                document.removeEventListener('click', removeMenu);
               };
               setTimeout(
-                () => document.addEventListener("click", removeMenu),
+                () => document.addEventListener('click', removeMenu),
                 0,
               );
 
@@ -517,7 +521,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
     getImages: () => {
       const images: { src: string; alt?: string; title?: string }[] = [];
       editor?.state.doc.descendants((node) => {
-        if (node.type.name === "image") {
+        if (node.type.name === 'image') {
           images.push({
             src: node.attrs.src,
             alt: node.attrs.alt,
@@ -531,7 +535,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
       if (editor && !editor.isDestroyed) {
         editor.chain().focus().run();
         setTimeout(() => {
-          const dom = document.querySelector(".tiptap");
+          const dom = document.querySelector('.tiptap');
           if (dom) {
             (dom as HTMLElement).focus();
           }
@@ -544,7 +548,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
     <>
       <EditorContent
         editor={editor}
-        className="max-w-full prose dark:prose-invert"
+        className="prose dark:prose-invert max-w-full"
       />
       <LinkEditModal
         isOpen={linkModal.isOpen}

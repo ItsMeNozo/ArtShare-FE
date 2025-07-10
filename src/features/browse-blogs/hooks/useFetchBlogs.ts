@@ -1,7 +1,7 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { BlogTab } from "../types";
-import { searchBlogs } from "../api/search-blogs.api";
-import { fetchBlogs } from "../api/fetch-blogs.api";
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { fetchBlogs } from '../api/fetch-blogs.api';
+import { searchBlogs } from '../api/search-blogs.api';
+import { BlogTab } from '../types';
 
 interface FetchBlogsParams {
   tab: BlogTab | null;
@@ -10,7 +10,7 @@ interface FetchBlogsParams {
 
 export function useFetchBlogs({ tab, searchQuery }: FetchBlogsParams) {
   return useInfiniteQuery({
-    queryKey: searchQuery ? ["blogsSearch", searchQuery] : ["blogs", tab],
+    queryKey: searchQuery ? ['blogsSearch', searchQuery] : ['blogs', tab],
     queryFn: ({ pageParam = 1 }) => {
       if (searchQuery) {
         return searchBlogs({
@@ -19,7 +19,7 @@ export function useFetchBlogs({ tab, searchQuery }: FetchBlogsParams) {
         });
       }
       if (!tab) {
-        throw new Error("Tab is required when not searching");
+        throw new Error('Tab is required when not searching');
       }
       return fetchBlogs(tab, { page: pageParam });
     },

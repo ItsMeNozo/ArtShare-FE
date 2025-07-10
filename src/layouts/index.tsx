@@ -1,8 +1,6 @@
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="flex dark:bg-mountain-950 overflow-hidden">
-      {children}
-    </div>
+    <div className="dark:bg-mountain-950 flex overflow-hidden">{children}</div>
   );
 };
 

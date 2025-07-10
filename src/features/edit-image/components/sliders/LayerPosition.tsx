@@ -1,4 +1,4 @@
-import { Input } from "@mui/material";
+import { Input } from '@mui/material';
 
 export default function LayerPosition({
   label,
@@ -16,15 +16,15 @@ export default function LayerPosition({
     }
   };
   return (
-    <div className="flex items-center space-x-2 w-1/2">
+    <div className="flex w-1/2 items-center space-x-2">
       <p>{label}:</p>
       <Input
         type="number"
         inputMode="numeric"
-        className="p-2 w-16 text-sm text-right"
+        className="w-16 p-2 text-right text-sm"
         value={position}
         onChange={handleInputChange}
-        style={{ direction: "ltr" }}
+        style={{ direction: 'ltr' }}
       />
     </div>
   );

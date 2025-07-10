@@ -1,6 +1,6 @@
 // In Categories.tsx or your separate ImageWithFallback.tsx file
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
 
 interface ImageWithFallbackProps {
   src?: string;
@@ -16,7 +16,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   alt,
   className,
   fallbackClassName, // Can be used for specific styling on the fallback <img> wrapper if needed
-  fallbackSrc = "/logo_app_v_101.png", // Default to your logo
+  fallbackSrc = '/logo_app_v_101.png', // Default to your logo
 }) => {
   const [error, setError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(src);
@@ -39,7 +39,7 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
       <img
         src={fallbackSrc} // Use the provided or default fallback source
         alt={`${alt} (fallback)`} // Indicate it's a fallback
-        className={`${className} ${fallbackClassName || ""}`} // Apply same class for sizing and styling
+        className={`${className} ${fallbackClassName || ''}`} // Apply same class for sizing and styling
         // You might not want onError for the fallback itself, or handle it differently
         // onError={() => console.warn(`Fallback image ${fallbackSrc} also failed to load.`)}
       />

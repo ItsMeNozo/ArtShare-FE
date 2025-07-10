@@ -25,7 +25,7 @@ export const postsToPhotos = async (
 const transformPostToPhoto = (post: Post): Promise<GalleryPhoto | null> => {
   return new Promise((resolve) => {
     const thumbnailUrl =
-      post.thumbnail_url ||
+      post.thumbnailUrl ||
       post.medias[0]?.url ||
       'https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg';
     const image = new Image();
@@ -43,11 +43,11 @@ const transformPostToPhoto = (post: Post): Promise<GalleryPhoto | null> => {
         author: post.user?.username || 'Unknown Author',
         postLength: post.medias?.length ?? 0,
         postId: post.id,
-        is_mature: post.is_mature,
-        ai_created: post.ai_created,
-        like_count: post.like_count,
-        comment_count: post.comment_count,
-        view_count: post.view_count,
+        isMature: post.isMature,
+        aiCreated: post.aiCreated,
+        likeCount: post.likeCount,
+        commentCount: post.commentCount,
+        viewCount: post.viewCount,
       });
     };
 
@@ -56,4 +56,18 @@ const transformPostToPhoto = (post: Post): Promise<GalleryPhoto | null> => {
       resolve(null);
     };
   });
+};
+
+export const transformToPostType = (posts: Post[]): Post[] => {
+  return posts.map((post) => ({
+    ...post,
+    src: post.thumbnailUrl || (post.medias && post.medias[0]?.url) || '',
+    width: 1,
+    height: 1,
+    isMature: post.isMature,
+    aiCreated: post.aiCreated,
+    likeCount: post.likeCount,
+    commentCount: post.commentCount,
+    viewCount: post.viewCount,
+  }));
 };

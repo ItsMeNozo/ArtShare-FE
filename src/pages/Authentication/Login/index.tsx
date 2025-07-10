@@ -25,7 +25,7 @@ const Login = () => {
   // Navigate when user state changes after successful login
   useEffect(() => {
     if (user && !loading) {
-      if (!user.is_onboard) {
+      if (!user.isOnboard) {
         navigate('/onboarding');
       } else {
         navigate('/explore');
@@ -189,15 +189,15 @@ const Login = () => {
   }
 
   return (
-    <div className="flex-1 space-y-4 px-10 md:px-0 lg:px-20 py-8">
+    <div className="flex-1 space-y-4 px-10 py-8 md:px-0 lg:px-20">
       <div className="flex flex-col space-x-3">
-        <h1 className="font-bold text-mountain-800 dark:text-mountain-50 text-xl xl:text-2xl leading-6">
+        <h1 className="text-mountain-800 dark:text-mountain-50 text-xl leading-6 font-bold xl:text-2xl">
           Welcome back!
         </h1>
-        <p className="mt-2 font-bold text-mountain-600 dark:text-mountain-300 text-xl xl:text-2xl">
+        <p className="text-mountain-600 dark:text-mountain-300 mt-2 text-xl font-bold xl:text-2xl">
           Login to your account
         </p>
-        <p className="mt-4 text-mountain-500 dark:text-mountain-300 text-xs xl:text-sm">
+        <p className="text-mountain-500 dark:text-mountain-300 mt-4 text-xs xl:text-sm">
           It's nice to see you again. Ready to showcase your art?
         </p>
       </div>
@@ -205,14 +205,14 @@ const Login = () => {
         <div>
           <label
             htmlFor="username"
-            className="block font-semibold text-mountain-600 dark:text-mountain-50 text-sm"
+            className="text-mountain-600 dark:text-mountain-50 block text-sm font-semibold"
           >
             Email
           </label>
           <Input
             type="email"
             placeholder="Enter your username or email"
-            className="dark:bg-mountain-900 shadow-sm mt-1 p-3 border border-mountain-800 rounded-lg focus:ring-indigo-500 w-full h-10 text-mountain-950 dark:text-mountain-50"
+            className="dark:bg-mountain-900 border-mountain-800 text-mountain-950 dark:text-mountain-50 mt-1 h-10 w-full rounded-lg border p-3 shadow-sm focus:ring-indigo-500"
             value={email}
             onChange={(e) => {
               handleEmailChange(e);
@@ -220,7 +220,7 @@ const Login = () => {
           />
           {/* Display error and success messages */}
           {emailError && emailError.length > 0 && (
-            <p className="mt-2 text-red-600 dark:text-red-400 text-sm">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
               {emailError}
             </p>
           )}
@@ -228,36 +228,36 @@ const Login = () => {
         <div>
           <label
             htmlFor="password"
-            className="block font-medium text-mountain-600 dark:text-mountain-50 text-sm"
+            className="text-mountain-600 dark:text-mountain-50 block text-sm font-medium"
           >
             Password
           </label>
           <Input
             type="password"
             placeholder="Enter your password"
-            className="dark:bg-mountain-900 shadow-sm mt-1 p-3 border border-mountain-800 rounded-lg focus:ring-indigo-500 w-full h-10 text-mountain-950 dark:text-mountain-50"
+            className="dark:bg-mountain-900 border-mountain-800 text-mountain-950 dark:text-mountain-50 mt-1 h-10 w-full rounded-lg border p-3 shadow-sm focus:ring-indigo-500"
             value={password}
             onChange={handlePasswordChange}
           />
           {/* Display error and success messages */}
           {passwordError && passwordError.length > 0 && (
-            <p className="mt-2 text-red-600 dark:text-red-400 text-sm">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
               {passwordError}
             </p>
           )}
         </div>
-        <div className="flex justify-between items-center mt-4">
-          <label className="flex items-center text-mountain-500 text-sm">
+        <div className="mt-4 flex items-center justify-between">
+          <label className="text-mountain-500 flex items-center text-sm">
             <input type="checkbox" className="mr-2" />
             Remember me
           </label>
-          <div className="text-indigo-600 dark:text-indigo-300 text-sm">
+          <div className="text-sm text-indigo-600 dark:text-indigo-300">
             <Link to="/forgot-password">Forgot username or password?</Link>
           </div>
         </div>
         <Button
           type="submit"
-          className="bg-mountain-800 hover:bg-mountain-700 dark:bg-gradient-to-r dark:from-blue-800 dark:via-purple-700 dark:to-pink-900 hover:brightness-110 py-3 rounded-lg focus:ring-indigo-500 w-full h-10 font-bold text-mountain-50 hover:cursor-pointer"
+          className="bg-mountain-800 hover:bg-mountain-700 text-mountain-50 h-10 w-full rounded-lg py-3 font-bold hover:cursor-pointer hover:brightness-110 focus:ring-indigo-500 dark:bg-gradient-to-r dark:from-blue-800 dark:via-purple-700 dark:to-pink-900"
         >
           Login
         </Button>
@@ -265,25 +265,25 @@ const Login = () => {
 
       {/* Display error and success messages */}
       {error && error.length > 0 && (
-        <p className="mt-4 text-red-600 dark:text-red-400 text-sm">{error}</p>
+        <p className="mt-4 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
       {message && (
-        <p className="mt-4 text-green-600 dark:text-green-400 text-sm">
+        <p className="mt-4 text-sm text-green-600 dark:text-green-400">
           {message}
         </p>
       )}
 
-      <div className="flex items-center space-x-4 mt-6 text-center">
-        <hr className="border-mountain-900 border-t-1 w-full" />
+      <div className="mt-6 flex items-center space-x-4 text-center">
+        <hr className="border-mountain-900 w-full border-t-1" />
         <div className="text-mountain-600 text-sm">Or</div>
-        <hr className="border-mountain-900 border-t-1 w-full" />
+        <hr className="border-mountain-900 w-full border-t-1" />
       </div>
 
-      <div className="flex flex-col justify-between space-x-4 space-y-4 mt-4">
+      <div className="mt-4 flex flex-col justify-between space-y-4 space-x-4">
         <div className="flex w-full">
           <Button
             variant={'outline'}
-            className="flex justify-center items-center hover:brightness-115 px-4 py-3 border border-mountain-950 dark:border-mountain-700 rounded-lg w-full h-10 font-normal text-mountain-950 dark:text-mountain-50 text-sm hover:cursor-pointer"
+            className="border-mountain-950 dark:border-mountain-700 text-mountain-950 dark:text-mountain-50 flex h-10 w-full items-center justify-center rounded-lg border px-4 py-3 text-sm font-normal hover:cursor-pointer hover:brightness-115"
             onClick={handleGoogleLogin}
           >
             <FcGoogle className="size-5" />
@@ -303,7 +303,7 @@ const Login = () => {
           </Link>
         </p>
       </div>
-      <div className="mt-4 text-[10px] text-mountain-500 dark:text-mountain-300 xl:text-xs lg:text-left text-center">
+      <div className="text-mountain-500 dark:text-mountain-300 mt-4 text-center text-[10px] lg:text-left xl:text-xs">
         <p>
           By logging in to ArtShare, I confirm that I have read and agree to the
           ArtShare{' '}

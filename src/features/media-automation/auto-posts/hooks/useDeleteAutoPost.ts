@@ -3,7 +3,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteAutoPost } from '../api/auto-posts.api';
-import { autoPostKeys } from '../utilts/autoPostKeys';
+import { autoPostKeys } from '../utils/autoPostKeys';
 
 interface UseDeleteAutoPostOptions {
   onSuccess?: () => void;

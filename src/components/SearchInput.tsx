@@ -1,7 +1,7 @@
-import React from "react";
-import { Paper, Input } from "@mui/material";
-import { FiSearch } from "react-icons/fi";
-import { TiDeleteOutline } from "react-icons/ti";
+import { Input, Paper } from '@mui/material';
+import React from 'react';
+import { FiSearch } from 'react-icons/fi';
+import { TiDeleteOutline } from 'react-icons/ti';
 
 interface SearchInputProps {
   searchQuery: string;
@@ -12,26 +12,26 @@ interface SearchInputProps {
 export const SearchInput: React.FC<SearchInputProps> = ({
   searchQuery,
   onSearchChange,
-  placeholder = "Search...",
+  placeholder = 'Search...',
 }) => {
   return (
     <Paper
       component="form"
       onSubmit={(e) => e.preventDefault()}
       sx={{
-        p: "2px 4px",
-        display: "flex",
-        alignItems: "center",
-        borderRadius: "16px",
-        border: "1px solid",
-        borderColor: "grey.400",
-        boxShadow: "none",
-        bgcolor: "background.paper",
+        p: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+        borderRadius: '16px',
+        border: '1px solid',
+        borderColor: 'grey.400',
+        boxShadow: 'none',
+        bgcolor: 'background.paper',
         height: 40,
         minWidth: 256,
       }}
     >
-      <FiSearch style={{ margin: "0 8px", color: "grey.600" }} />
+      <FiSearch style={{ margin: '0 8px', color: 'grey.600' }} />
       <Input
         placeholder={placeholder}
         disableUnderline
@@ -44,13 +44,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({
       {searchQuery && (
         <TiDeleteOutline
           style={{
-            margin: "0 8px",
-            color: "grey.600",
-            cursor: "pointer",
+            margin: '0 8px',
+            color: 'grey.600',
+            cursor: 'pointer',
             width: 20,
             height: 20,
           }}
-          onClick={() => onSearchChange("")}
+          onClick={() => onSearchChange('')}
         />
       )}
     </Paper>

@@ -1,11 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLoading } from '@/contexts/Loading/useLoading';
+import { subscriptionKeys } from '@/lib/react-query/query-keys';
+import { extractApiErrorMessage } from '@/utils/error.util';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   generatePostContent,
   GeneratePostContentResponse,
-} from "../api/generate-post-content.api";
-import { extractApiErrorMessage } from "@/utils/error.util";
-import { subscriptionKeys } from "@/lib/react-query/query-keys";
-import { useLoading } from "@/contexts/Loading/useLoading";
+} from '../api/generate-post-content.api';
 
 interface UseGeneratePostContentOptions {
   onSuccess?: (data: GeneratePostContentResponse) => void;
@@ -20,14 +20,14 @@ export const useGeneratePostContent = (
 
   return useMutation<GeneratePostContentResponse, Error, FormData>({
     mutationFn: generatePostContent,
-    onMutate: () => showLoading("Generating..."),
+    onMutate: () => showLoading('Generating...'),
 
     onSuccess: (data) => {
       options?.onSuccess?.(data);
     },
 
     onError: (error) => {
-      const message = extractApiErrorMessage(error, "Error generating content");
+      const message = extractApiErrorMessage(error, 'Error generating content');
       options?.onError?.(message);
     },
 

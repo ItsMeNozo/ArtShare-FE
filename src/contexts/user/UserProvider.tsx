@@ -119,7 +119,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       value={{
         user: logoutInProgress ? null : user, // Immediately show logged out state
         isAuthenticated: logoutInProgress ? false : !!user,
-        isOnboard: logoutInProgress ? false : (user?.is_onboard ?? false),
+        isOnboard: logoutInProgress ? false : (user?.isOnboard ?? false),
         error,
         loading,
         loginWithEmail,

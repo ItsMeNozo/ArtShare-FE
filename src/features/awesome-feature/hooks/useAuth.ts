@@ -1,1 +1,1 @@
-  // Authentication hook
+// Authentication hook

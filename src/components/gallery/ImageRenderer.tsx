@@ -14,7 +14,7 @@ export const ImageRenderer = (
   const { photo, height, width, index } = context;
 
   const imageClassName = `w-full h-full object-cover rounded-lg ${
-    photo.is_mature ? 'filter blur-md' : ''
+    photo.isMature ? 'filter blur-md' : ''
   }`;
 
   return (
@@ -37,7 +37,7 @@ export const ImageRenderer = (
         />
 
         {/* Mature Content Warning Overlay */}
-        {photo.is_mature && (
+        {photo.isMature && (
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/60 p-4 text-white">
             <p className="text-center text-sm font-light uppercase">
               Mature Content
@@ -53,7 +53,7 @@ export const ImageRenderer = (
                 <Images size={14} />
               </div>
 
-              {photo.ai_created && (
+              {photo.aiCreated && (
                 <img
                   src="/logo_app_v_101.png"
                   alt="AI Generated"
@@ -73,19 +73,19 @@ export const ImageRenderer = (
             <div className="flex flex-col items-end space-y-0.5">
               <div className="flex items-center space-x-1">
                 <p className="text-xs font-medium">
-                  {formatCount(photo.like_count)}
+                  {formatCount(photo.likeCount)}
                 </p>
                 <AiOutlineLike className="size-3.5" />
               </div>
               <div className="flex items-center space-x-1">
                 <p className="text-xs font-medium">
-                  {formatCount(photo.comment_count)}
+                  {formatCount(photo.commentCount)}
                 </p>
                 <BiCommentDetail className="size-3.5 text-white" />
               </div>
               <div className="flex items-center space-x-1">
                 <p className="text-xs font-medium">
-                  {formatCount(photo.view_count)}
+                  {formatCount(photo.viewCount)}
                 </p>
                 <HiOutlineEye className="size-3.5" />
               </div>

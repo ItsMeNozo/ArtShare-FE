@@ -1,11 +1,14 @@
-import React from 'react'
-import { Box, BoxProps } from '@mui/material'
+import { Box, BoxProps } from '@mui/material';
+import React from 'react';
 
-export const MediaPreviewContainer: React.FC<BoxProps> = ({ children, ...props }) => (
+export const MediaPreviewContainer: React.FC<BoxProps> = ({
+  children,
+  ...props
+}) => (
   <Box
-    className="flex flex-col justify-center items-center bg-mountain-100 border border-gray-500 border-dashed rounded-lg w-full h-full"
+    className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
     {...props}
   >
     {children}
   </Box>
-)
+);

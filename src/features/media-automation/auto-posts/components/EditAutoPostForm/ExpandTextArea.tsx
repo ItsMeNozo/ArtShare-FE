@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import parse from 'html-react-parser';
 import { Typography } from '@mui/material';
+import parse from 'html-react-parser';
+import React, { useState } from 'react';
 
 interface PostContentProps {
   content: string;
@@ -22,13 +22,17 @@ export const ExpandablePostContent: React.FC<PostContentProps> = ({
     : parse(rawText.slice(0, limit) + '...');
 
   return (
-    <div className="p-4 pt-0 text-gray-800 text-base">
-      <Typography variant="body2" component="div" sx={{ whiteSpace: 'pre-line' }}>
+    <div className="p-4 pt-0 text-base text-gray-800">
+      <Typography
+        variant="body2"
+        component="div"
+        sx={{ whiteSpace: 'pre-line' }}
+      >
         {displayedContent}
         {shouldTruncate && (
           <span
             onClick={() => setExpanded(!expanded)}
-            className='ml-2 font-medium text-mountain-600 hover:underline cursor-pointer'
+            className="text-mountain-600 ml-2 cursor-pointer font-medium hover:underline"
           >
             {expanded ? 'See less' : 'See more'}
           </span>

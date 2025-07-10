@@ -83,7 +83,7 @@ const PostForm: React.FC<PostFormProps> = ({
         setFieldValue('title', title);
         setFieldValue('description', description);
         setFieldValue(
-          'cate_ids',
+          'categoryIds',
           categories.map((cate) => cate.id),
         );
       },

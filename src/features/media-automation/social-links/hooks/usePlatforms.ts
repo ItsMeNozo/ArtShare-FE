@@ -3,10 +3,10 @@ import { AxiosError } from 'axios';
 import { Platform } from '../../projects/types/platform';
 import { disconnectPlatform, fetchPlatforms } from '../api/platforms.api';
 
-export const useFetchPlatforms = () => {
+export const useFetchPlatforms = (platformName: string) => {
   return useQuery<Platform[], AxiosError>({
-    queryKey: ['platforms'],
-    queryFn: fetchPlatforms,
+    queryKey: ['platforms', platformName],
+    queryFn: () => fetchPlatforms(platformName),
     staleTime: 1000 * 60 * 5,
   });
 };

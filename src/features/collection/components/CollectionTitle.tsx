@@ -2,25 +2,29 @@ import {
   Box,
   CircularProgress,
   IconButton,
+  Menu,
+  MenuItem,
   Stack,
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+} from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FiX as CancelIcon,
-  FiEdit as EditIcon,
+  FiMoreVertical as MoreIcon,
   FiCheck as SaveIcon,
-} from "react-icons/fi";
+} from 'react-icons/fi';
 
 interface CollectionTitleProps {
   title: string;
   itemCountText: string;
   isEditable: boolean;
+  isPrivate: boolean;
   isLoading?: boolean;
   error?: string | null;
   onSave: (newName: string) => Promise<void>;
+  onSetPrivacy: (isPrivate: boolean) => Promise<void>;
   isEditing: boolean;
   onEditRequest: () => void;
   onEditCancel: () => void;
@@ -31,9 +35,11 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   title,
   itemCountText,
   isEditable,
+  isPrivate,
   isLoading = false,
   error,
   onSave,
+  onSetPrivacy,
   isEditing,
   onEditRequest,
   onEditCancel,
@@ -43,6 +49,27 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorEl);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleRenameClick = () => {
+    handleMenuClose();
+    requestEditMode();
+  };
+
+  const handlePrivacyClick = async () => {
+    handleMenuClose();
+    // Assuming onSetPrivacy will handle the API call and state update
+    await onSetPrivacy(!isPrivate);
+  };
 
   useEffect(() => {
     if (!isEditing) {
@@ -69,7 +96,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   const handleSave = useCallback(async () => {
     const newNameTrimmed = editedTitle.trim();
 
-    if (newNameTrimmed === "" || newNameTrimmed === title) {
+    if (newNameTrimmed === '' || newNameTrimmed === title) {
       cancelEditMode();
       return;
     }
@@ -84,7 +111,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
     );
 
     if (isDuplicate) {
-      setSaveError("A collection with this name already exists.");
+      setSaveError('A collection with this name already exists.');
       setIsSaving(false);
       return;
     }
@@ -94,9 +121,9 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
     try {
       await onSave(newNameTrimmed);
     } catch (err) {
-      console.error("Error saving title:", err);
+      console.error('Error saving title:', err);
       setSaveError(
-        err instanceof Error ? err.message : "Failed to save title.",
+        err instanceof Error ? err.message : 'Failed to save title.',
       );
     } finally {
       setIsSaving(false);
@@ -126,8 +153,8 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
               autoFocus
               disabled={isSaving || isLoading}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !isSaving) handleSave();
-                if (e.key === "Escape" && !isSaving) cancelEditMode();
+                if (e.key === 'Enter' && !isSaving) handleSave();
+                if (e.key === 'Escape' && !isSaving) cancelEditMode();
               }}
               error={!!saveError}
               sx={{ flexGrow: 1, maxWidth: 400 }}
@@ -141,7 +168,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
                   disabled={
                     isSaving ||
                     isLoading ||
-                    editedTitle.trim() === "" ||
+                    editedTitle.trim() === '' ||
                     editedTitle.trim() === title
                   }
                 >
@@ -170,7 +197,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
           <>
             {/* Display Mode */}
             <Typography variant="h6" component="h2" fontWeight="normal" noWrap>
-              {isLoading ? "Loading Title..." : title}
+              {isLoading ? 'Loading Title...' : title}
             </Typography>
             {!isLoading && (
               <Typography
@@ -182,18 +209,30 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
               </Typography>
             )}
             {isEditable && !isLoading && (
-              <Tooltip title="Rename Collection">
-                <IconButton
-                  size="small"
-                  onClick={requestEditMode}
-                  sx={{
-                    opacity: isHovered ? 1 : 0,
-                    transition: "opacity 0.2s ease-in-out",
-                  }}
+              <>
+                <Tooltip title="Options">
+                  <IconButton
+                    size="small"
+                    onClick={handleMenuOpen}
+                    sx={{
+                      opacity: isHovered || isMenuOpen ? 1 : 0,
+                      transition: 'opacity 0.2s ease-in-out',
+                    }}
+                  >
+                    <MoreIcon fontSize={20} />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={isMenuOpen}
+                  onClose={handleMenuClose}
                 >
-                  <EditIcon fontSize={20} />
-                </IconButton>
-              </Tooltip>
+                  <MenuItem onClick={handleRenameClick}>Rename</MenuItem>
+                  <MenuItem onClick={handlePrivacyClick}>
+                    {isPrivate ? 'Make Public' : 'Make Private'}
+                  </MenuItem>
+                </Menu>
+              </>
             )}
           </>
         )}
