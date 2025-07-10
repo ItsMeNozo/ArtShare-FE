@@ -1,5 +1,4 @@
 //Components
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import OpacitySlider from "../sliders/OpacitySlider";
 
@@ -37,17 +36,8 @@ const CropPanel: React.FC<PanelsProp> = ({
   return (
     <>
       <div className="flex flex-col space-y-2">
-        <Label className="font-medium">Layer Name</Label>
-        <Input
-          className="flex bg-mountain-50 border w-full placeholder:text-mountain-600"
-          placeholder="Input Layer Name"
-          defaultValue="Background"
-        />
-      </div>
-      <hr className="flex border-mountain-100 border-t-1 w-full" />
-      <div className="flex flex-col space-y-2">
         <Label className="font-medium">Layer position</Label>
-        <div className="flex justify-between gap-x-4">
+        <div className="flex justify-between gap-4 w-full">
           <LayerPosition
             label={"X"}
             position={layers.find((layer) => layer.id === selectedLayerId)?.x!}

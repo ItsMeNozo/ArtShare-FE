@@ -1,31 +1,32 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ZoomTool from "./Zoom";
-import { Button, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { Plus } from "lucide-react";
 import Draggable from "react-draggable";
-import { MdOutlineSaveAlt } from "react-icons/md";
 import { Sketch } from '@uiw/react-color';
 
 interface LayerToolsBarProp {
   layers: Layer[];
   zoomLevel: number;
+  currentZIndex: number;
   selectedLayerId: string | null;
   setLayers: Dispatch<SetStateAction<Layer[]>>;
   handleZoomIn: () => void;
   handleZoomOut: () => void;
+  setCurrentZIndex: Dispatch<SetStateAction<number>>;
   setSelectedLayerId: Dispatch<SetStateAction<string | null>>;
-  handleDownload: () => void;
 }
 
 const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   layers,
   zoomLevel,
   selectedLayerId,
+  currentZIndex,
   setLayers,
   handleZoomIn,
   handleZoomOut,
   setSelectedLayerId,
-  handleDownload,
+  setCurrentZIndex
 }) => {
   const [openColorSettings, setOpenColorSettings] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -34,7 +35,6 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = () => {
       const imageSrc = reader.result as string;
@@ -74,8 +74,10 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             saturation: 100,
             hue: 0,
             sepia: 0,
+            zIndex: currentZIndex
           },
         ]);
+        setCurrentZIndex(currentZIndex + 1);
       };
 
       img.src = imageSrc;
@@ -205,22 +207,6 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
               </div>
             </Draggable>
           )}
-        </div>
-        <div className="flex flex-col space-y-2 py-2 border-mountain-200 border-t-1">
-          <div className="flex justify-center items-center p-2 py-0 border-mountain-400 w-full h-10 hover:cursor-pointer">
-            <Button className="flex justify-center items-center bg-white hover:bg-mountain-50 border border-mountain-200 rounded-lg w-full h-full hover:cursor-pointer">
-              <p className="font-normal">Close</p>
-            </Button>
-          </div>
-          <div
-            onClick={handleDownload}
-            className="flex justify-center items-center p-2 py-0 border-mountain-400 w-full h-10 hover:cursor-pointer"
-          >
-            <Button className="flex justify-center items-center bg-indigo-200 hover:bg-indigo-100 border border-mountain-200 rounded-lg w-full h-full hover:cursor-pointer">
-              <MdOutlineSaveAlt className="mr-1" />
-              <p className="font-normal">Export</p>
-            </Button>
-          </div>
         </div>
       </div>
       <ZoomTool

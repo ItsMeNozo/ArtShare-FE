@@ -8,7 +8,6 @@ import GuestRoute from '@/components/routes/guest-route';
 import RootLayout from '@/layouts';
 import OnboardingRoute from './components/ProtectedItems/OnboardingRoute';
 import UserSubscription from './features/user-profile-private/UserSubscription';
-import BrowseImage from './features/edit-image/BrowseImage';
 
 const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
@@ -47,6 +46,7 @@ const DocumentDashboard = lazy(
 const MyWriting = lazy(() => import('@/features/user-writing/MyWriting'));
 const ArtGeneration = lazy(() => import('@/features/gen-art/ArtGenAI'));
 const ImageEditor = lazy(() => import('@/features/edit-image/EditImage'));
+const BrowseImage = lazy(() => import('@/features/edit-image/BrowseImage'));
 
 const SocialLinksPage = lazy(
   () =>

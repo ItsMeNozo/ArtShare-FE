@@ -21,7 +21,7 @@ export default function LayerPosition({
       <Input
         type="number"
         inputMode="numeric"
-        className="p-2 w-16 text-sm text-right"
+        className="py-2 pl-2 w-full text-sm text-right"
         value={position}
         onChange={handleInputChange}
         style={{ direction: "ltr" }}

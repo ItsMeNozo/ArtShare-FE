@@ -15,18 +15,26 @@ import { IoIosColorFilter } from "react-icons/io";
 import Moveable from "react-moveable";
 import LayerToolsBar from "./components/tools/LayerToolsBar";
 import EditHeader from "./components/EditHeader";
-import { useLayerStyleHandlers } from "./utils/useLayerStyleHandlers";
-import { useLayerTransformHandlers } from "./utils/useLayerTransformHandlers";
+import { useLayerStyleHandlers } from "./hooks/useLayerStyleHandlers";
+import { useLayerTransformHandlers } from "./hooks/useLayerTransformHandlers";
 import { ChevronDown } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import LayerItem from "./components/LayerItem";
 
 const EditImage: React.FC = () => {
+  //Handle getting images
+  const location = useLocation();
+  const { imageUrl, name } = location.state || {};
+
   //Toolbar
   const [fullScreen, setFullScreen] = useState(false);
+
   //Images
   const [zoomLevel, setZoomLevel] = useState(1);
   const [activePanel, setActivePanel] = useState<
     "arrange" | "crop" | "adjust" | "filter" | "text" | null
   >(null);
+  const [globalZIndex, setGlobalZIndex] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [opacity, setOpacity] = useState(1);
   const [xPos, setXPos] = useState(0);
@@ -45,6 +53,7 @@ const EditImage: React.FC = () => {
   const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
   const layerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const moveableRef = useRef<Moveable>(null);
+  const hasAppendedInitialImage = useRef(false);
 
   const [layers, setLayers] = useState<Layer[]>([
     {
@@ -65,11 +74,64 @@ const EditImage: React.FC = () => {
       sepia: sepia,
       backgroundColor: "#ffffff",
       height: canvasSize.height,
-      width: canvasSize.width
+      width: canvasSize.width,
+      zIndex: 0,
     },
   ]);
 
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!imageUrl || hasAppendedInitialImage.current) return;
+    hasAppendedInitialImage.current = true;
+
+    const img = new Image();
+    img.onload = () => {
+      const maxWidth = 540;
+      const maxHeight = 540;
+
+      const width = img.width;
+      const height = img.height;
+
+      const widthRatio = maxWidth / width;
+      const heightRatio = maxHeight / height;
+      const scale = Math.min(widthRatio, heightRatio);
+
+      const scaledWidth = width * scale;
+      const scaledHeight = height * scale;
+
+      // Prevent duplicate image layer
+      const isAlreadyAdded = layers.some(
+        (layer) => layer.type === "image" && layer.src === imageUrl
+      );
+      if (isAlreadyAdded) return;
+
+      const newImageLayer: ImageLayer = {
+        id: crypto.randomUUID(),
+        type: "image",
+        name: name,
+        src: imageUrl,
+        zoom: 1,
+        opacity: 1,
+        flipH: false,
+        flipV: false,
+        x: (maxWidth - scaledWidth) / 2,
+        y: (maxHeight - scaledHeight) / 2,
+        width: scaledWidth,
+        height: scaledHeight,
+        rotation: 0,
+        brightness: 100,
+        contrast: 100,
+        saturation: 100,
+        hue: 0,
+        sepia: 0,
+        zIndex: 1,
+      };
+      setGlobalZIndex(2);
+      setLayers((prev) => [...prev, newImageLayer]);
+    };
+    img.src = imageUrl;
+  }, [imageUrl, layers]);
 
   useEffect(() => {
     const imageLayer = layers.find(
@@ -89,6 +151,15 @@ const EditImage: React.FC = () => {
     );
   };
 
+  const updateLayerById = (id: string, updates: Partial<Layer>) => {
+    setLayers((prev) =>
+      prev.map((layer) => {
+        if (layer.id !== id) return layer;
+        return { ...layer, ...updates } as Layer;
+      }),
+    );
+  };
+
   const handleDuplicate = (layerId: string) => {
     const layerToDuplicate = layers.find((l) => l.id === layerId);
     if (!layerToDuplicate) return;
@@ -98,7 +169,7 @@ const EditImage: React.FC = () => {
     };
     setLayers((prev) => [...prev, newLayer]);
   };
-
+  //Style hooks
   const {
     handleBrightness,
     handleContrast,
@@ -114,8 +185,12 @@ const EditImage: React.FC = () => {
     setHue,
     setSepia
   });
-
+  // Transform hooks
   const {
+    moveForward,
+    moveBackward,
+    bringToFront,
+    sendToBack,
     handleZoomIn,
     handleZoomOut,
     handleRotationChange,
@@ -125,7 +200,9 @@ const EditImage: React.FC = () => {
     handleLayerXPosition,
     handleLayerYPosition
   } = useLayerTransformHandlers({
+    layers,
     selectedLayerId,
+    updateLayerById,
     updateSelectedLayer,
     moveableRef,
     setZoomLevel,
@@ -285,8 +362,8 @@ const EditImage: React.FC = () => {
 
   const addText = () => {
     const defaultText = "Your Text";
-    const maxWidth = 300; // Width of your text box
-    const maxHeight = 100; // Height of your text box
+    const maxWidth = 300;
+    const maxHeight = 100;
 
     const fittedFontSize = getFittingFontSize(defaultText, maxWidth, maxHeight);
 
@@ -301,9 +378,10 @@ const EditImage: React.FC = () => {
       rotation: 0,
       opacity: 1,
       width: maxWidth,
-      height: maxHeight
+      height: maxHeight,
+      zIndex: globalZIndex,
     };
-
+    setGlobalZIndex(globalZIndex + 1);
     setLayers((prev) => [...prev, newTextLayer]);
   };
 
@@ -372,7 +450,11 @@ const EditImage: React.FC = () => {
           <ChevronDown className="size-5 text-mountain-950 transition-opacity duration-200" />
         </div>
       </button>
-      <EditHeader hideTopBar={fullScreen} setHideTopBar={setFullScreen} />
+      <EditHeader
+        hideTopBar={fullScreen}
+        setHideTopBar={setFullScreen}
+        handleDownload={handleDownload}
+      />
       <div className={`flex ${fullScreen ? 'p-0 h-screen' : 'p-4 h-[calc(100vh-4rem)]'}  w-full overflow-hidden`}>
         <div className={`flex space-y-4 bg-mountain-100 border border-mountain-200 ${fullScreen ? 'rounded-none' : 'rounded-lg'} w-full h-full overflow-y-hidden`}>
           <LayerToolsBar
@@ -383,14 +465,14 @@ const EditImage: React.FC = () => {
             setSelectedLayerId={setSelectedLayerId}
             handleZoomIn={handleZoomIn}
             handleZoomOut={handleZoomOut}
-            handleDownload={handleDownload}
+            currentZIndex={globalZIndex}
+            setCurrentZIndex={setGlobalZIndex}
           />
-          <div className="relative flex justify-center items-center bg-mountain-200 w-full h-full">
-
+          <div onMouseDown={() => setSelectedLayerId(null)}
+            className="relative flex justify-center items-center bg-mountain-200 w-full h-full">
             <div
               ref={imageContainerRef}
               className="relative mx-auto overflow-hidden"
-              onMouseDown={() => setSelectedLayerId(null)}
               style={{
                 transform: `scale(${zoomLevel})`,
                 backgroundColor:
@@ -412,167 +494,23 @@ const EditImage: React.FC = () => {
                 }}
               >
                 {layers.slice(1).map((layer) => (
-                  <div key={layer.id}>
-                    <div
-                      ref={(el) => {
-                        layerRefs.current[layer.id] = el;
-                      }}
-                      style={{
-                        width: layer.width,
-                        height: layer.height,
-                        transform: `
-                      translate(${layer.x}px, ${layer.y}px)
-                      rotate(${layer.rotation}deg)
-                      `,
-                        transformOrigin: "center",
-                        position: "absolute",
-                        zIndex: layer.id,
-                        background: "transparent",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        pointerEvents: "auto",
-                      }}
-                      onMouseDown={(e) => {
-                        e.stopPropagation();
-                        setSelectedLayerId(layer.id);
-                      }}                    >
-                      {layer.type === "image" ? (
-                        <img
-                          src={layer.src}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            pointerEvents: "none",
-                            filter: `
-                            saturate(${layer.saturation}%)
-                            hue-rotate(${layer.hue}deg)
-                            brightness(${layer.brightness}%)
-                            contrast(${layer.contrast}%)
-                            opacity(${layer.opacity})
-                            sepia(${layer.sepia}%)
-                            `,
-                            transform: `
-                            scaleX(${layer.flipH ? -1 : 1})
-                            scaleY(${layer.flipV ? -1 : 1})
-                            `,
-                          }}
-                          draggable={false}
-                        />
-                      ) : editingLayerId === layer.id ? (
-                        <textarea
-                          autoFocus
-                          value={layer.text}
-                          onChange={(e) => handleTextChange(layer.id, e.target.value)}
-                          onBlur={() => setEditingLayerId(null)}
-                          onFocus={(e) => {
-                            const val = e.target.value;
-                            e.target.setSelectionRange(val.length, val.length);
-                          }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            fontSize: layer.fontSize,
-                            color: layer.color,
-                            fontWeight: layer.fontWeight || "normal",
-                            fontFamily: layer.fontFamily || "sans-serif",
-                            textAlign: "center",
-                            background: "transparent",
-                            border: "none",
-                            resize: "none",
-                            outline: "none",
-                            overflow: "hidden",
-                            whiteSpace: "pre-wrap",
-                            transform: `
-                              scaleX(${layer.flipH ? -1 : 1})
-                              scaleY(${layer.flipV ? -1 : 1})
-                            `,
-                            opacity: layer.opacity,
-                          }}
-                        />
-                      ) : (
-                        <div
-                          onDoubleClick={() => setEditingLayerId(layer.id)}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            fontSize: layer.fontSize,
-                            color: layer.color,
-                            fontWeight: layer.fontWeight || "normal",
-                            fontFamily: layer.fontFamily || "sans-serif",
-                            textAlign: "center",
-                            whiteSpace: "pre-wrap",
-                            userSelect: "none",
-                            cursor: "text",
-                            transform: `
-                              scaleX(${layer.flipH ? -1 : 1})
-                              scaleY(${layer.flipV ? -1 : 1})
-                            `,
-                            opacity: layer.opacity,
-                          }}
-                          className="cursor-pointer"
-                        >
-                          {layer.text}
-                        </div>
-                      )}
-                    </div>
-                    {selectedLayerId === layer.id && (
-                      <Moveable
-                        ref={moveableRef}
-                        target={layerRefs.current[layer.id]}
-                        draggable
-                        resizable
-                        rotatable
-                        rotationPosition="top"
-                        throttleResize={1}
-                        renderDirections={["nw", "ne", "sw", "se"]}
-                        keepRatio={false}
-                        onDrag={({ beforeTranslate }) => {
-                          setLayers((prev) =>
-                            prev.map((l) =>
-                              l.id === layer.id
-                                ? {
-                                  ...l,
-                                  x: beforeTranslate[0],
-                                  y: beforeTranslate[1],
-                                }
-                                : l,
-                            ),
-                          );
-                        }}
-                        onResize={({ width, height, drag, target }) => {
-                          target.style.width = `${width}px`;
-                          target.style.height = `${height}px`;
-                          target.style.transform = drag.transform;
-                        }}
-                        onResizeEnd={({ lastEvent }) => {
-                          if (!lastEvent) return;
-                          const { width, height, drag } = lastEvent;
-                          setLayers((prev) =>
-                            prev.map((l) =>
-                              l.id === layer.id
-                                ? {
-                                  ...l,
-                                  width,
-                                  height,
-                                  x: drag.beforeTranslate[0],
-                                  y: drag.beforeTranslate[1],
-                                }
-                                : l,
-                            ),
-                          );
-                        }}
-                        onRotate={({ rotation }) => {
-                          setLayers((prev) =>
-                            prev.map((l) =>
-                              l.id === layer.id ? { ...l, rotation } : l,
-                            ),
-                          );
-                        }}
-                      />
-                    )}
-                  </div>
+                  <LayerItem
+                    key={layer.id}
+                    layer={layer}
+                    editingLayerId={editingLayerId}
+                    selectedLayerId={selectedLayerId}
+                    layerRefs={layerRefs}
+                    moveableRef={moveableRef}
+                    setEditingLayerId={setEditingLayerId}
+                    setSelectedLayerId={setSelectedLayerId}
+                    handleTextChange={handleTextChange}
+                    setLayers={setLayers}
+                    handleDuplicate={handleDuplicate}
+                    bringToFront={() => bringToFront(layer.id)}
+                    sendToBack={() => sendToBack(layer.id)}
+                    moveForward={() => moveForward(layer.id)}
+                    moveBackward={() => moveBackward(layer.id)}
+                  />
                 ))}
               </div>
             </div>

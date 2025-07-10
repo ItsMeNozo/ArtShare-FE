@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
 
 interface TransformHandlersParams {
+  layers: Layer[];
   selectedLayerId: string | null;
+  updateLayerById: (id: string, updates: Partial<Layer>) => void;
   updateSelectedLayer: (updates: Partial<Layer>) => void;
   moveableRef: React.RefObject<any>;
   setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
@@ -14,7 +16,9 @@ interface TransformHandlersParams {
 }
 
 export const useLayerTransformHandlers = ({
+  layers,
   selectedLayerId,
+  updateLayerById,
   updateSelectedLayer,
   moveableRef,
   setZoomLevel,
@@ -25,6 +29,70 @@ export const useLayerTransformHandlers = ({
   setXPos,
   setYPos,
 }: TransformHandlersParams) => {
+  const bringToFront = useCallback(
+    (layerId: string) => {
+      const targetLayers = layers.filter((l) => l.id !== layerId);
+      const sorted = [...targetLayers].sort(
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
+      );
+      sorted.forEach((l, i) => {
+        updateLayerById(l.id, { zIndex: i + 1 }); // Start from 1
+      });
+      updateLayerById(layerId, { zIndex: sorted.length + 1 }); // Topmost
+    },
+    [layers, updateLayerById],
+  );
+
+  const sendToBack = useCallback(
+    (layerId: string) => {
+      const targetLayers = layers.filter(
+        (l) => l.id !== layerId && (l.zIndex ?? 0) > 0,
+      );
+      const sorted = [...targetLayers].sort(
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
+      );
+      sorted.forEach((l, i) => {
+        updateLayerById(l.id, { zIndex: i + 2 });
+      });
+      updateLayerById(layerId, { zIndex: 1 });
+    },
+    [layers, updateLayerById],
+  );
+
+  const moveForward = useCallback(
+    (layerId: string) => {
+      const layer = layers.find((l) => l.id === layerId);
+      if (!layer) return;
+      const sorted = [...layers].sort(
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
+      );
+      const index = sorted.findIndex((l) => l.id === layerId);
+      if (index === -1 || index === sorted.length - 1) return; // Already on top
+      const aboveLayer = sorted[index + 1];
+      if (!aboveLayer) return;
+      updateLayerById(layer.id, { zIndex: aboveLayer.zIndex });
+      updateLayerById(aboveLayer.id, { zIndex: layer.zIndex });
+    },
+    [layers, updateLayerById],
+  );
+
+  const moveBackward = useCallback(
+    (layerId: string) => {
+      const layer = layers.find((l) => l.id === layerId);
+      if (!layer) return;
+      const sorted = [...layers].sort(
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
+      );
+      const index = sorted.findIndex((l) => l.id === layerId);
+      if (index <= 0) return;
+      const belowLayer = sorted[index - 1];
+      if (!belowLayer) return;
+      updateLayerById(layer.id, { zIndex: belowLayer.zIndex });
+      updateLayerById(belowLayer.id, { zIndex: layer.zIndex });
+    },
+    [layers, updateLayerById],
+  );
+
   const handleLayerXPosition = useCallback(
     (newXPos: number) => {
       setXPos(newXPos);
@@ -92,6 +160,10 @@ export const useLayerTransformHandlers = ({
   }, [selectedLayerId]);
 
   return {
+    bringToFront,
+    sendToBack,
+    moveForward,
+    moveBackward,
     handleZoomIn,
     handleZoomOut,
     handleRotationChange,

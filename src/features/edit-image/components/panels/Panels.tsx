@@ -71,7 +71,10 @@ const Panels: React.FC<PanelsProp> = ({
             />
             <p className="capitalize">{activePanel}</p>
           </div>
-          <div className="custom-scrollbar-left flex flex-col space-y-4 px-6 py-4 max-h-[82%] overflow-y-auto">
+          <div className="flex flex-col space-y-4 px-6 py-4 max-h-[82%] overflow-y-auto custom-scrollbar">
+            {activePanel == "arrange" && (
+              <ArrangePanel layers={layers} selectedLayerId={selectedLayerId} />
+            )}
             {activePanel == "crop" && (
               <CropPanel
                 layers={layers}
@@ -85,9 +88,7 @@ const Panels: React.FC<PanelsProp> = ({
                 handleRotationChange={handleRotationChange}
               />
             )}
-            {activePanel == "arrange" && (
-              <ArrangePanel layers={layers} selectedLayerId={selectedLayerId} />
-            )}
+
             {activePanel === "adjust" &&
               (isNonTextLayer ? (
                 <>
@@ -172,66 +173,6 @@ const Panels: React.FC<PanelsProp> = ({
                 </div>
               ))}
           </div>
-          {/* {activePanel === "filter" ? (
-                        <>
-                            <hr className='flex mb-4 border-mountain-200 border-t-1 w-full' />
-                            <div className='flex space-x-2 w-full h-10'>
-                                <div className='flex justify-center items-center pl-6 w-1/2 h-10'>
-                                    <Button className='flex justify-center items-center bg-indigo-200 border border-mountain-200 rounded-lg w-full h-full font-normal text-sm'>
-                                        <p>Apply</p>
-                                    </Button>
-                                </div>
-                                <div className='flex justify-center items-center pr-6 w-1/2 h-10'>
-                                    <Button className='flex justify-center items-center bg-white border border-mountain-200 rounded-lg w-full h-full font-normal text-sm'>
-                                        <p>Cancel</p>
-                                    </Button>
-                                </div>
-                            </div>
-                        </>
-                    ) : (activePanel !== "arrange") && (
-                        <>
-                            <hr className='flex mb-4 border-mountain-200 border-t-1 w-full' />
-                            <div className='flex justify-center items-center px-6 w-full h-10'>
-                                <Tooltip
-                                    title="Hold down"
-                                    placement="top"
-                                    arrow
-                                    slotProps={{
-                                        popper: {
-                                            sx: {
-                                                [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
-                                                {
-                                                    marginTop: '4px',
-                                                },
-                                                [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]:
-                                                {
-                                                    marginBottom: '4px',
-                                                },
-                                                [`&.${tooltipClasses.popper}[data-popper-placement*="right"] .${tooltipClasses.tooltip}`]:
-                                                {
-                                                    marginLeft: '4px',
-                                                },
-                                                [`&.${tooltipClasses.popper}[data-popper-placement*="left"] .${tooltipClasses.tooltip}`]:
-                                                {
-                                                    marginRight: '4px',
-                                                },
-                                            },
-                                        },
-                                    }}>
-                                    <Button className='flex justify-center items-center bg-white border border-mountain-200 rounded-lg w-full h-full font-normal text-sm'>
-                                        <MdOutlineFlip className='mr-2' />
-                                        <p>Compare</p>
-                                    </Button>
-                                </Tooltip>
-                            </div>
-                            <div className='flex justify-center items-center px-6 w-full h-10'>
-                                <Button className='flex justify-center items-center bg-white border border-mountain-200 rounded-lg w-full h-full font-normal text-sm'>
-                                    <RiResetRightLine className='mr-2' />
-                                    <p>Reset</p>
-                                </Button>
-                            </div>
-                        </>
-                    )} */}
         </div>
       )}
     </div>
