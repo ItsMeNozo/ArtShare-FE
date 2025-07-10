@@ -53,7 +53,7 @@ export class TestHelpers {
 
     if (waitForNavigation) {
       await Promise.all([
-        this.page.waitForNavigation(),
+        this.page.waitForURL((url) => !url.toString().includes('/login')),
         typeof selector === 'string'
           ? this.page.click(selector)
           : selector.click(),
@@ -500,11 +500,43 @@ export class TestHelpers {
    */
   async loginWithEmail(email: string, password: string) {
     await this.page.goto('/login');
-    await this.fillField('input[type="email"]', email);
-    await this.fillField('input[type="password"]', password);
-    await this.clickAndWait('button[type="submit"]', {
-      waitForNavigation: true,
+
+    // Wait for the login form to be visible and interactable using more specific selectors
+    const emailInput = this.page.getByRole('textbox', {
+      name: 'Enter your username or email',
     });
+    const passwordInput = this.page.getByRole('textbox', {
+      name: 'Enter your password',
+    });
+    const loginButton = this.page.getByRole('button', { name: 'Login' });
+
+    await emailInput.waitFor({ state: 'visible' });
+    await passwordInput.waitFor({ state: 'visible' });
+    await loginButton.waitFor({ state: 'visible' });
+
+    // Clear and fill the email field
+    await emailInput.clear();
+    await emailInput.fill(email);
+
+    // Clear and fill the password field
+    await passwordInput.clear();
+    await passwordInput.fill(password);
+
+    // Wait a moment for form validation to complete
+    await this.page.waitForTimeout(500);
+
+    // Click login and wait for navigation
+    await Promise.all([
+      this.page.waitForURL((url) => !url.toString().includes('/login'), {
+        timeout: 30000,
+      }),
+      loginButton.click(),
+    ]);
+
+    // Verify we're successfully logged in by checking for user menu
+    await this.page
+      .getByRole('button', { name: 'User menu' })
+      .waitFor({ state: 'visible', timeout: 10000 });
   }
 
   /**
