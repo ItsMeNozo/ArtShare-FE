@@ -39,7 +39,15 @@ export const usePromptHistory = () => {
   useEffect(() => {
     api
       .get('/art-generation/prompt-history')
-      .then((res) => setPromptResultList(res.data))
+      .then((res) => {
+        if (res.data && Array.isArray(res.data.data)) {
+          setPromptResultList(res.data.data);
+        } else if (Array.isArray(res.data)) {
+          setPromptResultList(res.data);
+        } else {
+          setPromptResultList([]);
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
