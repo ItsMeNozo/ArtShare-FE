@@ -5,7 +5,7 @@ import 'react-photo-view/dist/react-photo-view.css';
 const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
   if (!medias || medias.length === 0) {
     return (
-      <div className="flex w-full flex-col items-center justify-center rounded-2xl bg-white pb-4 text-gray-500 md:h-full md:shadow">
+      <div className="flex flex-col justify-center items-center bg-white md:shadow pb-4 rounded-2xl w-full md:h-full text-gray-500">
         No assets available for this post.
       </div>
     );
@@ -19,7 +19,7 @@ const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
         {medias.map((media) => (
           <div
             key={media.url}
-            className="flex max-h-full w-full justify-center pt-4 hover:cursor-zoom-in md:px-4"
+            className="flex justify-center md:px-4 pt-4 w-full max-h-full hover:cursor-zoom-in"
           >
             <PhotoView src={media.url}>
               {media.mediaType === 'image' ? (
@@ -27,13 +27,13 @@ const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
                   src={media.url}
                   alt={media.description || 'Post asset'}
                   crossOrigin="anonymous"
-                  className="max-h-[80vh] max-w-full object-contain md:max-h-full"
+                  className="max-w-full max-h-[80vh] md:max-h-full object-contain"
                 />
               ) : (
                 <video
                   src={media.url}
                   controls
-                  className="max-h-[80vh] max-w-full object-contain md:max-h-full"
+                  className="max-w-full max-h-[80vh] md:max-h-full object-contain"
                 />
               )}
             </PhotoView>

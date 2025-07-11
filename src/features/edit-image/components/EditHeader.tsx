@@ -16,14 +16,14 @@ const EditHeader: React.FC = () => {
     <nav
       className={`border-mountain-200 dark:bg-mountain-950 dark:border-b-mountain-700 relative z-50 flex h-16 w-full items-center justify-between border-b-1 pr-4`}
     >
-      <div className="flex w-full items-center justify-between p-4">
+      <div className="flex justify-between items-center p-4 w-full">
         <div className="flex space-x-2">
           <Link
             to="/explore"
-            className="bg-mountain-50 hover:bg-mountain-100/80 border-mountain-100 flex h-10 items-center rounded-lg border px-4"
+            className="flex items-center bg-mountain-50 hover:bg-mountain-100/80 px-4 border border-mountain-100 rounded-lg h-10"
           >
-            <div className="hover:bg-mountain-100 mr-2 flex items-center justify-center rounded-lg">
-              <FaArrowLeftLong className="text-mountain-600 size-5" />
+            <div className="flex justify-center items-center hover:bg-mountain-100 mr-2 rounded-lg">
+              <FaArrowLeftLong className="size-5 text-mountain-600" />
             </div>
             <div className="flex items-center space-x-2">
               <span className="flex font-medium">Dashboard</span>

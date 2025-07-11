@@ -51,14 +51,14 @@ const FilterBar = ({
   const isAllChannelsSelected = selectedMedium === null;
 
   return (
-    <div className="categories-bar flex w-full items-center gap-6 overflow-x-hidden">
+    <div className="flex items-center gap-6 w-full overflow-x-hidden categories-bar">
       <MediumFilters
         selectedMedium={selectedMedium}
         setSelectedMedium={setSelectedMedium}
       >
         {({ onClick, isLoading }) => (
           <Button
-            className="dark:bg-mountain-900 dark:text-mountain-50 all-channels-btn flex aspect-[1/1] min-w-auto flex-shrink-0 gap-2 rounded-lg p-2 font-normal normal-case shadow-none"
+            className="flex flex-shrink-0 gap-2 dark:bg-mountain-900 shadow-none p-2 rounded-lg min-w-auto aspect-[1/1] font-normal dark:text-mountain-50 normal-case all-channels-btn"
             variant="contained"
             disableElevation
             onClick={onClick}
@@ -74,21 +74,19 @@ const FilterBar = ({
       </MediumFilters>
 
       <Button
-        className={`all-channels-btn flex flex-shrink-0 gap-2 rounded-lg p-2 ${
-          isAllChannelsSelected
+        className={`all-channels-btn flex flex-shrink-0 gap-2 rounded-lg p-2 ${isAllChannelsSelected
             ? 'dark:bg-mountain-800'
             : 'dark:bg-mountain-900'
-        } dark:text-mountain-200 font-normal normal-case shadow-none`}
+          } dark:text-mountain-200 font-normal normal-case shadow-none`}
         variant={isAllChannelsSelected ? 'contained' : 'outlined'}
         onClick={handleAllMediumsClick}
         disableElevation={isAllChannelsSelected}
       >
         <div
-          className={`aspect-[1/1] rounded p-2 ${
-            isAllChannelsSelected
+          className={`aspect-[1/1] rounded p-2 ${isAllChannelsSelected
               ? 'bg-mountain-50 dark:bg-mountain-700 dark:text-primary-400 text-indigo-400'
               : 'text-mountain-900 bg-mountain-200 dark:bg-mountain-800 dark:text-mountain-300'
-          } `}
+            } `}
         >
           <LoaderPinwheel size={16} />
         </div>
@@ -112,7 +110,7 @@ const FilterBar = ({
       >
         {({ onClick, isLoading }) => (
           <Button
-            className="dark:bg-mountain-900 dark:text-mountain-50 spread-btn aspect-[1/1] min-w-auto flex-shrink-0 rounded-lg p-2"
+            className="flex-shrink-0 dark:bg-mountain-900 p-2 rounded-lg min-w-auto aspect-[1/1] dark:text-mountain-50 spread-btn"
             variant="contained"
             disableElevation
             onClick={onClick}

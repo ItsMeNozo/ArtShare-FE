@@ -5,14 +5,16 @@ type BaseLayer = {
   type: LayerType;
   x: number;
   y: number;
+  zIndex: number;
   rotation: number;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
 };
 
 type ImageLayer = BaseLayer & {
   type: 'image';
   id: string;
+  name?: string;
   src: string;
   zoom: number;
   opacity: number;
