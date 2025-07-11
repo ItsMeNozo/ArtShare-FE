@@ -1,12 +1,12 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { Box, Backdrop, CircularProgress, IconButton } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
-import { getPresignedUrl, uploadFile } from "@/api/storage";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { nanoid } from "nanoid";
-import { updateUserProfile } from "../api/user-profile.api";
-import { Edit2 } from "lucide-react";
-import Avatar from "boring-avatars";
+import { getPresignedUrl, uploadFile } from '@/api/storage';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { Backdrop, Box, CircularProgress, IconButton } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
+import Avatar from 'boring-avatars';
+import { Edit2 } from 'lucide-react';
+import { nanoid } from 'nanoid';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { updateUserProfile } from '../api/user-profile.api';
 interface AvatarSectionProps {
   profilePictureUrl?: string | null;
   onUploadSuccess: (newUrl: string) => void;
@@ -29,25 +29,25 @@ export function AvatarSection({
 
   const uploadMutation = useMutation<string, Error, File>({
     mutationFn: async (file) => {
-      const ext = file.type.split("/")[1];
+      const ext = file.type.split('/')[1];
       const key = `avatars/${nanoid(8)}.${ext}`;
       const { presignedUrl, fileUrl } = await getPresignedUrl(
         key,
         ext,
-        "image",
-        "users",
+        'image',
+        'users',
       );
       await uploadFile(file, presignedUrl);
       return fileUrl;
     },
     onSuccess: async (fileUrl) => {
-      await updateUserProfile({ profile_picture_url: fileUrl });
+      await updateUserProfile({ profilePictureUrl: fileUrl });
       setPreview(fileUrl);
       onUploadSuccess(fileUrl);
-      showSnackbar("Avatar updated", "success");
+      showSnackbar('Avatar updated', 'success');
     },
     onError: (err) => {
-      showSnackbar(err.message || "Failed to upload avatar", "error");
+      showSnackbar(err.message || 'Failed to upload avatar', 'error');
     },
   });
 
@@ -72,22 +72,22 @@ export function AvatarSection({
       </Backdrop>
 
       <Box className="flex flex-col items-center">
-        <Box className="relative w-24 h-24">
+        <Box className="relative h-24 w-24">
           {/* 1) Crop the photo */}
-          <div className="w-full h-full rounded-full overflow-hidden bg-gray-700">
+          <div className="h-full w-full overflow-hidden rounded-full bg-gray-700">
             {preview ? (
               <img
                 src={preview}
                 alt="User avatar"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
               // 2) Show a boring-avatar when there's no preview
               <Avatar
                 size={96} // match the Box 24×24 (px * 4)
-                name={username || "Unknown"}
+                name={username || 'Unknown'}
                 variant="beam" // pick your favorite style
-                colors={["#84bfc3", "#ff9b62", "#d96153"]}
+                colors={['#84bfc3', '#ff9b62', '#d96153']}
               />
             )}
           </div>
@@ -98,12 +98,12 @@ export function AvatarSection({
             size="small"
             disabled={uploadMutation.isPending}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               bottom: 4,
               right: 3,
-              bgcolor: "primary.main",
-              color: "white",
-              "&:hover": { bgcolor: "primary.dark" },
+              bgcolor: 'primary.main',
+              color: 'white',
+              '&:hover': { bgcolor: 'primary.dark' },
               width: 32,
               height: 32,
             }}

@@ -5,4 +5,4 @@ export interface BackendErrorResponse {
 }
 
 export const DEFAULT_ERROR_MSG =
-  "An unexpected error occurred. Please try again later.";
+  'An unexpected error occurred. Please try again later.';

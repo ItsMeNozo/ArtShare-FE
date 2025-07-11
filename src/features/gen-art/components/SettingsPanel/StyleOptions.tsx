@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 //Components
 import {
@@ -8,15 +8,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 //Assets
 import { MockModelOptionsData } from "../../data/Data";
 
 //Icons
-import { IoIosArrowForward } from "react-icons/io";
-import { Button } from "@mui/material";
-import StyleOption from "./StyleOption";
+import { Button } from '@mui/material';
+import { IoIosArrowForward } from 'react-icons/io';
+import StyleOption from './StyleOption';
 
 const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
   const [open, setOpen] = useState(false);
@@ -73,9 +73,7 @@ const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
         </DialogHeader>
         <div className="relative flex w-full h-[600px]">
           <div className="flex flex-col space-y-4 p-4 border-mountain-200 border-r-[1px] w-[717px]">
-            <div
-              className="gap-4 grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] pr-4 h-full overflow-y-auto custom-scrollbar"
-            >
+            <div className="gap-4 grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] pr-4 h-full overflow-y-auto custom-scrollbar">
               {MockModelOptionsData.map((style) => (
                 <StyleOption
                   key={style.name}
@@ -116,7 +114,7 @@ const StyleOptions: React.FC<StyleOptionsProp> = ({ style, selectStyle }) => {
                   {selectedStyle?.images.map((img, idx) => (
                     <div
                       key={idx}
-                      className={`flex w-20 h-20 cursor-pointer transform duration-200 ease-in-out rounded-xl ${selectedIndex === idx ? "border-4 border-black" : ""}`}
+                      className={`flex h-20 w-20 transform cursor-pointer rounded-xl duration-200 ease-in-out ${selectedIndex === idx ? 'border-4 border-black' : ''}`}
                       onClick={() => {
                         handleSelect(idx);
                       }}

@@ -1,29 +1,29 @@
-import { Button } from "@mui/material";
-import React, { useContext } from "react";
+import { Button } from '@mui/material';
+import React, { useContext } from 'react';
 import {
   ScrollMenu,
   VisibilityContext,
   type publicApiType,
-} from "react-horizontal-scrolling-menu";
-import "react-horizontal-scrolling-menu/dist/styles.css";
+} from 'react-horizontal-scrolling-menu';
+import 'react-horizontal-scrolling-menu/dist/styles.css';
 import {
   FiChevronLeft as LeftArrowIcon,
   FiChevronRight as RightArrowIcon,
-} from "react-icons/fi";
+} from 'react-icons/fi';
 
 const DefaultLeftArrow: React.FC = () => {
   const visibility = useContext<publicApiType>(VisibilityContext);
-  const isFirstItemVisible = visibility.useIsVisible("first", true);
+  const isFirstItemVisible = visibility.useIsVisible('first', true);
 
   return (
-    <div className="z-50 flex items-center justify-center mr-2 react-horizontal-scrolling-menu--arrow-left">
+    <div className="react-horizontal-scrolling-menu--arrow-left z-50 mr-2 flex items-center justify-center">
       <Button
         variant="contained"
         color="primary"
         disableElevation
         disabled={isFirstItemVisible}
         aria-label="Scroll Left"
-        className="shadow-md p-1 rounded-full min-w-auto aspect-[1/1]"
+        className="aspect-[1/1] min-w-auto rounded-full p-1 shadow-md"
         onClick={() => visibility.scrollPrev()}
         size="small"
       >
@@ -35,17 +35,17 @@ const DefaultLeftArrow: React.FC = () => {
 
 const DefaultRightArrow: React.FC = () => {
   const visibility = useContext<publicApiType>(VisibilityContext);
-  const isLastItemVisible = visibility.useIsVisible("last", false);
+  const isLastItemVisible = visibility.useIsVisible('last', false);
 
   return (
-    <div className="z-50 flex items-center justify-center ml-2 react-horizontal-scrolling-menu--arrow-right">
+    <div className="react-horizontal-scrolling-menu--arrow-right z-50 ml-2 flex items-center justify-center">
       <Button
         variant="contained"
         color="primary"
         disableElevation
         disabled={isLastItemVisible}
         aria-label="Scroll Right"
-        className="shadow-md p-1 rounded-full min-w-auto aspect-[1/1]"
+        className="aspect-[1/1] min-w-auto rounded-full p-1 shadow-md"
         onClick={() => visibility.scrollNext()}
         size="small"
       >
@@ -70,18 +70,18 @@ interface HorizontalSliderProps<T> {
   RightArrowComponent?: React.FC;
   /** Optional: Styling applied to the main ScrollMenu wrapper */
   wrapperClassName?: string;
-  variant?: "default" | "overlay"; // new
+  variant?: 'default' | 'overlay'; // new
 }
 
 const OverlayLeftArrow: React.FC = () => {
   const visibility = useContext<publicApiType>(VisibilityContext);
-  const isFirstItemVisible = visibility.useIsVisible("first", true);
+  const isFirstItemVisible = visibility.useIsVisible('first', true);
   if (isFirstItemVisible) return null;
 
   return (
     <>
-      <div className="absolute z-10 flex w-20 h-full transition duration-300 ease-in-out opacity-0 pointer-events-none -left-4 bg-gradient-to-r from-black/60 to-transparent group-hover:opacity-100" />
-      <div className="absolute z-20 transition-opacity -translate-y-1/2 opacity-0 top-1/2 left-2 group-hover:opacity-100">
+      <div className="pointer-events-none absolute -left-4 z-10 flex h-full w-20 bg-gradient-to-r from-black/60 to-transparent opacity-0 transition duration-300 ease-in-out group-hover:opacity-100" />
+      <div className="absolute top-1/2 left-2 z-20 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <DefaultLeftArrow />
       </div>
     </>
@@ -90,12 +90,12 @@ const OverlayLeftArrow: React.FC = () => {
 
 const OverlayRightArrow: React.FC = () => {
   const visibility = useContext<publicApiType>(VisibilityContext);
-  const isLastItemVisible = visibility.useIsVisible("last", false);
+  const isLastItemVisible = visibility.useIsVisible('last', false);
   if (isLastItemVisible) return null;
   return (
     <>
-      <div className="absolute z-10 flex w-20 h-full transition duration-300 ease-in-out opacity-0 pointer-events-none -right-4 bg-gradient-to-l from-black/60 to-transparent group-hover:opacity-100" />
-      <div className="absolute z-20 transition-opacity -translate-y-1/2 opacity-0 top-1/2 right-2 group-hover:opacity-100">
+      <div className="pointer-events-none absolute -right-4 z-10 flex h-full w-20 bg-gradient-to-l from-black/60 to-transparent opacity-0 transition duration-300 ease-in-out group-hover:opacity-100" />
+      <div className="absolute top-1/2 right-2 z-20 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <DefaultRightArrow />
       </div>
     </>
@@ -106,19 +106,19 @@ export const HorizontalSlider = <T extends object>({
   data,
   renderItem,
   getItemId,
-  itemClassName = "flex-shrink-0 flex items-center mx-1",
+  itemClassName = 'flex-shrink-0 flex items-center mx-1',
   LeftArrowComponent = DefaultLeftArrow,
   RightArrowComponent = DefaultRightArrow,
-  wrapperClassName = "",
-  variant = "default",
+  wrapperClassName = '',
+  variant = 'default',
 }: HorizontalSliderProps<T>) => {
   if (!data || data.length === 0) return null;
 
-  const isOverlay = variant === "overlay";
+  const isOverlay = variant === 'overlay';
 
   return (
     <div
-      className={`horizontal-slider-wrapper overflow-x-hidden relative group ${wrapperClassName}`}
+      className={`horizontal-slider-wrapper group relative overflow-x-hidden ${wrapperClassName}`}
     >
       <ScrollMenu
         LeftArrow={isOverlay ? OverlayLeftArrow : LeftArrowComponent}

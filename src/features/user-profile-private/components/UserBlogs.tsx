@@ -42,7 +42,7 @@ const UserBlogs = () => {
   });
 
   // Flatten the pages into a single array and filter for published blogs only
-  const blogs = data?.pages.flat().filter((blog) => blog.is_published) ?? [];
+  const blogs = data?.pages.flat().filter((blog) => blog.isPublished) ?? [];
 
   // Infinite scroll handler
   useEffect(() => {
@@ -129,17 +129,17 @@ const UserBlogs = () => {
             author={{
               username: blog.user.username,
               avatar:
-                blog.user.profile_picture_url &&
-                blog.user.profile_picture_url.trim() !== ''
-                  ? blog.user.profile_picture_url
+                blog.user.profilePictureUrl &&
+                blog.user.profilePictureUrl.trim() !== ''
+                  ? blog.user.profilePictureUrl
                   : '',
             }}
             category={blog.categories?.[0]?.name ?? 'Uncategorized'}
             timeReading={`${Math.ceil((blog.content ? blog.content.split(/\s+/).length : 0) / 200)}m reading`}
-            dateCreated={blog.created_at}
-            like_count={blog.like_count}
-            comment_count={blog.comment_count}
-            view_count={blog.view_count}
+            createdAt={blog.createdAt}
+            likeCount={blog.likeCount}
+            commentCount={blog.commentCount}
+            viewCount={blog.viewCount}
             isOwner={isOwner}
           />
         );

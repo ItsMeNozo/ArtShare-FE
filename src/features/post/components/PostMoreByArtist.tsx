@@ -1,6 +1,6 @@
-import { User } from "@/types";
-import { useQuery } from "@tanstack/react-query";
-import { fetchPostsByArtist } from "@/features/explore/api/get-post";
+import { fetchPostsByArtist } from '@/features/explore/api/get-post';
+import { User } from '@/types';
+import { useQuery } from '@tanstack/react-query';
 
 const PostMoreByArtist = ({ artist }: { artist: User }) => {
   const {
@@ -8,7 +8,7 @@ const PostMoreByArtist = ({ artist }: { artist: User }) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["posts", artist.username],
+    queryKey: ['posts', artist.username],
     retry: 2,
     queryFn: () => fetchPostsByArtist(artist.username, 1),
   });
@@ -22,17 +22,17 @@ const PostMoreByArtist = ({ artist }: { artist: User }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-white px-4 py-6 rounded-2xl">
-      <div className="font-bold text-xl">
-        More by {artist.username || "Mock User"}
+    <div className="flex flex-col gap-4 rounded-2xl bg-white px-4 py-6">
+      <div className="text-xl font-bold">
+        More by {artist.username || 'Mock User'}
       </div>
-      <div className="gap-4 grid grid-cols-4 md:grid-cols-2 lg:grid-cols-3 bg-white rounded-2xl">
+      <div className="grid grid-cols-4 gap-4 rounded-2xl bg-white md:grid-cols-2 lg:grid-cols-3">
         {posts?.map((post) => (
           <img
             key={post.id}
             src={post.medias[0].url}
             alt={post.medias[0].description}
-            className="rounded aspect-[1/1]"
+            className="aspect-[1/1] rounded"
           />
         ))}
       </div>

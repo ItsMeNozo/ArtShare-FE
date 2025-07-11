@@ -1,19 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Post } from "@/types/post"; // Assuming you have a Post type
+import { Post } from '@/types/post'; // Assuming you have a Post type
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // API functions (assuming these are defined elsewhere)
-import { PostMedia } from "../types/post-media";
-import { PostFormValues } from "../types/post-form-values.type";
+import { useLoading } from '@/contexts/Loading/useLoading';
+import { postKeys } from '@/lib/react-query/query-keys';
+import { extractApiErrorMessage } from '@/utils/error.util';
+import { createPost } from '../api/create-post';
 import {
   createFormData,
   getImageFilesFromPostMedias,
   getVideoFileFromPostMedias,
-} from "../helpers/upload-post.helper";
-import { createPost } from "../api/create-post";
-import { useLoading } from "@/contexts/Loading/useLoading";
-import { extractApiErrorMessage } from "@/utils/error.util";
-import { postKeys } from "@/lib/react-query/query-keys";
-import { useUploadPostMedias } from "./useUploadPostMedias";
+} from '../helpers/upload-post.helper';
+import { PostFormValues } from '../types/post-form-values.type';
+import { PostMedia } from '../types/post-media';
+import { useUploadPostMedias } from './useUploadPostMedias';
 
 interface CreatePostVariables {
   values: PostFormValues;
@@ -50,8 +50,8 @@ export const useCreatePost = (options: UseCreatePostOptions) => {
       // --- async upload medias ---
       const [videoUrl, initialThumbnailUrl, thumbnailUrl] = await Promise.all([
         videoFile && handleUploadVideo(videoFile),
-        handleUploadImageFile(originalThumbnail.file, "original_thumbnail"),
-        handleUploadImageFile(thumbnail.file, "thumbnail"),
+        handleUploadImageFile(originalThumbnail.file, 'original_thumbnail'),
+        handleUploadImageFile(thumbnail.file, 'thumbnail'),
       ] as Promise<string | undefined>[]);
 
       // Create the form data
@@ -65,15 +65,15 @@ export const useCreatePost = (options: UseCreatePostOptions) => {
         initialThumbnailUrl,
         isMature: values.isMature,
         aiCreated: hasArtNovaImages,
-        cate_ids: values.cate_ids,
-        prompt_id: promptId ?? undefined,
+        categoryIds: values.categoryIds,
+        promptId: promptId ?? undefined,
       });
 
       const response = await createPost(formData);
       return response.data;
     },
 
-    onMutate: () => showLoading("Creating your post..."),
+    onMutate: () => showLoading('Creating your post...'),
     onSettled: () => hideLoading(),
 
     onSuccess: (createdPost) => {
@@ -83,7 +83,7 @@ export const useCreatePost = (options: UseCreatePostOptions) => {
     },
 
     onError: (error) => {
-      const message = extractApiErrorMessage(error, "Failed to create post.");
+      const message = extractApiErrorMessage(error, 'Failed to create post.');
       options.onError?.(message);
     },
   });

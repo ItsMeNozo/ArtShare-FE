@@ -2,14 +2,13 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { MdAdd, MdClose } from 'react-icons/md';
+import { MdClose } from 'react-icons/md';
 import { RiImageCircleAiLine } from 'react-icons/ri';
 import { TbDeviceDesktop } from 'react-icons/tb';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import TabValue from '../enum/media-tab-value';
-import MediaUploadTab from './media-upload-tab';
+import TabValue from '../../enum/media-tab-value';
+import MediaUploadTab from './MediaUploadTab';
 
-//Components
 import {
   Dialog,
   DialogContent,
@@ -25,13 +24,14 @@ import {
   MAX_VIDEO,
   validateVideoDuration,
   VIDEO_THUMBNAIL_DEFAULT_URL,
-} from '../helpers/media-upload.helper';
-import useIsMature from '../hooks/useIsMature';
-import { PostMedia } from '../types/post-media';
+} from '../../helpers/media-upload.helper';
+import { useCheckMaturity } from '../../hooks/useIsMature';
+import { PostMedia } from '../../types/post-media';
+import AddMoreMediaButton from './AddMoreMediaButton';
 import InfoMediaRemaining from './InfoMediaRemaining';
-import MediaPreview from './media-preview';
-import PostAiImages from './post-ai-images';
-import UploadFromDevice from './UploadFromDevice';
+import MediaPreviewer from './MediaPreviewer';
+import SelectAiImagesPanel from './SelectAiImagesPanel';
+import SelectDeviceMediaPanel from './UploadFromDevice';
 
 interface MediaSelectorPanelProps {
   postMedias: PostMedia[];
@@ -41,9 +41,10 @@ interface MediaSelectorPanelProps {
   setHasArtNovaImages: React.Dispatch<React.SetStateAction<boolean>>;
   isMatureAutoDetected: boolean;
   handleIsMatureAutoDetected: React.Dispatch<React.SetStateAction<boolean>>;
+  onMediasChanged?: () => void;
 }
 
-export default function MediaSelectorPanel({
+export default function PostMediaManager({
   postMedias,
   setPostMedias,
   onThumbnailAddedOrRemoved,
@@ -51,6 +52,7 @@ export default function MediaSelectorPanel({
   setHasArtNovaImages,
   isMatureAutoDetected,
   handleIsMatureAutoDetected,
+  onMediasChanged,
 }: MediaSelectorPanelProps) {
   const { showSnackbar } = useSnackbar();
 
@@ -102,11 +104,7 @@ export default function MediaSelectorPanel({
     }
   }, [postMedias, isMatureAutoDetected, handleIsMatureAutoDetected]);
 
-  const {
-    checkMaturityForNewItems,
-    isLoading: isCheckingMature,
-    // isError: matureError,
-  } = useIsMature();
+  const { mutateAsync: checkMaturityForNewItems } = useCheckMaturity();
 
   const captureThumbnailFromVideo = (videoElement: HTMLVideoElement) => {
     const canvas = document.createElement('canvas');
@@ -152,8 +150,6 @@ export default function MediaSelectorPanel({
     // combine with existing files
     const combinedMedias = [...postMedias, ...matureProcessedImageMedias];
 
-    console.log('Combined Medias:', combinedMedias);
-
     // image count
     const imageCount = combinedMedias.filter(
       (media) => media.type === MEDIA_TYPE.IMAGE,
@@ -163,6 +159,8 @@ export default function MediaSelectorPanel({
       return;
     }
     setPostMedias(combinedMedias);
+
+    onMediasChanged?.();
 
     // first time adding a media
     if (postMedias.length === 0) {
@@ -174,7 +172,10 @@ export default function MediaSelectorPanel({
   const handleVideoAdded = async (event: ChangeEvent<HTMLInputElement>) => {
     const videoFiles = event.target.files;
     if (!videoFiles || videoFiles.length === 0) return;
-    if (videoFiles.length > MAX_VIDEO) {
+    if (
+      postMedias.filter((media) => media.type === MEDIA_TYPE.VIDEO).length >=
+      MAX_VIDEO
+    ) {
       showSnackbar(`You can only upload up to ${MAX_VIDEO} video.`, 'error');
       return;
     }
@@ -197,6 +198,7 @@ export default function MediaSelectorPanel({
     ];
     const combinedMedias = [...postMedias, ...newVideoMedia];
     setPostMedias(combinedMedias);
+    onMediasChanged?.();
 
     // auto-thumbnail logic
     if (postMedias.length === 0) {
@@ -223,6 +225,7 @@ export default function MediaSelectorPanel({
   const handleRemoveMediaPreview = (media: PostMedia) => {
     const { url, file } = media;
     setPostMedias((prev) => prev.filter((media) => media.file !== file));
+    onMediasChanged?.();
 
     if (url?.startsWith('blob:')) {
       URL.revokeObjectURL(url);
@@ -294,9 +297,9 @@ export default function MediaSelectorPanel({
               >
                 <InfoMediaRemaining
                   currentImageCount={imageCount}
-                  MaxImage={MAX_IMAGES}
+                  maxImage={MAX_IMAGES}
                   hasVideo={hasVideo}
-                  MaxVideo={MAX_VIDEO}
+                  maxVideo={MAX_VIDEO}
                   hasAI={tabValue !== TabValue.BROWSE_GENAI}
                 />
                 <Tooltip title="Marked as an AI Post. Its prompt may appear in trending suggestions for others to reuse.">
@@ -308,56 +311,35 @@ export default function MediaSelectorPanel({
                   </div>
                 </Tooltip>
               </Box>
-              {isCheckingMature ? (
-                <Box
-                  sx={{
-                    height: '100%',
-                    minHeight: 0,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                  }}
-                  className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
-                >
-                  <div className="flex flex-col items-center space-y-2">
-                    <div className="border-mountain-600 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-                    <span className="text-mountain-600 text-sm">
-                      Processing images...
-                    </span>
-                  </div>
-                </Box>
-              ) : (
-                <Box
-                  sx={{
-                    height: '100%',
-                    minHeight: 0,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                    position: 'relative',
-                  }}
-                  className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
-                >
-                  {selectedPreviewMedia ? (
-                    <MediaPreview media={selectedPreviewMedia} />
-                  ) : tabValue === TabValue.UPLOAD_MEDIA ? (
-                    <UploadFromDevice
-                      onAddImages={handleImagesAdded}
-                      onAddVideo={handleVideoAdded}
-                    />
-                  ) : (
-                    <PostAiImages handleImageFilesChange={handleImagesAdded} />
-                  )}
-                </Box>
-              )}
+              <Box
+                sx={{
+                  height: '100%',
+                  minHeight: 0,
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
+                className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
+              >
+                {selectedPreviewMedia ? (
+                  <MediaPreviewer media={selectedPreviewMedia} />
+                ) : tabValue === TabValue.UPLOAD_MEDIA ? (
+                  <SelectDeviceMediaPanel
+                    onAddImages={handleImagesAdded}
+                    onAddVideo={handleVideoAdded}
+                  />
+                ) : (
+                  <SelectAiImagesPanel />
+                )}
+              </Box>
               {/* Carousel */}
               <Box
                 className="custom-scrollbar flex h-fit space-x-2 pt-3"
-                sx={{ flexShrink: 0, overflowX: 'hidden' }}
+                sx={{
+                  flexShrink: 0,
+                }}
               >
                 {postMedias.map((media, i) => (
                   <Box
@@ -395,24 +377,15 @@ export default function MediaSelectorPanel({
                     </IconButton>
                   </Box>
                 ))}
-                <Box
-                  className="border-mountain-600 flex h-[80px] w-[80px] cursor-pointer items-center justify-center rounded-md border text-gray-900 dark:text-white"
-                  component="label"
+                <AddMoreMediaButton
                   hidden={
                     (imageCount === 0 && !hasVideo) ||
-                    imageCount === MAX_IMAGES ||
+                    (imageCount === MAX_IMAGES && hasVideo) ||
                     hasArtNovaImages
                   }
-                >
-                  <MdAdd size={32} />
-                  <input
-                    accept="image/*"
-                    type="file"
-                    multiple
-                    hidden
-                    onChange={handleImagesAdded}
-                  />
-                </Box>
+                  handleImagesAdded={handleImagesAdded}
+                  handleVideoAdded={handleVideoAdded}
+                />
               </Box>
             </Box>
           );

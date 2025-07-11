@@ -41,18 +41,18 @@ const TokenPopover: React.FC = () => {
         </div>
       </PopoverTrigger>
       <PopoverContent
-        className="dark:bg-mountain-900 mt-4 p-3 border-mountain-100 dark:border-mountain-700 w-80"
+        className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-4 w-80 p-3"
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
       >
         <div className="flex flex-col space-y-2">
-          <p className="inline-block bg-clip-text bg-gradient-to-r from-pink-600 via-purple-500 to-indigo-700 w-fit font-medium text-transparent text-3xl">
+          <p className="inline-block w-fit bg-gradient-to-r from-pink-600 via-purple-500 to-indigo-700 bg-clip-text text-3xl font-medium text-transparent">
             {tokenNumber}
           </p>
           <p>credits remaining, get more with</p>
           {/* <Button>Upgrade</Button> */}
         </div>
-        <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
+        <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
         <div className="flex flex-col space-y-2">
           <p className="text-mountain-700 text-sm">
             Estimated remaining based on your credits

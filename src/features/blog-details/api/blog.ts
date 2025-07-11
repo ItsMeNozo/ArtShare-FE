@@ -1,10 +1,10 @@
-import api from "@/api/baseApi";
-import { PaginatedResponse } from "@/api/types/paginated-response.type";
+import api from '@/api/baseApi';
+import { PaginatedResponse } from '@/api/types/paginated-response.type';
 import {
   Blog,
   mapSimpleBlogResponseToBlog,
   SimpleBlogResponseDto,
-} from "@/types/blog";
+} from '@/types/blog';
 
 /**
  * Fetch details for a single blog by ID.
@@ -93,8 +93,8 @@ export const fetchBlogLikes = async (
   items: {
     id: string;
     username: string;
-    profile_picture_url?: string | null;
-    full_name?: string | null;
+    profilePictureUrl?: string | null;
+    fullName?: string | null;
   }[]; // Matched LikingUserResponseDto closer
   total: number;
 }> => {
@@ -103,8 +103,8 @@ export const fetchBlogLikes = async (
     items: {
       id: string;
       username: string;
-      profile_picture_url?: string | null;
-      full_name?: string | null;
+      profilePictureUrl?: string | null;
+      fullName?: string | null;
     }[];
     total: number;
   }>(`/blogs/${blogId}/likes`, { params });

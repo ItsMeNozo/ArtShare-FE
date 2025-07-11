@@ -131,8 +131,8 @@ const BlogDetails = () => {
   const likeMutation = useMutation({
     mutationFn: () =>
       createLike({
-        target_id: Number(blogId),
-        target_type: TargetType.BLOG,
+        targetId: Number(blogId),
+        targetType: TargetType.BLOG,
       }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] }),
@@ -148,8 +148,8 @@ const BlogDetails = () => {
   const unlikeMutation = useMutation({
     mutationFn: () =>
       removeLike({
-        target_id: Number(blogId),
-        target_type: TargetType.BLOG,
+        targetId: Number(blogId),
+        targetType: TargetType.BLOG,
       }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] }),
@@ -163,8 +163,8 @@ const BlogDetails = () => {
   });
 
   const isOwnBlog = user?.id === blog?.user.id;
-  const isFollowing = blog?.user.is_following;
-  const isPublished = blog?.is_published ?? true;
+  const isFollowing = blog?.user.isFollowing;
+  const isPublished = blog?.isPublished ?? true;
 
   const toggleFollow = () =>
     requireAuth('follow/unfollow users', () =>
@@ -174,7 +174,7 @@ const BlogDetails = () => {
   const followBtnLoading =
     followMutation.isPending || unfollowMutation.isPending;
   const isLiked = blog?.isLikedByCurrentUser || false;
-  const likeCount = blog?.like_count || 0;
+  const likeCount = blog?.likeCount || 0;
 
   const handleToggleLike = () =>
     requireAuth('like this blog', () => {
@@ -465,7 +465,7 @@ const BlogDetails = () => {
         >
           <BiComment className="mr-1 size-4 text-green-600 dark:text-green-400" />
           <span className="font-medium text-green-700 dark:text-green-300">
-            {blog.comment_count}
+            {blog.commentCount}
           </span>
         </div>
       </Tooltip>
@@ -554,7 +554,7 @@ const BlogDetails = () => {
               <>
                 <p>
                   Published{' '}
-                  {formatDistanceToNow(new Date(blog.created_at), {
+                  {formatDistanceToNow(new Date(blog.createdAt), {
                     addSuffix: true,
                   })}
                 </p>
@@ -569,7 +569,7 @@ const BlogDetails = () => {
                 <span>•</span>
                 <p>
                   Created{' '}
-                  {formatDistanceToNow(new Date(blog.created_at), {
+                  {formatDistanceToNow(new Date(blog.createdAt), {
                     addSuffix: true,
                   })}
                 </p>
@@ -625,9 +625,9 @@ const BlogDetails = () => {
           {/* Author Info Box */}
           <div className="dark:border-mountain-700 flex items-center justify-between rounded-lg border border-transparent bg-gradient-to-r from-indigo-100 to-purple-100 p-4 shadow-sm dark:from-indigo-900/30 dark:to-purple-900/30">
             <div className="flex items-center space-x-4">
-              {blog.user.profile_picture_url ? (
+              {blog.user.profilePictureUrl ? (
                 <img
-                  src={blog.user.profile_picture_url}
+                  src={blog.user.profilePictureUrl}
                   alt={blog.user.username}
                   className="h-12 w-12 rounded-full object-cover"
                 />
@@ -641,14 +641,14 @@ const BlogDetails = () => {
               )}
               <div className="flex flex-col">
                 <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                  {blog.user.full_name}
+                  {blog.user.fullName}
                 </p>
                 <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
                   <span>@{blog.user.username}</span>
                   <span className="text-gray-400 dark:text-gray-500">•</span>
                   <span>
-                    {blog.user.followers_count.toLocaleString()}{' '}
-                    {blog.user.followers_count <= 1 ? 'follower' : 'followers'}
+                    {blog.user.followersCount.toLocaleString()}{' '}
+                    {blog.user.followersCount <= 1 ? 'follower' : 'followers'}
                   </span>
                 </div>
               </div>

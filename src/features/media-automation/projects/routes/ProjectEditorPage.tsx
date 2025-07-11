@@ -61,7 +61,7 @@ const ProjectEditorPage = () => {
   }
 
   return (
-    <Box className="relative flex justify-center items-center p-4 w-full h-full">
+    <Box className="relative flex h-full w-full items-center justify-center p-4">
       {isLoadingProject && <Loading />}
       <Formik
         initialValues={initialValues}
@@ -72,32 +72,30 @@ const ProjectEditorPage = () => {
         {(formikProps: FormikProps<ProjectFormValues>) => {
           const { dirty, isSubmitting } = formikProps;
           return (
-            <Form className="flex flex-col items-center space-y-4 w-full h-full">
-              <div className='flex justify-center bg-gradient-to-br from-blue-100 to-indigo-50 p-2 rounded-lg w-full h-64'>
+            <Form className="flex h-full w-full flex-col items-center space-y-4">
+              <div className="flex h-64 w-full justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-50 p-2">
                 <PlatformSelection isEditMode={isEditMode} />
               </div>
               {/* General Info Section */}
-              <div className="flex flex-col space-y-4 w-xl">
-                <div className="flex flex-col items-center space-y-4 w-xl">
+              <div className="flex w-xl flex-col space-y-4">
+                <div className="flex w-xl flex-col items-center space-y-4">
                   <Box className="w-full">
-                    <Typography className="flex gap-1 mb-1 w-full font-medium text-left">
+                    <Typography className="mb-1 flex w-full gap-1 text-left font-medium">
                       Project Name
                       <span className="text-red-600">*</span>
                     </Typography>
                     <Field
                       name="projectName" // Connects to Formik state
                       as={TextField}
-                      className="rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 w-full"
+                      className="focus:ring-mountain-500 w-full rounded-md focus:ring-2 focus:outline-none"
                       placeholder="Enter your project name"
                     />
                     <ErrorMessage name="projectName">
-                      {(errorMsg) => (
-                        <InlineErrorMessage errorMsg={errorMsg} />
-                      )}
+                      {(errorMsg) => <InlineErrorMessage errorMsg={errorMsg} />}
                     </ErrorMessage>
                   </Box>
                   <Box className="w-full">
-                    <Typography className="flex gap-1 mb-1 w-full font-medium text-left">
+                    <Typography className="mb-1 flex w-full gap-1 text-left font-medium">
                       Description
                       <span className="text-red-600">*</span>
                     </Typography>
@@ -106,7 +104,7 @@ const ProjectEditorPage = () => {
                       as={TextField}
                       multiline
                       rows={4}
-                      className="rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 w-full esize-none"
+                      className="focus:ring-mountain-500 esize-none w-full rounded-md focus:ring-2 focus:outline-none"
                       placeholder="Enter your project description"
                     />
                     <ErrorMessage name="description">
@@ -129,15 +127,7 @@ const ProjectEditorPage = () => {
                 type="submit"
                 startIcon={<FaSave />}
                 disabled={!dirty || isSubmitting}
-                className={`
-                  absolute bottom-4
-                  hover:cursor-pointer
-                  w-48 h-10
-                text-white font-medium
-                  bg-indigo-600
-                  hover:bg-indigo-700
-                  disabled:bg-gray-300 disabled:cursor-not-allowed
-                `}
+                className={`absolute bottom-4 h-10 w-48 bg-indigo-600 font-medium text-white hover:cursor-pointer hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-300`}
               >
                 {isSubmitting ? 'Saving...' : 'Save Project'}
               </Button>

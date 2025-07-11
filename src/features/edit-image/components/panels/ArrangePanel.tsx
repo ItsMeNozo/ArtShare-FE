@@ -12,15 +12,7 @@ type PanelsProp = {
 };
 
 const ArrangePanel: React.FC<PanelsProp> = ({ selectedLayerId, layers }) => {
-  if (!selectedLayerId)
-    return (
-      <div className="flex justify-center w-full text-mountain-600 text-xs text-center">
-        <span>Select the layer to view the details.</span>
-      </div>
-    )
-
   const selectedLayer = layers?.find((layer) => layer.id === selectedLayerId) as ImageLayer;
-
   return (
     <>
       <div className="flex flex-col space-y-6">
@@ -29,7 +21,7 @@ const ArrangePanel: React.FC<PanelsProp> = ({ selectedLayerId, layers }) => {
           <Input
             className="flex bg-mountain-50 border w-full placeholder:text-mountain-600"
             placeholder="Input Layer Name"
-            defaultValue={selectedLayer?.name || "File Name"}
+            value={selectedLayer ? selectedLayer?.name : "File Name"}
           />
           <Button className="flex bg-mountain-50 py-2 border border-mountain-200 w-32 font-normal">
             <MdLockOutline className="mr-2 size-5 text-mountain-600" />

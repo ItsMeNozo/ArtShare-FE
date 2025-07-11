@@ -3,12 +3,11 @@ import { Label } from "@/components/ui/label";
 import OpacitySlider from "../sliders/OpacitySlider";
 
 //Icons
-import { PiFlipHorizontalLight } from "react-icons/pi";
-import { PiFlipVerticalLight } from "react-icons/pi";
-import { IoDuplicateOutline } from "react-icons/io5";
-import { GoTrash } from "react-icons/go";
-import RotateSlider from "../sliders/RotateSlider";
-import LayerPosition from "../sliders/LayerPosition";
+import { GoTrash } from 'react-icons/go';
+import { IoDuplicateOutline } from 'react-icons/io5';
+import { PiFlipHorizontalLight, PiFlipVerticalLight } from 'react-icons/pi';
+import LayerPosition from '../sliders/LayerPosition';
+import RotateSlider from '../sliders/RotateSlider';
 
 type PanelsProp = {
   selectedLayerId: string;
@@ -39,12 +38,12 @@ const CropPanel: React.FC<PanelsProp> = ({
         <Label className="font-medium">Layer position</Label>
         <div className="flex justify-between gap-4 w-full">
           <LayerPosition
-            label={"X"}
+            label={'X'}
             position={layers.find((layer) => layer.id === selectedLayerId)?.x!}
             onChange={handleLayerXPosition}
           />
           <LayerPosition
-            label={"Y"}
+            label={'Y'}
             position={layers.find((layer) => layer.id === selectedLayerId)?.y!}
             onChange={handleLayerYPosition}
           />

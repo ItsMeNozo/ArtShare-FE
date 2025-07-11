@@ -6,7 +6,6 @@ import { IoHome } from "react-icons/io5";
 import { PiStarFourFill } from "react-icons/pi";
 
 //Components
-import UserInAppConfigs from "../../../components/popovers/UserInAppConfigs";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,7 @@ import UserButton from "../../../components/header/user-button";
 
 //Context
 import { useUser } from '@/contexts/user/useUser';
+import UserInAppConfigs from "@/components/popovers/UserInAppConfigs";
 
 const AIHeader: React.FC = () => {
   const { user, loading } = useUser();
@@ -67,12 +67,12 @@ const AIHeader: React.FC = () => {
           </Dialog>
         </div>
       </div>
-      <div className={`flex items-center h-full space-x-2`}>
+      <div className={`flex h-full items-center space-x-2`}>
         <UserButton user={user!} loading={loading!} />
         <UserInAppConfigs />
       </div>
-    </nav >
-  )
-}
+    </nav>
+  );
+};
 
 export default AIHeader;

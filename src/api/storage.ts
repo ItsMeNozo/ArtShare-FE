@@ -1,25 +1,25 @@
-import axios from "axios"
-import api from "./baseApi"
+import axios from 'axios';
+import api from './baseApi';
 
 export type GetPresignedUrlResponse = {
-  presignedUrl: string
-  fileUrl: string
-}
+  presignedUrl: string;
+  fileUrl: string;
+};
 
 export const getPresignedUrl = async (
   fileName: string,
   extension: string,
   mediaType: string,
-  directory: string
+  directory: string,
 ): Promise<GetPresignedUrlResponse> => {
-  const response = await api.post("/storage/presigned-url", {
+  const response = await api.post('/storage/presigned-url', {
     fileName,
     extension,
     mediaType,
     directory,
-  })
-  return response.data
-}
+  });
+  return response.data;
+};
 
 export const uploadFile = async (file: File, presignedUrl: string) => {
   try {
@@ -34,4 +34,4 @@ export const uploadFile = async (file: File, presignedUrl: string) => {
     console.error('Error uploading file:', error);
     throw error; // Re-throw the error to be handled by the caller
   }
-}
+};

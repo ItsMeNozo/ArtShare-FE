@@ -1,18 +1,18 @@
 //Core
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 //Components
-import { Button, CircularProgress, TextareaAutosize } from "@mui/material";
-import PromptResult from "./components/PromptResult";
-import SettingsPanel from "./components/SettingsPanel/SettingsPanel";
-import AIBot from "./components/AI/AIBot";
+import { Button, CircularProgress, TextareaAutosize } from '@mui/material';
+import AIBot from './components/AI/AIBot';
+import PromptResult from './components/PromptResult';
+import SettingsPanel from './components/SettingsPanel/SettingsPanel';
 
 //Icons
-import { BiInfoCircle } from "react-icons/bi";
+import { BiInfoCircle } from 'react-icons/bi';
 
 //Css files
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import 'slick-carousel/slick/slick-theme.css';
+import 'slick-carousel/slick/slick.css';
 
 //Mock/Enum
 import {
@@ -24,20 +24,33 @@ import {
 import { MockModelOptionsData } from "./data/Data";
 
 //API Backend
-import { useQueryClient } from "@tanstack/react-query";
-import { generateImages } from "./api/generate-imges.api";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { useSubscriptionInfo } from "@/hooks/useSubscription";
-import axios, { AxiosError } from "axios";
 import {
   BackendErrorResponse,
   DEFAULT_ERROR_MSG,
-} from "@/api/types/error-response.type";
-import { buildTempPromptResult } from "./helper/image-gen.helper";
-import { useScrollBottom } from "@/hooks/useScrollBottom";
-import { usePromptHistory } from "@/hooks/usePromptHistory";
-import { useLocation } from "react-router-dom";
-import AIHeader from "@/features/gen-art/components/AIHeader";
+} from '@/api/types/error-response.type';
+import AIHeader from '@/features/gen-art/components/AIHeader';
+import { usePromptHistory } from '@/hooks/usePromptHistory';
+import { useScrollBottom } from '@/hooks/useScrollBottom';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { useSubscriptionInfo } from '@/hooks/useSubscription';
+import { useQueryClient } from '@tanstack/react-query';
+import axios, { AxiosError } from 'axios';
+import { useLocation } from 'react-router-dom';
+import { generateImages } from './api/generate-imges.api';
+import { buildTempPromptResult } from './helper/image-gen.helper';
+
+{
+  /*
+A stunning realistic scene featuring a woman astronaut curiously peeking out of 
+her dormitory window aboard a futuristic space station, overlooking the breathtaking 
+view of Earth below. The setting showcases a vibrant blue planet adorned with swirling 
+clouds and continents. Surrounding the space station are sleek construction drones actively 
+working, along with various spacecraft gliding gracefully through the cosmos. 
+The artwork is richly detailed and realistic, inspired by the visionary style of Syd Mead, 
+capturing the intricate design of the space station and the dynamic activity in orbit, 
+with stars twinkling in the background creating a sense of vastness in space.
+*/
+}
 
 const PAGE_SIZE = 5;
 
@@ -45,7 +58,7 @@ const ArtGenAI = () => {
   const { showSnackbar } = useSnackbar();
   const [expanded, setExpanded] = useState<boolean>(true);
   const [promptExpanded, setPromptExpanded] = useState<boolean>(false);
-  const [userPrompt, setUserPrompt] = useState("");
+  const [userPrompt, setUserPrompt] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [scrollTrigger, setScrollTrigger] = useState(0);
   const location = useLocation();
@@ -64,12 +77,8 @@ const ArtGenAI = () => {
   const { data: subscriptionInfo } = useSubscriptionInfo();
 
   // Prompt History results and filtering management
-  const {
-    scrollRef,
-    displayedResults,
-    setDisplayedResults,
-    loading
-  } = usePromptHistory();
+  const { scrollRef, displayedResults, setDisplayedResults, loading } =
+    usePromptHistory();
   useScrollBottom(scrollRef, [scrollTrigger], 200);
 
   useEffect(() => {
@@ -94,7 +103,7 @@ const ArtGenAI = () => {
     // style list = array of { name: "anime", … }
     const styleOpt =
       MockModelOptionsData.find(
-        (o) => o.name.toLowerCase() === (style ?? "").toLowerCase(),
+        (o) => o.name.toLowerCase() === (style ?? '').toLowerCase(),
       ) ?? MockModelOptionsData[0];
     setStyle(styleOpt);
   }, [location.state]);
@@ -104,8 +113,8 @@ const ArtGenAI = () => {
     if (!userPrompt.trim()) return;
     if (subscriptionInfo?.aiCreditRemaining === 0) {
       showSnackbar(
-        "You’ve run out of AI credits. Upgrade your plan or come back later.",
-        "warning",
+        'You’ve run out of AI credits. Upgrade your plan or come back later.',
+        'warning',
       );
       return;
     }
@@ -119,7 +128,7 @@ const ArtGenAI = () => {
     };
 
     setDisplayedResults((prev) => [...prev, placeholder].slice(-PAGE_SIZE));
-    setUserPrompt("");
+    setUserPrompt('');
     setScrollTrigger((prev) => prev + 1);
 
     try {
@@ -147,10 +156,10 @@ const ArtGenAI = () => {
           DEFAULT_ERROR_MSG)
         : DEFAULT_ERROR_MSG;
 
-      showSnackbar(msg, "error");
-      console.error("Image generation failed:", e);
+      showSnackbar(msg, 'error');
+      console.error('Image generation failed:', e);
     } finally {
-      queryClient.invalidateQueries({ queryKey: ["subscriptionInfo"] });
+      queryClient.invalidateQueries({ queryKey: ['subscriptionInfo'] });
     }
   };
 
@@ -171,11 +180,11 @@ const ArtGenAI = () => {
       }
     };
     if (promptExpanded) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [promptExpanded]);
 
@@ -201,7 +210,7 @@ const ArtGenAI = () => {
         </div>
         <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div
-            className={`flex relative h-full custom-scrollbar flex-col ${expanded ? "w-[80%]" : "w-full delay-300"} items-start transition-all duration-200 ease-in-out`}
+            className={`custom-scrollbar relative flex h-full flex-col ${expanded ? 'w-[80%]' : 'w-full delay-300'} items-start transition-all duration-200 ease-in-out`}
           >
             {loading ? (
               <div className="flex justify-center items-start mt-4 w-full h-full">
@@ -236,38 +245,36 @@ const ArtGenAI = () => {
         </div>
         {/* Prompt Chat */}
         <div
-          className={`flex bottom-4 items-end left-1/2 z-50 absolute transform duration-300 ease-in-out ${expanded ? "-translate-x-1/4" : "-translate-x-1/2  delay-300"}`}
+          className={`absolute bottom-4 left-1/2 z-50 flex transform items-end duration-300 ease-in-out ${expanded ? '-translate-x-1/4' : '-translate-x-1/2 delay-300'}`}
         >
           <div
-            className={`flex flex-col bg-white border ${promptExpanded ? "border-indigo-600 shadow-lg" : "border-mountain-300 shadow-md"} rounded-xl w-[720px] relative`}
+            className={`flex flex-col border bg-white ${promptExpanded ? 'border-indigo-600 shadow-lg' : 'border-mountain-300 shadow-md'} relative w-[720px] rounded-xl`}
           >
             <div
-              className={`flex bg-white rounded-xl w-[718px] border-0 rounded-b-none overflow-hidden transition-all duration-400 ease-in-out transform
-                            ${promptExpanded ? "h-24 scale-y-100 opacity-100 py-2" : "h-0 opacity-0"} 
-                            overflow-y-auto`}
+              className={`flex w-[718px] transform overflow-hidden rounded-xl rounded-b-none border-0 bg-white transition-all duration-400 ease-in-out ${promptExpanded ? 'h-24 scale-y-100 py-2 opacity-100' : 'h-0 opacity-0'} overflow-y-auto`}
             >
               <TextareaAutosize
                 value={userPrompt}
                 ref={textareaRef}
                 onChange={(e) => setUserPrompt(e.target.value)}
                 placeholder="What do you imagine about?"
-                className={`flex p-2 resize-none bg-white custom-scrollbar rounded-xl w-full text-sm rounded-b-none h-full overflow-y-auto placeholder:text-mountain-400 outline-none focus:outline-none focus:ring-0 focus:border-transparent`}
+                className={`custom-scrollbar placeholder:text-mountain-400 flex h-full w-full resize-none overflow-y-auto rounded-xl rounded-b-none bg-white p-2 text-sm outline-none focus:border-transparent focus:ring-0 focus:outline-none`}
               />
             </div>
             <div
               onClick={() => handlePrompt()}
-              className={`${promptExpanded && "rounded-t-none pointer-events-none"
-                } items-center text-sm flex bg-white px-2 py-4 rounded-xl w-[718px] h-15 line-clamp-1 hover:cursor-pointer overflow-y-auto`}
+              className={`${promptExpanded && 'pointer-events-none rounded-t-none'
+                } line-clamp-1 flex h-15 w-[718px] items-center overflow-y-auto rounded-xl bg-white px-2 py-4 text-sm hover:cursor-pointer`}
             >
               {userPrompt ? (
                 <p
-                  className={`pr-26 line-clamp-1 ${promptExpanded && "hidden"}`}
+                  className={`line-clamp-1 pr-26 ${promptExpanded && 'hidden'}`}
                 >
                   {userPrompt}
                 </p>
               ) : (
                 <p
-                  className={`pr-26 text-mountain-400 ${promptExpanded && "hidden"}`}
+                  className={`text-mountain-400 pr-26 ${promptExpanded && 'hidden'}`}
                 >
                   What do you imagine about?
                 </p>

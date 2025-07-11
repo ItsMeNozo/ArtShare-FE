@@ -1,4 +1,4 @@
-import { ModelKey } from "../enum";
+import { ModelKey } from '../enum';
 
 export const buildTempPromptResult = (
   userPrompt: string,
@@ -6,16 +6,16 @@ export const buildTempPromptResult = (
 ): PromptResult => {
   return {
     id: -1,
-    user_prompt: userPrompt,
-    final_prompt: "",
-    aspect_ratio: "",
-    created_at: new Date().toISOString(),
-    camera: "",
-    lighting: "",
-    model_key: ModelKey.GPT_IMAGE_1,
-    number_of_images_generated: numberOfImages,
-    style: "",
-    user_id: "", // Placeholder, replace with actual user ID if needed
-    image_urls: Array(numberOfImages).fill(""),
+    userPrompt: userPrompt,
+    finalPrompt: '',
+    aspectRatio: '',
+    createdAt: new Date().toISOString(),
+    camera: '',
+    lighting: '',
+    modelKey: ModelKey.GPT_IMAGE_1,
+    numberOfImagesGenerated: numberOfImages,
+    style: '',
+    userId: '', // Placeholder, replace with actual user ID if needed
+    imageUrls: Array(numberOfImages).fill(''),
   };
 };

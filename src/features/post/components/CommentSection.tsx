@@ -79,12 +79,12 @@ const addReplyRecursive = (
       // Sort replies by creation date to ensure latest is at bottom
       const sortedReplies = updatedReplies.sort(
         (a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
       return {
         ...c,
         replies: sortedReplies,
-        reply_count: (c.reply_count ?? 0) + 1,
+        replyCount: (c.replyCount ?? 0) + 1,
       };
     }
     return c.replies?.length
@@ -98,7 +98,7 @@ const toggleLikeRecursive = (list: CommentUI[], id: number): CommentUI[] =>
       ? {
           ...c,
           likedByCurrentUser: !c.likedByCurrentUser,
-          like_count: (c.like_count ?? 0) + (c.likedByCurrentUser ? -1 : 1),
+          likeCount: (c.likeCount ?? 0) + (c.likedByCurrentUser ? -1 : 1),
         }
       : c.replies?.length
         ? { ...c, replies: toggleLikeRecursive(c.replies, id) }
@@ -119,9 +119,9 @@ const removeRecursive = (list: CommentUI[], id: number): CommentUI[] => {
           return {
             ...c,
             replies: updatedReplies,
-            reply_count: Math.max(
+            replyCount: Math.max(
               0,
-              (c.reply_count ?? 0) - (originalReplyCount - newReplyCount),
+              (c.replyCount ?? 0) - (originalReplyCount - newReplyCount),
             ),
           };
         }
@@ -139,7 +139,7 @@ const updateContentRecursive = (
 ): CommentUI[] =>
   list.map((c) =>
     c.id === id
-      ? { ...c, content, updated_at: new Date() }
+      ? { ...c, content, updatedAt: new Date() }
       : c.replies?.length
         ? { ...c, replies: updateContentRecursive(c.replies, id, content) }
         : c,
@@ -203,7 +203,7 @@ const CommentRow = ({
   const { user } = useUser();
   const { showSnackbar } = useSnackbar();
   const CURRENT_USER_ID = user?.id;
-  const isMine = comment.user_id === CURRENT_USER_ID;
+  const isMine = comment.userId === CURRENT_USER_ID;
   const isEditing = editingId === comment.id;
   const editRef = useRef<HTMLTextAreaElement>(null);
   const prevReplyCountRef = useRef(comment.replies?.length || 0);
@@ -218,7 +218,7 @@ const CommentRow = ({
   const [replying, setReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
-  const olderCount = Math.max(0, (comment.reply_count ?? 0) - freshIds.size);
+  const olderCount = Math.max(0, (comment.replyCount ?? 0) - freshIds.size);
   // show the thread container if there's any older OR any fresh replies
   const showThread = olderCount > 0 || freshIds.size > 0;
   // only show the “View/Hide” button when there are truly older replies
@@ -264,7 +264,7 @@ const CommentRow = ({
 
   const toggleReplies = async () => {
     const loaded = comment.replies?.length ?? 0;
-    const total = comment.reply_count ?? 0;
+    const total = comment.replyCount ?? 0;
     const needsToFetch = !showReplies && loaded < total;
 
     if (needsToFetch) {
@@ -323,9 +323,9 @@ const CommentRow = ({
     >
       <Box className="w-full">
         <div className="flex w-full gap-3 py-3">
-          {comment.user.profile_picture_url ? (
+          {comment.user.profilePictureUrl ? (
             <img
-              src={comment.user.profile_picture_url}
+              src={comment.user.profilePictureUrl}
               alt={comment.user.username}
               className="h-8 w-8 cursor-pointer rounded-full object-cover ring-2 ring-transparent transition-all duration-200 hover:ring-blue-500/30"
               onClick={(e) => {
@@ -363,9 +363,9 @@ const CommentRow = ({
               <span
                 className="text-xs text-neutral-500 dark:text-neutral-400"
                 title={
-                  new Date(comment.updated_at).getTime() !==
-                  new Date(comment.created_at).getTime()
-                    ? `Edited ${new Date(comment.updated_at).toLocaleString(
+                  new Date(comment.updatedAt).getTime() !==
+                  new Date(comment.createdAt).getTime()
+                    ? `Edited: ${new Date(comment.updatedAt).toLocaleString(
                         undefined,
                         DATETIME_FORMAT_OPTIONS_FOR_TITLE,
                       )}`
@@ -373,11 +373,11 @@ const CommentRow = ({
                 }
               >
                 <ReactTimeAgo
-                  date={new Date(comment.updated_at)}
-                  locale="en-US"
+                  date={new Date(comment.updatedAt)}
+                  timeStyle="mini-now"
                 />
-                {new Date(comment.updated_at).getTime() !==
-                  new Date(comment.created_at).getTime() && ' (edited)'}
+                {new Date(comment.updatedAt).getTime() !==
+                  new Date(comment.createdAt).getTime() && ' (edited)'}
               </span>
             </div>
 
@@ -429,7 +429,7 @@ const CommentRow = ({
                   />
                 </IconButton>
                 <Typography variant="caption" sx={{ mr: 2 }}>
-                  {comment.like_count ?? 0}
+                  {comment.likeCount ?? 0}
                 </Typography>
                 {canReplyToThisComment && (
                   <Button
@@ -526,8 +526,8 @@ const CommentRow = ({
               ?.filter((r) => showReplies || freshIds.has(r.id))
               .sort(
                 (a, b) =>
-                  new Date(a.created_at).getTime() -
-                  new Date(b.created_at).getTime(),
+                  new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime(),
               )
               .map((r) => (
                 <CommentRow
@@ -558,9 +558,9 @@ const CommentRow = ({
             style={{ marginLeft: INDENT }} // Apply indent directly to the reply box container
           >
             {/* avatar */}
-            {user?.profile_picture_url ? (
+            {user?.profilePictureUrl ? (
               <img
-                src={user.profile_picture_url}
+                src={user.profilePictureUrl}
                 alt={user.username}
                 className="h-8 w-8 rounded-full object-cover"
               />
@@ -765,7 +765,6 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     const clearFresh = (parentId: number) =>
       setNewRepliesMap((prev) => {
         if (!prev[parentId]) return prev;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [parentId]: _, ...rest } = prev;
         return rest;
       });
@@ -1339,22 +1338,22 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
       const optimistic: CommentUI = {
         id: tmpId,
-        user_id: CURRENT_USER_ID || '',
+        userId: CURRENT_USER_ID || '',
         user: {
           id: CURRENT_USER_ID!,
           username: user?.username || '',
-          profile_picture_url: user?.profile_picture_url,
+          profilePictureUrl: user?.profilePictureUrl,
         } as User,
-        parent_comment_id: parentId ?? null,
-        target_id: targetId,
-        target_type: targetType,
+        parentCommentId: parentId,
+        targetId,
+        targetType,
         content,
-        created_at: now,
-        updated_at: now,
+        createdAt: now,
+        updatedAt: now,
         replies: [],
-        like_count: 0,
+        likeCount: 0,
         likedByCurrentUser: false,
-        reply_count: 0,
+        replyCount: 0,
       };
 
       // Optimistically update UI to show the new reply (and bump reply_count)
@@ -1375,9 +1374,9 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       try {
         const payload: CreateCommentDto = {
           content,
-          target_id: targetId,
-          target_type: targetType,
-          parent_comment_id: parentId ?? undefined,
+          targetId,
+          targetType,
+          parentCommentId: parentId ?? undefined,
         };
 
         const { data } = await createComment(payload);
@@ -1578,9 +1577,9 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
         }
       >
         {/* Avatar */}
-        {user?.profile_picture_url ? (
+        {user?.profilePictureUrl ? (
           <img
-            src={user.profile_picture_url}
+            src={user.profilePictureUrl}
             alt={user.username}
             className="h-8 w-8 rounded-full object-cover"
           />

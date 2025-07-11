@@ -1,4 +1,4 @@
-import { Input } from "@mui/material";
+import { Input } from '@mui/material';
 
 export default function LayerPosition({
   label,
@@ -24,7 +24,7 @@ export default function LayerPosition({
         className="py-2 pl-2 w-full text-sm text-right"
         value={position}
         onChange={handleInputChange}
-        style={{ direction: "ltr" }}
+        style={{ direction: 'ltr' }}
       />
     </div>
   );

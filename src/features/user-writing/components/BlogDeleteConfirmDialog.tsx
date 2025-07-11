@@ -4,8 +4,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-} from "@mui/material";
-import React from "react";
+} from '@mui/material';
+import React from 'react';
 
 interface BlogDeleteConfirmDialogProps {
   open: boolean;
@@ -22,8 +22,8 @@ export const BlogDeleteConfirmDialog: React.FC<
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Confirm Deletion</DialogTitle>
       <DialogContent>
-        Are you sure you want to delete{" "}
-        {blogTitle ? `"${blogTitle}"` : "this blog"}? This action cannot be
+        Are you sure you want to delete{' '}
+        {blogTitle ? `"${blogTitle}"` : 'this blog'}? This action cannot be
         undone.
       </DialogContent>
       <DialogActions>
@@ -37,7 +37,7 @@ export const BlogDeleteConfirmDialog: React.FC<
           disabled={submitting}
           autoFocus
         >
-          {submitting ? "Deleting..." : "Delete"}
+          {submitting ? 'Deleting...' : 'Delete'}
         </Button>
       </DialogActions>
     </Dialog>

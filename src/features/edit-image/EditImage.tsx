@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
 //Components
-import Panels from "./components/panels/Panels";
+import Panels from './components/panels/Panels';
 
 //Icons
 import { IoCrop } from "react-icons/io5";
@@ -28,11 +28,12 @@ const EditImage: React.FC = () => {
 
   //Toolbar
   const [fullScreen, setFullScreen] = useState(false);
+  const [newEdit, setNewEdit] = useState(false);
 
   //Images
   const [zoomLevel, setZoomLevel] = useState(1);
   const [activePanel, setActivePanel] = useState<
-    "arrange" | "crop" | "adjust" | "filter" | "text" | null
+    'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null
   >(null);
   const [globalZIndex, setGlobalZIndex] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -57,9 +58,9 @@ const EditImage: React.FC = () => {
 
   const [layers, setLayers] = useState<Layer[]>([
     {
-      type: "image",
+      type: 'image',
       id: crypto.randomUUID(),
-      src: "",
+      src: '',
       zoom: zoomLevel,
       opacity: opacity,
       flipH: flipHorizontal,
@@ -80,6 +81,39 @@ const EditImage: React.FC = () => {
   ]);
 
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  console.log("a", layers);
+
+  useEffect(() => {
+    if (!newEdit) return;
+    // Reset layers (e.g., to default canvas background layer)
+    const baseLayer: ImageLayer = {
+      type: "image",
+      id: crypto.randomUUID(),
+      src: "",
+      zoom: 1,
+      opacity: 1,
+      flipH: false,
+      flipV: false,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      brightness: 100,
+      contrast: 100,
+      saturation: 100,
+      hue: 0,
+      sepia: 0,
+      backgroundColor: "#ffffff",
+      height: canvasSize.height,
+      width: canvasSize.width,
+      zIndex: 0,
+    };
+    setLayers([baseLayer]);
+    setSelectedLayerId(null);
+    setEditingLayerId(null);
+    setGlobalZIndex(1);
+    hasAppendedInitialImage.current = false;
+    setNewEdit(false); // ✅ Reset flag
+  }, [newEdit]);
 
   useEffect(() => {
     if (!imageUrl || hasAppendedInitialImage.current) return;
@@ -131,11 +165,11 @@ const EditImage: React.FC = () => {
       setLayers((prev) => [...prev, newImageLayer]);
     };
     img.src = imageUrl;
-  }, [imageUrl, layers]);
+  }, [imageUrl, layers, newEdit]);
 
   useEffect(() => {
     const imageLayer = layers.find(
-      (l): l is ImageLayer => l.type === "image" && !!l.src,
+      (l): l is ImageLayer => l.type === 'image' && !!l.src,
     );
     if (!imageLayer) return;
     const img = new Image();
@@ -222,7 +256,7 @@ const EditImage: React.FC = () => {
         setLayers((prevLayers) =>
           prevLayers.map((layer) => {
             if (layer.id !== selectedLayerId) return layer;
-            if (layer.type !== "image") return layer;
+            if (layer.type !== 'image') return layer;
             const newZoom =
               e.deltaY < 0
                 ? Math.min(layer.zoom + 0.1, 3)
@@ -233,9 +267,9 @@ const EditImage: React.FC = () => {
         );
       }
     };
-    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener('wheel', handleWheel, { passive: false });
     return () => {
-      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener('wheel', handleWheel);
     };
   }, [selectedLayerId]);
 
@@ -256,7 +290,7 @@ const EditImage: React.FC = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
     layers.forEach((layer) => {
-      if (layer.type === "image") {
+      if (layer.type === 'image') {
         const img = new Image();
         img.src = layer.src;
         img.onload = () => {
@@ -302,7 +336,7 @@ const EditImage: React.FC = () => {
           );
           ctx.restore();
         };
-      } else if (layer.type === "text") {
+      } else if (layer.type === 'text') {
         ctx.save();
         ctx.translate(layer.x + layer.width / 2, layer.y);
         ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
@@ -388,7 +422,7 @@ const EditImage: React.FC = () => {
   const handleChangeFontSize = (newFontSize: number) => {
     setLayers((prevLayers) =>
       prevLayers.map((layer) =>
-        layer.id === selectedLayerId && layer.type === "text"
+        layer.id === selectedLayerId && layer.type === 'text'
           ? { ...layer, fontSize: newFontSize }
           : layer,
       ),
@@ -398,7 +432,7 @@ const EditImage: React.FC = () => {
   const handleChangeFontFamily = (font: string) => {
     if (!selectedLayerId) return;
     const updatedLayers = layers.map((layer) =>
-      layer.id === selectedLayerId && layer.type === "text"
+      layer.id === selectedLayerId && layer.type === 'text'
         ? { ...layer, fontFamily: font }
         : layer,
     );
@@ -408,7 +442,7 @@ const EditImage: React.FC = () => {
   const handleChangeTextColor = (newColor: string) => {
     if (!selectedLayerId) return;
     const updatedLayers = layers.map((layer) =>
-      layer.id === selectedLayerId && layer.type === "text"
+      layer.id === selectedLayerId && layer.type === 'text'
         ? { ...layer, color: newColor }
         : layer,
     );
@@ -453,6 +487,7 @@ const EditImage: React.FC = () => {
       <EditHeader
         hideTopBar={fullScreen}
         setHideTopBar={setFullScreen}
+        setNewEdit={setNewEdit}
         handleDownload={handleDownload}
       />
       <div className={`flex ${fullScreen ? 'p-0 h-screen' : 'p-4 h-[calc(100vh-4rem)]'}  w-full overflow-hidden`}>
@@ -476,7 +511,7 @@ const EditImage: React.FC = () => {
               style={{
                 transform: `scale(${zoomLevel})`,
                 backgroundColor:
-                  layers[0].type === "image"
+                  layers[0].type === 'image'
                     ? layers[0].backgroundColor
                     : "#ffffff",
                 width: canvasSize.width,
@@ -485,12 +520,12 @@ const EditImage: React.FC = () => {
             >
               <div
                 style={{
-                  position: "relative",
+                  position: 'relative',
                   width: `${canvasSize.width}px`,
                   height: `${canvasSize.height}px`,
-                  overflow: "hidden",
-                  transformOrigin: "top left",
-                  border: "1px solid #ccc",
+                  overflow: 'hidden',
+                  transformOrigin: 'top left',
+                  border: '1px solid #ccc',
                 }}
               >
                 {layers.slice(1).map((layer) => (
@@ -513,6 +548,9 @@ const EditImage: React.FC = () => {
                   />
                 ))}
               </div>
+            </div>
+            <div className="bottom-2 left-2 absolute flex justify-center items-center bg-white opacity-50 rounded-lg w-24 h-8 text-mountain-600 text-sm">
+              <span>{layers[0].width} x {layers[0].height}</span>
             </div>
           </div>
           {/* Settings Panel */}
@@ -543,7 +581,9 @@ const EditImage: React.FC = () => {
           <div className={`z-50 relative flex flex-col flex-none space-y-2 bg-white border border-mountain-200 w-20 h-full `}>
             <div
               onClick={() =>
-                setActivePanel((prev) => (prev === "arrange" ? null : "arrange"))
+                setActivePanel((prev) =>
+                  prev === 'arrange' ? null : 'arrange',
+                )
               }
               className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
@@ -552,7 +592,7 @@ const EditImage: React.FC = () => {
             </div>
             <div
               onClick={() =>
-                setActivePanel((prev) => (prev === "crop" ? null : "crop"))
+                setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
               }
               className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
@@ -561,7 +601,7 @@ const EditImage: React.FC = () => {
             </div>
             <div
               onClick={() =>
-                setActivePanel((prev) => (prev === "adjust" ? null : "adjust"))
+                setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
               }
               className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
@@ -570,7 +610,7 @@ const EditImage: React.FC = () => {
             </div>
             <div
               onClick={() =>
-                setActivePanel((prev) => (prev === "filter" ? null : "filter"))
+                setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
               }
               className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
@@ -579,7 +619,7 @@ const EditImage: React.FC = () => {
             </div>
             <div
               onClick={() =>
-                setActivePanel((prev) => (prev === "text" ? null : "text"))
+                setActivePanel((prev) => (prev === 'text' ? null : 'text'))
               }
               className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >

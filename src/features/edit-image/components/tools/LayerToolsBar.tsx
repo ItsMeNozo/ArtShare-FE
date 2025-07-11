@@ -58,7 +58,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
           ...prev,
           {
             id: crypto.randomUUID(),
-            type: "image",
+            type: 'image',
             zoom: zoomLevel,
             src: imageSrc,
             x: (maxWidth - scaledWidth) / 2,
@@ -112,7 +112,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
           <Tooltip title="Add Layer" arrow placement="right">
             <div
               className="flex justify-center items-center p-2 py-0 border-mountain-400 w-full h-10 hover:cursor-pointer"
-              onClick={() => document.getElementById("image-upload")?.click()}
+              onClick={() => document.getElementById('image-upload')?.click()}
             >
               <div className="flex justify-center items-center border border-mountain-200 w-full h-full">
                 <Plus className="size-4" />
@@ -135,7 +135,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                 className="flex justify-center items-center px-2 rounded-sm w-full h-20 hover:cursor-pointer"
                 onClick={() => setSelectedLayerId(layer.id)}
               >
-                {layer.type === "image" ? (
+                {layer.type === 'image' ? (
                   <img
                     src={layer.src}
                     className={`rounded-sm w-full h-20 object-cover border-1 ${selectedLayerId === layer.id
@@ -146,18 +146,18 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                   />
                 ) : (
                   <div
-                    className={`relative overflow-hidden border w-full h-20 rounded bg-white ${selectedLayerId === layer.id ? "border-indigo-400" : "border-mountain-200"}`}
+                    className={`relative h-20 w-full overflow-hidden rounded border bg-white ${selectedLayerId === layer.id ? 'border-indigo-400' : 'border-mountain-200'}`}
                   >
-                    {layer.type === "text" && (
+                    {layer.type === 'text' && (
                       <div
                         style={{
-                          position: "absolute",
+                          position: 'absolute',
                           fontSize: layer.fontSize * 0.5,
                           color: layer.color,
                         }}
                         className="top-1/2 left-1/2 flex-nowrap text-nowrap -translate-x-1/2 -translate-y-1/2"
                       >
-                        {layer.text || "Preview text"}
+                        {layer.text || 'Preview text'}
                       </div>
                     )}
                   </div>
@@ -174,12 +174,12 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
               className="relative flex px-2"
             >
               <div
-                className={`flex justify-center items-center border-2 w-full h-12 text-mountain-600 text-sm italic hover:cursor-pointer ${selectedLayerId === layers[0].id ? "border-indigo-400" : "border-mountain-200"}`}
+                className={`text-mountain-600 flex h-12 w-full items-center justify-center border-2 text-sm italic hover:cursor-pointer ${selectedLayerId === layers[0].id ? 'border-indigo-400' : 'border-mountain-200'}`}
                 style={{
                   backgroundColor:
-                    layers[0].type === "image"
+                    layers[0].type === 'image'
                       ? layers[0].backgroundColor
-                      : "#fffff",
+                      : '#fffff',
                 }}
               />
               <span className="top-1/2 left-1/2 absolute text-mountain-400 text-xs italic -translate-x-1/2 -translate-y-1/2">

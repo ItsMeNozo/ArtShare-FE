@@ -51,7 +51,7 @@ export default function PostScheduleEditor({
   };
 
   return (
-    <Box className="pb-20 max-w-xl h-full">
+    <Box className="h-full max-w-xl pb-20">
       <Box
         p={2}
         sx={{

@@ -54,7 +54,7 @@ const TextPanel: React.FC<PanelsProp> = ({
         <div className="relative flex justify-end w-3/4">
           <select
             id="font-family"
-            value={selectedLayer?.fontFamily || "Arial"}
+            value={selectedLayer?.fontFamily || 'Arial'}
             onChange={(e) => handleChangeFontFamily(e.target.value)}
             className="p-2 border border-mountain-200 rounded-md outline-none text-sm"
           >
@@ -89,7 +89,7 @@ const TextPanel: React.FC<PanelsProp> = ({
         <div className="flex justify-between items-center px-2 pl-4 border-1 border-mountain-200 rounded-lg w-full">
           <div
             className="shadow-md border-1 border-mountain-200 rounded-full w-4 h-4"
-            style={{ backgroundColor: `${selectedLayer?.color || "#ffffff"}` }}
+            style={{ backgroundColor: `${selectedLayer?.color || '#ffffff'}` }}
           />
           <div className="bg-mountain-200 w-[1px] h-10" />
           <Button

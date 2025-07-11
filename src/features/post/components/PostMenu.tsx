@@ -9,14 +9,14 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-} from "@mui/material";
-import React, { useState } from "react";
+} from '@mui/material';
+import React, { useState } from 'react';
 import {
   FiAlertTriangle,
   FiEdit2,
   FiMoreVertical,
   FiTrash2,
-} from "react-icons/fi";
+} from 'react-icons/fi';
 
 interface PostMenuProps {
   isOwner: boolean;
@@ -71,12 +71,12 @@ export const PostMenu: React.FC<PostMenuProps> = ({
     <>
       <IconButton
         aria-label="post options"
-        aria-controls={open ? "post-menu" : undefined}
+        aria-controls={open ? 'post-menu' : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
+        aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
         size="small"
-        className="text-gray-600 dark:text-gray-300 p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+        className="rounded-full p-1.5 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
       >
         <FiMoreVertical fontSize={20} />
       </IconButton>
@@ -86,31 +86,31 @@ export const PostMenu: React.FC<PostMenuProps> = ({
         anchorEl={anchorEl}
         open={open}
         onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{
           paper: {
             elevation: 2,
             sx: {
-              overflow: "visible",
-              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.1))",
+              overflow: 'visible',
+              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
               mt: 1.5,
-              "&:before": {
+              '&:before': {
                 content: '""',
-                display: "block",
-                position: "absolute",
+                display: 'block',
+                position: 'absolute',
                 top: 0,
                 right: 14,
                 width: 10,
                 height: 10,
-                bgcolor: "background.paper",
-                transform: "translateY(-50%) rotate(45deg)",
+                bgcolor: 'background.paper',
+                transform: 'translateY(-50%) rotate(45deg)',
                 zIndex: 0,
               },
             },
           },
           list: {
-            "aria-labelledby": "post-options-button",
+            'aria-labelledby': 'post-options-button',
           },
         }}
       >
@@ -123,7 +123,7 @@ export const PostMenu: React.FC<PostMenuProps> = ({
               <ListItemText
                 slotProps={{
                   primary: {
-                    sx: { fontSize: "0.9rem" },
+                    sx: { fontSize: '0.9rem' },
                   },
                 }}
               >
@@ -134,9 +134,9 @@ export const PostMenu: React.FC<PostMenuProps> = ({
               key="delete"
               onClick={handleOpenConfirmDelete}
               sx={{
-                "&:hover": {
-                  color: "error.main",
-                  backgroundColor: "rgba(211, 47, 47, 0.08)",
+                '&:hover': {
+                  color: 'error.main',
+                  backgroundColor: 'rgba(211, 47, 47, 0.08)',
                 },
               }}
             >
@@ -146,7 +146,7 @@ export const PostMenu: React.FC<PostMenuProps> = ({
               <ListItemText
                 slotProps={{
                   primary: {
-                    sx: { fontSize: "0.9rem" },
+                    sx: { fontSize: '0.9rem' },
                   },
                 }}
               >
@@ -162,7 +162,7 @@ export const PostMenu: React.FC<PostMenuProps> = ({
             <ListItemText
               slotProps={{
                 primary: {
-                  sx: { fontSize: "0.9rem" },
+                  sx: { fontSize: '0.9rem' },
                 },
               }}
             >

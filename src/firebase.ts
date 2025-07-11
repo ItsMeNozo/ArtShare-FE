@@ -1,6 +1,6 @@
 // src/firebase.js
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
 // Get Firebase configuration from environment variables
 const firebaseConfig = {
@@ -11,7 +11,6 @@ const firebaseConfig = {
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
-
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

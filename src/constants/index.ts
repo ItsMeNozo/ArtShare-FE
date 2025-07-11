@@ -1,4 +1,4 @@
 export enum CategoryTypeValues {
-  MEDIUM = "MEDIUM",
-  ATTRIBUTE = "ATTRIBUTE",
+  MEDIUM = 'MEDIUM',
+  ATTRIBUTE = 'ATTRIBUTE',
 }

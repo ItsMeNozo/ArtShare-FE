@@ -5,7 +5,7 @@ import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { editAutoPost } from '../api/auto-posts.api';
 import { AutoPost, AutoPostFormValues } from '../types';
-import { autoPostKeys } from '../utilts/autoPostKeys';
+import { autoPostKeys } from '../utils/autoPostKeys';
 
 interface UseEditAutoPostOptions {
   onSuccess?: (editedAutoPost: AutoPost) => void;
@@ -45,7 +45,7 @@ export const useEditAutoPost = ({
 
       return editAutoPost(id, {
         content: values.content,
-        scheduledAt: values.scheduled_at ?? undefined,
+        scheduledAt: values.scheduledAt ?? undefined,
         imageUrls: finalImageUrls,
       });
     },

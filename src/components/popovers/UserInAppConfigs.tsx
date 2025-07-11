@@ -79,9 +79,9 @@ const UserInAppConfigs = () => {
             }}
           >
             {user ? (
-              user.profile_picture_url ? (
+              user.profilePictureUrl ? (
                 <Avatar className="w-10 h-10">
-                  <AvatarImage src={user.profile_picture_url} />
+                  <AvatarImage src={user.profilePictureUrl} />
                   <AvatarFallback>
                     <BoringAvatar
                       size={40}
@@ -121,9 +121,9 @@ const UserInAppConfigs = () => {
         {user && (
           <>
             <div className="flex items-center space-x-2 p-3">
-              {user.profile_picture_url ? (
+              {user.profilePictureUrl ? (
                 <Avatar className="w-10 h-10">
-                  <AvatarImage src={user.profile_picture_url} />
+                  <AvatarImage src={user.profilePictureUrl} />
                   <AvatarFallback>
                     <BoringAvatar
                       size={40}

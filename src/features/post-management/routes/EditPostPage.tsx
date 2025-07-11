@@ -1,21 +1,21 @@
 import Loading from '@/components/loading/Loading';
+import { useGetPostDetails } from '@/features/post/hooks/useGetPostDetails';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Box } from '@mui/material';
 import { FormikHelpers } from 'formik';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostDetails } from '../post/hooks/useGetPostDetails';
-import { useUpdatePost } from './hooks/useUpdatePost';
-import PostForm from './PostForm';
-import { PostFormValues } from './types/post-form-values.type';
-import { PostMedia } from './types/post-media';
+import PostForm from '../components/PostForm';
+import { useUpdatePost } from '../hooks/useUpdatePost';
+import { PostFormValues } from '../types/post-form-values.type';
+import { PostMedia } from '../types/post-media';
 
 /**
  * EditPostPage – fully‑screen page that reuses UploadPost components
  * Route: /posts/:postId/edit
  */
-const EditPost: React.FC = () => {
+const EditPostPage: React.FC = () => {
   /** ──────────────────── fetch post data ─────────────────── */
   const { postId } = useParams<{ postId: string }>();
   const {
@@ -40,15 +40,15 @@ const EditPost: React.FC = () => {
   useEffect(() => {
     if (!fetchedPost) return;
 
-    setHasArtNovaImages(fetchedPost.ai_created);
+    setHasArtNovaImages(fetchedPost.aiCreated);
 
     setThumbnail({
-      url: fetchedPost.thumbnail_url,
+      url: fetchedPost.thumbnailUrl,
       type: MEDIA_TYPE.IMAGE,
       file: new File([], 'template file for thumbnail'),
     });
     setOriginalThumbnail({
-      url: fetchedPost.thumbnail_crop_meta.initialThumbnail,
+      url: fetchedPost.thumbnailCropMeta.initialThumbnail,
       type: MEDIA_TYPE.IMAGE,
       file: new File([], 'template file for thumbnail'),
     });
@@ -56,7 +56,7 @@ const EditPost: React.FC = () => {
     // build postMedias from postData.medias
     const initialMedias = fetchedPost.medias.map((media) => ({
       url: media.url,
-      type: media.media_type,
+      type: media.mediaType,
       file: new File([], 'template file for existing media'),
     }));
 
@@ -70,16 +70,16 @@ const EditPost: React.FC = () => {
     }
     return {
       title: fetchedPost.title,
-      description: fetchedPost.description,
-      cate_ids: fetchedPost.categories?.map((c) => c.id) ?? [],
-      isMature: fetchedPost.is_mature,
-      thumbnailMeta: fetchedPost.thumbnail_crop_meta,
+      description: fetchedPost.description || '',
+      categoryIds: fetchedPost.categories?.map((c) => c.id) ?? [],
+      isMature: fetchedPost.isMature,
+      thumbnailMeta: fetchedPost.thumbnailCropMeta,
     };
   }, [fetchedPost]);
 
   /** ─────────────────── submit ─────────────────── */
 
-  const { mutate: updatePost } = useUpdatePost({
+  const { mutateAsync: updatePost } = useUpdatePost({
     onSuccess: (updatedPost) => {
       navigate(`/posts/${updatedPost.id}`);
     },
@@ -104,7 +104,7 @@ const EditPost: React.FC = () => {
       return;
     }
 
-    updatePost(
+    await updatePost(
       {
         postId: parseInt(postId!),
         values,
@@ -126,7 +126,7 @@ const EditPost: React.FC = () => {
   if (isPostLoading) return <Loading />;
   if (postError || !fetchedPost) {
     return (
-      <Box className="flex justify-center items-center h-full text-red-500">
+      <Box className="flex h-full items-center justify-center text-red-500">
         <p>
           Error loading post:{' '}
           {postError instanceof Error ? postError.message : 'Unknown error'}
@@ -152,4 +152,4 @@ const EditPost: React.FC = () => {
   );
 };
 
-export default EditPost;
+export default EditPostPage;

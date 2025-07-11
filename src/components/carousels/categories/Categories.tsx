@@ -1,6 +1,6 @@
-import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
-import { cn } from "@/lib/utils";
-import { Category } from "@/types";
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
+import { cn } from '@/lib/utils';
+import { Category } from '@/types';
 import {
   Button,
   Fade,
@@ -8,14 +8,14 @@ import {
   Paper,
   Popper,
   PopperPlacementType,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import "react-horizontal-scrolling-menu/dist/styles.css";
-import { FiSearch } from "react-icons/fi";
-import { TiDeleteOutline } from "react-icons/ti";
-import { HorizontalSlider } from "../../sliders/HorizontalSlider";
-import "./Categories.css";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import 'react-horizontal-scrolling-menu/dist/styles.css';
+import { FiSearch } from 'react-icons/fi';
+import { TiDeleteOutline } from 'react-icons/ti';
+import { HorizontalSlider } from '../../sliders/HorizontalSlider';
+import './Categories.css';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export interface CategoriesScrollerProps {
   onSelectCategory: (categoryName: string | null) => void;
@@ -35,16 +35,16 @@ export const Categories: React.FC<CategoriesScrollerProps> = ({
   const renderCategoryItemInSlider = (category: Category) => {
     const isSelected = selectedCategory === category.name;
     const imageUrl =
-      category.example_images && category.example_images.length > 0
-        ? category.example_images[0]
+      category.exampleImages && category.exampleImages.length > 0
+        ? category.exampleImages[0]
         : undefined;
 
     return (
       <div
-        className={`category-item max-w-48 flex justify-center items-center ${isSelected
-          ? "bg-mountain-200 dark:bg-mountain-800"
-          : "hover:bg-mountain-100 dark:hover:bg-mountain-900"
-          } cursor-pointer rounded-lg p-2 gap-2 border ${isSelected ? "border-primary-500" : "border-transparent"
+        className={`category-item flex max-w-48 items-center justify-center ${isSelected
+          ? 'bg-mountain-200 dark:bg-mountain-800'
+          : 'hover:bg-mountain-100 dark:hover:bg-mountain-900'
+          } cursor-pointer gap-2 rounded-lg border p-2 ${isSelected ? 'border-primary-500' : 'border-transparent'
           }`}
         onClick={() => onSelectCategory(category.name)}
         title={category.name}
@@ -109,10 +109,10 @@ interface DataPopperProps {
   onSave: (selectedData: string[] | string | null) => void;
   selectedData: string[] | string | null;
   data: Category[];
-  renderItem: "category" | "prop";
+  renderItem: 'category' | 'prop';
   placement?: PopperPlacementType;
   className?: string;
-  selectionMode?: "single" | "multiple";
+  selectionMode?: 'single' | 'multiple';
   showClearAllButton?: boolean;
 }
 
@@ -122,16 +122,16 @@ const renderCategoryItemForPopper = (
   onClick: () => void,
 ) => {
   const imageUrl =
-    item.example_images && item.example_images.length > 0
-      ? item.example_images[0]
+    item.exampleImages && item.exampleImages.length > 0
+      ? item.exampleImages[0]
       : undefined;
 
   return (
     <div
-      className={`flex items-center cursor-pointer ${isSelected
-        ? "bg-mountain-200 dark:bg-mountain-800"
-        : "hover:bg-mountain-100 dark:hover:bg-mountain-900"
-        } rounded-lg p-2 gap-2 my-2`}
+      className={`flex cursor-pointer items-center ${isSelected
+        ? 'bg-mountain-200 dark:bg-mountain-800'
+        : 'hover:bg-mountain-100 dark:hover:bg-mountain-900'
+        } my-2 gap-2 rounded-lg p-2`}
       onClick={onClick}
     >
       <ImageWithFallback
@@ -181,10 +181,10 @@ export const DataPopper: React.FC<DataPopperProps> = ({
   renderItem,
   placement,
   className,
-  selectionMode = "multiple",
+  selectionMode = 'multiple',
   showClearAllButton = false,
 }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [internalSelectedData, setInternalSelectedData] = useState<
     string[] | string | null
   >(selectedDataProp);
@@ -196,7 +196,7 @@ export const DataPopper: React.FC<DataPopperProps> = ({
   }, [selectedDataProp, open]);
 
   const handleDataClick = (name: string) => {
-    if (selectionMode === "single") {
+    if (selectionMode === 'single') {
       setInternalSelectedData(name);
     } else {
       setInternalSelectedData((prev) => {
@@ -209,14 +209,14 @@ export const DataPopper: React.FC<DataPopperProps> = ({
   };
 
   const handleClearAll = () => {
-    if (selectionMode === "multiple") {
+    if (selectionMode === 'multiple') {
       setInternalSelectedData([]);
     }
   };
 
   const canClearAll =
     showClearAllButton &&
-    selectionMode === "multiple" &&
+    selectionMode === 'multiple' &&
     Array.isArray(internalSelectedData) &&
     internalSelectedData.length > 0;
 
@@ -233,7 +233,7 @@ export const DataPopper: React.FC<DataPopperProps> = ({
         <Fade {...TransitionProps} timeout={350}>
           <Paper
             className={cn(
-              "rounded-lg w-72 max-h-[60vh] overflow-y-auto custom-scrollbar",
+              'custom-scrollbar max-h-[60vh] w-72 overflow-y-auto rounded-lg',
               className,
             )}
           >
@@ -250,7 +250,7 @@ export const DataPopper: React.FC<DataPopperProps> = ({
                 {searchQuery && (
                   <TiDeleteOutline
                     className="right-2 absolute w-5 h-5 hover:text-mountain-700 dark:hover:text-mountain-300 cursor-pointer"
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => setSearchQuery('')}
                   />
                 )}
               </div>
@@ -263,12 +263,12 @@ export const DataPopper: React.FC<DataPopperProps> = ({
                 )
                 .map((item) => {
                   const renderer =
-                    renderItem === "category"
+                    renderItem === 'category'
                       ? renderCategoryItemForPopper
                       : renderPropItemForPopper;
 
                   let isItemSelected: boolean;
-                  if (selectionMode === "single") {
+                  if (selectionMode === 'single') {
                     isItemSelected = internalSelectedData === item.name;
                   } else {
                     isItemSelected =
@@ -288,7 +288,7 @@ export const DataPopper: React.FC<DataPopperProps> = ({
             <div className="bottom-0 sticky flex justify-between items-center gap-2 bg-white dark:bg-mountain-950 p-4 dark:border-mountain-800 border-t">
               {/* Clear All Button - Conditionally Rendered on the left */}
               <div>
-                {" "}
+                {' '}
                 {/* Wrapper to push Clear All to the left */}
                 {canClearAll && (
                   <Button

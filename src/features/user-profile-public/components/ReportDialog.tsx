@@ -5,8 +5,8 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
 
 interface ReportDialogProps {
   open: boolean;
@@ -25,19 +25,19 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   itemName,
   itemType,
 }) => {
-  const [reason, setReason] = useState("");
-  const [error, setError] = useState("");
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (open) {
-      setReason("");
-      setError("");
+      setReason('');
+      setError('');
     }
   }, [open]);
 
   const handleConfirm = () => {
     if (!reason.trim()) {
-      setError("Please enter a reason.");
+      setError('Please enter a reason.');
       return;
     }
     onSubmit(reason.trim());
@@ -46,10 +46,10 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle>
-        Report{" "}
+        Report{' '}
         {itemType
           ? itemType.charAt(0).toUpperCase() + itemType.slice(1)
-          : "Content"}
+          : 'Content'}
         {itemName && `: "${itemName}"`}
       </DialogTitle>
       <DialogContent dividers>
@@ -63,7 +63,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
           value={reason}
           onChange={(e) => {
             setReason(e.target.value);
-            if (error) setError("");
+            if (error) setError('');
           }}
           disabled={submitting}
           error={!!error}
@@ -80,7 +80,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
           onClick={handleConfirm}
           disabled={submitting}
         >
-          {submitting ? "Reporting…" : "Report"}
+          {submitting ? 'Reporting…' : 'Report'}
         </Button>
       </DialogActions>
     </Dialog>

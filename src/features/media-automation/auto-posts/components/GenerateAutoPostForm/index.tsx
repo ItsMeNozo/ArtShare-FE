@@ -46,7 +46,7 @@ const GenerateAutoPostForm = () => {
   };
 
   return (
-    <Box className="flex flex-col flex-1 items-center bg-white pb-2 border-mountain-200 border-b-1 h-full">
+    <Box className="border-mountain-200 flex h-full flex-1 flex-col items-center border-b-1 bg-white pb-2">
       <Formik
         initialValues={{
           contentPrompt: '',
@@ -62,12 +62,12 @@ const GenerateAutoPostForm = () => {
         {(formikProps: FormikProps<GenAutoPostFormValues>) => {
           const { isSubmitting } = formikProps;
           return (
-            <Form className="flex items-center gap-4 bg-white pl-4 border-mountain-200 border-b rounded-tr-3xl w-full h-20">
+            <Form className="border-mountain-200 flex h-20 w-full items-center gap-4 rounded-tr-3xl border-b bg-white pl-4">
               <Box className="flex flex-col">
                 <Field
                   name="contentPrompt"
                   as={TextField}
-                  className="rounded-md w-108 h-10 placeholder:text-mountain-400"
+                  className="placeholder:text-mountain-400 h-10 w-108 rounded-md"
                   placeholder="Generate your post content"
                 />
                 <ErrorMessage name="contentPrompt">
@@ -80,7 +80,7 @@ const GenerateAutoPostForm = () => {
                   type="number"
                   min={1}
                   max={7}
-                  className="bg-white px-2 border border-gray-300 rounded-md w-16 h-10"
+                  className="h-10 w-16 rounded-md border border-gray-300 bg-white px-2"
                   placeholder="e.g. 5"
                 />
               </Box>
@@ -88,7 +88,7 @@ const GenerateAutoPostForm = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex justify-center items-center bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md rounded-md w-30 h-10 text-white transition shrink-0"
+                className="flex h-10 w-30 shrink-0 items-center justify-center rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md transition"
               >
                 {isSubmitting ? 'Writing...' : 'Start Writing'}
               </Button>
@@ -96,8 +96,8 @@ const GenerateAutoPostForm = () => {
           );
         }}
       </Formik>
-      <div className="flex flex-col flex-1 justify-center items-center gap-4 ml-4">
-        <TbFileTextSpark className="size-12 text-mountain-400" />
+      <div className="ml-4 flex flex-1 flex-col items-center justify-center gap-4">
+        <TbFileTextSpark className="text-mountain-400 size-12" />
         <p className="text-mountain-400 text-sm">
           Prompt for your post content to automate posting workflow
         </p>

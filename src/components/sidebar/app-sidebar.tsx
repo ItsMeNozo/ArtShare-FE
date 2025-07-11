@@ -33,13 +33,13 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
 
   return (
     <aside
-      className={`${expand ? 'w-60' : 'w-16'} h-screen transition-all ease-in-out duration-500 top-0 z-20 sticky xs:flex flex-col flex-shrink-0 flex-none justify-between dark:bg-mountain-950 dark:border-r-mountain-700 overflow-hidden`}
+      className={`${expand ? 'w-60' : 'w-16'} xs:flex dark:bg-mountain-950 dark:border-r-mountain-700 sticky top-0 z-20 h-screen flex-none flex-shrink-0 flex-col justify-between overflow-hidden transition-all duration-500 ease-in-out`}
     >
       <div className="flex flex-col">
         {/* Sidebar Header */}
         <div className="flex justify-between items-center px-4 h-16">
           <div
-            className={`flex items-center overflow-hidden ease-in-out transition-all duration-500 ${expand ? 'w-auto opacity-100' : 'opacity-0'}`}
+            className={`flex items-center overflow-hidden transition-all duration-500 ease-in-out ${expand ? 'w-auto opacity-100' : 'opacity-0'}`}
           >
             <img src={app_logo} className="flex mr-2 rounded-sm w-6 h-6" />
             <p className="font-medium text-gray-800 dark:text-gray-100">
@@ -49,7 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
           <div className="flex-grow" />
           <div
             onClick={() => setExpand(!expand)}
-            className={`flex dark:hover:bg-mountain-800 justify-center items-center rounded-full w-6 h-6 hover:cursor-pointer max-pointer-events-none`}
+            className={`dark:hover:bg-mountain-800 max-pointer-events-none flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer`}
           >
             {expand ? (
               <GoSidebarExpand className="size-5 text-gray-600 dark:text-gray-300" />
@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
         </div>
         {/* Sidebar Body */}
         <div
-          className={`flex flex-col space-y-6 px-2 h-[calc(100vh)] overflow-x-hidden text-mountain-800 dark:text-gray-300`}
+          className={`text-mountain-800 flex h-[calc(100vh)] flex-col space-y-6 overflow-x-hidden px-2 dark:text-gray-300`}
         >
           <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
@@ -87,11 +87,8 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group flex hover:bg-mountain-50 items-center px-4 rounded-md w-full h-10 cursor-pointer
-                      ${isActive
-                        ? 'text-white'
-                        : 'text-violet-900'}
-                      `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
@@ -103,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                   >
                     <item.icon className="flex-shrink-0 size-5" />
                     <div
-                      className={`overflow-hidden transition-all duration-500 origin-left ${expand ? 'ml-2 w-auto' : 'w-0'
+                      className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'
                         }`}
                     >
                       <p
@@ -141,13 +138,8 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`
-                      group flex items-center px-4 rounded-md w-full h-10 hover:bg-mountain-50 cursor-pointer
-                      ${isActive
-                        ? 'text-white'
-                        : 'text-violet-900'
-                      }
-                    `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
@@ -159,7 +151,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                   >
                     <item.icon className="flex-shrink-0 size-5" />
                     <div
-                      className={`overflow-hidden transition-all duration-500 origin-left ${expand ? 'ml-2 w-auto' : 'w-0'}`}
+                      className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                     >
                       <p
                         className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} ${isActive ? 'font-medium' : 'font-normal'}`}
@@ -190,13 +182,8 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`
-                      group flex items-center px-4 rounded-md hover:bg-mountain-50 w-full h-10 cursor-pointer
-                      ${isActive
-                        ? 'text-white'
-                        : 'text-violet-900'
-                      }
-                    `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
@@ -208,7 +195,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                   >
                     <item.icon className="flex-shrink-0 size-5" />
                     <div
-                      className={`overflow-hidden transition-all duration-500 origin-left ${expand ? 'ml-2 w-auto' : 'w-0'}`}
+                      className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                     >
                       <p
                         className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} ${isActive ? 'font-medium' : 'font-normal'}`}
@@ -223,13 +210,21 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
           </div>
           <div className="flex flex-col justify-between items-start space-y-1 w-full">
             <p
-              className={`text-nowrap px-4 text-sm transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} font-normal`}
+              className={`px-4 text-sm text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} font-normal`}
             >
               Social Automation
             </p>
             {[
-              { icon: MdOutlineManageAccounts, label: 'Link Socials', href: '/auto/social-links' },
-              { icon: MdAutoMode, label: 'Post Automation', href: '/auto/projects' },
+              {
+                icon: MdOutlineManageAccounts,
+                label: 'Link Socials',
+                href: '/auto/social-links',
+              },
+              {
+                icon: MdAutoMode,
+                label: 'Post Automation',
+                href: '/auto/projects',
+              },
             ].map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -244,13 +239,8 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`
-                      group flex items-center px-4 rounded-md w-full h-10 cursor-pointer hover:bg-mountain-50
-                      ${isActive
-                        ? 'text-white'
-                        : 'text-violet-900'
-                      }
-                    `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
@@ -262,7 +252,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                   >
                     <item.icon className="flex-shrink-0 size-5" />
                     <div
-                      className={`overflow-hidden transition-all duration-500 origin-left ${expand ? 'ml-2 w-auto' : 'w-0'}`}
+                      className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                     >
                       <p
                         className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} ${isActive ? 'font-medium' : 'font-normal'}`}

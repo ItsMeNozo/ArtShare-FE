@@ -1,23 +1,23 @@
-import React, { memo, useMemo, useState } from "react";
-import { Paper, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import { AiFillFire } from "react-icons/ai";
-import { IoHeartCircleOutline } from "react-icons/io5";
-import { FiSearch } from "react-icons/fi";
-import { TiDeleteOutline } from "react-icons/ti";
+import { Paper, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import React, { memo, useMemo, useState } from 'react';
+import { AiFillFire } from 'react-icons/ai';
+import { FiSearch } from 'react-icons/fi';
+import { IoHeartCircleOutline } from 'react-icons/io5';
+import { TiDeleteOutline } from 'react-icons/ti';
 
-import BlogItem from "@/components/lists/BlogItem";
-import { Input } from "@/components/ui/input";
+import BlogItem from '@/components/lists/BlogItem';
+import { Input } from '@/components/ui/input';
 
-import "./BrowseBlogs.css";
-import { useFetchBlogs } from "./hooks/useFetchBlogs";
-import { BlogTab } from "./types";
-import { InfiniteScroll } from "@/components/InfiniteScroll";
+import { InfiniteScroll } from '@/components/InfiniteScroll';
+import './BrowseBlogs.css';
+import { useFetchBlogs } from './hooks/useFetchBlogs';
+import { BlogTab } from './types';
 
 const BrowseBlogs: React.FC = () => {
-  const [tab, setTab] = useState<BlogTab | null>("trending");
+  const [tab, setTab] = useState<BlogTab | null>('trending');
 
-  const [searchInput, setSearchInput] = useState("");
-  const [searcQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState('');
+  const [searcQuery, setSearchQuery] = useState('');
 
   const {
     data,
@@ -36,7 +36,7 @@ const BrowseBlogs: React.FC = () => {
     return data?.pages.flatMap((page) => page.data) ?? [];
   }, [data]);
 
-  console.log("allBlogs", allBlogs, data);
+  console.log('allBlogs', allBlogs, data);
 
   const handleTabChange = (
     _: React.MouseEvent<HTMLElement>,
@@ -47,9 +47,9 @@ const BrowseBlogs: React.FC = () => {
   };
 
   return (
-    <div className="flex dark:bg-mountain-950 rounded-t-3xl h-screen overflow-hidden">
-      <div className="flex flex-col flex-1 min-h-screen">
-        <div className="top-0 z-60 sticky bg-white dark:bg-mountain-900 shadow-sm p-4 border-mountain-200 dark:border-mountain-700 border-b-1">
+    <div className="dark:bg-mountain-950 flex h-screen overflow-hidden rounded-t-3xl">
+      <div className="flex min-h-screen flex-1 flex-col">
+        <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 sticky top-0 z-60 border-b-1 bg-white p-4 shadow-sm">
           <div className="flex items-center space-x-4">
             <Paper
               elevation={0}
@@ -75,7 +75,7 @@ const BrowseBlogs: React.FC = () => {
                     px: 2,
                     textTransform: 'none',
                     fontWeight: 500,
-                    backgroundColor: 'white'
+                    backgroundColor: 'white',
                   },
                   '.MuiToggleButton-root.Mui-selected': {
                     backgroundColor: 'primary.main',
@@ -86,42 +86,49 @@ const BrowseBlogs: React.FC = () => {
                   },
                 }}
               >
-                <ToggleButton value="trending" className="border border-mountain-200 w-32 dark:text-gray-300">
-                  <AiFillFire className="mr-1 size-4 dark:text-mountain-300" />
+                <ToggleButton
+                  value="trending"
+                  className="border-mountain-200 w-32 border dark:text-gray-300"
+                >
+                  <AiFillFire className="dark:text-mountain-300 mr-1 size-4" />
                   Trending
                 </ToggleButton>
-                <ToggleButton value="following" className="border border-mountain-200 w-32 dark:text-gray-300">
-                  <IoHeartCircleOutline className="mr-1 size-4 dark:text-mountain-300" />
+                <ToggleButton
+                  value="following"
+                  className="border-mountain-200 w-32 border dark:text-gray-300"
+                >
+                  <IoHeartCircleOutline className="dark:text-mountain-300 mr-1 size-4" />
                   Following
                 </ToggleButton>
               </ToggleButtonGroup>
             </Paper>
             <div className="relative flex flex-1 items-center">
-              <FiSearch className="left-2 absolute w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <FiSearch className="absolute left-2 h-5 w-5 text-gray-500 dark:text-gray-400" />
               <Input
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key !== "Enter" || !searchInput) return;
+                  if (e.key !== 'Enter' || !searchInput) return;
                   setSearchQuery(searchInput);
                   setTab(null);
                 }}
                 placeholder="Search"
-                className="bg-mountain-50 dark:bg-mountain-800 shadow-inner pr-8 pl-8 border-gray-200 dark:border-mountain-700 rounded-2xl w-full text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-700 w-full rounded-2xl border-gray-200 pr-8 pl-8 text-gray-900 placeholder-gray-500 shadow-inner dark:text-gray-100 dark:placeholder-gray-400"
               />
               <TiDeleteOutline
-                className={`absolute right-2 w-5 h-5 text-mountain-600 dark:text-mountain-400 cursor-pointer hover:text-mountain-700 dark:hover:text-mountain-300 ${searchInput ? "block" : "hidden"
-                  }`}
+                className={`text-mountain-600 dark:text-mountain-400 hover:text-mountain-700 dark:hover:text-mountain-300 absolute right-2 h-5 w-5 cursor-pointer ${
+                  searchInput ? 'block' : 'hidden'
+                }`}
                 onClick={() => {
-                  setSearchInput("");
-                  setSearchQuery("");
-                  setTab("trending");
+                  setSearchInput('');
+                  setSearchQuery('');
+                  setTab('trending');
                 }}
               />
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-4 space-y-8 dark:bg-mountain-950 py-0 pb-24 pl-4 min-h-screen overflow-auto sidebar">
+        <div className="dark:bg-mountain-950 sidebar flex min-h-screen flex-col gap-4 space-y-8 overflow-auto py-0 pb-24 pl-4">
           <InfiniteScroll
             data={allBlogs}
             isLoading={isLoading}
@@ -131,7 +138,7 @@ const BrowseBlogs: React.FC = () => {
             hasNextPage={!!hasNextPage}
             fetchNextPage={fetchNextPage}
           >
-            <div className="flex flex-col gap-4 py-4 pr-4 overflow-hidden">
+            <div className="flex flex-col gap-4 overflow-hidden py-4 pr-4">
               {allBlogs.map((b) => (
                 <BlogItem
                   key={b.id}
@@ -139,21 +146,21 @@ const BrowseBlogs: React.FC = () => {
                   title={b.title}
                   // ... rest of your BlogItem props
                   content={b.content}
-                  thumbnail={b.pictures?.[0] ?? "https://placehold.co/600x400"}
+                  thumbnail={b.pictures?.[0] ?? 'https://placehold.co/600x400'}
                   author={{
                     username: b.user.username,
-                    avatar: b.user.profile_picture_url ?? "",
+                    avatar: b.user.profilePictureUrl ?? '',
                   }}
-                  category={b.categories?.[0]?.name ?? ""}
+                  category={b.categories?.[0]?.name ?? ''}
                   timeReading={`${Math.ceil((b.content?.split(/\s+/).length ?? 0) / 200)}m reading`}
-                  dateCreated={b.created_at}
-                  like_count={b.like_count}
-                  comment_count={b.comment_count}
-                  view_count={b.view_count}
+                  createdAt={b.createdAt}
+                  likeCount={b.likeCount}
+                  commentCount={b.commentCount}
+                  viewCount={b.viewCount}
                 />
               ))}
               {!hasNextPage && allBlogs.length > 0 && (
-                <div className="mt-8 text-gray-500 dark:text-gray-400 text-center">
+                <div className="mt-8 text-center text-gray-500 dark:text-gray-400">
                   🎉 You've reached the end. No more blogs to show.
                 </div>
               )}

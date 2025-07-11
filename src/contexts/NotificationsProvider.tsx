@@ -109,6 +109,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // Handle incoming notifications
     const handler = (notification: Notification<ReportResolvedPayload>) => {
+      if (notification.type === 'report_created') return;
       setNotifications((prev) => {
         // Prevent duplicates by checking if notification already exists
         const exists = prev.some((n) => n.id === notification.id);
@@ -269,17 +270,22 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           throw new Error('Failed to fetch notifications');
         }
         const existing: Notification<ReportResolvedPayload>[] = res.data;
+        const freshNotifications: Notification<ReportResolvedPayload>[] =
+          existing.filter(
+            (notification: Notification<ReportResolvedPayload>) =>
+              notification.type !== 'report_created',
+          );
 
         // Merge with any notifications received via socket while loading
         setNotifications((prev) => {
           // Get IDs of existing notifications to avoid duplicates
-          const existingIds = existing.map((n) => n.id);
+          const existingIds = freshNotifications.map((n) => n.id);
           const socketNotifications = prev.filter(
             (n) => !existingIds.includes(n.id),
           );
 
           // Combine socket notifications (newer) with existing notifications
-          return [...socketNotifications, ...existing];
+          return [...socketNotifications, ...freshNotifications];
         });
       } catch (err) {
         console.error(

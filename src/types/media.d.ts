@@ -1,12 +1,12 @@
-import { MEDIA_TYPE } from "@/utils/constants";
+import { MEDIA_TYPE } from '@/utils/constants';
 
 export interface MediaDto {
   id: number;
-  post_id: number;
-  media_type: MEDIA_TYPE;
+  postId: number;
+  mediaType: MEDIA_TYPE;
   description?: string;
   url: string;
-  creator_id: string;
+  creatorId: string;
   downloads: number;
-  created_at: Date;
+  createdAt: Date;
 }

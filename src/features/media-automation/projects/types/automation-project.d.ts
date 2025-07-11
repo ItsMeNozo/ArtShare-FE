@@ -98,8 +98,8 @@ interface GenPostContent {
 }
 
 export interface AutoPostMeta {
-  scheduled_at: Date;
-  images_count: number;
+  scheduledAt: Date;
+  imagesCount: number;
 }
 
 export interface AutoProjectListItem {
@@ -125,20 +125,26 @@ export interface AutoProjectListItem {
 // "postCount": 0,
 // "nextPostAt": null
 
-export type ProjectStatus = ACTIVE | COMPLETED | CANCELLED | FAILED | DRAFT;
+export type ProjectStatus =
+  | 'ACTIVE'
+  | 'PAUSED'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'FAILED'
+  | 'DRAFT';
 
 export interface AutoProjectDetailsDto {
   id: number;
   title: string;
   description: string;
   status: ProjectStatus;
-  created_at: Date;
-  updated_at: Date | null;
+  createdAt: Date;
+  updatedAt: Date | null;
   platform: {
     id: number;
     name: SharePlatform;
-    external_page_id: string;
-    token_expires_at: Date | null;
+    externalPageId: string;
+    tokenExpiresAt: Date | null;
     status: PlatformStatus;
   };
 }
@@ -152,6 +158,6 @@ export interface ProjectSummaryStats {
 export interface CreateAutoProjectPayload {
   title: string;
   description: string;
-  platform_id: number;
-  auto_post_meta_list: AutoPostMeta[];
+  platformId: number;
+  autoPostMetaList: AutoPostMeta[];
 }

@@ -4,16 +4,23 @@ import { Paper, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import React, { memo, useMemo, useState } from 'react';
 import { RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
+import { useNavigate } from 'react-router-dom';
+import useMeasure from 'react-use-measure';
 import FilterBar from './components/FilterBar';
 import { useGetPosts } from './hooks/useGetPosts';
 import { ExploreTab } from './types';
 
 const Explore: React.FC = () => {
+  const [ref, { width }] = useMeasure();
   const [tab, setTab] = useState<ExploreTab>('Trending');
-  const [selectedCategories, setSelectedCategories] = useState<string | null>(
-    null,
-  );
-  const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
+  const [selectedMedium, setSelectedMedium] = useState<string | null>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+  const [isAi, setIsAi] = useState(false);
+  const navigate = useNavigate();
+
+  const handlePhotoClick = (photoId: number) => {
+    navigate(`/posts/${photoId}`);
+  };
 
   const {
     data: postsData,
@@ -26,9 +33,8 @@ const Explore: React.FC = () => {
   } = useGetPosts({
     tab,
     attributes: [],
-    mediums: selectedMediums,
-    isAi: false,
-    isMature: false,
+    medium: selectedMedium,
+    isAi,
   });
 
   const handleTabChange = (
@@ -43,32 +49,39 @@ const Explore: React.FC = () => {
   }, [postsData]);
 
   return (
-    <div className="relative flex flex-col h-screen min-h-0">
-      <div className="z-10 sticky flex flex-col bg-gradient-to-t dark:bg-gradient-to-t from-white dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 px-4 py-1 rounded-t-3xl">
+    <div ref={ref} className="relative flex flex-col h-screen min-h-0">
+      <div className="z-10 sticky flex flex-col gap-4 bg-gradient-to-t dark:bg-gradient-to-t from-white dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 px-4 py-1 pt-3 rounded-t-3xl">
         <FilterBar
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          selectedMediums={selectedMediums}
-          setSelectedMediums={setSelectedMediums}
+          selectedMedium={selectedMedium}
+          setSelectedMedium={setSelectedMedium}
+          selectedAttributes={selectedAttributes}
+          setSelectedAttributes={setSelectedAttributes}
+          isAi={isAi}
+          setIsAi={setIsAi}
         />
       </div>
-      <InfiniteScroll
-        data={galleryPhotos}
-        isLoading={isLoadingPosts}
-        isFetchingNextPage={isFetchingNextPage}
-        isError={isPostsError}
-        error={postsError}
-        hasNextPage={hasNextPage}
-        fetchNextPage={fetchNextPage}
-      >
-        <RowsPhotoAlbum
-          photos={galleryPhotos}
-          spacing={8}
-          targetRowHeight={256}
-          rowConstraints={{ singleRowMaxHeight: 256 }}
-          render={{ image: ImageRenderer }}
-        />
-      </InfiniteScroll>
+      {width > 0 && (
+        <InfiniteScroll
+          data={galleryPhotos}
+          isLoading={isLoadingPosts}
+          isFetchingNextPage={isFetchingNextPage}
+          isError={isPostsError}
+          error={postsError}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+        >
+          <RowsPhotoAlbum
+            photos={galleryPhotos}
+            defaultContainerWidth={width}
+            spacing={8}
+            targetRowHeight={256}
+            rowConstraints={{ singleRowMaxHeight: 256 }}
+            render={{ image: ImageRenderer }}
+            onClick={({ photo }) => handlePhotoClick(photo.postId)}
+          />
+        </InfiniteScroll>
+      )}
+
       <Paper className="bottom-4 left-1/2 z-50 fixed bg-white dark:bg-mountain-800 shadow-lg rounded-full transform">
         <ToggleButtonGroup
           className="flex gap-2 m-1.5"

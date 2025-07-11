@@ -16,7 +16,7 @@ ratings:
     - '**.jsx'
     - '**.ts'
     - '**.tsx'
-    
+
 exclude_patterns:
   - 'node_modules/'
   - '**/node_modules/'

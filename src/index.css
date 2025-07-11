@@ -1,8 +1,8 @@
-@import "tailwindcss" important;
-@import "@fontsource/roboto/300.css";
-@import "@fontsource/roboto/400.css";
-@import "@fontsource/roboto/500.css";
-@import "@fontsource/roboto/700.css";
+@import 'tailwindcss' important;
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
 
 @plugin "tailwindcss-animate";
 
@@ -152,15 +152,15 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: "Roboto", sans-serif;
-  scrollbar-gutter: "stable";
+  font-family: 'Roboto', sans-serif;
+  scrollbar-gutter: 'stable';
   background-color: var(--background);
   overflow-x: hidden;
   overflow-y: auto;
 }
 
 .bounce-item {
-  @apply transition-transform duration-500 transform hover:-translate-y-1;
+  @apply transform transition-transform duration-500 hover:-translate-y-1;
 }
 
 .sidebar {
@@ -186,8 +186,9 @@ body {
     linear-gradient(to left, transparent 17px, black 17px);
   mask-size: 100% 20000px;
   mask-position: left bottom;
-  -webkit-mask-image: linear-gradient(to top, transparent, black),
-  linear-gradient(to left, transparent 17px, black 17px);
+  -webkit-mask-image:
+    linear-gradient(to top, transparent, black),
+    linear-gradient(to left, transparent 17px, black 17px);
   -webkit-mask-size: 100% 20000px;
   -webkit-mask-position: left bottom;
   transition:
@@ -207,15 +208,14 @@ body {
 }
 
 @layer utilities {
-
   /* only in dark mode: invert the built-in calendar icon */
-  .dark input[type="date"]::-webkit-calendar-picker-indicator {
+  .dark input[type='date']::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(0.8);
     cursor: pointer;
   }
 
   /* Firefox uses a different pseudo */
-  .dark input[type="date"]::-moz-calendar-picker-indicator {
+  .dark input[type='date']::-moz-calendar-picker-indicator {
     filter: invert(1) brightness(0.8);
     cursor: pointer;
   }

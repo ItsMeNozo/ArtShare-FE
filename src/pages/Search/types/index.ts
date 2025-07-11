@@ -1,4 +1,4 @@
-import { Photo } from "react-photo-album";
+import { Photo } from 'react-photo-album';
 
 export interface PublicUserSearchDto {
   fullName: string | null;

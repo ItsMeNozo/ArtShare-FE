@@ -1,17 +1,16 @@
 export interface User {
   id: string;
   username: string;
-  full_name: string;
+  fullName: string;
   email: string;
-  is_onboard: boolean;
-  followers_count: number;
-  followings_count: number;
-  full_name?: string | null;
-  profile_picture_url?: string | null;
+  isOnboard: boolean;
+  followersCount: number;
+  followingsCount: number;
+  profilePictureUrl?: string | null;
   bio?: string | null;
-  created_at: Date;
-  updated_at?: Date | null;
-  refresh_token?: string | null;
+  createdAt: Date;
+  updatedAt?: Date | null;
+  refreshToken?: string | null;
   collections?: Collection[];
   blogs?: Blog[];
   bookmarks?: Bookmark[];

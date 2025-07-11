@@ -1,6 +1,6 @@
-import Lottie, { LottieRefCurrentProps } from "lottie-react";
-import loading_anim from "../../../src/loading_anim.json";
-import { useEffect, useRef } from "react";
+import Lottie, { LottieRefCurrentProps } from 'lottie-react';
+import { useEffect, useRef } from 'react';
+import loading_anim from '../../../src/loading_anim.json';
 
 const Loading = () => {
   const lottieRef = useRef<LottieRefCurrentProps>(null);
@@ -12,11 +12,11 @@ const Loading = () => {
   }, []);
 
   return (
-    <div className="flex justify-center items-center w-full h-screen">
+    <div className="flex h-screen w-full items-center justify-center">
       <Lottie
         animationData={loading_anim}
         loop={true}
-        className="w-80 h-80"
+        className="h-80 w-80"
         lottieRef={lottieRef}
       />
     </div>

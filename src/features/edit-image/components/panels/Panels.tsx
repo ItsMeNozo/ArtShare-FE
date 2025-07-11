@@ -1,20 +1,20 @@
 //Components
-import AdjustmentSlider from "../../components/sliders/AdjustmentSlider";
+import AdjustmentSlider from '../../components/sliders/AdjustmentSlider';
 
 //Icons
-import { X } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
-import CropPanel from "./CropPanel";
-import FilterPanel from "./FilterPanel";
-import ArrangePanel from "./ArrangePanel";
-import TextPanel from "./TextPanel";
+import { X } from 'lucide-react';
+import { Dispatch, SetStateAction } from 'react';
+import ArrangePanel from './ArrangePanel';
+import CropPanel from './CropPanel';
+import FilterPanel from './FilterPanel';
+import TextPanel from './TextPanel';
 
 type PanelsProp = {
   selectedLayerId: string;
   activePanel: string;
   layers: Layer[];
   setActivePanel: Dispatch<
-    SetStateAction<"arrange" | "crop" | "adjust" | "filter" | "text" | null>
+    SetStateAction<'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null>
   >;
   handleLayerXPosition: (newXPos: number) => void;
   handleLayerYPosition: (newYPos: number) => void;
@@ -58,8 +58,8 @@ const Panels: React.FC<PanelsProp> = ({
   handleChangeTextColor,
 }) => {
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
-  const isNonTextLayer = selectedLayer?.type === "image" || !selectedLayer;
-  const isTextLayer = selectedLayer?.type === "text" || !selectedLayer;
+  const isNonTextLayer = selectedLayer?.type === 'image' || !selectedLayer;
+  const isTextLayer = selectedLayer?.type === 'text' || !selectedLayer;
   return (
     <div className="z-50">
       {activePanel && (
@@ -98,7 +98,7 @@ const Panels: React.FC<PanelsProp> = ({
                     onChange={handleSaturation}
                     min={0}
                     max={200}
-                    gradientColors={["#808080", "#ff0000"]}
+                    gradientColors={['#808080', '#ff0000']}
                   />
                   <AdjustmentSlider
                     label="Hue"
@@ -107,14 +107,14 @@ const Panels: React.FC<PanelsProp> = ({
                     min={-180}
                     max={180}
                     gradientColors={[
-                      "#808080",
-                      "#ff0000",
-                      "#ffff00",
-                      "#00ff00",
-                      "#00ffff",
-                      "#0000ff",
-                      "#ff00ff",
-                      "#ff0000",
+                      '#808080',
+                      '#ff0000',
+                      '#ffff00',
+                      '#00ff00',
+                      '#00ffff',
+                      '#0000ff',
+                      '#ff00ff',
+                      '#ff0000',
                     ]}
                   />
                   <AdjustmentSlider
@@ -138,11 +138,11 @@ const Panels: React.FC<PanelsProp> = ({
                   non-text layers to continue.
                 </div>
               ))}
-            {activePanel === "filter" &&
+            {activePanel === 'filter' &&
               (isNonTextLayer ? (
                 <FilterPanel
                   layers={
-                    layers.filter((l) => l.type === "image") as ImageLayer[]
+                    layers.filter((l) => l.type === 'image') as ImageLayer[]
                   }
                   selectedLayerId={selectedLayerId}
                   handleSaturation={handleSaturation}
@@ -157,7 +157,7 @@ const Panels: React.FC<PanelsProp> = ({
                   non-text layers to continue.
                 </div>
               ))}
-            {activePanel === "text" &&
+            {activePanel === 'text' &&
               (isTextLayer ? (
                 <TextPanel
                   selectedLayer={selectedLayer}

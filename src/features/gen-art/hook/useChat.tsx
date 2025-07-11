@@ -1,6 +1,6 @@
 // hooks/useChat.ts
-import { useState, useCallback, useRef } from "react";
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
+import { useCallback, useRef, useState } from 'react';
 
 // Types
 export interface GeneratedPrompt {
@@ -10,7 +10,7 @@ export interface GeneratedPrompt {
 
 export interface Message {
   id: string;
-  role: "USER" | "ASSISTANT";
+  role: 'USER' | 'ASSISTANT';
   content: string;
   generatedPrompts?: string[];
   createdAt: string;
@@ -47,20 +47,20 @@ export function useChat(): UseChatReturn {
       // Add user message to UI immediately
       const userMessage: Message = {
         id: `temp-${Date.now()}`,
-        role: "USER",
+        role: 'USER',
         content: content.trim(),
         createdAt: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, userMessage]);
 
       try {
-        const response = await api.post("/trending/messages", {
+        const response = await api.post('/trending/messages', {
           content: content.trim(),
           conversationId: conversationIdRef.current,
         });
 
         const data = response.data;
-        console.log("data chat", data);
+        console.log('data chat', data);
 
         // Store conversation ID for subsequent messages
         if (!conversationIdRef.current) {
@@ -70,7 +70,7 @@ export function useChat(): UseChatReturn {
         // Add assistant message
         const assistantMessage: Message = {
           id: data.id,
-          role: "ASSISTANT",
+          role: 'ASSISTANT',
           content: data.content,
           generatedPrompts: data.generatedPrompts,
           createdAt: data.createdAt,
@@ -83,7 +83,7 @@ export function useChat(): UseChatReturn {
       } catch (err: any) {
         const errorMessage =
           err.response?.data?.message ||
-          "Failed to send message. Please try again.";
+          'Failed to send message. Please try again.';
         setError(errorMessage);
 
         // Remove the temporary user message on error
