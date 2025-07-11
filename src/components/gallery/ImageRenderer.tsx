@@ -31,7 +31,6 @@ export const ImageRenderer = (
           srcSet={
             Array.isArray(photo.srcSet) ? photo.srcSet.join(', ') : photo.srcSet
           }
-          crossOrigin="anonymous"
           alt={photo.alt || `Image ${index}`}
           className={imageClassName}
         />
