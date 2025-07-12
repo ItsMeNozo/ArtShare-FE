@@ -189,7 +189,7 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                       name={selectedItem.author.username || 'Unknown'}
                       colors={['#84bfc3', '#ff9b62', '#d96153']}
                       variant="beam"
-                      size={80}
+                      size={60}
                     />
                   )}
                   <p className="font-medium">{selectedItem?.author.username}</p>
