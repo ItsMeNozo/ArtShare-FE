@@ -10,15 +10,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "playwright test --project=e2e-chrome",
-    "test:ui": "playwright test --ui  --trace on",
-    "test:smoke": "playwright test --project=smoke",
-    "test:safe": "playwright test --project=safe --trace on",
+    "test:ui": "playwright test --ui --trace on",
+    "test:production": "playwright test --project=production-safe --trace on --headed",
     "test:unsafe": "playwright test --project=unsafe --trace on",
     "test:ai": "playwright test --project=ai --trace on --headed",
     "test:cleanup": "playwright test --project=cleanup --trace on",
     "test:report": "playwright show-report",
     "format": "prettier --write ."
-
   },
   "prepare": "husky",
   "lint-staged": {

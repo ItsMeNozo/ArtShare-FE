@@ -31,7 +31,7 @@ const environments = {
     webServer: undefined,
   },
   preview: {
-    baseURL: 'https://preview.artsharebe.id.vn',
+    baseURL: 'https://test.artsharebe.id.vn', // Fixed: Match the GitHub Actions workflow
     webServer: undefined,
   },
 };
@@ -80,7 +80,7 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    // E2E Tests
+    // E2E Tests (All tests for local development)
     {
       name: 'e2e-chrome',
       testDir: './tests/e2e',
@@ -91,52 +91,41 @@ export default defineConfig({
       },
     },
 
-    // Smoke Tests
+    // Production-Safe Tests (Merged: Smoke + Safe - Read-only tests)
     {
-      name: 'smoke',
+      name: 'production-safe',
       testDir: './tests/e2e',
-      grep: /@smoke/,
+      grep: /@safe|@smoke/, // Combined grep pattern
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome', // Use actual Chrome instead of Chromium
-      },
-    },
-
-    // Safe Tests (Production Safe - Read-only)
-    {
-      name: 'safe',
-      testDir: './tests/e2e',
-      grep: /@safe/,
-      use: {
-        ...devices['Desktop Chrome'],
-        channel: 'chrome', // Use actual Chrome instead of Chromium
-        baseURL: environments.production.baseURL, // Always use production for safe tests
+        channel: 'chrome',
+        baseURL: environments.production.baseURL,
         trace: 'on-first-retry',
       },
     },
 
-    // Unsafe Tests (Data Modifying - Preview/Local only)
+    // Unsafe Tests (Data Modifying - Preview environment only)
     {
       name: 'unsafe',
       testDir: './tests/e2e',
       grep: /@unsafe/,
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome', // Use actual Chrome instead of Chromium
-        baseURL: environments.preview.baseURL, // Always use preview for unsafe tests
+        channel: 'chrome',
+        baseURL: environments.preview.baseURL,
         trace: 'on-first-retry',
       },
     },
 
-    // AI Tests (Manual only - Production)
+    // AI Tests (Manual only - Production, but with cost awareness)
     {
       name: 'ai',
       testDir: './tests/e2e',
       grep: /@ai/,
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome', // Use actual Chrome instead of Chromium
-        baseURL: environments.production.baseURL, // Use production for AI tests
+        channel: 'chrome',
+        baseURL: environments.production.baseURL,
         trace: 'on', // Always trace AI tests since they cost money
       },
     },
@@ -148,8 +137,8 @@ export default defineConfig({
       grep: /@cleanup/,
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome', // Use actual Chrome instead of Chromium
-        baseURL: environments.preview.baseURL, // Use preview for cleanup tests
+        channel: 'chrome',
+        baseURL: environments.preview.baseURL,
         trace: 'on-first-retry',
       },
     },
