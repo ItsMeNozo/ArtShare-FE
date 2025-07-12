@@ -79,7 +79,7 @@ export const cameraOptions: CameraOption[] = [
     label: 'Auto Camera',
     exampleUrl:
       'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshate-panels-camera/s46uka4gwgfbvsg1yn7v?blur=300&q=1',
-    value: 'auto lighting',
+    value: 'auto camera',
   },
   {
     label: 'Close-Up',
