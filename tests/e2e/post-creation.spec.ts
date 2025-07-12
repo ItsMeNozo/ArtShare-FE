@@ -282,21 +282,8 @@ test.describe('Post Creation', () => {
     }
   });
 
-  test('@safe SCRUM-356-9: Required Fields Validation', async ({ page }) => {
+  test('@unsafe SCRUM-356-9: Required Fields Validation', async ({ page }) => {
     const submitButton = page.getByRole('button', { name: 'Submit' });
-
-    // Mock the POST /posts request to prevent real data modification
-    await page.route('**/posts', async (route, request) => {
-      if (request.method() === 'POST') {
-        await route.fulfill({
-          status: 201,
-          contentType: 'application/json',
-          body: JSON.stringify({ id: 'mocked-post-id' }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
 
     // Step 1: Try to submit without any media
     await expect(submitButton).toBeDisabled();
@@ -314,26 +301,22 @@ test.describe('Post Creation', () => {
     // Step 4: Add proper title - button should now be enabled
     await page
       .getByRole('textbox', { name: 'What do you call your artwork' })
-      .fill('A valid title');
+      .fill('Validation Test Post');
     await expect(submitButton).toBeEnabled();
 
-    // Step 5: Add category and submit
+    // Step 5: Add category and submit - this will create a real post for validation testing
     await selectFirstCategory(page);
     await expect(submitButton).toBeEnabled();
 
-    const postCreationPromise = setupPostCreationListener(page);
-    await submitButton.click();
+    // Create the post to verify validation works end-to-end
+    const postId = await submitPost(page);
 
-    const response = await postCreationPromise;
-    const postId = await handlePostCreationResponse(page, response);
-
-    await expect(page).toHaveURL(new RegExp(`.*/posts/${postId}`));
     console.log(
-      `✅ Created post with validation successfully with ID: ${postId} (mocked)`,
+      `✅ Created validation test post successfully with ID: ${postId} - will be cleaned up automatically`,
     );
   });
 
-  test.only('@unsafe SCRUM-356-10: AI-Generated Images from User Stock', async ({
+  test('@unsafe SCRUM-356-10: AI-Generated Images from User Stock', async ({
     page,
   }) => {
     test.setTimeout(90000); // Increased timeout for slow AI image processing/posting
