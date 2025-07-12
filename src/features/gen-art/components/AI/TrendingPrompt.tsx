@@ -187,14 +187,8 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                   ) : (
                     <Avatar
                       name={selectedItem.author.username || 'Unknown'}
+                      colors={['#84bfc3', '#ff9b62', '#d96153']}
                       variant="beam"
-                      colors={[
-                        '#84bfc3',
-                        '#fff5d6',
-                        '#ffb870',
-                        '#d96153',
-                        '#000511',
-                      ]}
                       size={60}
                     />
                   )}
