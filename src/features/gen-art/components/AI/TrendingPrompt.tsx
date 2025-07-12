@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 // UI Components
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@mui/material';
+import Avatar from 'boring-avatars';
 
 // Icons
 import { Skeleton } from '@/components/ui/skeleton';
@@ -179,16 +179,25 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                 <>
                   <Avatar className="size-12">
                     {selectedItem?.author.profilePictureUrl ? (
-                      <AvatarImage
-                        src={selectedItem.author.profilePictureUrl}
-                        alt={selectedItem.author.username || 'User'}
+                      <img
+                        src={selectedItem?.author.profilePictureUrl}
+                        alt={selectedItem?.author.username}
+                        className="dark:border-mountain-700 h-7 w-7 rounded-full border border-gray-200"
+                        onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      <AvatarFallback className="bg-mountain-100">
-                        {selectedItem.author.username
-                          ?.slice(0, 3)
-                          .toUpperCase() || 'US'}
-                      </AvatarFallback>
+                      <Avatar
+                        size={28}
+                        name={selectedItem?.author.username || 'Unknown'}
+                        variant="beam"
+                        colors={[
+                          '#84bfc3',
+                          '#fff5d6',
+                          '#ffb870',
+                          '#d96153',
+                          '#000511',
+                        ]}
+                      />
                     )}
                   </Avatar>
                   <p className="font-medium">{selectedItem?.author.username}</p>
