@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import React, { Suspense } from 'react';
 import './App.css';
 import Loading from './components/loading/Loading';
@@ -27,6 +28,7 @@ const App: React.FC = () => {
       <Suspense fallback={<Loading />}>
         <RouterProvider router={router} />
       </Suspense>
+      <SpeedInsights />
     </ComposeProviders>
   );
 };

@@ -34,3 +34,9 @@ db
 
 # # Ignore assets folder in gen-art feature
 src/features/gen-art/assets/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
