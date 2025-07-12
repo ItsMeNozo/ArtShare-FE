@@ -20,14 +20,7 @@ export default defineConfig(({ mode }) => {
           mode === 'development' ? 'unsafe-none' : 'require-corp',
       },
     },
-    plugins: [
-      react(),
-      tailwindcss(),
-      istanbul({
-        cypress: true,
-        requireEnv: false,
-      }),
-    ],
+    plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
