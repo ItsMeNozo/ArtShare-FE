@@ -350,6 +350,9 @@ test.describe('Post Creation', () => {
           .getByRole('textbox', { name: 'What do you call your artwork' })
           .fill('AI Generated Art from Stock');
 
+        await expect(
+          page.getByRole('img', { name: 'Thumbnail' }),
+        ).toBeVisible();
         const postId = await submitPost(page);
         console.log(
           `✅ Created AI-generated post successfully with ID: ${postId}`,
