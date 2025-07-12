@@ -46,7 +46,7 @@ export default function SelectCategorySection({
     data: fetchedCategories,
     isLoading,
     isError,
-  }: UseQueryResult<Category[]> = useCategories({ page: 1, pageSize: 25 });
+  }: UseQueryResult<Category[]> = useCategories({});
 
   useEffect(() => {
     if (!fetchedCategories) return;

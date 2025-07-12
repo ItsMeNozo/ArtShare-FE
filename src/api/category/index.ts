@@ -4,10 +4,7 @@ import type { Category } from '@/types/category'; // This will now use the updat
 import qs from 'qs';
 
 export interface GetCategoriesParams {
-  page?: number;
-  pageSize?: number;
   type?: CategoryTypeValues;
-  searchQuery?: string;
 }
 
 export const getCategories = async (
