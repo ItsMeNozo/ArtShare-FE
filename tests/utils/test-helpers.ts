@@ -160,24 +160,8 @@ export class TestHelpers {
       await this.cleanupUtility.cleanupFiles(this.createdTestData.uploads);
       await this.cleanupUtility.cleanupUsers(this.createdTestData.users);
 
-      // Verify cleanup was successful
-      const failed = await this.cleanupUtility.verifyCleanup(
-        this.createdTestData.posts,
-        this.createdTestData.uploads,
-      );
-
-      if (failed.posts.length > 0) {
-        console.warn(
-          `⚠️  Failed to clean up ${failed.posts.length} posts:`,
-          failed.posts,
-        );
-      }
-      if (failed.files.length > 0) {
-        console.warn(
-          `⚠️  Failed to clean up ${failed.files.length} files:`,
-          failed.files,
-        );
-      }
+      // Removed verification step to avoid duplicate GET requests after deletion
+      // If you want to verify cleanup, run it only in one place (e.g., global script)
 
       // Reset tracking arrays
       this.createdTestData = {

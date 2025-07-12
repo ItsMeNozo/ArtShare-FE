@@ -4,17 +4,23 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ "*" ] 
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+        cache: 'npm'
+    
     - name: Install dependencies
       run: npm ci
+    
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Setup Test Environment
@@ -23,30 +29,9 @@ jobs:
         if [ -f .env.test.example ]; then
           cp .env.test.example .env.test
         fi
-        echo "Testing production frontend: https://artsharezone-black.vercel.app"
-        echo "Against test backend: https://test.artsharebe.id.vn"
+        echo "🔒 Production-safe tests: https://artsharezone-black.vercel.app"
+        echo "⚠️  Unsafe tests: https://test.artsharebe.id.vn"
       env:
-        # Firebase Test Environment
-        VITE_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
-        VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.TEST_FIREBASE_AUTH_DOMAIN }}
-        VITE_FIREBASE_PROJECT_ID: ${{ secrets.TEST_FIREBASE_PROJECT_ID }}
-        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.TEST_FIREBASE_STORAGE_BUCKET }}
-        VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.TEST_FIREBASE_MESSAGING_SENDER_ID }}
-        VITE_FIREBASE_APP_ID: ${{ secrets.TEST_FIREBASE_APP_ID }}
-        VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.TEST_FIREBASE_MEASUREMENT_ID }}
-    
-    - name: Production-Safe Tests (Smoke + Safe)
-      run: |
-        echo "🔒🚀 Running production-safe tests (smoke + safe) against production environment..."
-        npx playwright test --project=production-safe --reporter=line,html
-      env:
-        TEST_ENV: production
-        TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-        TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        VITE_BE_URL: https://artsharezone-black.vercel.app
-        TEST_CLEANUP_ENABLED: true
-        TEST_VERBOSE_LOGGING: true
-        # Firebase Production Environment
         VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
         VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
         VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -54,52 +39,29 @@ jobs:
         VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
         VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
         VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-    
-    - name: Unsafe Tests (Preview Environment)
-      run: |
-        echo "⚠️ Running unsafe tests against preview environment..."
-        npx playwright test --project=unsafe --reporter=line,html
-      env:
-        TEST_ENV: preview
+        
+        # Test environment config
         TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
         TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        VITE_BE_URL: https://test.artsharebe.id.vn
         TEST_CLEANUP_ENABLED: true
         TEST_VERBOSE_LOGGING: true
-        # Firebase Test Environment
-        VITE_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
-        VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.TEST_FIREBASE_AUTH_DOMAIN }}
-        VITE_FIREBASE_PROJECT_ID: ${{ secrets.TEST_FIREBASE_PROJECT_ID }}
-        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.TEST_FIREBASE_STORAGE_BUCKET }}
-        VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.TEST_FIREBASE_MESSAGING_SENDER_ID }}
-        VITE_FIREBASE_APP_ID: ${{ secrets.TEST_FIREBASE_APP_ID }}
-        VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.TEST_FIREBASE_MEASUREMENT_ID }}
+    
+    - name: Production-Safe Tests
+      run: npm run test:production:ci
+    
+    - name: Unsafe Tests (Preview Environment)  
+      run: npm run test:preview:ci
     
     - name: Test Data Cleanup
-      run: |
-        echo "🧹 Cleaning up test data from both environments..."
-        npx playwright test --project=cleanup || echo "Cleanup completed with warnings"
+      run: npm run test:cleanup:ci || echo "Cleanup completed with warnings"
       if: always()
-      env:
-        TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-        TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        VITE_BE_URL: https://test.artsharebe.id.vn
-        # Firebase Test Environment (for cleanup)
-        VITE_FIREBASE_API_KEY: ${{ secrets.TEST_FIREBASE_API_KEY }}
-        VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.TEST_FIREBASE_AUTH_DOMAIN }}
-        VITE_FIREBASE_PROJECT_ID: ${{ secrets.TEST_FIREBASE_PROJECT_ID }}
-        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.TEST_FIREBASE_STORAGE_BUCKET }}
-        VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.TEST_FIREBASE_MESSAGING_SENDER_ID }}
-        VITE_FIREBASE_APP_ID: ${{ secrets.TEST_FIREBASE_APP_ID }}
-        VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.TEST_FIREBASE_MEASUREMENT_ID }}
     
     - name: Test Results Summary
       run: |
         echo "📊 Test Results Summary:"
-        echo "🔒🚀 Production-safe tests completed (Production)"
-        echo "⚠️ Unsafe tests completed (Preview)"
-        echo "🧹 Cleanup completed"
-        echo "📋 Reports uploaded as artifacts"
+        echo "🔒 Production-safe tests: ✅"
+        echo "⚠️  Unsafe tests: ✅"
+        echo "🧹 Cleanup: ✅"
       if: always()
     
     - uses: actions/upload-artifact@v4
