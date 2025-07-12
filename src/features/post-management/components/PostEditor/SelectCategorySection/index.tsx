@@ -51,13 +51,14 @@ export default function SelectCategorySection({
   useEffect(() => {
     if (!fetchedCategories) return;
 
-    const subjects: SubjectType[] = fetchedCategories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description,
-      examples: cat.exampleImages,
-    }));
-
+    const subjects: SubjectType[] = fetchedCategories
+      .map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        description: cat.description,
+        examples: cat.exampleImages,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
     setAllSubjectsForDisplay(subjects);
   }, [fetchedCategories]);
 
