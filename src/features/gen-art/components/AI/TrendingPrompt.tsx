@@ -192,7 +192,14 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                       size={60}
                     />
                   )}
-                  <p className="font-medium">{selectedItem?.author.username}</p>
+                  <div className="flex flex-col pt-0.5">
+                    <div className="text-xl font-bold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {selectedItem?.author.fullName || 'Unknown fullname'}
+                    </div>
+                    <div className="line-clamp-1 text-sm transition-colors duration-200 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+                      @{selectedItem?.author.username}
+                    </div>
+                  </div>
                 </>
               )}
             </div>
