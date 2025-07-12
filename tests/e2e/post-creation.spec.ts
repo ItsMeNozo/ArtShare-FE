@@ -228,7 +228,7 @@ test.describe('Post Creation', () => {
 
   // Test cases using the helper methods
 
-  test('@smoke @unsafe SCRUM-356-1: Basic Post Creation with Image Upload', async ({
+  test('@smoke SCRUM-356-1: Basic Post Creation with Image Upload', async ({
     page,
   }) => {
     console.log(`📍 Current URL: ${page.url()}`);
@@ -346,20 +346,18 @@ test.describe('Post Creation', () => {
       await expect(page.getByRole('img', { name: 'Preview' })).toBeVisible();
 
       try {
-        const postId = await createImagePost(
-          page,
-          'AI Generated Art from Stock',
-          'Created with AI from my stock',
-        );
+        await page
+          .getByRole('textbox', { name: 'What do you call your artwork' })
+          .fill('AI Generated Art from Stock');
+
+        const postId = await submitPost(page);
         console.log(
-          `✅ Created AI stock image post successfully with ID: ${postId}`,
+          `✅ Created AI-generated post successfully with ID: ${postId}`,
         );
       } catch (error) {
         // Handle 413 Content Too Large error specifically
         if (error.message?.includes('413')) {
-          console.log(
-            '⚠️ Received 413 Content Too Large error - AI image compression may be needed',
-          );
+          console.log('⚠️ Received 413 Content Too Large error');
           console.log(
             '🔧 Known issue: AI images need compression to prevent 413 errors',
           );
