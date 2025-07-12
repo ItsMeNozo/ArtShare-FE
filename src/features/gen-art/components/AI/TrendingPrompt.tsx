@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 
 // UI Components
 import { Button } from '@mui/material';
-import Avatar from 'boring-avatars';
 
 // Icons
 import { Skeleton } from '@/components/ui/skeleton';
+import Avatar from 'boring-avatars';
 import { IoCopyOutline } from 'react-icons/io5';
 import { LuImagePlus } from 'react-icons/lu';
 import { PiStarFourFill } from 'react-icons/pi';
@@ -187,8 +187,14 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                   ) : (
                     <Avatar
                       name={selectedItem.author.username || 'Unknown'}
-                      colors={['#84bfc3', '#ff9b62', '#d96153']}
                       variant="beam"
+                      colors={[
+                        '#84bfc3',
+                        '#fff5d6',
+                        '#ffb870',
+                        '#d96153',
+                        '#000511',
+                      ]}
                       size={60}
                     />
                   )}
