@@ -177,29 +177,21 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                 </>
               ) : (
                 <>
-                  <Avatar className="size-12">
-                    {selectedItem?.author.profilePictureUrl ? (
-                      <img
-                        src={selectedItem?.author.profilePictureUrl}
-                        alt={selectedItem?.author.username}
-                        className="dark:border-mountain-700 h-7 w-7 rounded-full border border-gray-200"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    ) : (
-                      <Avatar
-                        size={28}
-                        name={selectedItem?.author.username || 'Unknown'}
-                        variant="beam"
-                        colors={[
-                          '#84bfc3',
-                          '#fff5d6',
-                          '#ffb870',
-                          '#d96153',
-                          '#000511',
-                        ]}
-                      />
-                    )}
-                  </Avatar>
+                  {selectedItem?.author.profilePictureUrl ? (
+                    <img
+                      src={selectedItem?.author.profilePictureUrl}
+                      alt={selectedItem?.author.username}
+                      className="dark:border-mountain-700 h-7 w-7 rounded-full border border-gray-200"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <Avatar
+                      name={selectedItem.author.username || 'Unknown'}
+                      colors={['#84bfc3', '#ff9b62', '#d96153']}
+                      variant="beam"
+                      size={80}
+                    />
+                  )}
                   <p className="font-medium">{selectedItem?.author.username}</p>
                 </>
               )}
