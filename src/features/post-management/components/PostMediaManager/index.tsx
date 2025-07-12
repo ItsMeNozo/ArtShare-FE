@@ -205,7 +205,6 @@ export default function PostMediaManager({
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.src = previewUrl;
-      video.crossOrigin = 'anonymous';
 
       video.onloadeddata = () => {
         video.currentTime = 0; // Go to the first frame

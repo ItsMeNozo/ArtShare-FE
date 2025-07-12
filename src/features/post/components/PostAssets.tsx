@@ -26,7 +26,6 @@ const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
                 <img
                   src={media.url}
                   alt={media.description || 'Post asset'}
-                  crossOrigin="anonymous"
                   className="max-h-[80vh] max-w-full object-contain md:max-h-full"
                 />
               ) : (
