@@ -31,7 +31,7 @@ const FilterBar = ({
     data: allCategories,
     isLoading: isLoadingAllCategories,
     isError: isErrorAllCategories,
-  }: UseQueryResult<Category[]> = useCategories({ page: 1, pageSize: 200 });
+  }: UseQueryResult<Category[]> = useCategories({});
 
   const mediumCategories = useMemo(() => {
     if (!allCategories) return [];
