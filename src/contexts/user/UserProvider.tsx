@@ -3,7 +3,7 @@ import { User } from '@/types';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { UserContext } from './UserContext';
 import { handleFirebaseUserAuth, handleNoFirebaseUser } from './authHandler';
-import { LOADING_DELAY_MS, LOADING_TIMEOUT_MS } from './constants';
+import { LOADING_TIMEOUT_MS } from './constants';
 import {
   loginWithEmail as loginWithEmailAuth,
   logout as logoutAuth,
@@ -63,9 +63,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           await handleNoFirebaseUser(flags, setUser, setLoading);
         }
 
-        setTimeout(() => {
-          setLoading(false);
-        }, LOADING_DELAY_MS);
+        setLoading(false);
       },
       (err) => {
         // Clear the loading timeout on error
