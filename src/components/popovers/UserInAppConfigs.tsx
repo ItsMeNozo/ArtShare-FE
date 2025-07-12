@@ -166,7 +166,6 @@ const UserInAppConfigs = () => {
               className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex items-center space-x-2 p-3"
             >
               <FaRegCircleUser className="text-mountain-600" />
-              <FaRegCircleUser className="text-mountain-600" />
               <p className="text-sm">My Profile</p>
             </Link>
             <div className="xs:hidden hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full p-3 py-2 hover:cursor-pointer">

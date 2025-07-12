@@ -1,9 +1,9 @@
 import { auth } from '@/firebase';
 import { User } from '@/types';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { UserContext } from './UserContext';
 import { handleFirebaseUserAuth, handleNoFirebaseUser } from './authHandler';
-import { LOADING_DELAY_MS, LOADING_TIMEOUT_MS } from './constants';
+import { LOADING_TIMEOUT_MS } from './constants';
 import {
   loginWithEmail as loginWithEmailAuth,
   logout as logoutAuth,
@@ -63,9 +63,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           await handleNoFirebaseUser(flags, setUser, setLoading);
         }
 
-        setTimeout(() => {
-          setLoading(false);
-        }, LOADING_DELAY_MS);
+        setLoading(false);
       },
       (err) => {
         // Clear the loading timeout on error
@@ -114,25 +112,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  return (
-    <UserContext.Provider
-      value={{
-        user: logoutInProgress ? null : user, // Immediately show logged out state
-        isAuthenticated: logoutInProgress ? false : !!user,
-        isOnboard: logoutInProgress ? false : (user?.isOnboard ?? false),
-        error,
-        loading,
-        loginWithEmail,
-        signUpWithEmail,
-        logout,
-        authenWithGoogle,
-        signUpWithFacebook,
-        loginWithFacebook: signUpWithFacebook,
-        setUser,
-        setError,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
+  const value = useMemo(
+    () => ({
+      user: logoutInProgress ? null : user,
+      isAuthenticated: logoutInProgress ? false : !!user,
+      isOnboard: logoutInProgress ? false : (user?.isOnboard ?? false),
+      error,
+      loading,
+      loginWithEmail, // Assuming these are memoized with useCallback
+      signUpWithEmail,
+      logout,
+      authenWithGoogle,
+      signUpWithFacebook,
+      loginWithFacebook: signUpWithFacebook,
+      setUser,
+      setError,
+    }),
+    [user, error, loading, logoutInProgress],
   );
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
