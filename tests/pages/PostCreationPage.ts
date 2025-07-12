@@ -11,6 +11,7 @@ export class PostCreationPage {
   private readonly aiGenerateButton: Locator;
   private readonly previewImage: Locator;
   private readonly previewVideo: Locator;
+  private readonly thumbnailImage: Locator;
 
   constructor(private page: Page) {
     // Initialize locators once in constructor
@@ -35,6 +36,7 @@ export class PostCreationPage {
     });
     this.previewImage = this.page.getByRole('img', { name: 'Preview' });
     this.previewVideo = this.page.locator('video');
+    this.thumbnailImage = this.page.getByRole('img', { name: 'Thumbnail' });
   }
 
   // Form filling methods
@@ -172,6 +174,7 @@ export class PostCreationPage {
     const postButton = this.page
       .getByRole('button', { name: 'Post this' })
       .first();
+    await expect(postButton).toBeVisible();
 
     if (await postButton.isVisible()) {
       await postButton.click();
@@ -179,6 +182,10 @@ export class PostCreationPage {
       return true;
     }
     return false;
+  }
+
+  async waitForThumbnail(): Promise<void> {
+    await expect(this.thumbnailImage).toBeVisible();
   }
 
   async handleNoAIImagesAvailable(): Promise<void> {
@@ -218,6 +225,7 @@ export class PostCreationPage {
     const imageSelected = await this.selectFirstAIImage();
     if (imageSelected) {
       await this.fillTitle(title);
+      await this.waitForThumbnail();
       return true;
     }
 
@@ -245,5 +253,9 @@ export class PostCreationPage {
 
   getPreviewVideo(): Locator {
     return this.previewVideo;
+  }
+
+  getThumbnailImage(): Locator {
+    return this.thumbnailImage;
   }
 }
