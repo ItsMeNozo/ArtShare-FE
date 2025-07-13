@@ -10,6 +10,21 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     
+    env:
+      VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+      VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+      
+      # Test environment config
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      TEST_CLEANUP_ENABLED: true
+      TEST_VERBOSE_LOGGING: true
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -23,6 +38,7 @@ jobs:
     
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+      
     - name: Setup Test Environment
       run: |
         # Copy test environment file if it exists
@@ -31,20 +47,8 @@ jobs:
         fi
         echo "🔒 Production-safe tests: https://artsharezone-black.vercel.app"
         echo "⚠️  Unsafe tests: https://test.artsharebe.id.vn"
-      env:
-        VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-        VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-        VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-        VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-        VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-        VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-        
-        # Test environment config
-        TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-        TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-        TEST_CLEANUP_ENABLED: true
-        TEST_VERBOSE_LOGGING: true
+        echo "✅ Environment variables configured"
+        echo "📧 Test user email: ${TEST_USER_EMAIL}"
     
     - name: Production-Safe Tests
       run: npm run test:production:ci
