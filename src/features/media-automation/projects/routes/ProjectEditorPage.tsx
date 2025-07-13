@@ -95,9 +95,9 @@ const ProjectEditorPage = () => {
                     </ErrorMessage>
                   </Box>
                   <Box className="w-full">
-                    <Typography className="mb-1 flex w-full gap-1 text-left font-medium">
+                    <Typography className="mb-1 flex w-full items-center gap-1 text-left font-medium">
                       Description
-                      <span className="text-red-600">*</span>
+                      <span className="text-sm text-gray-400">(Optional)</span>
                     </Typography>
                     <Field
                       name="description"
@@ -147,7 +147,8 @@ const validationSchema = Yup.object().shape({
     .required('Project name is required'),
   description: Yup.string()
     .min(5, 'Description must be at least 5 characters')
-    .required('Description is required'),
+    .nullable()
+    .optional(),
   platform: Yup.object().shape({
     id: Yup.number()
       .min(1, 'Please select a platform account')
