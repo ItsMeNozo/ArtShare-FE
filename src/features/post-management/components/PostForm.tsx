@@ -179,7 +179,7 @@ const PostForm: React.FC<PostFormProps> = ({
                   {/* Form fields */}
                   <Box className="custom-scrollbar relative w-full overflow-y-auto rounded-md pr-4">
                     <Tooltip
-                      title="Auto generate content (title, description, categories) - Credit cost: ~2"
+                      title="Auto generate content (title, description, categories) based on images - Credit cost: ~2"
                       arrow
                       placement="left"
                     >
