@@ -1,95 +1,74 @@
-# Test Strategy Documentation
+# Test Strategy
 
 ## Test Categories
 
-Our test suite is organized into three main categories based on cost and safety:
+- **@safe**: Read-only tests, run against production.  
+  _CI/CD: Yes_  
+  _Command: `npm run test:production:ci`_
 
-### 🤖 @ai - AI Tests (Manual Only)
+- **@unsafe**: Data-modifying tests, run against preview/test environment.  
+  _CI/CD: Yes_  
+  _Command: `npm run test:preview:ci`_
 
-- **Cost**: These tests use AI services and will incur charges
-- **Environment**: Any environment
-- **Execution**: Manual only - **NEVER run in CI/CD pipeline**
-- **Command**: `npm run test:ai`
-- **Purpose**: Tests that involve AI image generation, content analysis, or other AI-powered features
+- **@ai**: AI-powered tests (may incur costs).  
+  _CI/CD: No (manual only)_  
+  _Command: `npm run test:ai`_
 
-### ✅ @safe - Safe Tests (Production Pipeline)
+- **@cleanup**: Cleanup tests to remove test data.  
+  _CI/CD: Yes (always runs after other tests)_  
+  _Command: `npm run test:cleanup:ci`_
 
-- **Cost**: Free to run
-- **Environment**: Production environment (read-only operations)
-- **Execution**: Automated in CI/CD pipeline
-- **Command**: `npm run test:safe`
-- **Purpose**: Tests that verify UI functionality, navigation, and read-only operations
-
-### ⚠️ @unsafe - Unsafe Tests (Preview Environment)
-
-- **Cost**: Free to run
-- **Environment**: Preview/test environment
-- **Execution**: Automated in CI/CD pipeline
-- **Command**: `npm run test:unsafe`
-- **Purpose**: Tests that create, update, or delete data; require isolated test environment
-
-## Available Commands
+## Running Tests
 
 ```bash
-# Run all tests (not recommended for CI)
+# All local tests (not for CI)
 npm run test
 
-# Run safe tests (production environment)
-npm run test:safe
+# Production-safe tests (CI/CD)
+npm run test:production:ci
 
-# Run unsafe tests (preview environment)
-npm run test:unsafe
+# Unsafe tests (CI/CD)
+npm run test:preview:ci
 
-# Run AI tests (manual only - costs money!)
+# AI tests (manual only)
 npm run test:ai
 
-# Run smoke tests
-npm run test:smoke
+# Cleanup (CI/CD)
+npm run test:cleanup:ci
 
-# Run tests with UI
-npm run test:ui
-
-# Clean up test data
-npm run test:cleanup
-
-# Show test report
+# Show HTML report
 npm run test:report
 ```
 
 ## CI/CD Pipeline
 
-The GitHub Actions workflow will automatically run:
+- Runs **@safe** tests on production
+- Runs **@unsafe** tests on preview
+- Runs **@cleanup** to remove test data
+- **@ai** tests are excluded from CI/CD
 
-1. **@safe tests** against the production environment
-2. **@unsafe tests** against the preview environment
-3. **Test cleanup** to remove any test data
-
-**@ai tests are excluded from the pipeline** to prevent unexpected charges.
-
-## Test Tagging Examples
+## Tagging Examples
 
 ```typescript
-// Safe test - can run in production
-test('@safe should display landing page correctly', async ({ page }) => {
-  // Read-only operations only
+// Safe test (production)
+test('@safe should show landing page', async ({ page }) => {
+  // Read-only
 });
 
-// Unsafe test - modifies data, needs test environment
-test('@unsafe should create new user account', async ({ page }) => {
-  // Creates/modifies data
+// Unsafe test (preview)
+test('@unsafe should create user', async ({ page }) => {
+  // Data-modifying
 });
 
-// AI test - uses AI services, costs money
-test('@ai should generate artwork with AI', async ({ page }) => {
-  // Calls AI APIs that cost money
+// AI test (manual only)
+test('@ai should generate artwork', async ({ page }) => {
+  // Calls paid AI APIs
 });
 ```
 
 ## Best Practices
 
-1. **Always tag your tests** with one of the three categories
-2. **Use @safe for read-only operations** that can safely run in production
-3. **Use @unsafe for data-modifying operations** that need a test environment
-4. **Use @ai sparingly** and only for features that absolutely require AI testing
-5. **Keep AI tests focused** to minimize costs
-6. **Test cleanup** should run after unsafe tests to maintain environment cleanliness
+1. Tag every test with @safe, @unsafe, or @ai
+2. Use @safe for read-only, @unsafe for data-modifying, @ai for AI/costly features
+3. Keep AI tests minimal and focused
+4. Cleanup always runs after unsafe tests
