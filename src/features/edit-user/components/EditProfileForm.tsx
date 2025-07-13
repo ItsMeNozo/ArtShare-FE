@@ -48,7 +48,11 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     }
 
     const payload = {
-      ...raw,
+      username: raw.username,
+      email: raw.email,
+      fullName: raw.fullName,
+      profilePictureUrl: raw.profilePictureUrl,
+      bio: raw.bio,
       birthday: new Date(raw.birthday ?? '').toISOString(),
     };
 
