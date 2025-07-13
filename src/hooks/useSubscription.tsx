@@ -3,11 +3,13 @@ import {
   SubscriptionInfoDto,
   SubscriptionPlan,
 } from '@/api/subscription/get-subscription-info.api';
+import { useUser } from '@/contexts/user';
 import { useQuery } from '@tanstack/react-query';
 
 export const useSubscriptionInfo = () => {
+  const { user } = useUser();
   return useQuery<SubscriptionInfoDto, Error>({
-    queryKey: ['subscriptionInfo'],
+    queryKey: ['subscriptionInfo', user?.id],
     queryFn: getSubscriptionInfo,
     staleTime: 1000 * 60 * 5, // 5 minutes
     select: (data) => ({

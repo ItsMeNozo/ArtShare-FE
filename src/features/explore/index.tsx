@@ -17,6 +17,7 @@ const Explore: React.FC = () => {
   const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
   const [isAi, setIsAi] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem('accessToken');
 
   const handlePhotoClick = (photoId: number) => {
     navigate(`/posts/${photoId}`);
@@ -82,7 +83,7 @@ const Explore: React.FC = () => {
         </InfiniteScroll>
       )}
 
-      <Paper className="dark:bg-mountain-800 fixed bottom-4 left-1/2 z-50 -translate-x-1/2 transform rounded-full bg-white shadow-lg">
+      <Paper className="dark:bg-mountain-800 absolute bottom-4 left-1/2 z-50 -translate-x-1/2 transform rounded-full bg-white shadow-lg">
         <ToggleButtonGroup
           className="m-1.5 flex gap-2"
           size="small"
@@ -98,13 +99,15 @@ const Explore: React.FC = () => {
           >
             Trending
           </ToggleButton>
-          <ToggleButton
-            color="primary"
-            className="data-[selected]:dark:bg-primary-700 dark:text-mountain-100 -m-0.5 rounded-full border-0 px-4 py-2 normal-case data-[selected]:dark:text-white"
-            value={'Following' as ExploreTab}
-          >
-            Following
-          </ToggleButton>
+          {token && (
+            <ToggleButton
+              color="primary"
+              className="data-[selected]:dark:bg-primary-700 dark:text-mountain-100 -m-0.5 rounded-full border-0 px-4 py-2 normal-case data-[selected]:dark:text-white"
+              value={'Following' as ExploreTab}
+            >
+              Following
+            </ToggleButton>
+          )}
         </ToggleButtonGroup>
       </Paper>
     </div>

@@ -61,26 +61,24 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
   return (
     <Box ref={ref} className="flex h-screen max-h-[68vh] flex-col px-2">
       {isLoading && photos.length === 0 && <Loading />}
-      {width > 0 && (
-        <InfiniteScroll
-          data={photos}
-          isLoading={isLoading}
-          isFetchingNextPage={isFetchingNextPage}
-          isError={isError}
-          error={error}
-          hasNextPage={hasNextPage}
-          fetchNextPage={fetchNextPage}
-        >
-          <RowsPhotoAlbum
-            defaultContainerWidth={width}
-            photos={photos}
-            spacing={8}
-            targetRowHeight={250}
-            rowConstraints={{ singleRowMaxHeight: 256 }}
-            render={{ image: UserPhotoRenderer }}
-          />
-        </InfiniteScroll>
-      )}
+      <InfiniteScroll
+        data={photos}
+        isLoading={isLoading}
+        isFetchingNextPage={isFetchingNextPage}
+        isError={isError}
+        error={error}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
+      >
+        <RowsPhotoAlbum
+          defaultContainerWidth={width}
+          photos={photos}
+          spacing={8}
+          targetRowHeight={250}
+          rowConstraints={{ singleRowMaxHeight: 256 }}
+          render={{ image: UserPhotoRenderer }}
+        />
+      </InfiniteScroll>
     </Box>
   );
 };

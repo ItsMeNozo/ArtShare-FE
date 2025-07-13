@@ -35,6 +35,7 @@ const Search = () => {
     setInputValue('');
     setSearchParams(undefined);
   };
+
   return (
     <div className="flex h-full flex-col">
       <div className="border-mountain-100 dark:bg-mountain-950 dark:border-mountain-800 flex h-fit w-full flex-col items-center justify-end space-y-2 space-x-4 border-b-1 bg-white pt-8">
