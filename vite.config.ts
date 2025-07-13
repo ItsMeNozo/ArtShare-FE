@@ -5,10 +5,17 @@ import { defineConfig, loadEnv } from 'vite';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  // Load .env file tương ứng với mode (ví dụ: .env.test)
-  const env = loadEnv(process.env.MODE || mode, process.cwd(), '');
+  // Vite automatically loads .env.test when MODE=test
+  const currentMode = process.env.MODE || mode;
+  console.log(`🔧 Vite mode: ${currentMode}`);
+
+  // Load environment variables based on mode
+  const env = loadEnv(currentMode, process.cwd(), '');
 
   return {
+    // Override env file path for test mode
+    envDir: './',
+    envPrefix: 'VITE_',
     server: {
       port: 5173, // fixed port for the admin app
       open: true, // (optional) auto‑open browser
@@ -26,8 +33,8 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    // Need to explicitly define these for custom modes like 'test'
     define: {
-      // Ép biến env dùng được trong import.meta.env
       'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(
         env.VITE_FIREBASE_API_KEY,
       ),
@@ -46,6 +53,16 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_FIREBASE_APP_ID': JSON.stringify(
         env.VITE_FIREBASE_APP_ID,
       ),
+      'import.meta.env.VITE_FIREBASE_MEASUREMENT_ID': JSON.stringify(
+        env.VITE_FIREBASE_MEASUREMENT_ID,
+      ),
+      'import.meta.env.VITE_S3_BUCKET_URL': JSON.stringify(
+        env.VITE_S3_BUCKET_URL,
+      ),
+      'import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY': JSON.stringify(
+        env.VITE_STRIPE_PUBLISHABLE_KEY,
+      ),
+      'import.meta.env.VITE_BE_URL': JSON.stringify(env.VITE_BE_URL),
     },
   };
 });
