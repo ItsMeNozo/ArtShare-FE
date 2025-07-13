@@ -28,7 +28,7 @@ const App: React.FC = () => {
       <Suspense fallback={<Loading />}>
         <RouterProvider router={router} />
       </Suspense>
-      <SpeedInsights />
+      <SpeedInsights debug={import.meta.env.DEV} />
     </ComposeProviders>
   );
 };
