@@ -10,6 +10,10 @@ export const useSubscriptionInfo = () => {
     queryKey: ['subscriptionInfo'],
     queryFn: getSubscriptionInfo,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    select: (data) => ({
+      ...data,
+      expiresAt: new Date(data.expiresAt),
+    }),
   });
 };
 
