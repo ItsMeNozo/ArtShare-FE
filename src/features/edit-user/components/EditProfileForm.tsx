@@ -1,9 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useUser } from '@/contexts/user';
+import { getUserProfile } from '@/features/user-profile-private/api/get-user-profile';
 import { UserProfile } from '@/features/user-profile-public/api/user-profile.api';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { cn } from '@/lib/utils';
 import { Box, TextareaAutosize, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import React from 'react';
@@ -14,6 +17,8 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
   initialData,
 }) => {
   const { showSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+  const { setUser } = useUser();
 
   const {
     register,
@@ -58,6 +63,18 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
 
     try {
       await updateUserProfile(payload);
+
+      // Invalidate and refetch user profile query
+      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+
+      // Update user context with fresh data
+      try {
+        const updatedProfile = await getUserProfile();
+        setUser?.(updatedProfile);
+      } catch (contextError) {
+        console.warn('Failed to update user context:', contextError);
+      }
+
       reset(raw);
       showSnackbar('Profile updated successfully!', 'success');
     } catch (err: unknown) {
