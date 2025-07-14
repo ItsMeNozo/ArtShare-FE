@@ -1,9 +1,12 @@
-import { Button } from '@/components/ui/button'; // Using shadcn/ui Button
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useUser } from '@/contexts/user';
+import { getUserProfile } from '@/features/user-profile-private/api/get-user-profile';
 import { UserProfile } from '@/features/user-profile-public/api/user-profile.api';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { cn } from '@/lib/utils';
-import { Box, TextareaAutosize, Typography } from '@mui/material'; // Removed Button from here as it's not used with MUI styles
+import { Box, TextareaAutosize, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import React from 'react';
@@ -14,6 +17,8 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
   initialData,
 }) => {
   const { showSnackbar } = useSnackbar();
+  const queryClient = useQueryClient();
+  const { setUser } = useUser();
 
   const {
     register,
@@ -48,12 +53,28 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     }
 
     const payload = {
-      ...raw,
+      username: raw.username,
+      email: raw.email,
+      fullName: raw.fullName,
+      profilePictureUrl: raw.profilePictureUrl,
+      bio: raw.bio,
       birthday: new Date(raw.birthday ?? '').toISOString(),
     };
 
     try {
       await updateUserProfile(payload);
+
+      // Invalidate and refetch user profile query
+      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+
+      // Update user context with fresh data
+      try {
+        const updatedProfile = await getUserProfile();
+        setUser?.(updatedProfile);
+      } catch (contextError) {
+        console.warn('Failed to update user context:', contextError);
+      }
+
       reset(raw);
       showSnackbar('Profile updated successfully!', 'success');
     } catch (err: unknown) {
@@ -76,30 +97,25 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     }
   };
 
-  // Define common classes for inputs
   const customInputClassName = cn(
-    // Light Mode Styles (remain the same)
-    'bg-mountain-50',
+    'bg-white',
     'text-slate-800',
     'placeholder:text-slate-500',
-    'border-slate-300', // Default border color
-    'hover:border-slate-400', // Hover border color
-
-    // Dark Mode Styles (Updated for darker input background)
-    'dark:bg-mountain-950', // Very dark background for input, darker than mountain-900 (e.g., slate-800)
-    'dark:text-slate-200', // Light text for contrast on very dark background
-    'dark:placeholder:text-slate-500', // Dimmer placeholder text
-    'dark:border-slate-700', // Border color (lighter than input bg, darker than form bg if form is lighter)
-    'dark:hover:border-slate-600', // Hover border color for dark mode
+    'border-slate-300',
+    'hover:border-slate-400',
+    'dark:bg-mountain-950',
+    'dark:text-slate-200',
+    'dark:placeholder:text-slate-500',
+    'dark:border-slate-700',
+    'dark:hover:border-slate-600',
   );
 
   return (
     <Box
       component="form"
       onSubmit={handleSubmit(onSubmit)}
-      className="dark:bg-mountain-900 mt-5 max-w-screen rounded-none p-6 dark:rounded-md" // Parent form background
+      className="dark:bg-mountain-900 mt-5 max-w-screen rounded-none p-6 dark:rounded-md"
     >
-      {/* Full Name */}
       <Box className="mb-4">
         <Typography className="text-foreground mb-1 font-medium">
           Full Name <span className="text-rose-500">*</span>
@@ -120,7 +136,6 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
         )}
       </Box>
 
-      {/* Username */}
       <Box className="mb-4">
         <Typography className="text-foreground mb-1 font-medium">
           Username <span className="text-rose-500">*</span>
@@ -146,7 +161,6 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
         )}
       </Box>
 
-      {/* Birthday */}
       <Box className="mb-4">
         <Typography className="text-foreground mb-1 font-medium">
           Birthday <span className="text-rose-500">*</span>
@@ -168,7 +182,6 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
         )}
       </Box>
 
-      {/* Bio */}
       <Box className="mb-6">
         <Typography className="text-foreground mb-1 font-medium">
           Bio (optional)
@@ -179,13 +192,10 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
           placeholder="A short description about you"
           {...register('bio')}
           className={cn(
-            // Base structure & shadcn-like styles (ensure 'border' class is present)
             'w-full min-w-0 rounded-md border px-3 py-1 text-base shadow-xs transition-[color,box-shadow]',
             'selection:bg-primary selection:text-primary-foreground',
             'resize-none outline-none',
-            // Custom styles for background, text, placeholder, and border
             customInputClassName,
-            // Specific focus for TextareaAutosize
             'focus-visible:border-ring focus-visible:ring-ring/30 focus-visible:ring-[2px]',
             'aria-invalid:ring-destructive/20 aria-invalid:border-destructive',
           )}
@@ -198,16 +208,11 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
         </Typography>
       </Box>
 
-      {/* Submit */}
       <Box className="text-right">
-        {/* Using shadcn/ui Button now based on imports, custom sx styling removed unless you add it back */}
         <Button
           type="submit"
           disabled={isSubmitting}
           className="cursor-pointer bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white hover:from-indigo-800 hover:via-purple-800 hover:to-indigo-900"
-          // The MUI sx prop styling was removed. The classes above replicate a gradient.
-          // If you still want the exact MUI sx styling, you'd need to import Button from @mui/material
-          // and apply the sx prop as you had it.
         >
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save changes
