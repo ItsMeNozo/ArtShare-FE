@@ -205,7 +205,6 @@ export default function PostMediaManager({
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.src = previewUrl;
-      video.crossOrigin = 'anonymous';
 
       video.onloadeddata = () => {
         video.currentTime = 0; // Go to the first frame
@@ -297,9 +296,9 @@ export default function PostMediaManager({
               >
                 <InfoMediaRemaining
                   currentImageCount={imageCount}
-                  MaxImage={MAX_IMAGES}
+                  maxImage={MAX_IMAGES}
                   hasVideo={hasVideo}
-                  MaxVideo={MAX_VIDEO}
+                  maxVideo={MAX_VIDEO}
                   hasAI={tabValue !== TabValue.BROWSE_GENAI}
                 />
                 <Tooltip title="Marked as an AI Post. Its prompt may appear in trending suggestions for others to reuse.">

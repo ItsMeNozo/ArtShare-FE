@@ -8,7 +8,7 @@
 }
 
 .reset-tailwind q {
-  quotes: "“" "”" "‘" "’";
+  quotes: '“' '”' '‘' '’';
 }
 
 .reset-tailwind q:before {

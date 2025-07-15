@@ -1,13 +1,10 @@
-import api from "@/api/baseApi";
-import qs from "qs";
-import type { Category } from "@/types/category"; // This will now use the updated Category type
-import { CategoryTypeValues } from "@/constants";
+import api from '@/api/baseApi';
+import { CategoryTypeValues } from '@/constants';
+import type { Category } from '@/types/category'; // This will now use the updated Category type
+import qs from 'qs';
 
 export interface GetCategoriesParams {
-  page?: number;
-  pageSize?: number;
   type?: CategoryTypeValues;
-  searchQuery?: string;
 }
 
 export const getCategories = async (
@@ -24,11 +21,11 @@ export const getCategories = async (
     // Parse dates from string to Date objects
     return response.data.map((cat) => ({
       ...cat,
-      created_at: new Date(cat.created_at as string),
-      updated_at: cat.updated_at ? new Date(cat.updated_at as string) : null,
+      createdAt: new Date(cat.createdAt as string),
+      updatedAt: cat.updatedAt ? new Date(cat.updatedAt as string) : null,
     }));
   } catch (error) {
-    console.error("Error in getCategories API call:", error);
+    console.error('Error in getCategories API call:', error);
     throw error;
   }
 };

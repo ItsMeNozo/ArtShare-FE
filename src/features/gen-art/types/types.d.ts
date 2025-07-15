@@ -71,17 +71,17 @@ interface UsedModel {
 
 interface PromptResult {
   id: number;
-  aspect_ratio: string;
-  created_at: string;
+  aspectRatio: string;
+  createdAt: string;
   camera: string;
-  final_prompt: string;
-  image_urls: string[];
+  finalPrompt: string;
+  imageUrls: string[];
   lighting: string;
-  model_key: string;
-  number_of_images_generated: number;
+  modelKey: string;
+  numberOfImagesGenerated: number;
   style: string;
-  user_id: string;
-  user_prompt: string;
+  userId: string;
+  userPrompt: string;
   generating?: boolean;
 }
 
@@ -96,12 +96,12 @@ interface TrendingItem {
   style: string;
   lighting: string;
   camera: string;
-  aspect_ratio: string;
-  model_key: string;
+  aspectRatio: string;
+  modelKey: string;
   author: {
     id: string;
     username: string;
-    full_name: string;
-    profile_picture_url: string | null;
+    fullName: string;
+    profilePictureUrl: string | null;
   };
 }

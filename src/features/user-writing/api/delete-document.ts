@@ -1,4 +1,4 @@
-import api from "@/api/baseApi";
+import api from '@/api/baseApi';
 
 /**
  * Delete a blog post.

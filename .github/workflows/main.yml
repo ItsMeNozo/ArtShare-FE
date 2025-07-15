@@ -33,7 +33,7 @@ jobs:
           cache: 'npm' # Added caching for npm
 
       - name: Install dependencies
-        run: npm install 
+        run: npm install
 
       - name: Build the app
         run: npm run build

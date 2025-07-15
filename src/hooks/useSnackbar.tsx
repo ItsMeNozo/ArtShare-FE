@@ -1,10 +1,10 @@
-import { createContext, ReactNode, useContext } from "react";
-import { SnackbarOrigin } from "@mui/material";
+import { SnackbarOrigin } from '@mui/material';
+import { createContext, ReactNode, useContext } from 'react';
 
 type SnackbarContextType = {
   showSnackbar: (
     message: string,
-    severity?: "success" | "info" | "warning" | "error",
+    severity?: 'success' | 'info' | 'warning' | 'error',
     action?: ReactNode,
     anchorOrigin?: SnackbarOrigin, // Add anchorOrigin as an optional parameter
   ) => void;
@@ -17,6 +17,6 @@ export const SnackbarContext = createContext<SnackbarContextType | undefined>(
 export const useSnackbar = () => {
   const context = useContext(SnackbarContext);
   if (!context)
-    throw new Error("useSnackbar must be used within SnackbarProvider");
+    throw new Error('useSnackbar must be used within SnackbarProvider');
   return context;
 };

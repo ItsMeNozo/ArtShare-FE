@@ -73,7 +73,7 @@
   }
 
   /* Task list specific styles */
-  ul[data-type="taskList"] {
+  ul[data-type='taskList'] {
     list-style: none;
     margin-left: 0;
     padding: 0;
@@ -94,11 +94,11 @@
       }
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       cursor: pointer;
     }
 
-    ul[data-type="taskList"] {
+    ul[data-type='taskList'] {
       margin: 0;
     }
   }
@@ -133,7 +133,7 @@
 
     .selectedCell:after {
       background: var(#c7c7c8);
-      content: "";
+      content: '';
       left: 0;
       right: 0;
       top: 0;

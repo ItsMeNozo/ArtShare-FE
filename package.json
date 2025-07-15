@@ -5,12 +5,23 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:test": "cross-env MODE=test vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "cy-open": "cypress open",
-    "cy-open-unit": "vite --mode test & cypress open --component --browser chrome",
-    "cy-run-unit": "cross-env MODE=test cypress run --component",
-    "preview": "vite preview"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "test": "cross-env TEST_ENV=local playwright test --project=e2e-chrome",
+    "test:ui": "cross-env TEST_ENV=local playwright test --ui --trace on",
+    "test:production": "cross-env TEST_ENV=production playwright test --project=production-safe --trace on --headed",
+    "test:preview": "cross-env TEST_ENV=preview playwright test --project=unsafe --trace on --headed",
+    "test:ai": "cross-env TEST_ENV=local playwright test --project=ai --trace on --headed",
+    "test:cleanup": "cross-env TEST_ENV=preview playwright test --project=cleanup --trace on",
+    "test:production:ci": "cross-env TEST_ENV=production playwright test --project=production-safe --reporter=line,html",
+    "test:preview:ci": "cross-env TEST_ENV=preview playwright test --project=unsafe --reporter=line,html",
+    "test:cleanup:ci": "cross-env TEST_ENV=preview playwright test --project=cleanup",
+    "test:all:ci": "npm run test:production:ci && npm run test:preview:ci",
+    "test:smoke:ci": "cross-env TEST_ENV=production playwright test --project=production-safe --grep @smoke",
+    "test:report": "playwright show-report"
   },
   "prepare": "husky",
   "lint-staged": {
@@ -20,7 +31,6 @@
   },
   "dependencies": {
     "@achmadk/react-loading-overlay": "^3.0.5",
-    "@cypress/react": "^9.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
@@ -78,7 +88,9 @@
     "@tiptap/pm": "^2.11.9",
     "@tiptap/react": "^2.2.0",
     "@tiptap/starter-kit": "^2.11.9",
+    "@types/lodash": "^4.17.20",
     "@types/react-show-more-text": "^1.4.5",
+    "@vercel/speed-insights": "^1.2.0",
     "art-share": "file:",
     "axios": "^1.8.4",
     "boring-avatars": "^1.11.2",
@@ -97,6 +109,7 @@
     "jszip": "^3.10.1",
     "keen-slider": "^6.8.6",
     "lightningcss": "^1.29.3",
+    "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.477.0",
@@ -120,6 +133,7 @@
     "react-scroll": "^1.9.3",
     "react-show-more-text": "^1.7.1",
     "react-time-ago": "^7.3.3",
+    "react-use-measure": "^2.1.7",
     "react-virtualized-auto-sizer": "^1.0.26",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.8.1",
@@ -133,8 +147,8 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "^3.13.12",
     "@eslint/js": "^9.21.0",
+    "@playwright/test": "^1.52.0",
     "@swc/core": "^1.11.13",
     "@swc/helpers": "^0.5.15",
     "@types/file-saver": "^2.0.7",
@@ -149,7 +163,7 @@
     "@vitejs/plugin-react-swc": "^3.8.0",
     "autoprefixer": "^10.4.21",
     "cross-env": "^7.0.3",
-    "cypress": "^14.2.1",
+    "dotenv": "^17.0.1",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
@@ -162,7 +176,6 @@
     "sass-embedded": "^1.87.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "vite": "^6.3.4",
-    "vite-plugin-istanbul": "^7.0.0"
+    "vite": "^6.3.4"
   }
 }

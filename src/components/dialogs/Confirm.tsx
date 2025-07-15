@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -5,9 +6,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Dispatch, SetStateAction } from "react";
+} from '@/components/ui/dialog';
+import { Dispatch, SetStateAction } from 'react';
 
 type ConfirmDialogProps = {
   title: string;
@@ -32,12 +32,12 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
-      <DialogContent className="flex flex-col border-mountain-200 w-108">
+      <DialogContent className="border-mountain-200 flex w-108 flex-col">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div className="flex justify-center items-center bg-mountain-50 py-6">
+        <div className="bg-mountain-50 flex items-center justify-center py-6">
           {icon}
         </div>
         <DialogFooter>
@@ -48,7 +48,7 @@ export default function ConfirmDialog({
             Cancel
           </Button>
           <Button
-            className="bg-red-700 hover:bg-red-700/80 text-mountain-50"
+            className="text-mountain-50 bg-red-700 hover:bg-red-700/80"
             onClick={onConfirm}
             disabled={isLoading}
           >

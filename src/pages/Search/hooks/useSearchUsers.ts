@@ -1,5 +1,5 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { searchUsers } from "../api/searchUsers.api";
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { searchUsers } from '../api/searchUsers.api';
 
 interface UserSearchUsersParams {
   searchQuery: string;
@@ -10,7 +10,7 @@ export const useSearchUsers = (params: UserSearchUsersParams) => {
   const { searchQuery, enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ["userSearch", searchQuery],
+    queryKey: ['userSearch', searchQuery],
 
     queryFn: ({ pageParam = 1 }) =>
       searchUsers({ search: searchQuery, page: pageParam }),

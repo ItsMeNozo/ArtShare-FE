@@ -1,4 +1,4 @@
 export enum TargetType {
-  BLOG = "BLOG",
-  POST = "POST",
+  BLOG = 'BLOG',
+  POST = 'POST',
 }

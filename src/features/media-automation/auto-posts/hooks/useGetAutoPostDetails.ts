@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getAutoPostDetails } from '../api/auto-posts.api';
-import { autoPostKeys } from '../utilts/autoPostKeys';
+import { autoPostKeys } from '../utils/autoPostKeys';
 
 export const useGetAutoPostDetails = (
   autoPostId: number | undefined,

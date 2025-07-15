@@ -1,21 +1,28 @@
-import CategoryList from '@/components/filters/Filter';
 import { ImageRenderer } from '@/components/gallery/ImageRenderer';
 import { InfiniteScroll } from '@/components/InfiniteScroll';
+import { Button } from '@/components/ui/button';
+import AttributeFilters from '@/features/explore/components/AttributeFilters';
+import MediumFilters from '@/features/explore/components/MediumFilters';
 import { Box } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
+import { IoMdArrowDropdown } from 'react-icons/io';
+import { TbCategory } from 'react-icons/tb';
 import { RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
+import useMeasure from 'react-use-measure';
 import { useSearchPosts } from '../../hooks/useSearchPosts';
-import MediumFilters from './MediumFilters';
 
 interface PostSearchResultsProps {
   finalQuery: string | null;
 }
 
 const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
+  const [ref, { width }] = useMeasure();
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
+  const [selectedMedium, setSelectedMedium] = useState<string | null>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+  const [isAi, setIsAi] = useState(false);
 
   const {
     data: postsData,
@@ -27,7 +34,9 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
     isFetchingNextPage,
   } = useSearchPosts({
     finalQuery,
-    selectedMediums,
+    medium: selectedMedium,
+    attributes: selectedAttributes,
+    isAi,
     enabled: !!finalQuery && finalQuery.length > 0,
   });
 
@@ -37,7 +46,10 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
 
   return (
     <Box className="relative flex h-screen flex-col p-2 pb-48">
-      <div className="dark:bg-mountain-950 dark:border-mountain-800 absolute top-0 left-0 z-50 flex h-16 bg-white dark:border-b">
+      <div
+        ref={ref}
+        className="dark:bg-mountain-950 dark:border-mountain-800 absolute top-0 left-0 z-50 flex h-16 bg-white dark:border-b"
+      >
         {/* Left side - Filter */}
         <div className="absolute top-1/2 left-4 flex -translate-y-1/2 transform items-center space-x-4">
           <div
@@ -55,30 +67,62 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
           </div>
 
           {showFilters && (
-            <MediumFilters
-              selectedMediums={selectedMediums}
-              setSelectedMediums={setSelectedMediums}
-            />
+            <Box className="relative flex gap-2">
+              <MediumFilters
+                selectedMedium={selectedMedium}
+                setSelectedMedium={setSelectedMedium}
+              >
+                {({ onClick }) => (
+                  <Button
+                    variant="outline"
+                    className="dark:bg-mountain-900 hover:bg-mountain-50 dark:hover:bg-mountain-800 border-mountain-200 dark:border-mountain-700 text-mountain-950 dark:text-mountain-200 flex w-auto cursor-pointer items-center justify-center rounded-full border bg-white px-3 py-1"
+                    onClick={onClick}
+                  >
+                    <TbCategory size={16} className="mr-1" />
+                    <p className="mr-1">Mediums</p>
+                    <IoMdArrowDropdown />
+                  </Button>
+                )}
+              </MediumFilters>
+              <AttributeFilters
+                selectedAttributes={selectedAttributes}
+                setSelectedAttributes={setSelectedAttributes}
+                isAi={isAi}
+                setIsAi={setIsAi}
+              >
+                {({ onClick }) => (
+                  <Button
+                    variant="outline"
+                    className="dark:bg-mountain-900 hover:bg-mountain-50 dark:hover:bg-mountain-800 border-mountain-200 dark:border-mountain-700 text-mountain-950 dark:text-mountain-200 flex w-auto cursor-pointer items-center justify-center rounded-full border bg-white px-3 py-1"
+                    onClick={onClick}
+                  >
+                    <TbCategory size={16} className="mr-1" />
+                    <p className="mr-1">Attributes</p>
+                    <IoMdArrowDropdown />
+                  </Button>
+                )}
+              </AttributeFilters>
+            </Box>
           )}
         </div>
         {/* Center - Tabs */}
       </div>
 
-      {selectedMediums.length > 0 && (
+      {/* {selectedAttributes.length > 0 && (
         <div className="flex h-12 w-full items-center justify-center">
           <p className="text-mountain-400 dark:text-mountain-500 mr-2">
-            Mediums:{' '}
+            Attributes:{' '}
           </p>
           <CategoryList
-            selectedCategories={selectedMediums}
-            setSelectedCategories={setSelectedMediums}
+            selectedCategories={selectedAttributes}
+            setSelectedCategories={setSelectedAttributes}
           />
         </div>
-      )}
-      {selectedMediums.length === 0 && (
-        <div className="flex h-12 w-full items-center justify-center">
+      )} */}
+      {selectedAttributes.length === 0 && !selectedMedium && (
+        <div className="mb-2 flex h-12 w-full items-center justify-center">
           <div className="text-mountain-400 dark:text-mountain-500">
-            Tips: Want more specific results? Try adding a channel filter.
+            Tips: Want more specific results? Try adding filters.
           </div>
         </div>
       )}
@@ -93,6 +137,7 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
       >
         <RowsPhotoAlbum
           photos={galleryPhotos}
+          defaultContainerWidth={width}
           spacing={8}
           targetRowHeight={256}
           rowConstraints={{ singleRowMaxHeight: 256 }}

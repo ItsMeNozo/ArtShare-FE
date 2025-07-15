@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchPost } from "../api/post.api";
-import { postKeys } from "@/lib/react-query/query-keys";
+import { postKeys } from '@/lib/react-query/query-keys';
+import { useQuery } from '@tanstack/react-query';
+import { fetchPost } from '../api/post.api';
 
 export const useGetPostDetails = (postId?: string | number) => {
   const numericPostId = postId ? Number(postId) : NaN;

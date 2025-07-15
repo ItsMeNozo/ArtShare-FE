@@ -86,10 +86,10 @@ const DocumentDashboard = () => {
         // Apply date range filtering for "last7days" or "last30days"
         if (order === 'last7days' || order === 'last30days') {
           processedBlogs = processedBlogs.filter((blog) => {
-            // Handle potential null updated_at
-            if (!blog.updated_at) return false;
+            // Handle potential null updatedAt
+            if (!blog.updatedAt) return false;
 
-            const updatedAtDate = new Date(blog.updated_at);
+            const updatedAtDate = new Date(blog.updatedAt);
             const diffInMilliseconds = now.getTime() - updatedAtDate.getTime();
             const diffInDays = Math.floor(
               diffInMilliseconds / (1000 * 60 * 60 * 24),
@@ -105,11 +105,11 @@ const DocumentDashboard = () => {
           });
         }
 
-        // Apply sorting based on updated_at
+        // Apply sorting based on updatedAt
         processedBlogs.sort((a, b) => {
-          // IMPORTANT: Using a.updated_at and b.updated_at for sorting
-          const dateA = new Date(a.updated_at || a.created_at).getTime();
-          const dateB = new Date(b.updated_at || b.created_at).getTime();
+          // IMPORTANT: Using a.updatedAt and b.updatedAt for sorting
+          const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+          const dateB = new Date(b.updatedAt || b.createdAt).getTime();
 
           if (order === 'oldest') {
             return dateA - dateB; // Ascending for oldest update
@@ -140,7 +140,7 @@ const DocumentDashboard = () => {
     try {
       const newBlogPayload: CreateBlogPayload = {
         title: 'Untitled Document',
-        is_published: false,
+        isPublished: false,
         content: '<p></p>',
       };
       const createdBlog = await createNewBlog(newBlogPayload);
@@ -155,7 +155,7 @@ const DocumentDashboard = () => {
     try {
       const payload: CreateBlogPayload = {
         title: 'Untitled Tutorial',
-        is_published: false,
+        isPublished: false,
         content: TUTORIAL_TEMPLATE_HTML,
       };
       const newBlog = await createNewBlog(payload);
@@ -227,36 +227,36 @@ const DocumentDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col items-center rounded-t-3xl h-screen overflow-auto custom-scrollbar">
+    <div className="custom-scrollbar flex h-screen flex-col items-center overflow-auto rounded-t-3xl">
       {/* Top Templates Section */}
-      <div className="flex justify-center bg-white border-mountain-50 dark:border-mountain-700 w-full h-fit">
-        <div className="flex flex-col justify-center items-center space-y-2 p-4 w-fit h-full">
-          <div className="flex space-x-4 h-full">
+      <div className="border-mountain-50 dark:border-mountain-700 flex h-fit w-full justify-center bg-white">
+        <div className="flex h-full w-fit flex-col items-center justify-center space-y-2 p-4">
+          <div className="flex h-full space-x-4">
             {/* Blank Document Template */}
             <div
-              className="flex flex-col justify-center space-y-4 cursor-pointer"
+              className="flex cursor-pointer flex-col justify-center space-y-4"
               onClick={() => createNewDocument()}
             >
-              <div className="flex justify-center items-center bg-mountain-50 dark:bg-mountain-800 border-1 border-white hover:border-indigo-600 dark:border-mountain-600 dark:hover:border-indigo-400 w-42 h-48 transition-colors">
-                <div className="flex justify-center items-center bg-gradient-to-br from-indigo-200 dark:from-indigo-700 to-purple-200 dark:to-purple-700 rounded-full w-16 h-16">
+              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-colors hover:border-indigo-600 dark:hover:border-indigo-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700">
                   <MdOutlineAdd className="size-10 text-gray-800 dark:text-gray-200" />
                 </div>
               </div>
-              <p className="text-mountain-800 dark:text-mountain-200 text-sm text-center">
+              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm">
                 Blank Document
               </p>
             </div>
             {/* Tutorial Template */}
             <div
-              className="flex flex-col justify-center space-y-4 cursor-pointer"
+              className="flex cursor-pointer flex-col justify-center space-y-4"
               onClick={() => createTutorialDocument()}
             >
-              <div className="flex justify-center items-center bg-mountain-50 dark:bg-mountain-800 border-1 border-white hover:border-indigo-600 dark:border-mountain-600 dark:hover:border-indigo-400 w-42 h-48 transition-colors">
-                <div className="flex justify-center items-center bg-gradient-to-br from-indigo-200 dark:from-indigo-700 to-purple-200 dark:to-purple-700 rounded-full w-16 h-16">
+              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-colors hover:border-indigo-600 dark:hover:border-indigo-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700">
                   <IoBookOutline className="size-10 text-gray-800 dark:text-gray-200" />
                 </div>
               </div>
-              <p className="text-mountain-800 dark:text-mountain-200 text-sm text-center">
+              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm">
                 Tutorial Template
               </p>
             </div>
@@ -264,10 +264,10 @@ const DocumentDashboard = () => {
         </div>
       </div>
       {/* Documents Section */}
-      <div className="flex flex-col space-y-6 border-mountain-200 border-t-1 w-full">
+      <div className="border-mountain-200 flex w-full flex-col space-y-6 border-t-1">
         {/* Header with Filter */}
-        <div className="top-0 sticky flex justify-between items-center bg-white dark:bg-mountain-800 shadow-md px-4 w-full h-fit">
-          <p className="font-medium text-gray-900 dark:text-gray-100 text-lg">
+        <div className="dark:bg-mountain-800 sticky top-0 flex h-fit w-full items-center justify-between bg-white px-4 shadow-md">
+          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
             Recent projects
           </p>
           <div className="flex items-center">
@@ -312,7 +312,7 @@ const DocumentDashboard = () => {
                       color: 'var(--select-text)',
                     },
                   }}
-                  className="relative pl-8 rounded-full w-36 h-10"
+                  className="relative h-10 w-36 rounded-full pl-8"
                   style={
                     {
                       '--select-bg': 'white',
@@ -330,16 +330,16 @@ const DocumentDashboard = () => {
                   <MenuItem value={'last7days'}>Last 7 days</MenuItem>
                   <MenuItem value={'last30days'}>Last 30 days</MenuItem>
                 </Select>
-                <IoFilter className="top-1/2 left-4 absolute text-gray-600 dark:text-gray-400 -translate-y-1/2" />
+                <IoFilter className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-600 dark:text-gray-400" />
               </FormControl>
             </div>
           </div>
         </div>
 
         {/* Documents Grid */}
-        <div className="items-start gap-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 p-6 pb-96 min-h-[calc(100vh-4rem)]">
+        <div className="grid min-h-[calc(100vh-4rem)] grid-cols-2 items-start gap-6 p-6 pb-96 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {isLoading ? (
-            <div className="flex justify-center items-center col-span-full py-8">
+            <div className="col-span-full flex items-center justify-center py-8">
               <CircularProgress
                 size={32}
                 sx={{ color: 'var(--loader-color)' }}
@@ -352,26 +352,26 @@ const DocumentDashboard = () => {
               </span>
             </div>
           ) : error ? (
-            <div className="flex justify-center items-center col-span-full py-8 text-red-500 dark:text-red-400">
+            <div className="col-span-full flex items-center justify-center py-8 text-red-500 dark:text-red-400">
               <span>{error}</span>
             </div>
           ) : userBlogs.length === 0 ? (
-            <div className="flex justify-center items-center col-span-full py-8 text-gray-500 dark:text-gray-400">
+            <div className="col-span-full flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
               <span>No documents found for the selected criteria.</span>
             </div>
           ) : (
             userBlogs.map((blog) => (
               <div
                 key={blog.id}
-                className="flex flex-col justify-center items-center space-y-4 bg-white dark:bg-mountain-800 pb-2 border border-mountain-200 hover:border-indigo-600 dark:border-mountain-600 dark:hover:border-indigo-400 rounded-lg transition-colors duration-200 cursor-pointer"
+                className="dark:bg-mountain-800 border-mountain-200 dark:border-mountain-600 flex cursor-pointer flex-col items-center justify-center space-y-4 rounded-lg border bg-white pb-2 transition-colors duration-200 hover:border-indigo-600 dark:hover:border-indigo-400"
                 onClick={() => handleDocumentClick(blog.id)}
               >
                 {/* Document Thumbnail */}
-                <div className="flex justify-center items-center bg-mountain-50 dark:bg-mountain-700 border border-mountain-50 dark:border-mountain-600 rounded-t-lg w-full aspect-square overflow-hidden">
+                <div className="bg-mountain-50 dark:bg-mountain-700 border-mountain-50 dark:border-mountain-600 flex aspect-square w-full items-center justify-center overflow-hidden rounded-t-lg border">
                   <img
                     src={getThumbnail(blog)}
                     alt={blog.title}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                     onError={(e) => {
                       // Fallback to placeholder if image fails to load
                       e.currentTarget.src = 'https://placehold.co/600x400';
@@ -380,20 +380,20 @@ const DocumentDashboard = () => {
                 </div>
 
                 {/* Document Info */}
-                <div className="flex flex-col justify-start items-start space-y-2 w-full">
+                <div className="flex w-full flex-col items-start justify-start space-y-2">
                   <p
-                    className="bg-white dark:bg-mountain-800 px-2 w-full text-mountain-800 dark:text-mountain-200 text-sm text-left line-clamp-1 select-none"
+                    className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-200 line-clamp-1 w-full bg-white px-2 text-left text-sm select-none"
                     title={blog.title}
                   >
                     {truncateTitle(blog.title)}
                   </p>
-                  <div className="flex justify-between items-center w-full">
-                    <p className="bg-white dark:bg-mountain-800 px-2 w-full text-mountain-800 dark:text-mountain-300 text-xs text-left truncate select-none">
-                      {formatDate(blog.created_at)}
+                  <div className="flex w-full items-center justify-between">
+                    <p className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-300 w-full truncate bg-white px-2 text-left text-xs select-none">
+                      {formatDate(blog.createdAt)}
                     </p>
                     <IconButton
                       onClick={(event) => handleMenuClick(event, blog.id)}
-                      className="bg-white hover:bg-mountain-50 dark:bg-mountain-800 dark:hover:bg-mountain-700 mr-2 w-6 h-6 text-mountain-600 dark:text-mountain-400 cursor-pointer"
+                      className="hover:bg-mountain-50 dark:bg-mountain-800 dark:hover:bg-mountain-700 text-mountain-600 dark:text-mountain-400 mr-2 h-6 w-6 cursor-pointer bg-white"
                       size="small"
                     >
                       <IoMdMore className="size-5" />

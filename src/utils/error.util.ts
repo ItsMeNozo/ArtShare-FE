@@ -1,6 +1,6 @@
-import { BackendErrorResponse } from "@/api/types/error-response.type";
-import { ReportTargetType } from "@/features/user-profile-public/api/report.api";
-import axios, { AxiosError } from "axios";
+import { BackendErrorResponse } from '@/api/types/error-response.type';
+import { ReportTargetType } from '@/features/user-profile-public/api/report.api';
+import axios, { AxiosError } from 'axios';
 
 export const extractApiErrorMessage = (
   error: unknown,
@@ -11,7 +11,7 @@ export const extractApiErrorMessage = (
         fallbackMessage)
     : error instanceof Error
       ? error.message
-      : "An unexpected error occurred. Please try again.";
+      : 'An unexpected error occurred. Please try again.';
 };
 
 export const extractReportErrorMessage = (
@@ -33,5 +33,5 @@ export const extractReportErrorMessage = (
 
   return error instanceof Error
     ? error.message
-    : "An unexpected error occurred. Please try again.";
+    : 'An unexpected error occurred. Please try again.';
 };

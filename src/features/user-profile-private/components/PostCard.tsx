@@ -168,11 +168,10 @@ const PostCard: React.FC<PostCardProps> = ({
         underline="none"
       >
         <img
-          src={post.thumbnail_url}
+          src={post.thumbnailUrl}
           alt={post.title}
           className="h-full w-full object-cover"
         />
-
         <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-b from-transparent via-transparent to-black/70 p-3 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="flex w-full items-end justify-between">
             <div>
@@ -183,15 +182,15 @@ const PostCard: React.FC<PostCardProps> = ({
             </div>
             <div className="flex flex-col items-end space-y-1 text-xs">
               <div className="flex items-center space-x-1">
-                <span className="font-semibold">{post.like_count}</span>
+                <span className="font-semibold">{post.likeCount}</span>
                 <AiOutlineLike className="size-4" />
               </div>
               <div className="flex items-center space-x-1">
-                <span className="font-semibold">{post.comment_count}</span>
+                <span className="font-semibold">{post.commentCount}</span>
                 <BiCommentDetail className="size-4" />
               </div>
               <div className="flex items-center space-x-1">
-                <span className="font-semibold">{post.view_count}</span>
+                <span className="font-semibold">{post.viewCount}</span>
                 <HiOutlineEye className="size-4" />
               </div>
             </div>

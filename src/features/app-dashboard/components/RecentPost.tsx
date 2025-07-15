@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 const RecentPost = () => {
   const [posts, setPosts] = useState<Post[] | null>([]);
-  const getCurentPosts = async () => {
+  const getCurrentPosts = async () => {
     const posts = await getPosts('trending', {
       page: 1,
     });
@@ -13,7 +13,7 @@ const RecentPost = () => {
     setPosts(posts.data);
   };
   useEffect(() => {
-    getCurentPosts();
+    getCurrentPosts();
   }, []);
   const getPostId = (post: Post) => {
     return post.id;
@@ -24,9 +24,9 @@ const RecentPost = () => {
         className={`rounded-lg"} relative flex h-86 w-72 cursor-pointer flex-col items-center justify-center`}
         title={post.title}
       >
-        {post.thumbnail_url && (
+        {post.thumbnailUrl && (
           <img
-            src={post.thumbnail_url}
+            src={post.thumbnailUrl}
             alt={post.title}
             className="dark:border-mountain-700 aspect-[1/1] h-full w-fit rounded-lg border object-cover object-center"
             loading="lazy"

@@ -37,7 +37,7 @@ export const fetchPostsByArtist = async (
 ): Promise<Post[]> => {
   try {
     const response = await api.get<Post[]>(
-      `/posts/user/${artistUsername}?page=${page}&page_size=${pageSize}`,
+      `/posts/user/${artistUsername}?page=${page}&pageSize=${pageSize}`,
     );
     return response.data;
   } catch (error) {

@@ -3,7 +3,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { genAutoPosts } from '../api/auto-posts.api';
 import { AutoPost } from '../types';
-import { autoPostKeys } from '../utilts/autoPostKeys';
+import { autoPostKeys } from '../utils/autoPostKeys';
 
 interface UseGenAutoPostsOptions {
   onSuccess?: (genResponse: AutoPost[]) => void;

@@ -1,7 +1,7 @@
-import api from "@/api/baseApi";
-import { PaginatedResponse } from "@/api/types/paginated-response.type";
-import qs from "qs";
-import { PublicUserSearchDto } from "../types";
+import api from '@/api/baseApi';
+import { PaginatedResponse } from '@/api/types/paginated-response.type';
+import qs from 'qs';
+import { PublicUserSearchDto } from '../types';
 
 interface FetchUsersParams {
   search: string;

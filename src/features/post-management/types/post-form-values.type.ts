@@ -1,21 +1,21 @@
-import { ThumbnailMeta } from "./crop-meta.type";
+import { ThumbnailMeta } from './crop-meta.type';
 
 export interface PostFormValues {
   title: string;
   description?: string;
-  cate_ids: number[];
+  categoryIds: number[];
   isMature: boolean;
   thumbnailMeta: ThumbnailMeta;
 }
 
 export const defaultPostFormValues: PostFormValues = {
-  title: "",
-  cate_ids: [],
+  title: '',
+  categoryIds: [],
   isMature: false,
   thumbnailMeta: {
     crop: { x: 0, y: 0 },
     zoom: 1,
     aspect: undefined,
-    selectedAspect: "Original",
+    selectedAspect: 'Original',
   } as ThumbnailMeta,
 };

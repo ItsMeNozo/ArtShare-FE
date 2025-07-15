@@ -2,30 +2,30 @@ import {
   FacebookIcon,
   InstagramIcon,
   PinterestIcon,
-} from "./SocialNetworksIcon";
+} from './SocialNetworksIcon';
 
 const socialNetWorks = [
   {
-    name: "Facebook",
+    name: 'Facebook',
     icon: FacebookIcon,
   },
   {
-    name: "Instagram",
+    name: 'Instagram',
     icon: InstagramIcon,
   },
   {
-    name: "Pinterest",
+    name: 'Pinterest',
     icon: PinterestIcon,
   },
 ];
 
 const PostShare: React.FC = () => {
   return (
-    <div className="flex flex-col gap-4 bg-white px-4 py-6 rounded-2xl">
-      <div className="font-bold text-xl">Share</div>
-      <div className="flex flex-wrap gap-2 bg-white rounded-2xl justify-center">
+    <div className="flex flex-col gap-4 rounded-2xl bg-white px-4 py-6">
+      <div className="text-xl font-bold">Share</div>
+      <div className="flex flex-wrap justify-center gap-2 rounded-2xl bg-white">
         {socialNetWorks.map((socialNetWork) => (
-          <div className="flex flex-col justify-center items-center gap-2 px-2 py-1 rounded text-xs">
+          <div className="flex flex-col items-center justify-center gap-2 rounded px-2 py-1 text-xs">
             {socialNetWork.icon}
             {socialNetWork.name}
           </div>

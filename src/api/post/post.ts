@@ -1,4 +1,4 @@
-import api from "../baseApi";
+import api from '../baseApi';
 
 export const deletePost = async (postId: number) => {
   try {
@@ -9,4 +9,4 @@ export const deletePost = async (postId: number) => {
     console.error('Error deleting post:', error);
     throw error; // Re-throw the error to be handled by the caller
   }
-}
+};

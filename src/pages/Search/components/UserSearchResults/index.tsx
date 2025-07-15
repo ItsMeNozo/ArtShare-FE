@@ -1,18 +1,20 @@
-import { InfiniteScroll } from "@/components/InfiniteScroll";
-import Loading from "@/components/loading/Loading";
-import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
-import { RowsPhotoAlbum } from "react-photo-album";
-import { useSearchUsers } from "../../hooks/useSearchUsers";
-import { UserPhoto } from "../../types";
-import { transformUserToPhoto } from "../../utils/transformUserToPhoto";
-import { UserPhotoRenderer } from "./UserPhotoRenderer";
+import { InfiniteScroll } from '@/components/InfiniteScroll';
+import Loading from '@/components/loading/Loading';
+import { Box } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { RowsPhotoAlbum } from 'react-photo-album';
+import useMeasure from 'react-use-measure';
+import { useSearchUsers } from '../../hooks/useSearchUsers';
+import { UserPhoto } from '../../types';
+import { transformUserToPhoto } from '../../utils/transformUserToPhoto';
+import { UserPhotoRenderer } from './UserPhotoRenderer';
 
 interface UserSearchResultsProps {
   searchQuery: string | null;
 }
 
 const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
+  const [ref, { width }] = useMeasure();
   const {
     data,
     isLoading,
@@ -22,7 +24,7 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
     hasNextPage,
     fetchNextPage,
   } = useSearchUsers({
-    searchQuery: searchQuery ?? "",
+    searchQuery: searchQuery ?? '',
     enabled: !!searchQuery,
   });
 
@@ -41,7 +43,7 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
         (p): p is UserPhoto => p !== null,
       );
 
-      console.log("Fetched new photos:", validNewPhotos);
+      console.log('Fetched new photos:', validNewPhotos);
       setPhotos((prevPhotos) => [...prevPhotos, ...validNewPhotos]);
     };
 
@@ -57,9 +59,8 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
   }, [searchQuery]);
 
   return (
-    <Box className="flex flex-col px-2 h-screen max-h-[68vh]">
+    <Box ref={ref} className="flex h-screen max-h-[68vh] flex-col px-2">
       {isLoading && photos.length === 0 && <Loading />}
-
       <InfiniteScroll
         data={photos}
         isLoading={isLoading}
@@ -69,8 +70,8 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}
       >
-        {" "}
         <RowsPhotoAlbum
+          defaultContainerWidth={width}
           photos={photos}
           spacing={8}
           targetRowHeight={250}

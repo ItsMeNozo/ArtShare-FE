@@ -110,6 +110,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     // Handle incoming notifications
     const handler = (notification: Notification<ReportResolvedPayload>) => {
       if (notification.type === 'report_created') return;
+      if (notification.type === 'report_created') return;
       setNotifications((prev) => {
         // Prevent duplicates by checking if notification already exists
         const exists = prev.some((n) => n.id === notification.id);
@@ -271,10 +272,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         const existing: Notification<ReportResolvedPayload>[] = res.data;
         const freshNotifications: Notification<ReportResolvedPayload>[] =
-            existing.filter(
-              (notification: Notification<ReportResolvedPayload>) =>
-                notification.type !== 'report_created',
-            );
+          existing.filter(
+            (notification: Notification<ReportResolvedPayload>) =>
+              notification.type !== 'report_created',
+          );
 
         // Merge with any notifications received via socket while loading
         setNotifications((prev) => {

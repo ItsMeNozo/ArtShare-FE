@@ -58,7 +58,7 @@ const UserInAppConfigs = () => {
   if (loading)
     return (
       <>
-        <Skeleton className="dark:bg-mountain-900 rounded-full w-10 h-10" />
+        <Skeleton className="dark:bg-mountain-900 h-10 w-10 rounded-full" />
       </>
     );
 
@@ -79,9 +79,9 @@ const UserInAppConfigs = () => {
             }}
           >
             {user ? (
-              user.profile_picture_url ? (
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={user.profile_picture_url} />
+              user.profilePictureUrl ? (
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={user.profilePictureUrl} />
                   <AvatarFallback>
                     <BoringAvatar
                       size={40}
@@ -117,13 +117,13 @@ const UserInAppConfigs = () => {
           </Button>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="dark:bg-mountain-900 mt-4 p-0 py-2 border-mountain-100 dark:border-mountain-700 w-64">
+      <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-4 w-64 p-0 py-2">
         {user && (
           <>
             <div className="flex items-center space-x-2 p-3">
-              {user.profile_picture_url ? (
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={user.profile_picture_url} />
+              {user.profilePictureUrl ? (
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={user.profilePictureUrl} />
                   <AvatarFallback>
                     <BoringAvatar
                       size={40}
@@ -160,35 +160,35 @@ const UserInAppConfigs = () => {
                 <p className="text-mountain-500 text-xs">{user.email}</p>
               </div>
             </div>
-            <hr className="my-2 border-mountain-100 dark:border-mountain-800" />
+            <hr className="border-mountain-100 dark:border-mountain-800 my-2" />
             <Link
               to={`/${user.username}`}
-              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
+              className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex items-center space-x-2 p-3"
             >
               <FaRegCircleUser className="text-mountain-600" />
               <p className="text-sm">My Profile</p>
             </Link>
-            <div className="xs:hidden flex hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
+            <div className="xs:hidden hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full p-3 py-2 hover:cursor-pointer">
               <MdMailOutline className="" />
               <p className="text-sm">Messages</p>
             </div>
-            <div className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
+            <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2 hover:cursor-pointer">
               <LuSettings className="text-mountain-600" />
               <p className="text-sm">Settings</p>
             </div>
             <Link
               to={'/app-subscription'}
-              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
+              className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex items-center space-x-2 p-3"
             >
               <TbChessQueen className="text-mountain-600" />
               <p className="text-sm">App Subscription</p>
             </Link>
-            <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
+            <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
           </>
         )}
 
         {/* Theme Toggle */}
-        <div className="flex justify-between items-center hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full h-full">
+        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
           <span className="text-sm">Theme</span>
           <div className="flex space-x-2">
             <Button onClick={toggleTheme}>
@@ -200,10 +200,10 @@ const UserInAppConfigs = () => {
           </div>
         </div>
 
-        <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
+        <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
 
         {/* Content Settings */}
-        <div className="flex justify-between items-center hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full h-full">
+        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
           <span className="text-sm">Mature Content</span>
           <Switch
             checked={matureContent}
@@ -212,7 +212,7 @@ const UserInAppConfigs = () => {
           />
         </div>
 
-        <div className="flex justify-between items-center hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full h-full">
+        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
           <span className="text-sm">AI Content</span>
           <Switch
             checked={aiContent}
@@ -222,17 +222,17 @@ const UserInAppConfigs = () => {
         </div>
         {/* Show these options only if the user is not logged in */}
         <>
-          <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
-          <div className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full">
+          <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
+          <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2">
             <p className="text-sm">Help Center</p>
           </div>
         </>
         {/* Show these options only if the user is logged in */}
         {user && (
           <>
-            <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
+            <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
             <div
-              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer"
+              className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2 hover:cursor-pointer"
               onClick={handleLogout}
             >
               <p className="text-sm">Logout</p>

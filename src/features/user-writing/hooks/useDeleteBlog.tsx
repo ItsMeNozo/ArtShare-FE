@@ -1,7 +1,7 @@
-import { useLoading } from "@/contexts/Loading/useLoading";
-import { extractApiErrorMessage } from "@/utils/error.util";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteBlog } from "../api/blog.api";
+import { useLoading } from '@/contexts/Loading/useLoading';
+import { extractApiErrorMessage } from '@/utils/error.util';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteBlog } from '../api/blog.api';
 
 type UseDeleteBlogOptions = {
   onSuccess?: (blogId: number) => void;
@@ -20,7 +20,7 @@ export const useDeleteBlog = (options: UseDeleteBlogOptions = {}) => {
     },
 
     onMutate: () => {
-      showLoading("Deleting blog...");
+      showLoading('Deleting blog...');
     },
 
     onSettled: () => {
@@ -28,22 +28,22 @@ export const useDeleteBlog = (options: UseDeleteBlogOptions = {}) => {
     },
 
     onSuccess: (_, blogId) => {
-      console.log("Blog deleted successfully!");
+      console.log('Blog deleted successfully!');
 
       // Invalidate and remove relevant queries
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      queryClient.invalidateQueries({ queryKey: ["userBlogs"] });
-      queryClient.removeQueries({ queryKey: ["blogDetails", blogId] });
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      queryClient.invalidateQueries({ queryKey: ['userBlogs'] });
+      queryClient.removeQueries({ queryKey: ['blogDetails', blogId] });
 
       options.onSuccess?.(Number(blogId));
     },
 
     onError: (error) => {
-      console.error("Error deleting blog:", error);
+      console.error('Error deleting blog:', error);
       if (options.onError) {
         const displayMessage = extractApiErrorMessage(
           error,
-          "Failed to delete blog. Please try again.",
+          'Failed to delete blog. Please try again.',
         );
         options.onError(displayMessage);
       }

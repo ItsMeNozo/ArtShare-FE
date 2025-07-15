@@ -57,7 +57,7 @@ export const handleFirebaseUserAuth = async (
         console.log(
           '🔐 UserProvider: External login flag cleared after successful profile fetch',
         );
-        return; // Exit early since external login already handled everything
+        return; // Exit early since external login handled everything
       } catch (err) {
         console.error('🔐 UserProvider: Error with external login token:', err);
         // Clear the flag even on error to prevent hanging
@@ -235,19 +235,19 @@ export const handleFirebaseUserAuth = async (
       }
     }
 
-    if (!loginResponse?.access_token) {
+    if (!loginResponse?.accessToken) {
       throw new Error('No access token received from backend');
     }
 
     console.log(
       '🔐 UserProvider: Received access token (first 20 chars):',
-      loginResponse.access_token.substring(0, 20) + '...',
+      loginResponse.accessToken.substring(0, 20) + '...',
     );
 
     // Always update localStorage and authorization header with the new token
-    localStorage.setItem('accessToken', loginResponse.access_token);
+    localStorage.setItem('accessToken', loginResponse.accessToken);
     api.defaults.headers.common['Authorization'] =
-      `Bearer ${loginResponse.access_token}`;
+      `Bearer ${loginResponse.accessToken}`;
     console.log(
       '🔐 UserProvider: Access token stored and authorization header set',
     );

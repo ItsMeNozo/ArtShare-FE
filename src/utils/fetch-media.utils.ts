@@ -1,8 +1,8 @@
 export const fetchImageFileFromUrl = async (url: string): Promise<File> => {
   const res = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      "cache-control": "no-cache",
+      'cache-control': 'no-cache',
     },
   });
   if (!res.ok) {
@@ -11,15 +11,15 @@ export const fetchImageFileFromUrl = async (url: string): Promise<File> => {
 
   const blob = await res.blob();
 
-  const parts = url.split("/");
-  const filename = parts[parts.length - 1] || "image.jpg";
+  const parts = url.split('/');
+  const filename = parts[parts.length - 1] || 'image.jpg';
 
   return new File([blob], filename, { type: blob.type });
 };
 
 export const fetchVideoFileFromUrl = async (url: string): Promise<File> => {
   const res = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     // headers: {
     //   "cache-control": "no-cache",
     // },
@@ -30,8 +30,8 @@ export const fetchVideoFileFromUrl = async (url: string): Promise<File> => {
 
   const blob = await res.blob();
 
-  const parts = url.split("/");
-  const filename = parts[parts.length - 1] || "video.mp4";
+  const parts = url.split('/');
+  const filename = parts[parts.length - 1] || 'video.mp4';
 
   return new File([blob], filename, { type: blob.type });
 };

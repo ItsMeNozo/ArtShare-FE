@@ -20,21 +20,6 @@ export const HistoryFilter = {
   LAST30DAYS: { label: 'Last 30 Days', value: 'last30days' },
 };
 
-export const styleOptions = [
-  { label: 'Photorealistic', value: 'photorealistic' },
-  { label: 'Digital Art', value: 'digital art' },
-  { label: 'Anime', value: 'anime' },
-  { label: 'Cyberpunk', value: 'cyberpunk' },
-  { label: 'Watercolor', value: 'watercolor painting' },
-  { label: 'Oil Painting', value: 'oil painting' },
-  { label: 'Sketch', value: 'sketch' },
-  { label: 'Low Poly', value: 'low poly' },
-  { label: 'Pixel Art', value: 'pixel art' },
-  { label: '3D Render', value: '3d render' },
-  { label: 'Fantasy Art', value: 'fantasy art' },
-  { label: 'Minimalist', value: 'minimalist' },
-];
-
 export const lightingOptions: LightingOption[] = [
   {
     label: 'Auto Lighting',
@@ -79,7 +64,7 @@ export const cameraOptions: CameraOption[] = [
     label: 'Auto Camera',
     exampleUrl:
       'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshate-panels-camera/s46uka4gwgfbvsg1yn7v?blur=300&q=1',
-    value: 'auto lighting',
+    value: 'auto camera',
   },
   {
     label: 'Close-Up',

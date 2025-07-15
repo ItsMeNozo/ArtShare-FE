@@ -6,13 +6,13 @@ interface ProjectInfo {
 export interface Platform {
   id: number;
   name: 'FACEBOOK' | 'INSTAGRAM';
-  external_page_id: string;
+  externalPageId: string;
   config: {
-    page_name: string;
+    pageName: string;
     category?: string;
   };
   status: PlatformStatus;
-  token_expires_at: string | null;
-  picture_url?: string | null;
+  tokenExpiresAt: string | null;
+  pictureUrl?: string | null;
   autoProjects: ProjectInfo[];
 }

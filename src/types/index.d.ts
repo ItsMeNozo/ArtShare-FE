@@ -1,9 +1,9 @@
-import { Post } from "./post";
-import { Category } from "./category";
-import { MediaDto } from "./media";
-import { CategoryType } from "./category-type";
-import { User } from "./user";
-import { Collection } from "./collection";
+import { Category } from './category';
+import { CategoryType } from './category-type';
+import { Collection } from './collection';
+import { MediaDto } from './media';
+import { Post } from './post';
+import { User } from './user';
 
-export type { Post, Category, MediaDto, User, Collection };
 export { CategoryType };
+export type { Category, Collection, MediaDto, Post, User };

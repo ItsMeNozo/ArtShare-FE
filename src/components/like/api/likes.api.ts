@@ -1,5 +1,5 @@
-import api from "@/api/baseApi";
-import type { LikingUser } from "../types/user";
+import api from '@/api/baseApi';
+import type { LikingUser } from '../types/user';
 
 /**
  * Fetches the list of users who liked a specific post.

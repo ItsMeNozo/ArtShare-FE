@@ -58,7 +58,7 @@ const PostEditor: React.FC<{
       <Box className="dark:bg-mountain-900 space-y-2 rounded-md">
         <Box className="border-mountain-300 dark:border-mountain-700 border-b p-3">
           <Typography className="text-left text-base font-semibold dark:text-white">
-            Title
+            Title <span className="text-red-500">*</span>
           </Typography>
         </Box>
 
@@ -186,7 +186,7 @@ const PostEditor: React.FC<{
           originalThumbnailUrl={originalThumbnail.url}
           open={thumbnailCropOpen}
           onClose={() => setThumbnailCropOpen(false)}
-          onCropped={(blob, thumbnail_crop_meta) => {
+          onCropped={(blob, thumbnailCropMeta) => {
             setThumbnail({
               file: new File([blob], 'cropped_thumbnail.png', {
                 type: 'image/png',
@@ -195,7 +195,7 @@ const PostEditor: React.FC<{
               type: MEDIA_TYPE.IMAGE,
             });
 
-            setFieldValue('thumbnailMeta', thumbnail_crop_meta);
+            setFieldValue('thumbnailMeta', thumbnailCropMeta);
 
             onThumbnailChange?.();
           }}
@@ -287,8 +287,8 @@ const PostEditor: React.FC<{
           <Box className="space-y-1 px-3 pb-3">
             {/** TODO: uncomment this */}
             <SelectCategorySection
-              cate_ids={values.cate_ids}
-              setCateIds={(val) => setFieldValue('cate_ids', val)}
+              categoryIds={values.categoryIds}
+              setCategoryIds={(val) => setFieldValue('categoryIds', val)}
             />
           </Box>
         </Box>

@@ -39,13 +39,13 @@ type BlogItemProps = {
   author: Author;
   title: string;
   content: string;
-  dateCreated: string;
+  createdAt: string;
   timeReading: string;
   category: string;
   thumbnail: string;
-  like_count: number;
-  comment_count: number;
-  view_count: number;
+  likeCount: number;
+  commentCount: number;
+  viewCount: number;
   isOwner?: boolean;
   onBlogDeleted?: (blogId: string) => void;
 };
@@ -55,12 +55,12 @@ const BlogItem: React.FC<BlogItemProps> = ({
   author,
   title,
   content,
-  dateCreated,
+  createdAt,
   timeReading,
   category,
   thumbnail,
-  like_count,
-  comment_count,
+  likeCount,
+  commentCount,
   isOwner,
   onBlogDeleted,
 }) => {
@@ -149,8 +149,8 @@ const BlogItem: React.FC<BlogItemProps> = ({
               </p>
               <span className="text-gray-500 dark:text-gray-500">•</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {dateCreated && !isNaN(new Date(dateCreated).getTime()) ? (
-                  <ReactTimeAgo date={new Date(dateCreated)} locale="en-US" />
+                {createdAt && !isNaN(new Date(createdAt).getTime()) ? (
+                  <ReactTimeAgo date={new Date(createdAt)} locale="en-US" />
                 ) : (
                   'Unknown time'
                 )}
@@ -160,13 +160,13 @@ const BlogItem: React.FC<BlogItemProps> = ({
               <Tooltip title="Like">
                 <Button className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 h-full font-normal">
                   <AiOutlineLike className="mr-1 size-4" />
-                  <p>{like_count}</p>
+                  <p>{likeCount}</p>
                 </Button>
               </Tooltip>
               <Tooltip title="Comment">
                 <Button className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 h-full font-normal">
                   <BiComment className="mr-1 size-4" />
-                  <p>{comment_count}</p>
+                  <p>{commentCount}</p>
                 </Button>
               </Tooltip>
             </div>

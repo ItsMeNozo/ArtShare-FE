@@ -11,35 +11,35 @@ import {
   ToggleButton,
   Tooltip,
   Typography,
-} from "@mui/material";
-import React, { useCallback, useMemo, useState } from "react";
+} from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { SearchInput } from "@/components/SearchInput";
-import { Collection, Post } from "@/types";
-import { FiGlobe as AllIcon, FiLock as LockIcon } from "react-icons/fi";
+import { SearchInput } from '@/components/SearchInput';
+import { Collection, Post } from '@/types';
+import { FiGlobe as AllIcon, FiLock as LockIcon } from 'react-icons/fi';
+import { CollectionGallery } from './components/CollectionGallery';
+import { CollectionSlider } from './components/CollectionSlider';
+import { CollectionTitle } from './components/CollectionTitle';
+import { CreateCollectionDialog } from './components/CreateCollectionDialog';
 import {
-  deleteCollection,
-  removePostFromCollection,
-  updateCollection,
-} from "./api/collection.api";
-import { CollectionGallery } from "./components/CollectionGallery";
-import { CollectionSlider } from "./components/CollectionSlider";
-import { CollectionTitle } from "./components/CollectionTitle";
-import { CreateCollectionDialog } from "./components/CreateCollectionDialog";
-import { useCollectionsData } from "./hooks/useCollectionsData";
-import { useGalleryPhotos } from "./hooks/useGalleryPhotos";
+  useCreateCollection,
+  useDeleteCollection,
+  useRemovePostFromCollection,
+  useUpdateCollection,
+} from './hooks/useCollectionMutations';
+import { useCollectionsData } from './hooks/useCollectionsData';
+import { useGalleryPhotos } from './hooks/useGalleryPhotos';
 import {
   CollectionDisplayInfo,
   SelectedCollectionId,
   SliderItem,
   SliderItemCollection,
-} from "./types/collection";
+} from './types/collection';
 
 const CollectionPage: React.FC = () => {
   const [selectedCollectionId, setSelectedCollectionId] =
-    useState<SelectedCollectionId>("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [actionError, setActionError] = useState<string | null>(null);
+    useState<SelectedCollectionId>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
@@ -49,121 +49,116 @@ const CollectionPage: React.FC = () => {
 
   const {
     collections,
-    loading: loadingCollections,
     error: collectionsError,
-    setCollections,
-    setError: setCollectionsError,
+    isLoading: loadingCollections,
   } = useCollectionsData();
 
-  const currentCollection = useMemo<Collection | undefined>(() => {
-    return typeof selectedCollectionId === "number"
-      ? collections.find((c) => c.id === selectedCollectionId)
-      : undefined;
-  }, [collections, selectedCollectionId]);
+  const createCollectionMutation = useCreateCollection();
+  const updateCollectionMutation = useUpdateCollection();
+  const deleteCollectionMutation = useDeleteCollection();
+  const removePostMutation = useRemovePostFromCollection();
+
+  const currentCollection = useMemo<Collection | undefined>(
+    () =>
+      typeof selectedCollectionId === 'number'
+        ? collections.find((c) => c.id === selectedCollectionId)
+        : undefined,
+    [collections, selectedCollectionId],
+  );
 
   const existingCollectionNames = useMemo(() => {
     return collections.map((col) => col.name);
   }, [collections]);
 
-  const {
-    publicPosts,
-    privatePosts,
-    newestPublicThumbnail,
-    newestPrivateThumbnail,
-  } = useMemo(() => {
+  const allPostsData = useMemo(() => {
     if (loadingCollections || !collections) {
       return {
-        publicPosts: [],
-        privatePosts: [],
+        allPublicPosts: [],
+        allPrivatePosts: [],
+        allPostsCombined: [],
         newestPublicThumbnail: undefined,
         newestPrivateThumbnail: undefined,
+        newestCombinedThumbnail: undefined,
       };
     }
 
-    const pubCollections = collections.filter((c) => !c.is_private && c.posts);
-    const pubPosts = pubCollections.flatMap((col) => col.posts);
+    const publicCollections = collections.filter((c) => !c.isPrivate);
+    const publicPosts = publicCollections.flatMap((col) => col.posts || []);
     const uniquePublicMap = new Map<number, Post>();
-    pubPosts.forEach((post) => {
-      if (!uniquePublicMap.has(post.id)) {
-        uniquePublicMap.set(post.id, post);
-      }
-    });
-    const uniquePublicPosts = Array.from(uniquePublicMap.values()).sort(
+    publicPosts.forEach((post) => uniquePublicMap.set(post.id, post));
+    const allPublicPosts = Array.from(uniquePublicMap.values()).sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-    const newestPublicPost = uniquePublicPosts[0];
+    const newestPublicPost = allPublicPosts[0];
     const pubThumbnail =
-      newestPublicPost?.thumbnail_url || newestPublicPost?.medias?.[0]?.url;
+      newestPublicPost?.thumbnailUrl || newestPublicPost?.medias?.[0]?.url;
 
-    const privCollections = collections.filter((c) => c.is_private && c.posts);
-    const privPosts = privCollections.flatMap((col) => col.posts);
+    const privateCollections = collections.filter((c) => c.isPrivate);
+    const privatePosts = privateCollections.flatMap((col) => col.posts || []);
     const uniquePrivateMap = new Map<number, Post>();
-    privPosts.forEach((post) => {
-      if (!uniquePrivateMap.has(post.id)) {
-        uniquePrivateMap.set(post.id, post);
-      }
-    });
-    const uniquePrivatePosts = Array.from(uniquePrivateMap.values()).sort(
+    privatePosts.forEach((post) => uniquePrivateMap.set(post.id, post));
+    const allPrivatePosts = Array.from(uniquePrivateMap.values()).sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
-    const newestPrivatePost = uniquePrivatePosts[0];
+    const newestPrivatePost = allPrivatePosts[0];
     const privThumbnail =
-      newestPrivatePost?.thumbnail_url || newestPrivatePost?.medias?.[0]?.url;
+      newestPrivatePost?.thumbnailUrl || newestPrivatePost?.medias?.[0]?.url;
+
+    const combinedMap = new Map<number, Post>();
+    [...allPublicPosts, ...allPrivatePosts].forEach((post) => {
+      combinedMap.set(post.id, post);
+    });
+    const allPostsCombined = Array.from(combinedMap.values()).sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    const newestCombinedPost = allPostsCombined[0];
+    const combinedThumbnail =
+      newestCombinedPost?.thumbnailUrl || newestCombinedPost?.medias?.[0]?.url;
 
     return {
-      publicPosts: uniquePublicPosts,
-      privatePosts: uniquePrivatePosts,
+      allPublicPosts,
+      allPrivatePosts,
+      allPostsCombined,
       newestPublicThumbnail: pubThumbnail,
       newestPrivateThumbnail: privThumbnail,
+      newestCombinedThumbnail: combinedThumbnail,
     };
-  }, [
-    collections,
-    loadingCollections /* allPosts dependency removed if not used for unassigned */,
-  ]);
+  }, [collections, loadingCollections]);
 
   const filteredPosts = useMemo<Post[]>(() => {
-    console.log(
-      `FILTERED_POSTS: Recalculating. Selected ID: ${selectedCollectionId}, Show Only Private: ${showOnlyPrivate}`,
-    );
     if (loadingCollections) return [];
 
-    if (selectedCollectionId === "all") {
-      return showOnlyPrivate ? privatePosts : publicPosts;
+    if (selectedCollectionId === 'all') {
+      return showOnlyPrivate
+        ? allPostsData.allPrivatePosts
+        : allPostsData.allPostsCombined;
     } else {
-      if (currentCollection) {
-        const collectionMatchesFilter =
-          !showOnlyPrivate || currentCollection.is_private;
-        return collectionMatchesFilter ? currentCollection.posts || [] : [];
-      }
-      return [];
+      return currentCollection?.posts || [];
     }
   }, [
-    publicPosts,
-    privatePosts,
-    currentCollection,
     selectedCollectionId,
-    loadingCollections,
+    currentCollection,
     showOnlyPrivate,
+    allPostsData,
+    loadingCollections,
   ]);
 
-  const {
-    galleryPhotos,
-    isProcessing: isProcessingPhotos,
-    processingError: photosError,
-  } = useGalleryPhotos(filteredPosts);
+  const { galleryPhotos, isProcessing: isProcessingPhotos } =
+    useGalleryPhotos(filteredPosts);
 
   const collectionsForDisplay = useMemo<CollectionDisplayInfo[]>(() => {
     if (loadingCollections) return [];
     return collections.map((collection) => {
       const sortedPosts = [...(collection.posts || [])].sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
       const newestPostInCollection = sortedPosts[0];
       const thumbnailUrl =
-        newestPostInCollection?.thumbnail_url ||
+        newestPostInCollection?.thumbnailUrl ||
         newestPostInCollection?.medias?.[0]?.url;
       return { ...collection, thumbnailUrl, posts: collection.posts || [] };
     });
@@ -173,22 +168,21 @@ const CollectionPage: React.FC = () => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
     const items: SliderItem[] = [];
 
-    items.push({ type: "add" });
+    items.push({ type: 'add' });
 
-    const allPostsTitle = "all posts";
+    const allPostsTitle = 'all';
     if (!normalizedQuery || allPostsTitle.includes(normalizedQuery)) {
       const countForAllPosts = showOnlyPrivate
-        ? privatePosts.length
-        : publicPosts.length;
+        ? allPostsData.allPrivatePosts.length
+        : allPostsData.allPostsCombined.length;
+
       const thumbnailForAllPosts = showOnlyPrivate
-        ? newestPrivateThumbnail
-        : newestPublicThumbnail;
+        ? allPostsData.newestPrivateThumbnail
+        : allPostsData.newestCombinedThumbnail;
 
       items.push({
-        type: "all",
-
+        type: 'all',
         thumbnailUrl: countForAllPosts > 0 ? thumbnailForAllPosts : undefined,
-
         count: countForAllPosts,
       });
     }
@@ -196,54 +190,50 @@ const CollectionPage: React.FC = () => {
     const filteredCollectionItems: SliderItemCollection[] =
       collectionsForDisplay
         .filter((collection) => {
-          const matchesVisibility = !showOnlyPrivate || collection.is_private;
+          const matchesVisibility = !showOnlyPrivate || collection.isPrivate;
           const matchesSearch =
             !normalizedQuery ||
             collection.name.toLowerCase().includes(normalizedQuery);
           return matchesVisibility && matchesSearch;
         })
         .map((collection) => ({
-          type: "collection",
+          type: 'collection',
           id: collection.id,
           name: collection.name,
-
+          isPrivate: collection.isPrivate,
           thumbnailUrl: collection.thumbnailUrl,
           count: collection.posts?.length ?? 0,
         }));
 
     items.push(...filteredCollectionItems);
 
-    const addIndex = items.findIndex((item) => item.type === "add");
-    const allPostsIndex = items.findIndex((item) => item.type === "all");
+    const addIndex = items.findIndex((item) => item.type === 'add');
+    const allPostsIndex = items.findIndex((item) => item.type === 'all');
     if (allPostsIndex > addIndex + 1) {
       const [allPostsItem] = items.splice(allPostsIndex, 1);
       items.splice(addIndex + 1, 0, allPostsItem);
     }
 
     return items;
-  }, [
-    collectionsForDisplay,
+  }, [collectionsForDisplay, allPostsData, searchQuery, showOnlyPrivate]);
 
-    publicPosts.length,
-    privatePosts.length,
-    newestPublicThumbnail,
-    newestPrivateThumbnail,
-    searchQuery,
-    showOnlyPrivate,
-  ]);
+  useEffect(() => {
+    if (!showOnlyPrivate) {
+      return;
+    }
+
+    if (currentCollection && !currentCollection.isPrivate) {
+      setSelectedCollectionId('all');
+    }
+  }, [showOnlyPrivate, currentCollection, setSelectedCollectionId]);
 
   const handleTogglePrivateFilter = useCallback(() => {
     setShowOnlyPrivate((prev) => !prev);
   }, []);
 
-  const handleCollectionSelect = useCallback(
-    (id: SelectedCollectionId) => {
-      setSelectedCollectionId(id);
-      setActionError(null);
-      setCollectionsError(null);
-    },
-    [setCollectionsError],
-  );
+  const handleCollectionSelect = useCallback((id: SelectedCollectionId) => {
+    setSelectedCollectionId(id);
+  }, []);
 
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query);
@@ -251,7 +241,6 @@ const CollectionPage: React.FC = () => {
 
   const handleAddCollectionClick = useCallback(() => {
     setIsCreateDialogOpen(true);
-    setActionError(null);
   }, []);
 
   const handleCloseCreateDialog = useCallback(() => {
@@ -264,20 +253,18 @@ const CollectionPage: React.FC = () => {
   };
 
   const handleCreateCollection = useCallback(
-    async (newCollection: Collection) => {
-      setActionError(null);
-
-      setCollections((prevCollections) => [...prevCollections, newCollection]);
-
-      setSelectedCollectionId(newCollection.id);
-
-      handleCloseCreateDialog();
+    async (newCollectionData: { name: string; isPrivate: boolean }) => {
+      createCollectionMutation.mutate(newCollectionData, {
+        onSuccess: (newCollection) => {
+          setSelectedCollectionId(newCollection.id);
+          handleCloseCreateDialog();
+        },
+      });
     },
-    [setCollections, handleCloseCreateDialog],
+    [createCollectionMutation],
   );
 
   const handleEditRequest = useCallback(() => {
-    setActionError(null);
     setIsTitleEditing(true);
   }, []);
 
@@ -286,70 +273,34 @@ const CollectionPage: React.FC = () => {
   }, []);
 
   const handleSaveTitle = useCallback(
-    async (newName: string): Promise<void> => {
+    async (newName: string) => {
       if (!currentCollection) return;
-
-      setActionError(null);
-
-      try {
-        const updatedCollectionFromApi = await updateCollection(
-          currentCollection.id,
-          { name: newName },
-        );
-
-        setCollections((prevCollections) =>
-          prevCollections.map((col) =>
-            col.id === updatedCollectionFromApi.id
-              ? { ...col, name: updatedCollectionFromApi.name }
-              : col,
-          ),
-        );
-
-        setIsTitleEditing(false);
-      } catch (err) {
-        console.error("Error renaming collection via API:", err);
-        const errorMsg =
-          err instanceof Error ? err.message : "Failed to rename collection.";
-
-        setActionError(errorMsg);
-
-        throw err;
-      }
+      await updateCollectionMutation.mutateAsync({
+        id: currentCollection.id,
+        data: { name: newName },
+      });
+      setIsTitleEditing(false);
     },
-    [currentCollection, setCollections, setActionError],
+    [currentCollection, updateCollectionMutation],
+  );
+
+  const handleSetPrivacy = useCallback(
+    async (isPrivate: boolean) => {
+      if (!currentCollection) return;
+      await updateCollectionMutation.mutateAsync({
+        id: currentCollection.id,
+        data: { isPrivate },
+      });
+    },
+    [currentCollection, updateCollectionMutation],
   );
 
   const handleRemovePost = useCallback(
-    async (postId: number) => {
-      if (typeof selectedCollectionId !== "number") return;
-
-      setActionError(null);
-      const originalCollections = collections;
-
-      setCollections((prevCollections) =>
-        prevCollections.map((col) => {
-          if (col.id === selectedCollectionId) {
-            return {
-              ...col,
-              posts: (col.posts || []).filter((p) => p.id !== postId),
-            };
-          }
-          return col;
-        }),
-      );
-
-      try {
-        await removePostFromCollection(selectedCollectionId, postId);
-      } catch (err) {
-        console.error(`Error removing post ${postId}:`, err);
-        const errorMsg =
-          err instanceof Error ? err.message : "Failed to remove post.";
-        setActionError(errorMsg);
-        setCollections(originalCollections);
-        alert(`Error removing post: ${errorMsg}`);
-      }
+    (postId: number) => {
+      if (typeof selectedCollectionId !== 'number') return;
+      removePostMutation.mutate({ collectionId: selectedCollectionId, postId });
     },
-    [selectedCollectionId, collections, setCollections],
+    [selectedCollectionId, removePostMutation],
   );
 
   const handleRemoveCollection = useCallback(
@@ -357,7 +308,7 @@ const CollectionPage: React.FC = () => {
       const collection = collections.find((c) => c.id === collectionIdToRemove);
       if (!collection) {
         console.warn(
-          "Tried to initiate delete for non-existent collection:",
+          'Tried to initiate delete for non-existent collection:',
           collectionIdToRemove,
         );
         return;
@@ -365,121 +316,58 @@ const CollectionPage: React.FC = () => {
 
       setCollectionToDelete(collection);
       setIsDeleteDialogOpen(true);
-      setActionError(null);
     },
     [collections],
   );
 
-  const handleConfirmDeleteCollection = useCallback(async () => {
+  const handleConfirmDeleteCollection = useCallback(() => {
     if (!collectionToDelete) return;
-
-    const collectionIdToRemove = collectionToDelete.id;
-    const originalCollections = [...collections];
-
-    handleCloseDeleteDialog();
-
-    setCollections((prev) => prev.filter((c) => c.id !== collectionIdToRemove));
-
-    if (selectedCollectionId === collectionIdToRemove) {
-      setSelectedCollectionId("all");
-    }
-
-    try {
-      await deleteCollection(collectionIdToRemove);
-
-      console.log(`Collection ${collectionIdToRemove} deleted successfully.`);
-    } catch (err) {
-      console.error("Error deleting collection:", err);
-      const errorMsg =
-        err instanceof Error ? err.message : "Failed to delete collection.";
-      setActionError(errorMsg);
-
-      setCollections(originalCollections);
-
-      if (
-        selectedCollectionId === "all" &&
-        originalCollections.some((c) => c.id === collectionIdToRemove)
-      ) {
-        setSelectedCollectionId(collectionIdToRemove);
-      }
-    }
-  }, [
-    collectionToDelete,
-    collections,
-    setCollections,
-    selectedCollectionId,
-    setActionError,
-  ]);
+    deleteCollectionMutation.mutate(collectionToDelete.id, {
+      onSuccess: () => {
+        if (selectedCollectionId === collectionToDelete.id) {
+          setSelectedCollectionId('all');
+        }
+        handleCloseDeleteDialog();
+      },
+    });
+  }, [collectionToDelete, deleteCollectionMutation, selectedCollectionId]);
 
   const galleryTitle = useMemo(() => {
-    if (
-      loadingCollections &&
-      selectedCollectionId !== "all" &&
-      !currentCollection
-    ) {
-      return "Loading...";
-    }
+    if (selectedCollectionId === 'all') return 'All';
+    if (currentCollection) return currentCollection.name;
+    return 'Loading...';
+  }, [selectedCollectionId, currentCollection]);
 
-    if (selectedCollectionId === "all") {
-      return "All";
-    }
-
-    if (currentCollection) {
-      const collectionMatchesFilter =
-        !showOnlyPrivate || currentCollection.is_private;
-
-      if (collectionMatchesFilter) {
-        return currentCollection.name;
-      } else {
-        return "All";
-      }
-    }
-
-    console.warn(
-      "GalleryTitle: Fallback reached, currentCollection likely undefined for selected ID",
-      selectedCollectionId,
-    );
-    return showOnlyPrivate ? "Private Collections" : "All Collections";
-  }, [
-    selectedCollectionId,
-    currentCollection,
-    loadingCollections,
-    showOnlyPrivate,
-  ]);
-
-  const galleryItemCountText = useMemo(() => {
-    if (loadingCollections) return "Loading...";
-    if (isProcessingPhotos) return "Processing...";
-    return `${galleryPhotos.length} items`;
-  }, [loadingCollections, isProcessingPhotos, galleryPhotos.length]);
+  const galleryItemCountText = `${galleryPhotos.length} items`;
 
   const isGalleryLoading = loadingCollections || isProcessingPhotos;
-  const displayError = collectionsError || photosError || actionError;
+  const anyMutationError =
+    createCollectionMutation.error ||
+    updateCollectionMutation.error ||
+    deleteCollectionMutation.error ||
+    removePostMutation.error;
+  const displayError = collectionsError || anyMutationError;
 
   return (
     <Container maxWidth="xl" className="h-screen py-3">
       {/* Header */}
       <Stack
-        direction={{ xs: "column", md: "row" }}
+        direction={{ xs: 'column', md: 'row' }}
         justifyContent="space-between"
         alignItems="center"
         spacing={{ xs: 2, md: 3 }}
         mb={4}
         flexWrap="wrap"
       >
-        {/* Left Side: Title */}
         <Typography variant="h6" component="h1" fontWeight="normal" noWrap>
           Collections
         </Typography>
-
-        {/* Right Side: Filter & Search */}
         <Stack direction="row" alignItems="center" spacing={2}>
-          {/* Filter Toggle Button */}
           <Tooltip
             title={
               showOnlyPrivate
-                ? "Show All Collections"
-                : "Show Only Private Collections"
+                ? 'Show All Collections'
+                : 'Show Only Private Collections'
             }
           >
             <ToggleButton
@@ -489,36 +377,31 @@ const CollectionPage: React.FC = () => {
               aria-label="Toggle private collection filter"
               size="small"
               sx={{
-                height: "fit-content",
-                textTransform: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                bgcolor: "background.paper",
+                height: 'fit-content',
+                textTransform: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'background.paper',
               }}
             >
-              {/* Show Lock icon when filtering, LockOpen/Apps when not */}
               {!showOnlyPrivate ? (
                 <LockIcon fontSize={16} />
               ) : (
                 <AllIcon fontSize={16} />
               )}
-              {/* Optionally add text - might make button too wide */}
               <Typography
                 variant="caption"
                 sx={{
                   ml: 1,
-                  display: { xs: "none", sm: "inline" },
+                  display: { xs: 'none', sm: 'inline' },
                   lineHeight: 1,
                 }}
               >
-                {/* Text also depends on the current state */}
-                {showOnlyPrivate ? "All" : "Private Only"}
+                {showOnlyPrivate ? 'All' : 'Private Only'}
               </Typography>
             </ToggleButton>
           </Tooltip>
-
-          {/* Search Input */}
           <SearchInput
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
@@ -544,17 +427,12 @@ const CollectionPage: React.FC = () => {
         <CollectionTitle
           title={galleryTitle}
           itemCountText={galleryItemCountText}
-          isEditable={
-            typeof selectedCollectionId === "number" &&
-            (!showOnlyPrivate || !!currentCollection?.is_private)
-          }
-          isLoading={
-            loadingCollections &&
-            !currentCollection &&
-            selectedCollectionId !== "all"
-          }
-          error={actionError}
+          isEditable={typeof selectedCollectionId === 'number'}
+          isPrivate={!!currentCollection?.isPrivate}
+          isLoading={updateCollectionMutation.isPending}
+          error={updateCollectionMutation.error?.message ?? null}
           onSave={handleSaveTitle}
+          onSetPrivacy={handleSetPrivacy}
           isEditing={isTitleEditing}
           onEditRequest={handleEditRequest}
           onEditCancel={handleEditCancel}
@@ -567,7 +445,7 @@ const CollectionPage: React.FC = () => {
         photos={galleryPhotos}
         isLoading={isGalleryLoading}
         isError={!!displayError && !isGalleryLoading}
-        error={displayError && !isGalleryLoading ? displayError : null}
+        error={displayError ? (displayError as Error).message : null}
         onRemovePost={handleRemovePost}
         selectedCollectionId={selectedCollectionId}
       />
@@ -577,9 +455,11 @@ const CollectionPage: React.FC = () => {
         onClose={handleCloseCreateDialog}
         onSuccess={handleCreateCollection}
         existingCollectionNames={collections.map((c) => c.name)}
+        isSubmitting={createCollectionMutation.isPending}
+        error={createCollectionMutation.error?.message}
       />
 
-      {/* --- Delete Confirmation Dialog --- */}
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
@@ -594,16 +474,14 @@ const CollectionPage: React.FC = () => {
         <DialogContent>
           <DialogContentText id="delete-collection-dialog-description">
             Are you sure you want to delete the collection
-            <strong>"{collectionToDelete?.name || "this collection"}"</strong>?
+            <strong>"{collectionToDelete?.name || 'this collection'}"</strong>?
             <br />
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          {/* Added padding */}
           <Button onClick={handleCloseDeleteDialog} variant="outlined">
             Cancel
           </Button>
-          {/* Call the confirmation handler */}
           <Button
             onClick={handleConfirmDeleteCollection}
             variant="contained"

@@ -1,1 +1,1 @@
-export type BlogTab = "following" | "trending";
+export type BlogTab = 'following' | 'trending';

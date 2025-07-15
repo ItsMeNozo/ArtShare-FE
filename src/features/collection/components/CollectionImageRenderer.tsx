@@ -1,5 +1,5 @@
-import { GalleryPhoto } from "@/components/gallery/Gallery";
-import { formatCount } from "@/utils/common";
+import { GalleryPhoto } from '@/components/gallery/Gallery';
+import { formatCount } from '@/utils/common';
 import {
   Button,
   Dialog,
@@ -9,16 +9,16 @@ import {
   DialogTitle,
   IconButton,
   Tooltip,
-} from "@mui/material";
-import { Images } from "lucide-react";
-import React, { useState } from "react";
-import { AiOutlineLike } from "react-icons/ai";
-import { BiCommentDetail } from "react-icons/bi";
-import { FiX as DeleteIcon } from "react-icons/fi";
-import { HiOutlineEye } from "react-icons/hi";
-import { RenderPhotoContext } from "react-photo-album";
-import { Link } from "react-router-dom";
-import { SelectedCollectionId } from "../types/collection";
+} from '@mui/material';
+import { Images } from 'lucide-react';
+import React, { useState } from 'react';
+import { AiOutlineLike } from 'react-icons/ai';
+import { BiCommentDetail } from 'react-icons/bi';
+import { FiX as DeleteIcon } from 'react-icons/fi';
+import { HiOutlineEye } from 'react-icons/hi';
+import { RenderPhotoContext } from 'react-photo-album';
+import { Link } from 'react-router-dom';
+import { SelectedCollectionId } from '../types/collection';
 
 export interface CollectionImageRendererOptions {
   selectedCollectionId: SelectedCollectionId;
@@ -34,7 +34,7 @@ export const CollectionImageRenderer = (
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const canDelete = typeof selectedCollectionId === "number";
+  const canDelete = typeof selectedCollectionId === 'number';
 
   const handleOpenDeleteDialog = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -53,7 +53,7 @@ export const CollectionImageRenderer = (
 
   return (
     <div
-      className="relative border border-transparent rounded-lg cursor-pointer group hover:border-gray-300"
+      className="group relative cursor-pointer rounded-lg border border-transparent hover:border-gray-300"
       style={{
         height: height,
         width: width,
@@ -67,19 +67,19 @@ export const CollectionImageRenderer = (
             size="small"
             onClick={handleOpenDeleteDialog}
             sx={{
-              position: "absolute",
+              position: 'absolute',
               top: -8,
               right: -8,
               zIndex: 10,
-              color: "white",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              color: 'white',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
               opacity: 0,
-              transition: "opacity 0.2s ease-in-out",
-              "&:hover": {
-                backgroundColor: "rgba(200, 0, 0, 0.8)",
+              transition: 'opacity 0.2s ease-in-out',
+              '&:hover': {
+                backgroundColor: 'rgba(200, 0, 0, 0.8)',
                 opacity: 1,
               },
-              ".group:hover &": {
+              '.group:hover &': {
                 opacity: 1,
               },
             }}
@@ -90,46 +90,46 @@ export const CollectionImageRenderer = (
       )}
       {/* --- End Delete Button --- */}
 
-      <Link to={`/posts/${photo.postId}`} className="block w-full h-full">
+      <Link to={`/posts/${photo.postId}`} className="block h-full w-full">
         <img
           key={photo.key || photo.src}
           src={photo.src}
-          loading="lazy"
-          className="object-cover w-full h-full rounded-lg"
-          style={{ display: "block" }}
+          className="h-full w-full rounded-lg object-cover"
+          style={{ display: 'block' }}
         />
         {/* Overlay */}
-        <div className="absolute inset-0 flex flex-col items-start justify-end p-4 text-white transition-opacity duration-300 rounded-lg opacity-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:opacity-100">
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           {photo.postLength > 1 && (
-            <div className="absolute flex items-center justify-center p-1 rounded-full pointer-events-auto top-2 left-2 bg-black/40">
+            <div className="pointer-events-auto absolute top-2 left-2 flex items-center justify-center rounded-full bg-black/40 p-1">
               <Images size={14} />
             </div>
           )}
-          <div className="flex items-end justify-between w-full">
-            <div>
-              <span className="font-semibold text-md line-clamp-1">
+          <div className="flex w-full items-end justify-between gap-2">
+            <div title={`${photo.title}\n${photo.author}`}>
+              <span className="line-clamp-1 text-sm font-semibold">
                 {photo.title}
               </span>
-              <span className="text-xs line-clamp-1">{photo.author}</span>
+              <span className="line-clamp-1 text-xs">{photo.author}</span>
             </div>
-            {/* Stats section */}
-            <div className="flex items-center space-x-1">
-              <p className="text-xs font-medium">
-                {formatCount(photo.like_count)}
-              </p>
-              <AiOutlineLike className="size-3.5" />
-            </div>
-            <div className="flex items-center space-x-1">
-              <p className="text-xs font-medium">
-                {formatCount(photo.comment_count)}
-              </p>
-              <BiCommentDetail className="size-3.5 text-white" />
-            </div>
-            <div className="flex items-center space-x-1">
-              <p className="text-xs font-medium">
-                {formatCount(photo.view_count)}
-              </p>
-              <HiOutlineEye className="size-3.5" />
+            <div className="flex flex-col items-end space-y-0.5">
+              <div className="flex items-center space-x-1">
+                <p className="text-xs font-medium">
+                  {formatCount(photo.likeCount)}
+                </p>
+                <AiOutlineLike className="size-3.5" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <p className="text-xs font-medium">
+                  {formatCount(photo.commentCount)}
+                </p>
+                <BiCommentDetail className="size-3.5 text-white" />
+              </div>
+              <div className="flex items-center space-x-1">
+                <p className="text-xs font-medium">
+                  {formatCount(photo.viewCount)}
+                </p>
+                <HiOutlineEye className="size-3.5" />
+              </div>
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export const CollectionImageRenderer = (
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to remove the post "
-            {photo.title || "this post"}" from the collection?
+            {photo.title || 'this post'}" from the collection?
           </DialogContentText>
         </DialogContent>
         <DialogActions className="p-4">

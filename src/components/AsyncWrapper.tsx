@@ -1,6 +1,6 @@
-import React from "react";
-import { CircularProgress } from "@mui/material";
-import { MdError } from "react-icons/md";
+import { CircularProgress } from '@mui/material';
+import React from 'react';
+import { MdError } from 'react-icons/md';
 
 interface AsyncWrapperProps {
   loading: boolean;

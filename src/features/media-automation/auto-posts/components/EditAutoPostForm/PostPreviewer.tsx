@@ -1,16 +1,16 @@
 // FacebookPostDialog.tsx
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from '@/components/ui/button';
-import { IoEarthSharp } from "react-icons/io5";
-import { MdMoreHoriz } from "react-icons/md";
-import { BiLike } from "react-icons/bi";
-import { ExpandablePostContent } from "./ExpandTextArea";
+} from '@/components/ui/dialog';
+import { BiLike } from 'react-icons/bi';
+import { IoEarthSharp } from 'react-icons/io5';
+import { MdMoreHoriz } from 'react-icons/md';
+import { ExpandablePostContent } from './ExpandTextArea';
 
 interface FacebookPostDialogProps {
   open: boolean;
@@ -27,90 +27,106 @@ export const FacebookPostDialog: React.FC<FacebookPostDialogProps> = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent hideCloseButton className="bg-[#F2F4F7] p-0 border-mountain-200 rounded-none sm:w-[1024px] h-full overflow-y-auto custom-scrollbar">
-        <DialogHeader className="top-0 z-50 sticky flex flex-row justify-between items-center bg-white p-4 border-mountain-200 border-b-1 rounded-t-lg w-full h-16">
+      <DialogContent
+        hideCloseButton
+        className="border-mountain-200 custom-scrollbar h-full overflow-y-auto rounded-none bg-[#F2F4F7] p-0 sm:w-[1024px]"
+      >
+        <DialogHeader className="border-mountain-200 sticky top-0 z-50 flex h-16 w-full flex-row items-center justify-between rounded-t-lg border-b-1 bg-white p-4">
           <DialogTitle className="flex items-center space-x-2 font-medium">
-            <img src={'/public/fb_icon.svg'} alt="Facebook Logo" className="w-auto h-8" />
+            <img
+              src={'/public/fb_icon.svg'}
+              alt="Facebook Logo"
+              className="h-8 w-auto"
+            />
             <p>Facebook</p>
           </DialogTitle>
-          <p className="font-medium text-lg">Preview Post</p>
-          <Button variant={"outline"} className="border-mountain-200 cursor-pointer" onClick={onClose}>
+          <p className="text-lg font-medium">Preview Post</p>
+          <Button
+            variant={'outline'}
+            className="border-mountain-200 cursor-pointer"
+            onClick={onClose}
+          >
             Close Preview
           </Button>
-          <DialogDescription hidden>
-          </DialogDescription>
+          <DialogDescription hidden></DialogDescription>
         </DialogHeader>
-        <div className="flex justify-center w-full scale-90">
-          <div className="flex flex-col space-y-2 bg-white shadow-md rounded-lg w-[680px] h-fit">
-            <div className="flex justify-between items-center p-4 pb-0">
+        <div className="flex w-full scale-90 justify-center">
+          <div className="flex h-fit w-[680px] flex-col space-y-2 rounded-lg bg-white shadow-md">
+            <div className="flex items-center justify-between p-4 pb-0">
               <div className="flex items-center space-x-2">
-                <img src={'/public/blank_avatar.png'} alt="Facebook Logo" className="rounded-full w-10 h-10" />
+                <img
+                  src={'/public/blank_avatar.png'}
+                  alt="Facebook Logo"
+                  className="h-10 w-10 rounded-full"
+                />
                 <div className="flex flex-col">
                   <p className="font-medium">Sample Page</p>
-                  <div className="flex items-center space-x-2 text-mountain-400 text-xs">
+                  <div className="text-mountain-400 flex items-center space-x-2 text-xs">
                     <p>July 1 at 23:15</p>
                     <span>•</span>
                     <IoEarthSharp className="text-mountain-600" />
                   </div>
                 </div>
               </div>
-              <MdMoreHoriz className="size-6 text-mountain-600" />
+              <MdMoreHoriz className="text-mountain-600 size-6" />
             </div>
             <ExpandablePostContent content={content} />
             <div
-              className={`grid w-full max-h-[680px] overflow-hidden gap-1 border-b border-mountain-200
-                ${images.length === 1
+              className={`border-mountain-200 grid max-h-[680px] w-full gap-1 overflow-hidden border-b ${
+                images.length === 1
                   ? 'grid-cols-1'
                   : images.length === 2
                     ? 'grid-rows-2'
                     : images.length === 3
-                      ? 'grid-rows-[340px_1fr] grid-cols-2'
+                      ? 'grid-cols-2 grid-rows-[340px_1fr]'
                       : 'grid-cols-2 grid-rows-2'
-                }`}
+              }`}
             >
               {images.slice(0, 4).map((image, index) => (
                 <img
                   key={index}
                   src={image}
                   alt={`Post Image ${index + 1}`}
-                  className={`
-                    object-cover w-full h-full
-                    ${images.length === 3 && index === 0
-                      ? 'col-span-2'
-                      : ''
-                    }
-                  `}
+                  className={`h-full w-full object-cover ${
+                    images.length === 3 && index === 0 ? 'col-span-2' : ''
+                  } `}
                 />
               ))}
             </div>
-            <div className="flex justify-between items-center px-4 py-2">
+            <div className="flex items-center justify-between px-4 py-2">
               <div className="flex items-center space-x-2">
-                <img src="/like_icon.png" className="border border-white rounded-full w-8 h-8" />
-                <img src="/love_icon.png" className="-ml-4 border border-white rounded-full w-8 h-8" />
+                <img
+                  src="/like_icon.png"
+                  className="h-8 w-8 rounded-full border border-white"
+                />
+                <img
+                  src="/love_icon.png"
+                  className="-ml-4 h-8 w-8 rounded-full border border-white"
+                />
                 <p className="text-mountain-600 text-sm">999</p>
               </div>
               <div className="flex items-center space-x-2">
-                <p className="flex space-x-1 text-mountain-600 text-sm">
+                <p className="text-mountain-600 flex space-x-1 text-sm">
                   <span>100</span>
                   <span>Comments</span>
                 </p>
-                <p className="flex space-x-1 text-mountain-600 text-sm">
+                <p className="text-mountain-600 flex space-x-1 text-sm">
                   <span>100</span>
                   <span>Shares</span>
                 </p>
               </div>
             </div>
-            <div className="flex justify-center items-center p-4 border-mountain-200 border-t w-full">
-              <div className="flex justify-center items-center space-x-2 w-1/3">
-                <BiLike className="size-5 text-mountain-600" />
+            <div className="border-mountain-200 flex w-full items-center justify-center border-t p-4">
+              <div className="flex w-1/3 items-center justify-center space-x-2">
+                <BiLike className="text-mountain-600 size-5" />
                 <p className="text-mountain-600 text-sm">Like</p>
               </div>
-              <div className="flex justify-center items-center space-x-2 w-1/3">
-                <BiLike className="size-5 text-mountain-600" />
+              <div className="flex w-1/3 items-center justify-center space-x-2">
+                <BiLike className="text-mountain-600 size-5" />
                 <p className="text-mountain-600 text-sm">Comment</p>
               </div>
-              <div className="flex justify-center items-center space-x-2 w-1/3">
-                <BiLike className="size-5 text-mountain-600" />
+              <div className="flex w-1/3 items-center justify-center space-x-2">
+                <BiLike className="text-mountain-600 size-5" />
                 <p className="text-mountain-600 text-sm">Share</p>
               </div>
             </div>

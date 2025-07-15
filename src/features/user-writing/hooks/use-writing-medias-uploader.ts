@@ -2,10 +2,10 @@ import {
   getPresignedUrl,
   GetPresignedUrlResponse,
   uploadFile,
-} from "@/api/storage";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import { nanoid } from "nanoid";
-const WRITING_STORAGE_DIRECTORY = "blogs";
+} from '@/api/storage';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { nanoid } from 'nanoid';
+const WRITING_STORAGE_DIRECTORY = 'blogs';
 
 export function useWritingMediaUploader() {
   const { showSnackbar } = useSnackbar();
@@ -16,15 +16,15 @@ export function useWritingMediaUploader() {
     try {
       const presignedUrlResponse: GetPresignedUrlResponse =
         await getPresignedUrl(
-          `${videoFile.name.split(".")[0]}_${nanoid(6)}`,
-          videoFile.type.split("/")[1],
-          "video",
+          `${videoFile.name.split('.')[0]}_${nanoid(6)}`,
+          videoFile.type.split('/')[1],
+          'video',
           WRITING_STORAGE_DIRECTORY,
         );
       await uploadFile(videoFile, presignedUrlResponse.presignedUrl);
       return presignedUrlResponse.fileUrl;
     } catch (error) {
-      showSnackbar("Failed to upload video", "error");
+      showSnackbar('Failed to upload video', 'error');
       throw error;
     }
   };
@@ -36,14 +36,14 @@ export function useWritingMediaUploader() {
     try {
       const presigned: GetPresignedUrlResponse = await getPresignedUrl(
         `${filenNamePrefix}_${nanoid(6)}`,
-        imageFile.type.split("/")[1],
-        "image",
+        imageFile.type.split('/')[1],
+        'image',
         WRITING_STORAGE_DIRECTORY,
       );
       await uploadFile(imageFile, presigned.presignedUrl);
       return presigned.fileUrl;
     } catch (error) {
-      showSnackbar("Failed to upload image", "error");
+      showSnackbar('Failed to upload image', 'error');
       throw error;
     }
   };

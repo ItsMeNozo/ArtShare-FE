@@ -29,7 +29,7 @@ export const useSaveProject = ({
       const payload: SaveAutoProjectPayload = {
         title: values.projectName,
         description: values.description,
-        platform_id: values.platform.id,
+        platformId: values.platform.id,
       };
       if (id) {
         return updateAutoProject(id, payload);

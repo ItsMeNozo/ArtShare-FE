@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 export function useScrollBottom(
   ref: React.RefObject<HTMLElement>,
@@ -10,7 +10,7 @@ export function useScrollBottom(
     const t = window.setTimeout(() => {
       ref.current!.scrollTo({
         top: ref.current!.scrollHeight,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }, delay);
     console.log(`Scrolling to bottom after ${delay}ms delay`);
