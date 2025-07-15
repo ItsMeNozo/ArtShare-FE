@@ -1,36 +1,46 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
+
+//Logo src
+import watermark from '/public/app_watermark.png'
 
 //Components
 import Panels from './components/panels/Panels';
+import LayerItem from "./components/LayerItem";
+import LayerToolsBar from "./components/tools/LayerToolsBar";
+import EditHeader from "./components/EditHeader";
+import Moveable from "react-moveable";
 
 //Icons
 import { IoCrop } from "react-icons/io5";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { RiText } from "react-icons/ri";
-import { IoShapesOutline } from "react-icons/io5";
-import { PiDiamondsFourLight } from "react-icons/pi";
-import { HiDotsHorizontal } from "react-icons/hi";
+// import { IoShapesOutline } from "react-icons/io5";
+// import { PiDiamondsFourLight } from "react-icons/pi";
+// import { HiDotsHorizontal } from "react-icons/hi";
 import { MdFlipToFront } from "react-icons/md";
 import { IoIosColorFilter } from "react-icons/io";
-import Moveable from "react-moveable";
-import LayerToolsBar from "./components/tools/LayerToolsBar";
-import EditHeader from "./components/EditHeader";
-import { useLayerStyleHandlers } from "./hooks/useLayerStyleHandlers";
-import { useLayerTransformHandlers } from "./hooks/useLayerTransformHandlers";
 import { ChevronDown } from "lucide-react";
-import { useLocation } from "react-router-dom";
-import LayerItem from "./components/LayerItem";
+
+//Hooks
+import { useImageStyleHandlers } from "./hooks/useImageStyleHandlers";
+import { useLayerTransformHandlers } from "./hooks/useLayerTransformHandlers";
+import { useTextStyleHandlers } from './hooks/useTextStyleHandlers';
 
 const EditImage: React.FC = () => {
   //Handle getting images
   const location = useLocation();
-  const { imageUrl, name } = location.state || {};
+  const navigate = useNavigate();
+  const { imageUrl, name, canvas, editCanvas } = location.state || {};
 
   //Toolbar
   const [fullScreen, setFullScreen] = useState(false);
-  const [newEdit, setNewEdit] = useState(false);
+  const [newEdit, setNewEdit] = useState<NewDesign | null>(null);
+  const [newDesign, setNewDesign] = useState<NewDesign | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   //Images
+  const [zIndex, setZIndex] = useState({ min: 1, max: 1 });
   const [zoomLevel, setZoomLevel] = useState(1);
   const [activePanel, setActivePanel] = useState<
     'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null
@@ -48,13 +58,20 @@ const EditImage: React.FC = () => {
   const [hue, setHue] = useState(0);
   const [sepia, setSepia] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [canvasSize] = useState({ width: 540, height: 540 });
+
+  //Canvas Size
+  const hasAppendedInitialImage = useRef(false);
+  const [finalCanvasSize, setFinalCanvasSize] = useState<Canvas>(canvas);
+  const [canvasSize, setCanvasSize] = useState<Canvas>(
+    editCanvas || { width: 560, height: 560 }
+  );
 
   //Texts
   const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const layerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const moveableRef = useRef<Moveable>(null);
-  const hasAppendedInitialImage = useRef(false);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   const [layers, setLayers] = useState<Layer[]>([
     {
@@ -77,69 +94,112 @@ const EditImage: React.FC = () => {
       height: canvasSize.height,
       width: canvasSize.width,
       zIndex: 0,
-    },
+      isLocked: false
+    }
   ]);
 
-  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
-  console.log("a", layers);
+  useEffect(() => {
+    if (layers.length !== 1) {
+      setHasChanges(true);
+      return;
+    } else setHasChanges(false);
+    const base = layers[0];
+    const isBase =
+      base.type === "image" &&
+      base.src === "" &&
+      base.zIndex === 0 &&
+      base.backgroundColor === "#ffffff";
+    setHasChanges(!isBase);
+  }, [layers]);
 
   useEffect(() => {
-    if (!newEdit) return;
-    // Reset layers (e.g., to default canvas background layer)
+    if (!newDesign || !newDesign.canvas) return;
+    hasAppendedInitialImage.current = false;
+    location.state.imageUrl = null;
+    setLayers([]);
+    setSelectedLayerId(null);
+    setEditingLayerId(null);
+    setCanvasSize(newDesign.canvas);
+    setFinalCanvasSize(newDesign.finalCanvas);
     const baseLayer: ImageLayer = {
-      type: "image",
+      type: 'image',
       id: crypto.randomUUID(),
-      src: "",
-      zoom: 1,
-      opacity: 1,
-      flipH: false,
-      flipV: false,
-      x: 0,
-      y: 0,
-      rotation: 0,
-      brightness: 100,
-      contrast: 100,
-      saturation: 100,
-      hue: 0,
-      sepia: 0,
+      src: '',
+      zoom: zoomLevel,
+      opacity: opacity,
+      flipH: flipHorizontal,
+      flipV: flipVertical,
+      x: xPos,
+      y: yPos,
+      rotation: rotation,
+      brightness: brightness,
+      contrast: contrast,
+      saturation: saturation,
+      hue: hue,
+      sepia: sepia,
       backgroundColor: "#ffffff",
       height: canvasSize.height,
       width: canvasSize.width,
       zIndex: 0,
+      isLocked: false
     };
     setLayers([baseLayer]);
+    setNewDesign(null);
+  }, [newDesign]);
+
+  useEffect(() => {
+    if (!newEdit || !newEdit.canvas) return;
+    hasAppendedInitialImage.current = false;
+    setLayers([]);
     setSelectedLayerId(null);
     setEditingLayerId(null);
-    setGlobalZIndex(1);
-    hasAppendedInitialImage.current = false;
-    setNewEdit(false); // ✅ Reset flag
+    setCanvasSize(newEdit.canvas);
+    setFinalCanvasSize(newEdit.finalCanvas);
+    const baseLayer: ImageLayer = {
+      type: 'image',
+      id: crypto.randomUUID(),
+      src: '',
+      zoom: zoomLevel,
+      opacity: opacity,
+      flipH: flipHorizontal,
+      flipV: flipVertical,
+      x: xPos,
+      y: yPos,
+      rotation: rotation,
+      brightness: brightness,
+      contrast: contrast,
+      saturation: saturation,
+      hue: hue,
+      sepia: sepia,
+      backgroundColor: "#ffffff",
+      height: newEdit.canvas.height,
+      width: newEdit.canvas.width,
+      zIndex: 0,
+      isLocked: false
+    };
+    setLayers([baseLayer]);
+    setNewDesign(null);
   }, [newEdit]);
 
   useEffect(() => {
     if (!imageUrl || hasAppendedInitialImage.current) return;
     hasAppendedInitialImage.current = true;
-
     const img = new Image();
     img.onload = () => {
-      const maxWidth = 540;
-      const maxHeight = 540;
-
+      const maxWidth = canvasSize.width;
+      const maxHeight = canvasSize.height;
       const width = img.width;
       const height = img.height;
-
       const widthRatio = maxWidth / width;
       const heightRatio = maxHeight / height;
       const scale = Math.min(widthRatio, heightRatio);
-
       const scaledWidth = width * scale;
       const scaledHeight = height * scale;
-
       // Prevent duplicate image layer
       const isAlreadyAdded = layers.some(
         (layer) => layer.type === "image" && layer.src === imageUrl
       );
       if (isAlreadyAdded) return;
-
       const newImageLayer: ImageLayer = {
         id: crypto.randomUUID(),
         type: "image",
@@ -160,12 +220,12 @@ const EditImage: React.FC = () => {
         hue: 0,
         sepia: 0,
         zIndex: 1,
+        isLocked: false
       };
-      setGlobalZIndex(2);
       setLayers((prev) => [...prev, newImageLayer]);
     };
     img.src = imageUrl;
-  }, [imageUrl, layers, newEdit]);
+  }, [imageUrl, layers, newDesign]);
 
   useEffect(() => {
     const imageLayer = layers.find(
@@ -174,6 +234,14 @@ const EditImage: React.FC = () => {
     if (!imageLayer) return;
     const img = new Image();
     img.src = imageLayer.src;
+  }, [layers]);
+
+  useEffect(() => {
+    const nonBackgroundLayers = layers.filter((layer) => layer.zIndex !== 0);
+    const zIndexes = nonBackgroundLayers.map((layer) => layer.zIndex ?? 1);
+    const maxZIndex = zIndexes.length > 0 ? Math.max(...zIndexes) : 1;
+    const minZIndex = zIndexes.length > 0 ? Math.min(...zIndexes) : 1;
+    setZIndex({ min: minZIndex, max: maxZIndex });
   }, [layers]);
 
   const updateSelectedLayer = (updates: Partial<Layer>) => {
@@ -199,18 +267,19 @@ const EditImage: React.FC = () => {
     if (!layerToDuplicate) return;
     const newLayer = {
       ...layerToDuplicate,
+      zIndex: layerToDuplicate.zIndex + 1,
       id: crypto.randomUUID(),
     };
     setLayers((prev) => [...prev, newLayer]);
   };
-  //Style hooks
+
   const {
     handleBrightness,
     handleContrast,
     handleSaturation,
     handleHue,
     handleSepia,
-  } = useLayerStyleHandlers({
+  } = useImageStyleHandlers({
     selectedLayerId,
     updateSelectedLayer,
     setBrightness,
@@ -219,6 +288,21 @@ const EditImage: React.FC = () => {
     setHue,
     setSepia
   });
+
+  const {
+    addText,
+    handleTextChange,
+    handleChangeFontSize,
+    handleChangeFontFamily,
+    handleChangeTextColor,
+  } = useTextStyleHandlers({
+    layers,
+    setLayers,
+    selectedLayerId,
+    globalZIndex,
+    setGlobalZIndex,
+  });
+
   // Transform hooks
   const {
     moveForward,
@@ -232,7 +316,8 @@ const EditImage: React.FC = () => {
     toggleFlipHorizontal,
     toggleFlipVertical,
     handleLayerXPosition,
-    handleLayerYPosition
+    handleLayerYPosition,
+    handleLockLayer
   } = useLayerTransformHandlers({
     layers,
     selectedLayerId,
@@ -273,7 +358,7 @@ const EditImage: React.FC = () => {
     };
   }, [selectedLayerId]);
 
-  const renderToCanvas = () => {
+  const renderToCanvas = (includeWatermark: boolean) => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     canvas.width = canvasSize.width;
@@ -289,187 +374,141 @@ const EditImage: React.FC = () => {
     ctx.fillStyle = backgroundLayer?.backgroundColor || "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
-    layers.forEach((layer) => {
-      if (layer.type === 'image') {
-        const img = new Image();
-        img.src = layer.src;
-        img.onload = () => {
-          const {
-            x,
-            y,
-            zoom,
-            rotation,
-            flipH,
-            flipV,
-            opacity,
-            brightness,
-            contrast,
-            saturation,
-            hue,
-            sepia,
-            width,
-            height,
-          } = layer;
-          // Calculate layer size
-          const drawWidth = width ?? img.naturalWidth;
-          const drawHeight = height ?? img.naturalHeight;
-          ctx.save();
-          // Translate to (x + center), so rotation is around center
-          ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
-          ctx.rotate((rotation * Math.PI) / 180);
-          ctx.scale((flipH ? -1 : 1) * zoom, (flipV ? -1 : 1) * zoom);
-          ctx.globalAlpha = opacity;
-          ctx.filter = `
+    [...layers]
+      .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
+      .forEach((layer) => {
+        if (layer.type === 'image') {
+          const img = new Image();
+          img.src = layer.src;
+          img.onload = () => {
+            const {
+              x,
+              y,
+              zoom,
+              rotation,
+              flipH,
+              flipV,
+              opacity,
+              brightness,
+              contrast,
+              saturation,
+              hue,
+              sepia,
+              width,
+              height,
+            } = layer;
+            // Calculate layer size
+            const drawWidth = width ?? img.naturalWidth;
+            const drawHeight = height ?? img.naturalHeight;
+            ctx.save();
+            // Translate to (x + center), so rotation is around center
+            ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.scale((flipH ? -1 : 1) * zoom, (flipV ? -1 : 1) * zoom);
+            ctx.globalAlpha = opacity;
+            ctx.filter = `
           brightness(${brightness}%)
           contrast(${contrast}%)
           saturate(${saturation}%)
           hue-rotate(${hue}deg)
           sepia(${sepia}%)
         `;
-          // Draw image centered
-          ctx.drawImage(
-            img,
-            -drawWidth / 2,
-            -drawHeight / 2,
-            drawWidth,
-            drawHeight
-          );
+            // Draw image centered
+            ctx.drawImage(
+              img,
+              -drawWidth / 2,
+              -drawHeight / 2,
+              drawWidth,
+              drawHeight
+            );
+            ctx.restore();
+          };
+        } else if (layer.type === 'text') {
+          ctx.save();
+          ctx.translate(layer.x + layer.width / 2, layer.y);
+          ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
+          ctx.font = `${layer.fontSize}px ${layer.fontFamily || "sans-serif"}`;
+          ctx.fillStyle = layer.color;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.globalAlpha = layer.opacity ?? 1;
+          ctx.fillText(layer.text, 0, 0);
           ctx.restore();
-        };
-      } else if (layer.type === 'text') {
+        }
+      });
+    const watermarkLayer: ImageLayer =
+    {
+      id: crypto.randomUUID(),
+      type: "image",
+      src: watermark,
+      name: "Watermark",
+      opacity: 0.4,
+      zoom: 1,
+      flipH: false,
+      flipV: false,
+      rotation: 0,
+      brightness: 100,
+      contrast: 100,
+      saturation: 100,
+      hue: 0,
+      sepia: 0,
+      width: 256 * 0.3,
+      height: 62 * 0.3,
+      x: canvasSize.width - 96,
+      y: canvasSize.height - 32,
+      zIndex: 9999,
+      isLocked: false
+    }
+    if (includeWatermark) {
+      const img = new Image();
+      img.src = watermarkLayer.src;
+      img.onload = () => {
         ctx.save();
-        ctx.translate(layer.x + layer.width / 2, layer.y);
-        ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
-        ctx.font = `${layer.fontSize}px ${layer.fontFamily || "sans-serif"}`;
-        ctx.fillStyle = layer.color;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.globalAlpha = layer.opacity ?? 1;
-        ctx.fillText(layer.text, 0, 0);
+        ctx.globalAlpha = watermarkLayer.opacity;
+        ctx.drawImage(
+          img,
+          watermarkLayer.x,
+          watermarkLayer.y,
+          watermarkLayer.width,
+          watermarkLayer.height
+        );
         ctx.restore();
-      }
-    });
+      };
+    }
   };
 
-  const handleDownload = () => {
-    renderToCanvas();
+  const handleDownload = (format: "png" | "jpg", fileName: string, includeWaterMark: boolean) => {
+    renderToCanvas(includeWaterMark);
     setTimeout(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+      const trimmedName = fileName.trim();
+      const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
       const link = document.createElement("a");
-      link.download = "edited-image.png";
-      link.href = canvas.toDataURL("image/png");
+      link.download = trimmedName;
+      link.href = canvas.toDataURL(mimeType);
       link.click();
     }, 300);
   };
 
-  const imageContainerRef = useRef<HTMLDivElement>(null);
-
-  const getFittingFontSize = (
-    text: string,
-    maxWidth: number,
-    maxHeight: number,
-    fontFamily = "Arial",
-    startingFontSize = 20
-  ): number => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return startingFontSize;
-
-    let fontSize = startingFontSize;
-    const lineHeightFactor = 1.2;
-
-    ctx.font = `${fontSize}px ${fontFamily}`;
-    let textWidth = ctx.measureText(text).width;
-
-    while (
-      (textWidth > maxWidth || fontSize * lineHeightFactor > maxHeight) &&
-      fontSize > 5
-    ) {
-      fontSize -= 1;
-      ctx.font = `${fontSize}px ${fontFamily}`;
-      textWidth = ctx.measureText(text).width;
-    }
-
-    return fontSize;
-  };
-
-  const addText = () => {
-    const defaultText = "Your Text";
-    const maxWidth = 300;
-    const maxHeight = 100;
-
-    const fittedFontSize = getFittingFontSize(defaultText, maxWidth, maxHeight);
-
-    const newTextLayer: TextLayer = {
-      id: crypto.randomUUID(),
-      type: "text",
-      text: defaultText,
-      fontSize: fittedFontSize,
-      color: "#000000",
-      x: 100,
-      y: 100,
-      rotation: 0,
-      opacity: 1,
-      width: maxWidth,
-      height: maxHeight,
-      zIndex: globalZIndex,
-    };
-    setGlobalZIndex(globalZIndex + 1);
-    setLayers((prev) => [...prev, newTextLayer]);
-  };
-
-  const handleChangeFontSize = (newFontSize: number) => {
-    setLayers((prevLayers) =>
-      prevLayers.map((layer) =>
-        layer.id === selectedLayerId && layer.type === 'text'
-          ? { ...layer, fontSize: newFontSize }
-          : layer,
-      ),
-    );
-  };
-
-  const handleChangeFontFamily = (font: string) => {
-    if (!selectedLayerId) return;
-    const updatedLayers = layers.map((layer) =>
-      layer.id === selectedLayerId && layer.type === 'text'
-        ? { ...layer, fontFamily: font }
-        : layer,
-    );
-    setLayers(updatedLayers);
-  };
-
-  const handleChangeTextColor = (newColor: string) => {
-    if (!selectedLayerId) return;
-    const updatedLayers = layers.map((layer) =>
-      layer.id === selectedLayerId && layer.type === 'text'
-        ? { ...layer, color: newColor }
-        : layer,
-    );
-    setLayers(updatedLayers);
-  };
-
-  const handleTextChange = (id: string, newText: string) => {
-    setLayers((prev) =>
-      prev.map((layer) => {
-        if (layer.id === id && layer.type === "text") {
-          const fittedFontSize = getFittingFontSize(
-            newText,
-            layer.width,
-            layer.height,
-            layer.fontFamily || "Arial",
-            20
-          );
-
-          return {
-            ...layer,
-            text: newText,
-            fontSize: fittedFontSize,
-          };
-        }
-        return layer;
-      })
-    );
+  const handleShare = () => {
+    renderToCanvas(true);
+    setTimeout(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const file = new File([blob], 'canvas-output.png', {
+          type: 'image/png',
+        });
+        const fileUrl = URL.createObjectURL(file);
+        navigate("/posts/new", {
+          state: {
+            fromEditorImage: { fileUrl, fileName: file.name },
+          },
+        });
+      }, 'image/png');
+    }, 300);
   };
 
   return (
@@ -485,9 +524,14 @@ const EditImage: React.FC = () => {
         </div>
       </button>
       <EditHeader
+        baseLayer={layers[0] as ImageLayer}
+        finalCanvasSize={finalCanvasSize}
         hideTopBar={fullScreen}
+        hasChanges={hasChanges}
         setHideTopBar={setFullScreen}
         setNewEdit={setNewEdit}
+        setNewDesign={setNewDesign}
+        handleShare={handleShare}
         handleDownload={handleDownload}
       />
       <div className={`flex ${fullScreen ? 'p-0 h-screen' : 'p-4 h-[calc(100vh-4rem)]'}  w-full overflow-hidden`}>
@@ -501,7 +545,6 @@ const EditImage: React.FC = () => {
             handleZoomIn={handleZoomIn}
             handleZoomOut={handleZoomOut}
             currentZIndex={globalZIndex}
-            setCurrentZIndex={setGlobalZIndex}
           />
           <div onMouseDown={() => setSelectedLayerId(null)}
             className="relative flex justify-center items-center bg-mountain-200 w-full h-full">
@@ -536,6 +579,7 @@ const EditImage: React.FC = () => {
                     selectedLayerId={selectedLayerId}
                     layerRefs={layerRefs}
                     moveableRef={moveableRef}
+                    zIndex={zIndex}
                     setEditingLayerId={setEditingLayerId}
                     setSelectedLayerId={setSelectedLayerId}
                     handleTextChange={handleTextChange}
@@ -545,12 +589,13 @@ const EditImage: React.FC = () => {
                     sendToBack={() => sendToBack(layer.id)}
                     moveForward={() => moveForward(layer.id)}
                     moveBackward={() => moveBackward(layer.id)}
+                    handleLockLayer={handleLockLayer}
                   />
                 ))}
               </div>
             </div>
             <div className="bottom-2 left-2 absolute flex justify-center items-center bg-white opacity-50 rounded-lg w-24 h-8 text-mountain-600 text-sm">
-              <span>{layers[0].width} x {layers[0].height}</span>
+              <span>{finalCanvasSize.width} x {finalCanvasSize.height}</span>
             </div>
           </div>
           {/* Settings Panel */}
@@ -558,6 +603,12 @@ const EditImage: React.FC = () => {
             activePanel={activePanel!}
             selectedLayerId={selectedLayerId!}
             layers={layers}
+            handleLockLayer={handleLockLayer}
+            updateSelectedLayer={updateSelectedLayer}
+            moveForward={moveForward}
+            moveBackward={moveBackward}
+            sendToBack={sendToBack}
+            bringToFront={bringToFront}
             handleLayerXPosition={handleLayerXPosition}
             handleLayerYPosition={handleLayerYPosition}
             handleRotationChange={handleRotationChange}
@@ -565,7 +616,6 @@ const EditImage: React.FC = () => {
             toggleFlipHorizontal={toggleFlipHorizontal}
             toggleFlipVertical={toggleFlipVertical}
             handleDuplicate={handleDuplicate}
-            updateSelectedLayer={updateSelectedLayer}
             setActivePanel={setActivePanel}
             handleSaturation={handleSaturation}
             handleBrightness={handleBrightness}
@@ -626,7 +676,7 @@ const EditImage: React.FC = () => {
               <RiText className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Text</p>
             </div>
-            <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
+            {/* <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
               <IoShapesOutline className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Shape</p>
             </div>
@@ -637,7 +687,7 @@ const EditImage: React.FC = () => {
             <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
               <HiDotsHorizontal className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">More</p>
-            </div>
+            </div> */}
           </div>
           <canvas ref={canvasRef} className="hidden" />
         </div>

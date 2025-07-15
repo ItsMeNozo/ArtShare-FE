@@ -29,6 +29,17 @@ export const useLayerTransformHandlers = ({
   setXPos,
   setYPos,
 }: TransformHandlersParams) => {
+  const handleLockLayer = useCallback(
+    (layerId: string) => {
+      if (!layerId) return;
+      const selectedLayer = layers.find((l) => l.id === layerId);
+      if (!selectedLayer) return;
+      const newLockedState = !selectedLayer.isLocked;
+      updateLayerById(layerId, { isLocked: newLockedState });
+    },
+    [layers, updateLayerById],
+  );
+
   const bringToFront = useCallback(
     (layerId: string) => {
       const targetLayers = layers.filter((l) => l.id !== layerId);
@@ -108,6 +119,7 @@ export const useLayerTransformHandlers = ({
     },
     [selectedLayerId, updateSelectedLayer],
   );
+
   const handleZoomIn = useCallback(() => {
     setZoomLevel((prev) => {
       const newZoom = Math.min(prev + 0.1, 3);
@@ -166,6 +178,7 @@ export const useLayerTransformHandlers = ({
     moveBackward,
     handleZoomIn,
     handleZoomOut,
+    handleLockLayer,
     handleRotationChange,
     handleOpacityChange,
     toggleFlipHorizontal,

@@ -1,9 +1,10 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import ZoomTool from "./Zoom";
 import { Tooltip } from "@mui/material";
-import { Plus } from "lucide-react";
+import { Lock, Plus } from "lucide-react";
 import Draggable from "react-draggable";
 import { Sketch } from '@uiw/react-color';
+import { IoLayersOutline } from "react-icons/io5";
 
 interface LayerToolsBarProp {
   layers: Layer[];
@@ -13,7 +14,6 @@ interface LayerToolsBarProp {
   setLayers: Dispatch<SetStateAction<Layer[]>>;
   handleZoomIn: () => void;
   handleZoomOut: () => void;
-  setCurrentZIndex: Dispatch<SetStateAction<number>>;
   setSelectedLayerId: Dispatch<SetStateAction<string | null>>;
 }
 
@@ -26,7 +26,6 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   handleZoomIn,
   handleZoomOut,
   setSelectedLayerId,
-  setCurrentZIndex
 }) => {
   const [openColorSettings, setOpenColorSettings] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -74,10 +73,10 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             saturation: 100,
             hue: 0,
             sepia: 0,
-            zIndex: currentZIndex
+            zIndex: currentZIndex,
+            isLocked: false,
           },
         ]);
-        setCurrentZIndex(currentZIndex + 1);
       };
 
       img.src = imageSrc;
@@ -91,11 +90,9 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
         setOpenColorSettings(false); // Close the color picker
       }
     }
-
     if (openColorSettings) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -106,8 +103,9 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
       <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full">
         <div className="flex flex-col space-y-2">
           {/* Layers Header */}
-          <div className="flex justify-center items-center bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
-            Layers
+          <div className="flex justify-center items-center space-x-2 bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
+            <IoLayersOutline />
+            <span>Layers</span>
           </div>
           <Tooltip title="Add Layer" arrow placement="right">
             <div
@@ -132,7 +130,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             .map((layer) => (
               <div
                 key={layer.id}
-                className="flex justify-center items-center px-2 rounded-sm w-full h-20 hover:cursor-pointer"
+                className="relative flex justify-center items-center px-2 rounded-sm w-full h-20 hover:cursor-pointer"
                 onClick={() => setSelectedLayerId(layer.id)}
               >
                 {layer.type === 'image' ? (
@@ -152,16 +150,19 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                       <div
                         style={{
                           position: 'absolute',
-                          fontSize: layer.fontSize * 0.5,
+                          fontSize: '12px',
                           color: layer.color,
                         }}
                         className="top-1/2 left-1/2 flex-nowrap text-nowrap -translate-x-1/2 -translate-y-1/2"
                       >
-                        {layer.text || 'Preview text'}
+                        {layer.text || 'Text Layer'}
                       </div>
                     )}
                   </div>
                 )}
+                <div className={`${layer.isLocked ? '' : 'hidden'} right-2 bottom-1 z-50 absolute flex bg-mountain-950/50 p-2`}>
+                  <Lock className="size-3 text-white" />
+                </div>
               </div>
             ))}
           <Tooltip title="Set Color" arrow placement="right">

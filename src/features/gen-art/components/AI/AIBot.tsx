@@ -94,7 +94,7 @@ const AIBotPopover = () => {
       </PopoverTrigger>
       <PopoverContent
         side="top"
-        className="bg-white shadow-xl mb-4 p-0 border border-mountain-200 rounded-xl w-[400px] h-[600px]"
+        className="bg-white shadow-xl mb-4 p-0 border border-mountain-200 rounded-xl w-[400px] h-128"
       >
         <div className="flex justify-between items-center p-3 border-mountain-100 border-b h-16">
           <span className="font-semibold text-mountain-700 text-base">
@@ -111,13 +111,13 @@ const AIBotPopover = () => {
             <p>New Chat</p>
           </Button>
         </div>
-        <div className="relative flex flex-col items-center w-full h-[536px]">
+        <div className="relative flex flex-col items-center w-full h-112">
           <div
             ref={scrollRef}
-            className="flex flex-col pb-24 w-full h-full overflow-y-auto custom-scrollbar"
+            className="flex flex-col pb-12 w-full h-full overflow-y-auto custom-scrollbar"
           >
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center space-y-6 mt-20 text-xs">
+              <div className="flex flex-col items-center space-y-6 mt-12 text-xs">
                 <div className="flex flex-col justify-center items-center space-y-2">
                   <div className="flex flex-col justify-center items-center space-y-4">
                     <div className="flex justify-center items-center bg-mountain-950 bg-gradient-to-r shadow border border-mountain-300 rounded-xl w-15 h-15">
@@ -151,8 +151,8 @@ const AIBotPopover = () => {
                   >
                     <div
                       className={`max-w-[70%] rounded-xl p-4 ${message.role === 'USER'
-                          ? 'text-mountain-50 bg-indigo-600'
-                          : 'bg-mountain-100'
+                        ? 'text-mountain-50 bg-indigo-600'
+                        : 'bg-mountain-100'
                         }`}
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
@@ -221,8 +221,8 @@ const AIBotPopover = () => {
                 onClick={handleGenerate}
                 disabled={isLoading || !userPrompt.trim()}
                 className={`absolute right-4 -bottom-2 flex -translate-y-1/2 items-center px-4 ${isLoading || !userPrompt.trim()
-                    ? 'bg-mountain-200 text-mountain-950 cursor-not-allowed'
-                    : 'bg-indigo-400 hover:cursor-pointer hover:bg-indigo-300'
+                  ? 'bg-mountain-200 text-mountain-950 cursor-not-allowed'
+                  : 'bg-indigo-400 hover:cursor-pointer hover:bg-indigo-300'
                   }`}
               >
                 {isLoading ? (

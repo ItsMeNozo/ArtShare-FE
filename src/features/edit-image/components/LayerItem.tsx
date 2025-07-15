@@ -2,7 +2,7 @@ import React from "react";
 import { IoCopyOutline } from "react-icons/io5";
 import { GoMoveToTop, GoMoveToBottom } from "react-icons/go";
 import { TbChevronUp, TbChevronDown } from "react-icons/tb";
-import { Trash2Icon } from "lucide-react";
+import { Lock, Trash2Icon, Unlock } from "lucide-react";
 import Moveable from "react-moveable";
 import {
   ContextMenu,
@@ -18,6 +18,7 @@ const LayerItem = React.memo(
     selectedLayerId,
     layerRefs,
     moveableRef,
+    zIndex,
     setEditingLayerId,
     setSelectedLayerId,
     handleTextChange,
@@ -26,13 +27,15 @@ const LayerItem = React.memo(
     moveForward,
     moveBackward,
     bringToFront,
-    sendToBack
+    sendToBack,
+    handleLockLayer,
   }: {
     layer: Layer;
     editingLayerId: string | null;
     selectedLayerId: string | null;
     layerRefs: React.MutableRefObject<{ [key: string]: HTMLDivElement | null }>;
     moveableRef: React.RefObject<Moveable>;
+    zIndex: { min: number; max: number } | null;
     setEditingLayerId: React.Dispatch<React.SetStateAction<string | null>>;
     setSelectedLayerId: React.Dispatch<React.SetStateAction<string | null>>;
     handleTextChange: (id: string, text: string) => void;
@@ -42,6 +45,7 @@ const LayerItem = React.memo(
     moveBackward: (id: string) => void;
     bringToFront: (id: string) => void;
     sendToBack: (id: string) => void;
+    handleLockLayer: (id: string) => void;
   }) => {
     return (
       <ContextMenu key={layer.id}>
@@ -141,7 +145,7 @@ const LayerItem = React.memo(
                 </div>
               )}
             </div>
-            {selectedLayerId === layer.id && (
+            {selectedLayerId === layer.id && !layer.isLocked && (
               <Moveable
                 ref={moveableRef}
                 target={layerRefs.current[layer.id]}
@@ -185,23 +189,35 @@ const LayerItem = React.memo(
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="p-2 border-mountain-200 w-48 text-sm">
+          <ContextMenuItem onClick={() => handleLockLayer(layer.id)}>
+            {layer.isLocked ?
+              <>
+                <Unlock className="size-4" />
+                <span>UnLock Layer</span>
+              </> :
+              <>
+                <Lock className="size-4" />
+                <span>Lock Layer</span>
+              </>
+            }
+          </ContextMenuItem>
           <ContextMenuItem onClick={() => handleDuplicate(layer.id)}>
             <IoCopyOutline className="size-4" />
             <span>Duplicate</span>
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => bringToFront(layer.id)}>
+          <ContextMenuItem disabled={layer?.zIndex === zIndex?.max} onClick={() => bringToFront(layer.id)}>
             <GoMoveToTop className="size-4" />
             <span>Bring To Front</span>
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => moveForward(layer.id)}>
+          <ContextMenuItem disabled={layer?.zIndex === zIndex?.max} onClick={() => moveForward(layer.id)}>
             <TbChevronUp className="size-4" />
             <span>Move Forward</span>
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => moveBackward(layer.id)}>
+          <ContextMenuItem disabled={layer?.zIndex === zIndex?.min} onClick={() => moveBackward(layer.id)}>
             <TbChevronDown className="size-4" />
             <span>Move Backward</span>
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => sendToBack(layer.id)}>
+          <ContextMenuItem disabled={layer?.zIndex === zIndex?.min} onClick={() => sendToBack(layer.id)}>
             <GoMoveToBottom className="size-4" />
             <span>Bring To Back</span>
           </ContextMenuItem>

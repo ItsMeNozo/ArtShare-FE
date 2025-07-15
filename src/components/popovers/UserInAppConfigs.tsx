@@ -65,57 +65,55 @@ const UserInAppConfigs = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div>
-          <Button
-            title="User menu"
-            className={`flex items-center rounded-full`}
-            onClick={() => setOpen(!open)}
-            disableRipple
-            sx={{
-              p: 0,
-              minWidth: 0,
-              width: 40,
-              height: 40,
-            }}
-          >
-            {user ? (
-              user.profilePictureUrl ? (
-                <Avatar className="w-10 h-10">
-                  <AvatarImage src={user.profilePictureUrl} />
-                  <AvatarFallback>
-                    <BoringAvatar
-                      size={40}
-                      name={user.username}
-                      variant="beam"
-                      colors={[
-                        '#84bfc3',
-                        '#fff5d6',
-                        '#ffb870',
-                        '#d96153',
-                        '#000511',
-                      ]}
-                    />
-                  </AvatarFallback>
-                </Avatar>
-              ) : (
-                <BoringAvatar
-                  size={40}
-                  name={user.username}
-                  variant="beam"
-                  colors={[
-                    '#84bfc3',
-                    '#fff5d6',
-                    '#ffb870',
-                    '#d96153',
-                    '#000511',
-                  ]}
-                />
-              )
+        <Button
+          title="User menu"
+          className={`flex items-center rounded-full`}
+          onClick={() => setOpen(!open)}
+          disableRipple
+          sx={{
+            p: 0,
+            minWidth: 0,
+            width: 40,
+            height: 40,
+          }}
+        >
+          {user ? (
+            user.profilePictureUrl ? (
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={user.profilePictureUrl} />
+                <AvatarFallback>
+                  <BoringAvatar
+                    size={40}
+                    name={user.username}
+                    variant="beam"
+                    colors={[
+                      '#84bfc3',
+                      '#fff5d6',
+                      '#ffb870',
+                      '#d96153',
+                      '#000511',
+                    ]}
+                  />
+                </AvatarFallback>
+              </Avatar>
             ) : (
-              <MdMoreVert className="size-5" />
-            )}
-          </Button>
-        </div>
+              <BoringAvatar
+                size={40}
+                name={user.username}
+                variant="beam"
+                colors={[
+                  '#84bfc3',
+                  '#fff5d6',
+                  '#ffb870',
+                  '#d96153',
+                  '#000511',
+                ]}
+              />
+            )
+          ) : (
+            <MdMoreVert className="size-5" />
+          )}
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="dark:bg-mountain-900 mt-4 p-0 py-2 border-mountain-100 dark:border-mountain-700 w-64">
         {user && (

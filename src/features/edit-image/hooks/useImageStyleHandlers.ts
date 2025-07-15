@@ -10,7 +10,7 @@ interface LayerHandlersParams {
   setSepia: (val: number) => void;
 }
 
-export const useLayerStyleHandlers = ({
+export const useImageStyleHandlers = ({
   selectedLayerId,
   updateSelectedLayer,
   setBrightness,

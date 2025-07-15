@@ -16,14 +16,18 @@ type PanelsProp = {
   setActivePanel: Dispatch<
     SetStateAction<'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null>
   >;
+  updateSelectedLayer: (updates: Partial<ImageLayer>) => void;
   handleLayerXPosition: (newXPos: number) => void;
   handleLayerYPosition: (newYPos: number) => void;
   handleOpacityChange: (newOpacity: number) => void;
   toggleFlipHorizontal: () => void;
   toggleFlipVertical: () => void;
   handleDuplicate: (layerId: string) => void;
-  updateSelectedLayer: (updates: Partial<ImageLayer>) => void;
   handleSaturation: (newSaturation: number) => void;
+  moveForward: (layerId: string) => void;
+  moveBackward: (layerId: string) => void;
+  bringToFront: (layerId: string) => void;
+  sendToBack: (layerId: string) => void;
   handleHue: (newHue: number) => void;
   handleBrightness: (newBrightness: number) => void;
   handleContrast: (newContrast: number) => void;
@@ -32,6 +36,7 @@ type PanelsProp = {
   handleChangeFontSize: (newFontSize: number) => void;
   handleChangeFontFamily: (newFontFamily: string) => void;
   handleChangeTextColor: (newColor: string) => void;
+  handleLockLayer: (layerId: string) => void;
   addText: () => void;
 };
 
@@ -39,6 +44,7 @@ const Panels: React.FC<PanelsProp> = ({
   selectedLayerId,
   activePanel,
   layers,
+  setActivePanel,
   handleLayerXPosition,
   handleLayerYPosition,
   handleRotationChange,
@@ -46,7 +52,10 @@ const Panels: React.FC<PanelsProp> = ({
   toggleFlipHorizontal,
   toggleFlipVertical,
   handleDuplicate,
-  setActivePanel,
+  moveForward,
+  moveBackward,
+  bringToFront,
+  sendToBack,
   handleSaturation,
   handleHue,
   handleBrightness,
@@ -56,6 +65,7 @@ const Panels: React.FC<PanelsProp> = ({
   handleChangeFontSize,
   handleChangeFontFamily,
   handleChangeTextColor,
+  handleLockLayer
 }) => {
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
   const isNonTextLayer = selectedLayer?.type === 'image' || !selectedLayer;
@@ -73,7 +83,15 @@ const Panels: React.FC<PanelsProp> = ({
           </div>
           <div className="flex flex-col space-y-4 px-6 py-4 max-h-[82%] overflow-y-auto custom-scrollbar">
             {activePanel == "arrange" && (
-              <ArrangePanel layers={layers} selectedLayerId={selectedLayerId} />
+              <ArrangePanel
+                layers={layers}
+                selectedLayerId={selectedLayerId}
+                moveForward={moveForward}
+                moveBackward={moveBackward}
+                bringToFront={bringToFront}
+                sendToBack={sendToBack}
+                handleLockLayer={handleLockLayer}
+              />
             )}
             {activePanel == "crop" && (
               <CropPanel

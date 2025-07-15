@@ -41,7 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
           <div
             className={`flex items-center overflow-hidden transition-all duration-500 ease-in-out ${expand ? 'w-auto opacity-100' : 'opacity-0'}`}
           >
-            <img src={app_logo} className="flex mr-2 rounded-sm w-6 h-6" />
+            <img src={app_logo} className="flex mr-2 rounded-sm w-7 h-7" />
             <p className="font-medium text-gray-800 dark:text-gray-100">
               ArtShare
             </p>

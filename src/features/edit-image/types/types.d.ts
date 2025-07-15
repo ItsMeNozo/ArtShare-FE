@@ -1,3 +1,16 @@
+interface Canvas {
+  width: number;
+  height: number;
+}
+
+type CanvasSize = { width: number; height: number };
+
+interface NewDesign {
+  ratio: string;
+  canvas: CanvasSize;
+  finalCanvas: CanvasSize;
+}
+
 type LayerType = 'image' | 'text';
 
 type BaseLayer = {
@@ -9,6 +22,7 @@ type BaseLayer = {
   rotation: number;
   width: number;
   height: number;
+  isLocked: boolean;
 };
 
 type ImageLayer = BaseLayer & {

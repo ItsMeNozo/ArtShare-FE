@@ -189,28 +189,30 @@ const ArtGenAI = () => {
   }, [promptExpanded]);
 
   return (
-    <div className="flex p-4 pr-0 w-full h-screen">
-      <SettingsPanel
-        isExpanded={expanded}
-        setIsExpanded={setExpanded}
-        numberOfImages={numberOfImages}
-        setNumberOfImages={setNumberOfImages}
-        aspectRatio={aspectRatio}
-        setAspectRatio={setAspectRatio}
-        lighting={lighting}
-        setLighting={setLighting}
-        camera={camera}
-        setCamera={setCamera}
-        style={style}
-        setStyle={setStyle}
-      />
+    <div className="flex pr-0 w-full h-screen">
+      <div className='absolute flex p-2 h-full'>
+        <SettingsPanel
+          isExpanded={expanded}
+          setIsExpanded={setExpanded}
+          numberOfImages={numberOfImages}
+          setNumberOfImages={setNumberOfImages}
+          aspectRatio={aspectRatio}
+          setAspectRatio={setAspectRatio}
+          lighting={lighting}
+          setLighting={setLighting}
+          camera={camera}
+          setCamera={setCamera}
+          style={style}
+          setStyle={setStyle}
+        />
+      </div>
       <div className="flex flex-col w-full h-full">
-        <div className="flex flex-col items-end pr-4 border-mountain-200 border-b-1">
+        <div className="flex flex-col items-end border-mountain-200 border-b-1">
           <AIHeader />
         </div>
         <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div
-            className={`custom-scrollbar relative flex h-full flex-col ${expanded ? 'w-[80%]' : 'w-full delay-300'} items-start transition-all duration-200 ease-in-out`}
+            className={`custom-scrollbar relative flex h-full flex-col ${expanded ? 'w-[calc(100vw-18rem)]' : 'w-full delay-300'} items-start transition-all duration-200 ease-in-out`}
           >
             {loading ? (
               <div className="flex justify-center items-start mt-4 w-full h-full">
