@@ -110,7 +110,6 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     // Handle incoming notifications
     const handler = (notification: Notification<ReportResolvedPayload>) => {
       if (notification.type === 'report_created') return;
-      if (notification.type === 'report_created') return;
       setNotifications((prev) => {
         // Prevent duplicates by checking if notification already exists
         const exists = prev.some((n) => n.id === notification.id);
