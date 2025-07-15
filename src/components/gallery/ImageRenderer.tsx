@@ -31,7 +31,6 @@ export const ImageRenderer = (
           srcSet={
             Array.isArray(photo.srcSet) ? photo.srcSet.join(', ') : photo.srcSet
           }
-          crossOrigin="anonymous"
           alt={photo.alt || `Image ${index}`}
           className={imageClassName}
         />
@@ -47,21 +46,19 @@ export const ImageRenderer = (
 
         {/* Info Overlay (visible on hover) */}
         <div className="absolute inset-0 z-10 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          {photo.postLength > 1 && (
-            <div className="absolute top-2 left-2 flex items-center justify-center gap-2">
-              <div className="rounded-full bg-black/40 p-1.5">
-                <Images size={14} />
-              </div>
-
-              {photo.aiCreated && (
-                <img
-                  src="/logo_app_v_101.png"
-                  alt="AI Generated"
-                  className="border-mountain-700 h-6 w-6 rounded-full border"
-                />
-              )}
+          <div className="absolute top-2 left-2 flex items-center justify-center gap-2">
+            <div className="rounded-full bg-black/40 p-1.5">
+              <Images size={14} />
             </div>
-          )}
+
+            {photo.aiCreated && (
+              <img
+                src="/logo_app_v_101.png"
+                alt="AI Generated"
+                className="border-mountain-700 h-6 w-6 rounded-full border"
+              />
+            )}
+          </div>
 
           <div className="flex w-full items-end justify-between gap-2">
             <div title={`${photo.title}\n${photo.author}`}>

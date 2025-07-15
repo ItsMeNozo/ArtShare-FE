@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 // UI Components
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@mui/material';
 
 // Icons
 import { Skeleton } from '@/components/ui/skeleton';
+import Avatar from 'boring-avatars';
 import { IoCopyOutline } from 'react-icons/io5';
 import { LuImagePlus } from 'react-icons/lu';
 import { PiStarFourFill } from 'react-icons/pi';
@@ -177,21 +177,29 @@ const TrendingPrompt: React.FC<TrendingPromptProps> = ({ onClose }) => {
                 </>
               ) : (
                 <>
-                  <Avatar className="size-12">
-                    {selectedItem?.author.profilePictureUrl ? (
-                      <AvatarImage
-                        src={selectedItem.author.profilePictureUrl}
-                        alt={selectedItem.author.username || 'User'}
-                      />
-                    ) : (
-                      <AvatarFallback className="bg-mountain-100">
-                        {selectedItem.author.username
-                          ?.slice(0, 3)
-                          .toUpperCase() || 'US'}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <p className="font-medium">{selectedItem?.author.username}</p>
+                  {selectedItem?.author.profilePictureUrl ? (
+                    <img
+                      src={selectedItem?.author.profilePictureUrl}
+                      alt={selectedItem?.author.username}
+                      className="dark:border-mountain-700 h-7 w-7 rounded-full border border-gray-200"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <Avatar
+                      name={selectedItem.author.username || 'Unknown'}
+                      colors={['#84bfc3', '#ff9b62', '#d96153']}
+                      variant="beam"
+                      size={60}
+                    />
+                  )}
+                  <div className="flex flex-col pt-0.5">
+                    <div className="text-xl font-bold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {selectedItem?.author.fullName || 'Unknown fullname'}
+                    </div>
+                    <div className="line-clamp-1 text-sm transition-colors duration-200 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+                      @{selectedItem?.author.username}
+                    </div>
+                  </div>
                 </>
               )}
             </div>

@@ -19,24 +19,25 @@ const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
         {medias.map((media) => (
           <div
             key={media.url}
-            className="flex justify-center md:px-4 pt-4 w-full max-h-full hover:cursor-zoom-in"
+            className={`flex max-h-full w-full justify-center pt-4 md:px-4 ${media.mediaType === 'image' ? 'hover:cursor-zoom-in' : ''
+              }`}
           >
-            <PhotoView src={media.url}>
-              {media.mediaType === 'image' ? (
+            {media.mediaType === 'image' ? (
+              <PhotoView src={media.url}>
                 <img
                   src={media.url}
                   alt={media.description || 'Post asset'}
                   crossOrigin="anonymous"
                   className="max-w-full max-h-[80vh] md:max-h-full object-contain"
                 />
-              ) : (
-                <video
-                  src={media.url}
-                  controls
-                  className="max-w-full max-h-[80vh] md:max-h-full object-contain"
-                />
-              )}
-            </PhotoView>
+              </PhotoView>
+            ) : (
+              <video
+                src={media.url}
+                controls
+                className="max-w-full max-h-[80vh] md:max-h-full object-contain"
+              />
+            )}
           </div>
         ))}
       </div>

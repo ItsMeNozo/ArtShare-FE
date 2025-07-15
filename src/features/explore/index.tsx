@@ -17,6 +17,7 @@ const Explore: React.FC = () => {
   const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
   const [isAi, setIsAi] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem('accessToken');
 
   const handlePhotoClick = (photoId: number) => {
     navigate(`/posts/${photoId}`);
@@ -98,13 +99,15 @@ const Explore: React.FC = () => {
           >
             Trending
           </ToggleButton>
-          <ToggleButton
-            color="primary"
-            className="data-[selected]:dark:bg-primary-700 -m-0.5 px-4 py-2 border-0 rounded-full data-[selected]:dark:text-white dark:text-mountain-100 normal-case"
-            value={'Following' as ExploreTab}
-          >
-            Following
-          </ToggleButton>
+          {token && (
+            <ToggleButton
+              color="primary"
+              className="data-[selected]:dark:bg-primary-700 -m-0.5 px-4 py-2 border-0 rounded-full data-[selected]:dark:text-white dark:text-mountain-100 normal-case"
+              value={'Following' as ExploreTab}
+            >
+              Following
+            </ToggleButton>
+          )}
         </ToggleButtonGroup>
       </Paper>
     </div>

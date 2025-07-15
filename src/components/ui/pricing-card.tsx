@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import {
   createCheckoutSession,
   CreateCheckoutSessionPayload,
+  createCustomerPortalSession,
 } from '@/pages/Home/api/stripe.api';
 import { FaCheckCircle } from 'react-icons/fa';
 
@@ -37,9 +38,9 @@ interface PricingCardProps {
 
 const getSubscriptionPlanFromTier = (tierId: string): SubscriptionPlan => {
   switch (tierId) {
-    case 'individual':
+    case 'free':
       return SubscriptionPlan.FREE;
-    case 'artist':
+    case 'artist_pro':
       return SubscriptionPlan.ARTIST_PRO;
     case 'studio':
       return SubscriptionPlan.STUDIO;
@@ -81,6 +82,15 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
     }
   };
 
+  const handleManageSubscription = async () => {
+    try {
+      const sessionResult = await createCustomerPortalSession();
+      window.location.href = sessionResult.url;
+    } catch (err) {
+      console.error('Customer portal session creation failed:', err);
+    }
+  };
+
   const getCtaProps = () => {
     if (
       subscriptionInfo &&
@@ -88,12 +98,12 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
     ) {
       return {
         text: 'Current Plan',
-        action: undefined,
+        action: handleManageSubscription,
         icon: FaCheckCircle,
         asChild: false,
         href: undefined,
         variant: isHighlighted ? 'secondary' : 'outline', // Give current plan a distinct look
-        disabled: true,
+        disabled: false,
       };
     }
     switch (tier.actionType) {

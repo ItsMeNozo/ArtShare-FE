@@ -741,9 +741,9 @@ const UserButton: React.FC<{
           {unreadCount > 0 && (
             <span
               className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white"
-              style={{ minWidth: '1rem', lineHeight: '1rem' }}
+              style={{ minWidth: `${unreadCount >= 9 ? '1.4rem' : '1rem'}`, lineHeight: '1rem' }}
             >
-              {unreadCount > 9 ? '9+' : unreadCount}
+              {unreadCount >= 9 ? '9+' : unreadCount}
             </span>
           )}
         </Button>

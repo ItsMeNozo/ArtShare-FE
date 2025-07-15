@@ -126,26 +126,24 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
           </div>
         </div>
       )}
-      {width > 0 && (
-        <InfiniteScroll
-          data={galleryPhotos}
-          isLoading={isLoadingPosts}
-          isFetchingNextPage={isFetchingNextPage}
-          isError={isPostsError}
-          error={postsError}
-          hasNextPage={hasNextPage}
-          fetchNextPage={fetchNextPage}
-        >
-          <RowsPhotoAlbum
-            photos={galleryPhotos}
-            defaultContainerWidth={width}
-            spacing={8}
-            targetRowHeight={256}
-            rowConstraints={{ singleRowMaxHeight: 256 }}
-            render={{ image: ImageRenderer }}
-          />
-        </InfiniteScroll>
-      )}
+      <InfiniteScroll
+        data={galleryPhotos}
+        isLoading={isLoadingPosts}
+        isFetchingNextPage={isFetchingNextPage}
+        isError={isPostsError}
+        error={postsError}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
+      >
+        <RowsPhotoAlbum
+          photos={galleryPhotos}
+          defaultContainerWidth={width}
+          spacing={8}
+          targetRowHeight={256}
+          rowConstraints={{ singleRowMaxHeight: 256 }}
+          render={{ image: ImageRenderer }}
+        />
+      </InfiniteScroll>
     </Box>
   );
 };

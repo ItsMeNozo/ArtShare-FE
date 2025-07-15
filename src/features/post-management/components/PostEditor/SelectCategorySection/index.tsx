@@ -46,18 +46,19 @@ export default function SelectCategorySection({
     data: fetchedCategories,
     isLoading,
     isError,
-  }: UseQueryResult<Category[]> = useCategories({ page: 1, pageSize: 25 });
+  }: UseQueryResult<Category[]> = useCategories({});
 
   useEffect(() => {
     if (!fetchedCategories) return;
 
-    const subjects: SubjectType[] = fetchedCategories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description,
-      examples: cat.exampleImages,
-    }));
-
+    const subjects: SubjectType[] = fetchedCategories
+      .map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        description: cat.description,
+        examples: cat.exampleImages,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
     setAllSubjectsForDisplay(subjects);
   }, [fetchedCategories]);
 
