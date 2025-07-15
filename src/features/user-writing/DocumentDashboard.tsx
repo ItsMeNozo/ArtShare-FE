@@ -11,7 +11,10 @@ import { IoMdMore } from 'react-icons/io';
 import { IoBookOutline, IoFilter } from 'react-icons/io5';
 import { MdOutlineAdd } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
-import { fetchBlogsByUsername } from '../blog-details/api/blog';
+import {
+  BlogQueryParams,
+  fetchBlogsByUsername,
+} from '../blog-details/api/blog';
 import { CreateBlogPayload, createNewBlog } from './api/blog.api';
 import { BlogDeleteConfirmDialog } from './components/BlogDeleteConfirmDialog';
 import { useDeleteBlog } from './hooks/useDeleteBlog';
@@ -72,53 +75,38 @@ const DocumentDashboard = () => {
         return;
       }
 
+      // 1. Map frontend state to backend query params
+      const params: BlogQueryParams = {
+        take: 100,
+        skip: 0,
+        sortField: 'updatedAt', // Sort by the last updated date to match original logic
+        dateRange: 'all', // Default date range
+      };
+
+      switch (order) {
+        case 'latest':
+          params.sortBy = 'latest';
+          break;
+        case 'oldest':
+          params.sortBy = 'oldest';
+          break;
+        case 'last7days':
+          params.sortBy = 'latest';
+          params.dateRange = 'last7days';
+          break;
+        case 'last30days':
+          params.sortBy = 'latest';
+          params.dateRange = 'last30days';
+          break;
+      }
+
       try {
         setIsLoading(true);
-        // Fetch all blogs with pagination - increase take to get more results
-        const blogs = await fetchBlogsByUsername(user.username, {
-          take: 100,
-          skip: 0,
-        });
-        let processedBlogs = [...blogs]; // Create a mutable copy
+        // 2. Fetch data using the new params. The backend does the filtering and sorting.
+        const blogs = await fetchBlogsByUsername(user.username, params);
 
-        const now = new Date();
-
-        // Apply date range filtering for "last7days" or "last30days"
-        if (order === 'last7days' || order === 'last30days') {
-          processedBlogs = processedBlogs.filter((blog) => {
-            // Handle potential null updatedAt
-            if (!blog.updatedAt) return false;
-
-            const updatedAtDate = new Date(blog.updatedAt);
-            const diffInMilliseconds = now.getTime() - updatedAtDate.getTime();
-            const diffInDays = Math.floor(
-              diffInMilliseconds / (1000 * 60 * 60 * 24),
-            );
-
-            if (order === 'last7days') {
-              return diffInDays <= 7;
-            }
-            if (order === 'last30days') {
-              return diffInDays <= 30;
-            }
-            return true;
-          });
-        }
-
-        // Apply sorting based on updatedAt
-        processedBlogs.sort((a, b) => {
-          // IMPORTANT: Using a.updatedAt and b.updatedAt for sorting
-          const dateA = new Date(a.updatedAt || a.createdAt).getTime();
-          const dateB = new Date(b.updatedAt || b.createdAt).getTime();
-
-          if (order === 'oldest') {
-            return dateA - dateB; // Ascending for oldest update
-          }
-          // "latest", "last7days", "last30days" will sort by most recent update first
-          return dateB - dateA; // Descending for latest update
-        });
-
-        setUserBlogs(processedBlogs);
+        // 3. Set the state directly. No more client-side logic is needed here.
+        setUserBlogs(blogs);
         setError(null);
       } catch (err) {
         console.error('Error fetching user documents:', err);
@@ -282,40 +270,45 @@ const DocumentDashboard = () => {
                     disableScrollLock: true,
                     PaperProps: {
                       sx: {
-                        backgroundColor: 'var(--select-bg)',
-                        color: 'var(--select-text)',
+                        backgroundColor: 'var(--select-bg, white)',
+                        color: 'var(--select-text, #374151)',
+                        boxShadow: 3,
+                        borderRadius: 2,
+                        border: '1px solid var(--select-border, #d1d5db)',
+                        // Add backdrop filter for blur effect
+                        backdropFilter: 'blur(8px)',
                         '& .MuiMenuItem-root': {
-                          color: 'var(--select-text)',
+                          color: 'var(--select-text, #374151)',
                           '&:hover': {
-                            backgroundColor: 'var(--select-hover)',
+                            backgroundColor: 'var(--select-hover, #f3f4f6)',
                           },
                           '&.Mui-selected': {
-                            backgroundColor: 'var(--select-selected)',
+                            backgroundColor: 'var(--select-selected, #e0e7ff)',
                           },
                         },
                       },
                     },
                   }}
                   sx={{
-                    backgroundColor: 'var(--select-bg)',
-                    color: 'var(--select-text)',
+                    backgroundColor: 'var(--select-bg, white)',
+                    color: 'var(--select-text, #374151)',
                     '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--select-border)',
+                      borderColor: 'var(--select-border, #d1d5db)',
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--select-border-hover)',
+                      borderColor: 'var(--select-border-hover, #9ca3af)',
                     },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--select-border-focus)',
+                      borderColor: 'var(--select-border-focus, #6366f1)',
                     },
                     '& .MuiSelect-icon': {
-                      color: 'var(--select-text)',
+                      color: 'var(--select-text, #374151)',
                     },
                   }}
                   className="relative h-10 w-36 rounded-full pl-8"
                   style={
                     {
-                      '--select-bg': 'white',
+                      '--select-bg': 'rgba(255,255,255,0.98)',
                       '--select-text': '#374151',
                       '--select-border': '#d1d5db',
                       '--select-border-hover': '#9ca3af',
