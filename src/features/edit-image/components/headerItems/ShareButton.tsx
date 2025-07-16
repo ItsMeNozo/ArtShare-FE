@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { GoShare } from 'react-icons/go';
-import { useNavigate } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -18,7 +17,6 @@ type ShareButtonProps = {
 };
 
 const ShareButton: React.FC<ShareButtonProps> = ({ handleShare, hasChanges }) => {
-  const navigate = useNavigate();
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
@@ -28,8 +26,6 @@ const ShareButton: React.FC<ShareButtonProps> = ({ handleShare, hasChanges }) =>
           if (hasChanges) {
             e.preventDefault();
             setShowConfirm(true);
-          } else {
-            handleShare?.();
           }
         }}
         className="flex justify-center items-center space-x-2 bg-mountain-50/60 hover:bg-mountain-100/60 shadow-sm border border-mountain-200 rounded-lg w-32 h-10 font-medium text-mountain-950 text-sm cursor-pointer"
@@ -60,7 +56,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ handleShare, hasChanges }) =>
             <AlertDialogAction
               onClick={() => {
                 setShowConfirm(false);
-                navigate("/explore");
+                handleShare?.();
               }}
               className="bg-indigo-900 hover:bg-indigo-800 text-white"
             >
