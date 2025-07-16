@@ -524,7 +524,6 @@ const EditImage: React.FC = () => {
         </div>
       </button>
       <EditHeader
-        baseLayer={layers[0] as ImageLayer}
         finalCanvasSize={finalCanvasSize}
         hideTopBar={fullScreen}
         hasChanges={hasChanges}

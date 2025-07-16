@@ -46,7 +46,6 @@ import { Link, useLocation } from "react-router-dom";
 import { PiStarFourFill } from "react-icons/pi";
 
 interface EditHeaderProps {
-  baseLayer?: ImageLayer | undefined;
   hideTopBar?: boolean;
   hasChanges?: boolean;
   finalCanvasSize?: Canvas;
@@ -58,7 +57,6 @@ interface EditHeaderProps {
 }
 
 const EditHeader: React.FC<EditHeaderProps> = ({
-  baseLayer,
   finalCanvasSize,
   hasChanges,
   hideTopBar,
@@ -126,7 +124,7 @@ const EditHeader: React.FC<EditHeaderProps> = ({
     if (aspectRatio) {
       setAspectRatio(aspectRatio);
     }
-  }, [baseLayer]);
+  }, [finalCanvasSize, finalCanvasSize?.width, finalCanvasSize?.height]);
 
   return (
     <nav

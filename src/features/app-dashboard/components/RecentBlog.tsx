@@ -2,9 +2,9 @@
 import BlogItem from '@/components/lists/BlogItem';
 import { fetchBlogs } from '@/features/browse-blogs/api/fetch-blogs.api';
 import { Blog } from '@/types/blog'; // Adjust path
-import { CircularProgress } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const RecentBlog = () => {
   const blogAreaRef = useRef<HTMLDivElement>(null);
@@ -25,16 +25,28 @@ const RecentBlog = () => {
 
   if (isLoading) {
     return (
-      <div className="sidebar flex h-full w-full items-center justify-center space-x-4">
-        <CircularProgress size={36} />
-        <p>Loading...</p>
+      <div className="flex flex-col gap-y-4 space-y-6 px-4 py-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex space-x-4">
+            <Skeleton className="rounded-md w-48 h-28" />
+            <div className="flex flex-col flex-1 space-y-2">
+              <Skeleton className="w-3/4 h-5" />
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-5/6 h-4" />
+              <div className="flex space-x-2 mt-2">
+                <Skeleton className="rounded-full w-20 h-6" />
+                <Skeleton className="rounded-full w-14 h-6" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="sidebar flex h-full w-full items-center justify-center text-red-500">
+      <div className="flex justify-center items-center w-full h-full text-red-500 sidebar">
         <p>Error loading recent blogs: {(error as Error).message}</p>
       </div>
     );
@@ -42,7 +54,7 @@ const RecentBlog = () => {
 
   if (blogs.length === 0) {
     return (
-      <div className="sidebar flex h-full w-full items-center justify-center">
+      <div className="flex justify-center items-center w-full h-full sidebar">
         <p>No recent blogs found.</p>
       </div>
     );
@@ -50,9 +62,9 @@ const RecentBlog = () => {
 
   return (
     // Removed outer loading check as useQuery's isLoading handles it
-    <div className="flex h-fit overflow-hidden rounded-t-3xl pb-20">
-      <div className="relative flex h-full w-full flex-1 flex-col">
-        <div ref={blogAreaRef} className="flex flex-col space-y-6 gap-y-4 py-4">
+    <div className="flex pb-20 rounded-t-3xl h-fit overflow-hidden">
+      <div className="relative flex flex-col flex-1 w-full h-full">
+        <div ref={blogAreaRef} className="flex flex-col gap-y-4 space-y-6 py-4">
           {blogs.map((blog) => (
             <BlogItem
               key={blog.id}
