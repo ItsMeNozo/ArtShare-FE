@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { IoSparkles } from 'react-icons/io5';
-import { LuImageOff } from 'react-icons/lu';
 import {
   MAX_IMAGES,
   MAX_VIDEO,
@@ -346,7 +345,7 @@ export default function PostMediaManager({
                   justifyContent: 'center',
                   overflow: 'hidden',
                 }}
-                className="flex flex-col justify-center items-center bg-mountain-100 border border-gray-500 border-dashed rounded-lg w-full h-full"
+                className="flex flex-col justify-center items-center bg-mountain-100/80 border border-gray-500 border-dashed rounded-lg w-full h-full"
               >
                 {selectedPreviewMedia ? (
                   <MediaPreviewer media={selectedPreviewMedia} />
@@ -424,9 +423,6 @@ export default function PostMediaManager({
               Switch tabs, your changes will be removed. Are you sure?
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-center items-center bg-mountain-100 py-6">
-            <LuImageOff className="size-12 text-mountain-600" />
-          </div>
           <DialogFooter>
             <Button
               className="bg-mountain-100 hover:bg-mountain-100/80"
