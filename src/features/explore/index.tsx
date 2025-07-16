@@ -18,6 +18,7 @@ const Explore: React.FC = () => {
   const [isAi, setIsAi] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem('accessToken');
 
   const handlePhotoClick = (photoId: number) => {
     navigate(`/posts/${photoId}`);

@@ -27,7 +27,6 @@ const PostAssets = ({ medias }: { medias: MediaDto[] }) => {
                 <img
                   src={media.url}
                   alt={media.description || 'Post asset'}
-                  crossOrigin="anonymous"
                   className="max-w-full max-h-[80vh] md:max-h-full object-contain"
                 />
               </PhotoView>

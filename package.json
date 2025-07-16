@@ -93,7 +93,6 @@
     "@types/lodash": "^4.17.20",
     "@types/react-show-more-text": "^1.4.5",
     "@vercel/speed-insights": "^1.2.0",
-    "@uiw/react-color": "^2.6.0",
     "art-share": "file:",
     "axios": "^1.8.4",
     "boring-avatars": "^1.11.2",
