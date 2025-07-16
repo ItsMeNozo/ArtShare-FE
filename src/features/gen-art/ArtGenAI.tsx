@@ -243,7 +243,6 @@ const ArtGenAI = () => {
               </div>
             )}
           </div>
-          <div className="bottom-0 z-0 absolute flex bg-white blur-3xl w-full h-40" />
         </div>
         {/* Prompt Chat */}
         <div

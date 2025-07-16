@@ -1,26 +1,36 @@
 import { useNavigate } from 'react-router-dom';
 import EditHeader from './components/EditHeader'
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Typography } from '@mui/material';
 import { BsCardImage } from 'react-icons/bs';
-import { Plus } from 'lucide-react';
+import { Plus, RectangleHorizontal, RectangleVertical, Square } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Sketch } from '@uiw/react-color';
 import { Label } from '@/components/ui/label';
 import { RiImageCircleAiLine } from 'react-icons/ri';
 import { MdAspectRatio, MdOutlinePhotoSizeSelectActual } from 'react-icons/md';
 
 const BrowseImage = () => {
   const navigate = useNavigate();
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const [color, setColor] = useState('#ffffff');
+  const [openColorSettings, setOpenColorSettings] = useState(false);
 
   const canvasSizeOptions = [
     {
       label: "1:1",
+      icon: Square,
       value: "1:1",
       sizes: [
         { label: "Small (512 x 512)", width: 512, height: 512 },
@@ -31,6 +41,7 @@ const BrowseImage = () => {
     {
       label: "16:9",
       value: "16:9",
+      icon: RectangleHorizontal,
       sizes: [
         { label: "Small (640 x 360)", width: 640, height: 360 },
         { label: "Medium (1280 x 720)", width: 1280, height: 720 },
@@ -40,6 +51,7 @@ const BrowseImage = () => {
     {
       label: "4:3",
       value: "4:3",
+      icon: RectangleVertical,
       sizes: [
         { label: "Small (800 x 600)", width: 800, height: 600 },
         { label: "Medium (1024 x 768)", width: 1024, height: 768 },
@@ -49,6 +61,7 @@ const BrowseImage = () => {
     {
       label: "3:4",
       value: "3:4",
+      icon: RectangleHorizontal,
       sizes: [
         { label: "Small (600 x 800)", width: 600, height: 800 },
         { label: "Medium (768 x 1024)", width: 768, height: 1024 },
@@ -81,11 +94,26 @@ const BrowseImage = () => {
             width: selectedCanvasSize.width,
             height: selectedCanvasSize.height,
           },
-          editCanvas: editCanvas
+          editCanvas: editCanvas,
+          color: color
         },
       });
     }
   };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setOpenColorSettings(false);
+      }
+    }
+    if (openColorSettings) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openColorSettings]);
 
   return (
     <div className="group relative flex flex-col w-full h-full">
@@ -122,22 +150,27 @@ const BrowseImage = () => {
                 </p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-1/2 h-12">
+                    <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12">
                       {selectedRatio.label}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="border-mountain-200 w-64">
-                    {canvasSizeOptions.map((ratio) => (
-                      <DropdownMenuItem
-                        key={ratio.value}
-                        onClick={() => {
-                          setSelectedRatio(ratio);
-                          setSelectedCanvasSize(ratio.sizes[1]);
-                        }}
-                      >
-                        {ratio.label}
-                      </DropdownMenuItem>
-                    ))}
+                  <DropdownMenuContent className="border-mountain-200 w-48">
+                    {canvasSizeOptions.map((ratio) => {
+                      const Icon = ratio.icon;
+                      return (
+                        <DropdownMenuItem
+                          key={ratio.value}
+                          onClick={() => {
+                            setSelectedRatio(ratio);
+                            setSelectedCanvasSize(ratio.sizes[1]);
+                          }}
+                          className="flex items-center space-x-2"
+                        >
+                          {Icon && <Icon className="size-4 text-muted-foreground" />}
+                          <span>{ratio.label}</span>
+                        </DropdownMenuItem>
+                      );
+                    })}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -151,11 +184,11 @@ const BrowseImage = () => {
                 </p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-1/2 h-12">
+                    <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12">
                       {selectedCanvasSize.label}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="border-mountain-200 w-64">
+                  <DropdownMenuContent className="border-mountain-200 w-48">
                     {selectedRatio.sizes.map((size) => (
                       <DropdownMenuItem
                         key={size.label}
@@ -169,10 +202,33 @@ const BrowseImage = () => {
               </div>
               <div className='flex justify-between items-center w-full'>
                 <p>Background Color</p>
-                <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-1/2 h-12">
-                  <div className='bg-white shadow-md border border-mountain-200 w-6 h-6' />
-                  <span>ffffff</span>
-                </Button>
+                <Popover open={openColorSettings} onOpenChange={setOpenColorSettings}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
+                    >
+                      <div
+                        className="shadow-md border border-mountain-200 rounded w-6 h-6"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="ml-2">{color.replace('#', '')}</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="ml-4 p-2 border-mountain-200 w-auto" side='right'>
+                    <div className="flex flex-col">
+                      <div className="mb-2 font-medium text-mountain-950 text-sm">
+                        🎨 Pick a color
+                      </div>
+                      <Sketch
+                        color={color}
+                        onChange={(colorResult) => {
+                          setColor(colorResult.hex);
+                        }}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
           </div>

@@ -31,7 +31,7 @@ const EditImage: React.FC = () => {
   //Handle getting images
   const location = useLocation();
   const navigate = useNavigate();
-  const { imageUrl, name, canvas, editCanvas } = location.state || {};
+  const { imageUrl, name, canvas, editCanvas, color } = location.state || {};
 
   //Toolbar
   const [fullScreen, setFullScreen] = useState(false);
@@ -90,7 +90,7 @@ const EditImage: React.FC = () => {
       saturation: saturation,
       hue: hue,
       sepia: sepia,
-      backgroundColor: "#ffffff",
+      backgroundColor: color || '#ffffff',
       height: canvasSize.height,
       width: canvasSize.width,
       zIndex: 0,
@@ -108,7 +108,7 @@ const EditImage: React.FC = () => {
       base.type === "image" &&
       base.src === "" &&
       base.zIndex === 0 &&
-      base.backgroundColor === "#ffffff";
+      base.backgroundColor === color || '#ffffff';
     setHasChanges(!isBase);
   }, [layers]);
 
@@ -137,7 +137,7 @@ const EditImage: React.FC = () => {
       saturation: saturation,
       hue: hue,
       sepia: sepia,
-      backgroundColor: "#ffffff",
+      backgroundColor: color || '#ffffff',
       height: canvasSize.height,
       width: canvasSize.width,
       zIndex: 0,
@@ -171,7 +171,7 @@ const EditImage: React.FC = () => {
       saturation: saturation,
       hue: hue,
       sepia: sepia,
-      backgroundColor: "#ffffff",
+      backgroundColor: color || '#ffffff',
       height: newEdit.canvas.height,
       width: newEdit.canvas.width,
       zIndex: 0,
