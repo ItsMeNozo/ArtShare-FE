@@ -62,6 +62,7 @@ export const useTextStyleHandlers = ({
       width: maxWidth,
       height: maxHeight,
       zIndex: globalZIndex,
+      isLocked: false,
     };
 
     setGlobalZIndex(globalZIndex + 1);

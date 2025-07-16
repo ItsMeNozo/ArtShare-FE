@@ -92,6 +92,7 @@
     "@tiptap/starter-kit": "^2.11.9",
     "@types/lodash": "^4.17.20",
     "@types/react-show-more-text": "^1.4.5",
+    "@uiw/react-color": "^2.7.1",
     "@vercel/speed-insights": "^1.2.0",
     "art-share": "file:",
     "axios": "^1.8.4",
