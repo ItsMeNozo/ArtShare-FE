@@ -3,12 +3,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { Blog } from '@/types/blog';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  useBeforeUnload,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchBlogDetails } from '../blog-details/api/blog';
 import {
   CreateBlogPayload,
@@ -72,7 +67,6 @@ const WriteBlog = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Memoize search params to prevent recreation
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search],
@@ -84,15 +78,6 @@ const WriteBlog = () => {
   const [isApiLoading, setIsApiLoading] = useState(!isNewDocument);
   const [isContentLoadedIntoEditor, setIsContentLoadedIntoEditor] =
     useState(isNewDocument);
-  const [initialFetchedContent, setInitialFetchedContent] = useState<
-    string | null
-  >(
-    isNewDocument
-      ? templateType === 'tutorial'
-        ? TUTORIAL_TEMPLATE_HTML
-        : ''
-      : null,
-  );
   const [isPublished, setIsPublished] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -110,47 +95,24 @@ const WriteBlog = () => {
     null,
   );
 
-  // Memoize content checking function
   const hasContentToSave = useCallback(() => {
     const content = editorRef.current?.getContent() || '';
     const textContent = content.replace(/<[^>]*>/g, '').trim();
     return textContent.length > 0;
   }, []);
 
-  // Memoize beforeunload callback
-  const beforeUnloadCallback = useCallback(
-    (event: BeforeUnloadEvent) => {
-      if (isNewDocument && hasContentToSave()) {
-        event.preventDefault();
-        return (event.returnValue =
-          'You have unsaved changes. Are you sure you want to leave?');
-      }
-      if (!isNewDocument && hasUnsavedChanges) {
-        event.preventDefault();
-        return (event.returnValue =
-          'You have unsaved changes. Are you sure you want to leave?');
-      }
-    },
-    [isNewDocument, hasContentToSave, hasUnsavedChanges],
-  );
-
-  // Debounce timer ref for new doc creation
   const createDocDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Memoize editor change handler with debounce for new doc creation
   const handleEditorChange = useCallback(() => {
     const hasContent = hasContentToSave();
     setHasContentForCreation(hasContent);
 
     if (isNewDocument && !createdDocId && !isCreating && hasContent) {
-      // Debounce the creation API call
       if (createDocDebounceRef.current) {
         clearTimeout(createDocDebounceRef.current);
       }
       createDocDebounceRef.current = setTimeout(async () => {
-        // Double-check state before creating
         if (!createdDocId && !isCreating) {
-          // Lock creation
           setIsCreating(true);
           try {
             const payload: CreateBlogPayload = {
@@ -164,8 +126,6 @@ const WriteBlog = () => {
               replace: true,
               state: { preserveContent: true },
             });
-            // Do NOT clear or reset editor content while waiting for backend
-            // Fetch the blog from backend to ensure content is in sync, but only update if different
             try {
               const fetchedBlog = await fetchBlogDetails(newBlog.id);
               setBlogTitle(fetchedBlog.title || 'Untitled Document');
@@ -175,13 +135,11 @@ const WriteBlog = () => {
                 typeof fetchedBlog.content === 'string'
               ) {
                 const currentContent = editorRef.current.getContent() || '';
-                // Only update if backend content is different from what user typed
                 if (fetchedBlog.content !== currentContent) {
                   editorRef.current.setContent(fetchedBlog.content);
                 }
               }
             } catch (fetchError) {
-              // If fetch fails, keep local content
               console.error('Failed to fetch blog after creation:', fetchError);
             }
             setHasUnsavedChanges(false);
@@ -194,7 +152,7 @@ const WriteBlog = () => {
             setIsCreating(false);
           }
         }
-      }, 500); // 500ms debounce
+      }, 500);
       return;
     }
 
@@ -212,7 +170,6 @@ const WriteBlog = () => {
     hasContentToSave,
   ]);
 
-  // Memoize title change handler
   const handleTitleChange = useCallback(
     (newTitle: string) => {
       setBlogTitle(newTitle);
@@ -223,7 +180,6 @@ const WriteBlog = () => {
     [isNewDocument, blogId],
   );
 
-  // Memoize navigation handlers
   const handleConfirmNavigation = useCallback(() => {
     if (pendingNavigation) {
       navigate(pendingNavigation);
@@ -237,23 +193,18 @@ const WriteBlog = () => {
     setPendingNavigation(null);
   }, []);
 
-  // Memoize export handler
   const handleExportDocument = useCallback(async () => {
     if (!editorRef.current || !blogId) return;
-
     const link = `http://localhost:5173/blogs/${blogId}`;
     try {
       await navigator.clipboard.writeText(link);
       setTooltipOpen(true);
-      setTimeout(() => {
-        setTooltipOpen(false);
-      }, 1500);
+      setTimeout(() => setTooltipOpen(false), 1500);
     } catch (err) {
       console.error('Failed to copy!', err);
     }
   }, [blogId]);
 
-  // Memoize save handler
   const handleSaveBlog = useCallback(
     async (currentTitle: string) => {
       if (!editorRef.current || !blogId) return;
@@ -294,15 +245,11 @@ const WriteBlog = () => {
     [blogId, navigate, showSnackbar],
   );
 
-  // MOVE ALL USEMEMO CALLS HERE - BEFORE ANY CONDITIONAL LOGIC OR EARLY RETURNS
-
-  // Memoize status component
   const statusComponent = useMemo(
     () => <AutoSaveStatus status={saveStatus} lastSaved={lastSaved} />,
     [saveStatus, lastSaved],
   );
 
-  // Memoize loading component
   const loadingComponent = useMemo(
     () => (
       <div className="dark:bg-mountain-950 flex h-screen w-full items-center justify-center bg-white">
@@ -317,7 +264,6 @@ const WriteBlog = () => {
     [],
   );
 
-  // Memoize status indicator
   const statusIndicator = useMemo(() => {
     if (!isNewDocument || createdDocId) return null;
 
@@ -341,20 +287,12 @@ const WriteBlog = () => {
     );
   }, [isNewDocument, createdDocId, isCreating]);
 
-  // Browser beforeunload warning
-  useBeforeUnload(beforeUnloadCallback);
-
-  // Auto-save effect for existing documents
   useEffect(() => {
-    // Skip auto-save if we just created this document and are transitioning
     if (isCreating || (createdDocId && blogId === createdDocId.toString())) {
       return;
     }
-
     if (!hasUnsavedChanges || !blogId || blogId === 'new') return;
-
     setSaveStatus('unsaved');
-
     const autoSaveTimer = setTimeout(async () => {
       const content = editorRef.current?.getContent();
       if (content && blogId !== 'new') {
@@ -368,91 +306,66 @@ const WriteBlog = () => {
           setHasUnsavedChanges(false);
           setSaveStatus('saved');
           setLastSaved(new Date());
-          console.log('Auto-saved successfully');
         } catch (error) {
           console.error('Auto-save failed:', error);
           setSaveStatus('error');
         }
       }
     }, 5000);
-
     return () => clearTimeout(autoSaveTimer);
   }, [hasUnsavedChanges, blogId, blogTitle, isCreating, createdDocId]);
 
-  // Navigation guard for programmatic navigation
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (isNewDocument && hasContentForCreation) {
-        event.preventDefault();
-        event.returnValue = '';
-      }
-      if (!isNewDocument && hasUnsavedChanges) {
+      if (
+        (isNewDocument && hasContentForCreation) ||
+        (!isNewDocument && hasUnsavedChanges)
+      ) {
         event.preventDefault();
         event.returnValue = '';
       }
     };
-
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isNewDocument, hasContentForCreation, hasUnsavedChanges]);
 
-  // Load existing document
   useEffect(() => {
-    if (isNewDocument) {
-      setIsApiLoading(false);
-      if (editorRef.current) {
+    const loadBlog = async () => {
+      if (isNewDocument) {
+        setIsApiLoading(false);
         const content =
           templateType === 'tutorial' ? TUTORIAL_TEMPLATE_HTML : '';
-        editorRef.current.setContent(content);
-        requestAnimationFrame(() => {
-          editorRef.current?.focus();
-        });
+        if (editorRef.current && !editorRef.current.getContent()) {
+          editorRef.current.setContent(content);
+        }
+        setIsContentLoadedIntoEditor(true);
+        return;
       }
-      return;
-    }
-
-    // Skip the entire effect if we just created this document - we already have the data and content loaded
-    if (createdDocId && blogId === createdDocId.toString()) {
-      // Only set state, do NOT reset editor content
-      setIsApiLoading(false);
-      setIsContentLoadedIntoEditor(true);
-      return;
-    }
-
-    if (!blogId) {
-      showSnackbar('No blog ID provided.', 'error');
-      navigate('/blogs', { replace: true });
-      return;
-    }
-
-    setIsApiLoading(true);
-    setIsContentLoadedIntoEditor(false);
-    setInitialFetchedContent(null);
-    const numericBlogId = parseInt(blogId, 10);
-
-    if (isNaN(numericBlogId)) {
-      showSnackbar('Invalid blog ID format.', 'error');
-      navigate('/blogs', { replace: true });
-      setIsApiLoading(false);
-      return;
-    }
-
-    fetchBlogDetails(numericBlogId)
-      .then((fetchedBlog: Blog) => {
+      if (!blogId || (createdDocId && blogId === createdDocId.toString())) {
+        setIsApiLoading(false);
+        setIsContentLoadedIntoEditor(true);
+        return;
+      }
+      const numericBlogId = parseInt(blogId, 10);
+      if (isNaN(numericBlogId)) {
+        showSnackbar('Invalid blog ID format.', 'error');
+        navigate('/blogs', { replace: true });
+        return;
+      }
+      setIsApiLoading(true);
+      try {
+        const fetchedBlog = await fetchBlogDetails(numericBlogId);
         setBlogTitle(fetchedBlog.title || 'Untitled Document');
         setIsPublished(fetchedBlog.isPublished || false);
         const contentToSet = fetchedBlog.content || '';
-        setInitialFetchedContent(contentToSet);
-
-        if (editorRef.current) {
+        if (
+          editorRef.current &&
+          editorRef.current.getContent() !== contentToSet
+        ) {
           editorRef.current.setContent(contentToSet);
-          setIsContentLoadedIntoEditor(true);
-          requestAnimationFrame(() => {
-            editorRef.current?.focus();
-          });
         }
-      })
-      .catch((error: unknown) => {
+        setIsContentLoadedIntoEditor(true);
+      } catch (error) {
         console.error('Error fetching blog content:', error);
         let errorMessage = 'Failed to load blog content.';
         if (error instanceof AxiosError) {
@@ -462,10 +375,11 @@ const WriteBlog = () => {
         }
         showSnackbar(errorMessage, 'error');
         navigate('/blogs', { replace: true });
-      })
-      .finally(() => {
+      } finally {
         setIsApiLoading(false);
-      });
+      }
+    };
+    loadBlog();
   }, [
     blogId,
     navigate,
@@ -475,53 +389,16 @@ const WriteBlog = () => {
     createdDocId,
   ]);
 
-  // Content loading effect
   useEffect(() => {
-    if (
-      !isApiLoading &&
-      editorRef.current &&
-      initialFetchedContent !== null &&
-      !isContentLoadedIntoEditor
-    ) {
-      const currentContent = editorRef.current.getContent() || '';
-      // For new documents, never set content to '' if user has typed anything
-      if (isNewDocument) {
-        if (initialFetchedContent && initialFetchedContent !== currentContent) {
-          editorRef.current.setContent(initialFetchedContent);
-        }
-        // If initialFetchedContent is '', do NOT set (never clear user input)
-      } else {
-        // For existing docs, only set if backend content is different
-        if (initialFetchedContent !== currentContent) {
-          editorRef.current.setContent(initialFetchedContent);
-        }
-      }
-      setIsContentLoadedIntoEditor(true);
-      requestAnimationFrame(() => {
-        editorRef.current?.focus();
-      });
-    }
-  }, [
-    isApiLoading,
-    initialFetchedContent,
-    isContentLoadedIntoEditor,
-    isNewDocument,
-  ]);
-
-  // Optimized focus effect - reduced number of attempts
-  useEffect(() => {
-    if (isContentLoadedIntoEditor && editorRef.current && !isApiLoading) {
-      // Single focus attempt after content is loaded
+    if (isContentLoadedIntoEditor && !isApiLoading && editorRef.current) {
       const timeoutId = setTimeout(() => {
         editorRef.current?.focus();
       }, 100);
-
       return () => clearTimeout(timeoutId);
     }
   }, [isContentLoadedIntoEditor, isApiLoading]);
 
-  // NOW THE EARLY RETURN CAN HAPPEN AFTER ALL HOOKS ARE CALLED
-  if (isApiLoading) {
+  if (isApiLoading && !isContentLoadedIntoEditor) {
     return loadingComponent;
   }
 
@@ -542,7 +419,6 @@ const WriteBlog = () => {
             <Toolbar />
             <div className="dark:print:bg-mountain-950 sidebar fixed h-screen w-full overflow-x-hidden pb-20 print:bg-white print:p-0">
               {statusIndicator}
-
               <div className="mx-auto mt-6 flex min-h-[1123px] w-[794px] min-w-max overflow-y-hidden py-4 pb-20 print:w-full print:py-0">
                 <Editor ref={editorRef} onChange={handleEditorChange} />
               </div>
@@ -550,7 +426,6 @@ const WriteBlog = () => {
           </div>
         </div>
       </div>
-
       <UnsavedChangesDialog
         open={showExitDialog}
         onConfirm={handleConfirmNavigation}
