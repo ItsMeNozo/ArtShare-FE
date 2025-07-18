@@ -20,6 +20,14 @@ import { useDeleteBlog } from './hooks/useDeleteBlog';
 // Define a type for the sort order
 type BlogSortOrder = 'latest' | 'oldest' | 'last7days' | 'last30days';
 
+// Enhanced menu state to handle right-click positioning
+interface MenuState {
+  anchorEl: null | HTMLElement;
+  currentBlogId: null | number;
+  anchorPosition?: { top: number; left: number };
+  isRightClick?: boolean;
+}
+
 // Move helper functions outside component to prevent recreation
 const getThumbnail = (blog: Blog): string => {
   if (Array.isArray(blog.pictures) && blog.pictures[0]) {
@@ -49,8 +57,7 @@ const BlogItem = React.memo(
     blog,
     onDocumentClick,
     onMenuClick,
-    onEditClick,
-    onDeleteClick,
+    onContextMenu,
     menuState,
   }: {
     blog: Blog;
@@ -59,28 +66,38 @@ const BlogItem = React.memo(
       event: React.MouseEvent<HTMLButtonElement>,
       id: number,
     ) => void;
-    onEditClick: (id: number) => void;
-    onDeleteClick: (id: number) => void;
-    menuState: { anchorEl: null | HTMLElement; currentBlogId: null | number };
+    onContextMenu: (
+      event: React.MouseEvent<HTMLDivElement>,
+      id: number,
+    ) => void;
+    menuState: MenuState;
   }) => {
-    const handleClick = useCallback(() => {
-      onDocumentClick(blog.id);
-    }, [blog.id, onDocumentClick]);
+    const handleClick = useCallback(
+      (_event: React.MouseEvent<HTMLDivElement>) => {
+        // Close menu if clicking on document while menu is open
+        if (menuState.anchorEl && menuState.currentBlogId === blog.id) {
+          return;
+        }
+        onDocumentClick(blog.id);
+      },
+      [blog.id, onDocumentClick, menuState.anchorEl, menuState.currentBlogId],
+    );
+
+    const handleContextMenu = useCallback(
+      (event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        onContextMenu(event, blog.id);
+      },
+      [blog.id, onContextMenu],
+    );
 
     const handleMenuClick = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         onMenuClick(event, blog.id);
       },
       [blog.id, onMenuClick],
     );
-
-    const handleEditClick = useCallback(() => {
-      onEditClick(blog.id);
-    }, [blog.id, onEditClick]);
-
-    const handleDeleteClick = useCallback(() => {
-      onDeleteClick(blog.id);
-    }, [blog.id, onDeleteClick]);
 
     const handleImageError = useCallback(
       (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -93,6 +110,7 @@ const BlogItem = React.memo(
       <div
         className="dark:bg-mountain-800 border-mountain-200 dark:border-mountain-600 flex cursor-pointer flex-col items-center justify-center space-y-4 rounded-lg border bg-white pb-2 transition-all duration-200 hover:scale-105 hover:border-indigo-600 hover:shadow-lg dark:hover:border-indigo-400"
         onClick={handleClick}
+        onContextMenu={handleContextMenu}
       >
         {/* Document Thumbnail */}
         <div className="bg-mountain-50 dark:bg-mountain-700 border-mountain-50 dark:border-mountain-600 flex aspect-square w-full items-center justify-center overflow-hidden rounded-t-lg border">
@@ -123,39 +141,6 @@ const BlogItem = React.memo(
             >
               <IoMdMore className="size-5" />
             </IconButton>
-            <Menu
-              anchorEl={menuState.anchorEl}
-              open={
-                menuState.currentBlogId === blog.id &&
-                Boolean(menuState.anchorEl)
-              }
-              onClose={() => {}} // Will be handled by parent
-              onClick={(e) => e.stopPropagation()}
-              PaperProps={{
-                sx: {
-                  backgroundColor: 'var(--menu-bg)',
-                  color: 'var(--menu-text)',
-                  border: '1px solid var(--menu-border)',
-                  '& .MuiMenuItem-root': {
-                    color: 'var(--menu-text)',
-                    '&:hover': {
-                      backgroundColor: 'var(--menu-hover)',
-                    },
-                  },
-                },
-              }}
-              style={
-                {
-                  '--menu-bg': 'white',
-                  '--menu-text': '#374151',
-                  '--menu-border': '#d1d5db',
-                  '--menu-hover': '#f3f4f6',
-                } as React.CSSProperties
-              }
-            >
-              <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-              <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
-            </Menu>
           </div>
         </div>
       </div>
@@ -175,10 +160,10 @@ const DocumentDashboard = () => {
   const { showSnackbar } = useSnackbar();
   const { user } = useUser();
 
-  const [menuState, setMenuState] = useState<{
-    anchorEl: null | HTMLElement;
-    currentBlogId: null | number;
-  }>({ anchorEl: null, currentBlogId: null });
+  const [menuState, setMenuState] = useState<MenuState>({
+    anchorEl: null,
+    currentBlogId: null,
+  });
 
   const [deleteConfirmState, setDeleteConfirmState] = useState<{
     open: boolean;
@@ -218,7 +203,12 @@ const DocumentDashboard = () => {
   const handleDocumentClick = useCallback(
     (blogId: number) => {
       if (menuState.anchorEl && menuState.currentBlogId === blogId) {
-        setMenuState({ anchorEl: null, currentBlogId: null });
+        setMenuState({
+          anchorEl: null,
+          currentBlogId: null,
+          anchorPosition: undefined,
+          isRightClick: false,
+        });
         return;
       }
       navigate(`/docs/${blogId}`);
@@ -229,13 +219,40 @@ const DocumentDashboard = () => {
   const handleMenuClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>, blogId: number) => {
       event.stopPropagation();
-      setMenuState({ anchorEl: event.currentTarget, currentBlogId: blogId });
+      setMenuState({
+        anchorEl: event.currentTarget,
+        currentBlogId: blogId,
+        anchorPosition: undefined,
+        isRightClick: false,
+      });
+    },
+    [],
+  );
+
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>, blogId: number) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setMenuState({
+        anchorEl: null,
+        currentBlogId: blogId,
+        anchorPosition: {
+          top: event.clientY,
+          left: event.clientX,
+        },
+        isRightClick: true,
+      });
     },
     [],
   );
 
   const handleMenuClose = useCallback(() => {
-    setMenuState({ anchorEl: null, currentBlogId: null });
+    setMenuState({
+      anchorEl: null,
+      currentBlogId: null,
+      anchorPosition: undefined,
+      isRightClick: false,
+    });
   }, []);
 
   const handleEditMenuClick = useCallback(
@@ -539,13 +556,75 @@ const DocumentDashboard = () => {
                       blog={blog}
                       onDocumentClick={handleDocumentClick}
                       onMenuClick={handleMenuClick}
-                      onEditClick={handleEditMenuClick}
-                      onDeleteClick={handleDeleteMenuClick}
+                      onContextMenu={handleContextMenu}
                       menuState={menuState}
                     />
                   ))}
         </div>
       </div>
+
+      {/* Context Menu */}
+      <Menu
+        anchorEl={menuState.anchorEl}
+        open={Boolean(menuState.anchorEl) || Boolean(menuState.anchorPosition)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        // Use anchorPosition for right-click menu positioning
+        anchorPosition={menuState.anchorPosition}
+        anchorReference={menuState.isRightClick ? 'anchorPosition' : 'anchorEl'}
+        PaperProps={{
+          sx: {
+            backgroundColor: 'var(--menu-bg)',
+            color: 'var(--menu-text)',
+            border: '1px solid var(--menu-border)',
+            minWidth: 120,
+            boxShadow: 3,
+            borderRadius: 2,
+            '& .MuiMenuItem-root': {
+              color: 'var(--menu-text)',
+              fontSize: '0.875rem',
+              padding: '8px 16px',
+              '&:hover': {
+                backgroundColor: 'var(--menu-hover)',
+              },
+            },
+          },
+        }}
+        style={
+          {
+            '--menu-bg': 'white',
+            '--menu-text': '#374151',
+            '--menu-border': '#d1d5db',
+            '--menu-hover': '#f3f4f6',
+          } as React.CSSProperties
+        }
+      >
+        <MenuItem
+          onClick={() => {
+            if (menuState.currentBlogId) {
+              handleEditMenuClick(menuState.currentBlogId);
+            }
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (menuState.currentBlogId) {
+              handleDeleteMenuClick(menuState.currentBlogId);
+            }
+          }}
+        >
+          Delete
+        </MenuItem>
+      </Menu>
 
       {/* Dark mode styles for MUI components */}
       <style>{`
