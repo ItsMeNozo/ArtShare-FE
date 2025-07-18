@@ -16,7 +16,47 @@ import Editor, { EditorHandle } from './components/Editor';
 import TextEditorHeader from './components/TextEditorHeader';
 import Toolbar from './components/Toolbar';
 
-// Move dialog component outside to prevent recreation on every render
+// Enhanced AutoSaveStatus component that handles new document state
+const EnhancedAutoSaveStatus = ({
+  status,
+  lastSaved,
+  isNewDocument,
+  createdDocId,
+  isCreating,
+  hasContent,
+}: {
+  status: 'saved' | 'saving' | 'unsaved' | 'error';
+  lastSaved?: Date;
+  isNewDocument: boolean;
+  createdDocId: number | null;
+  isCreating: boolean;
+  hasContent: boolean;
+}) => {
+  // For new documents that haven't been created yet
+  if (isNewDocument && !createdDocId) {
+    if (isCreating) {
+      return (
+        <div className="flex items-center space-x-2 text-sm text-blue-600 dark:text-blue-400">
+          <div className="h-3 w-3 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          <span>Creating document...</span>
+        </div>
+      );
+    }
+
+    if (!hasContent) {
+      return (
+        <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+          <div className="h-2 w-2 rounded-full bg-gray-400"></div>
+          <span>Start typing to create document</span>
+        </div>
+      );
+    }
+  }
+
+  // For existing documents or created documents, use the original AutoSaveStatus
+  return <AutoSaveStatus status={status} lastSaved={lastSaved} />;
+};
+
 const UnsavedChangesDialog = ({
   open,
   onConfirm,
@@ -102,6 +142,7 @@ const WriteBlog = () => {
   }, []);
 
   const createDocDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const titleSaveDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleEditorChange = useCallback(() => {
     const hasContent = hasContentToSave();
@@ -171,10 +212,40 @@ const WriteBlog = () => {
   ]);
 
   const handleTitleChange = useCallback(
-    (newTitle: string) => {
+    async (newTitle: string) => {
       setBlogTitle(newTitle);
-      if (!isNewDocument && blogId !== 'new') {
-        setHasUnsavedChanges(true);
+
+      // For existing documents, save title with short debounce (like Google Docs)
+      if (!isNewDocument && blogId !== 'new' && blogId) {
+        const numericBlogId = parseInt(blogId, 10);
+        if (!isNaN(numericBlogId)) {
+          // Clear previous debounce
+          if (titleSaveDebounceRef.current) {
+            clearTimeout(titleSaveDebounceRef.current);
+          }
+
+          // Set unsaved state immediately for visual feedback
+          setHasUnsavedChanges(true);
+          setSaveStatus('unsaved');
+
+          // Debounce the actual save for 800ms (faster than content auto-save)
+          titleSaveDebounceRef.current = setTimeout(async () => {
+            setSaveStatus('saving');
+            try {
+              await updateExistingBlog(numericBlogId, {
+                title: newTitle.trim() || 'Untitled Document',
+                isPublished: false,
+              });
+              setSaveStatus('saved');
+              setLastSaved(new Date());
+              setHasUnsavedChanges(false);
+            } catch (error) {
+              console.error('Failed to save title:', error);
+              setSaveStatus('error');
+              setHasUnsavedChanges(true);
+            }
+          }, 800);
+        }
       }
     },
     [isNewDocument, blogId],
@@ -246,8 +317,24 @@ const WriteBlog = () => {
   );
 
   const statusComponent = useMemo(
-    () => <AutoSaveStatus status={saveStatus} lastSaved={lastSaved} />,
-    [saveStatus, lastSaved],
+    () => (
+      <EnhancedAutoSaveStatus
+        status={saveStatus}
+        lastSaved={lastSaved}
+        isNewDocument={isNewDocument}
+        createdDocId={createdDocId}
+        isCreating={isCreating}
+        hasContent={hasContentForCreation}
+      />
+    ),
+    [
+      saveStatus,
+      lastSaved,
+      isNewDocument,
+      createdDocId,
+      isCreating,
+      hasContentForCreation,
+    ],
   );
 
   const loadingComponent = useMemo(
@@ -264,28 +351,13 @@ const WriteBlog = () => {
     [],
   );
 
-  const statusIndicator = useMemo(() => {
-    if (!isNewDocument || createdDocId) return null;
-
-    return (
-      <div className="mx-auto mt-2 mb-4 w-[794px] border-l-4 border-blue-400 bg-blue-50 p-3 dark:bg-blue-900/20">
-        <div className="flex items-center">
-          <div className="ml-3">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              {isCreating ? (
-                <span className="flex items-center">
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-blue-500"></div>
-                  Creating document...
-                </span>
-              ) : (
-                'Start typing to create your document'
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }, [isNewDocument, createdDocId, isCreating]);
+  useEffect(() => {
+    return () => {
+      if (titleSaveDebounceRef.current) {
+        clearTimeout(titleSaveDebounceRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isCreating || (createdDocId && blogId === createdDocId.toString())) {
@@ -311,8 +383,13 @@ const WriteBlog = () => {
           setSaveStatus('error');
         }
       }
-    }, 5000);
-    return () => clearTimeout(autoSaveTimer);
+    }, 2000);
+    return () => {
+      clearTimeout(autoSaveTimer);
+      if (titleSaveDebounceRef.current) {
+        clearTimeout(titleSaveDebounceRef.current);
+      }
+    };
   }, [hasUnsavedChanges, blogId, blogTitle, isCreating, createdDocId]);
 
   useEffect(() => {
@@ -418,7 +495,6 @@ const WriteBlog = () => {
           <div className="bg-mountain-50 dark:bg-mountain-900 border-l-mountain-100 dark:border-l-mountain-700 h-full w-full border-l-1">
             <Toolbar />
             <div className="dark:print:bg-mountain-950 sidebar fixed h-screen w-full overflow-x-hidden pb-20 print:bg-white print:p-0">
-              {statusIndicator}
               <div className="mx-auto mt-6 flex min-h-[1123px] w-[794px] min-w-max overflow-y-hidden py-4 pb-20 print:w-full print:py-0">
                 <Editor ref={editorRef} onChange={handleEditorChange} />
               </div>
