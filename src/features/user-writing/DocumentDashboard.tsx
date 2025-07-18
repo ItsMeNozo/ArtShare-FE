@@ -1,4 +1,3 @@
-import { TUTORIAL_TEMPLATE_HTML } from '@/constants/template';
 import { useUser } from '@/contexts/user';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { Blog } from '@/types/blog';
@@ -6,7 +5,7 @@ import { CircularProgress, IconButton, Menu } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { IoMdMore } from 'react-icons/io';
 import { IoBookOutline, IoFilter } from 'react-icons/io5';
 import { MdOutlineAdd } from 'react-icons/md';
@@ -15,16 +14,159 @@ import {
   BlogQueryParams,
   fetchBlogsByUsername,
 } from '../blog-details/api/blog';
-import { CreateBlogPayload, createNewBlog } from './api/blog.api';
 import { BlogDeleteConfirmDialog } from './components/BlogDeleteConfirmDialog';
 import { useDeleteBlog } from './hooks/useDeleteBlog';
 
 // Define a type for the sort order
 type BlogSortOrder = 'latest' | 'oldest' | 'last7days' | 'last30days';
 
+// Move helper functions outside component to prevent recreation
+const getThumbnail = (blog: Blog): string => {
+  if (Array.isArray(blog.pictures) && blog.pictures[0]) {
+    return blog.pictures[0];
+  }
+  return 'https://placehold.co/600x400';
+};
+
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+};
+
+const truncateTitle = (title: string, maxLength: number = 30): string => {
+  return title.length > maxLength
+    ? `${title.substring(0, maxLength)}...`
+    : title;
+};
+
+// Memoized blog item component
+const BlogItem = React.memo(
+  ({
+    blog,
+    onDocumentClick,
+    onMenuClick,
+    onEditClick,
+    onDeleteClick,
+    menuState,
+  }: {
+    blog: Blog;
+    onDocumentClick: (id: number) => void;
+    onMenuClick: (
+      event: React.MouseEvent<HTMLButtonElement>,
+      id: number,
+    ) => void;
+    onEditClick: (id: number) => void;
+    onDeleteClick: (id: number) => void;
+    menuState: { anchorEl: null | HTMLElement; currentBlogId: null | number };
+  }) => {
+    const handleClick = useCallback(() => {
+      onDocumentClick(blog.id);
+    }, [blog.id, onDocumentClick]);
+
+    const handleMenuClick = useCallback(
+      (event: React.MouseEvent<HTMLButtonElement>) => {
+        onMenuClick(event, blog.id);
+      },
+      [blog.id, onMenuClick],
+    );
+
+    const handleEditClick = useCallback(() => {
+      onEditClick(blog.id);
+    }, [blog.id, onEditClick]);
+
+    const handleDeleteClick = useCallback(() => {
+      onDeleteClick(blog.id);
+    }, [blog.id, onDeleteClick]);
+
+    const handleImageError = useCallback(
+      (e: React.SyntheticEvent<HTMLImageElement>) => {
+        e.currentTarget.src = 'https://placehold.co/600x400';
+      },
+      [],
+    );
+
+    return (
+      <div
+        className="dark:bg-mountain-800 border-mountain-200 dark:border-mountain-600 flex cursor-pointer flex-col items-center justify-center space-y-4 rounded-lg border bg-white pb-2 transition-all duration-200 hover:scale-105 hover:border-indigo-600 hover:shadow-lg dark:hover:border-indigo-400"
+        onClick={handleClick}
+      >
+        {/* Document Thumbnail */}
+        <div className="bg-mountain-50 dark:bg-mountain-700 border-mountain-50 dark:border-mountain-600 flex aspect-square w-full items-center justify-center overflow-hidden rounded-t-lg border">
+          <img
+            src={getThumbnail(blog)}
+            alt={blog.title}
+            className="h-full w-full object-cover"
+            onError={handleImageError}
+          />
+        </div>
+
+        {/* Document Info */}
+        <div className="flex w-full flex-col items-start justify-start space-y-2">
+          <p
+            className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-200 line-clamp-1 w-full bg-white px-2 text-left text-sm font-medium select-none"
+            title={blog.title}
+          >
+            {truncateTitle(blog.title)}
+          </p>
+          <div className="flex w-full items-center justify-between">
+            <p className="dark:bg-mountain-800 text-mountain-600 dark:text-mountain-400 w-full truncate bg-white px-2 text-left text-xs select-none">
+              {formatDate(blog.createdAt)}
+            </p>
+            <IconButton
+              onClick={handleMenuClick}
+              className="hover:bg-mountain-50 dark:bg-mountain-800 dark:hover:bg-mountain-700 text-mountain-600 dark:text-mountain-400 mr-2 h-6 w-6 cursor-pointer bg-white"
+              size="small"
+            >
+              <IoMdMore className="size-5" />
+            </IconButton>
+            <Menu
+              anchorEl={menuState.anchorEl}
+              open={
+                menuState.currentBlogId === blog.id &&
+                Boolean(menuState.anchorEl)
+              }
+              onClose={() => {}} // Will be handled by parent
+              onClick={(e) => e.stopPropagation()}
+              PaperProps={{
+                sx: {
+                  backgroundColor: 'var(--menu-bg)',
+                  color: 'var(--menu-text)',
+                  border: '1px solid var(--menu-border)',
+                  '& .MuiMenuItem-root': {
+                    color: 'var(--menu-text)',
+                    '&:hover': {
+                      backgroundColor: 'var(--menu-hover)',
+                    },
+                  },
+                },
+              }}
+              style={
+                {
+                  '--menu-bg': 'white',
+                  '--menu-text': '#374151',
+                  '--menu-border': '#d1d5db',
+                  '--menu-hover': '#f3f4f6',
+                } as React.CSSProperties
+              }
+            >
+              <MenuItem onClick={handleEditClick}>Edit</MenuItem>
+              <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
+            </Menu>
+          </div>
+        </div>
+      </div>
+    );
+  },
+);
+
+BlogItem.displayName = 'BlogItem';
+
 const DocumentDashboard = () => {
-  // Set "latest" as the default order
-  const [order, setOrder] = React.useState<BlogSortOrder>('latest');
+  const [order, setOrder] = useState<BlogSortOrder>('latest');
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,14 +202,86 @@ const DocumentDashboard = () => {
       },
     });
 
-  // Function to get thumbnail image from blog
-  const getThumbnail = (blog: Blog): string => {
-    if (Array.isArray(blog.pictures) && blog.pictures[0]) {
-      return blog.pictures[0];
-    }
-    return 'https://placehold.co/600x400';
-  };
+  // Memoize handlers to prevent recreation
+  const handleChange = useCallback((event: SelectChangeEvent) => {
+    setOrder(event.target.value as BlogSortOrder);
+  }, []);
 
+  const handleCreateBlankDocument = useCallback(() => {
+    navigate('/docs/new');
+  }, [navigate]);
+
+  const handleCreateTutorialDocument = useCallback(() => {
+    navigate('/docs/new?template=tutorial');
+  }, [navigate]);
+
+  const handleDocumentClick = useCallback(
+    (blogId: number) => {
+      if (menuState.anchorEl && menuState.currentBlogId === blogId) {
+        setMenuState({ anchorEl: null, currentBlogId: null });
+        return;
+      }
+      navigate(`/docs/${blogId}`);
+    },
+    [menuState.anchorEl, menuState.currentBlogId, navigate],
+  );
+
+  const handleMenuClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, blogId: number) => {
+      event.stopPropagation();
+      setMenuState({ anchorEl: event.currentTarget, currentBlogId: blogId });
+    },
+    [],
+  );
+
+  const handleMenuClose = useCallback(() => {
+    setMenuState({ anchorEl: null, currentBlogId: null });
+  }, []);
+
+  const handleEditMenuClick = useCallback(
+    (blogId: number) => {
+      handleMenuClose();
+      navigate(`/docs/${blogId}`);
+    },
+    [navigate, handleMenuClose],
+  );
+
+  const handleDeleteMenuClick = useCallback(
+    (blogId: number) => {
+      handleMenuClose();
+      const blog = userBlogs.find((b) => b.id === blogId);
+      setDeleteConfirmState({
+        open: true,
+        blogId,
+        blogTitle: blog?.title || null,
+      });
+    },
+    [userBlogs, handleMenuClose],
+  );
+
+  const handleConfirmDelete = useCallback(() => {
+    if (deleteConfirmState.blogId) {
+      deleteBlogMutation(deleteConfirmState.blogId);
+    }
+  }, [deleteConfirmState.blogId, deleteBlogMutation]);
+
+  const handleCancelDelete = useCallback(() => {
+    setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
+  }, []);
+
+  // Memoize document count text
+  const documentCountText = useMemo(() => {
+    return `${userBlogs.length} ${userBlogs.length === 1 ? 'document' : 'documents'}`;
+  }, [userBlogs.length]);
+
+  // Memoize empty state message
+  const emptyStateMessage = useMemo(() => {
+    return order === 'latest'
+      ? 'Get started by creating your first document.'
+      : 'No documents found for the selected criteria.';
+  }, [order]);
+
+  // Fetch documents effect
   useEffect(() => {
     const fetchUserDocuments = async () => {
       if (!user?.username) {
@@ -75,12 +289,11 @@ const DocumentDashboard = () => {
         return;
       }
 
-      // 1. Map frontend state to backend query params
       const params: BlogQueryParams = {
         take: 100,
         skip: 0,
-        sortField: 'updatedAt', // Sort by the last updated date to match original logic
-        dateRange: 'all', // Default date range
+        sortField: 'updatedAt',
+        dateRange: 'all',
       };
 
       switch (order) {
@@ -102,10 +315,7 @@ const DocumentDashboard = () => {
 
       try {
         setIsLoading(true);
-        // 2. Fetch data using the new params. The backend does the filtering and sorting.
         const blogs = await fetchBlogsByUsername(user.username, params);
-
-        // 3. Set the state directly. No more client-side logic is needed here.
         setUserBlogs(blogs);
         setError(null);
       } catch (err) {
@@ -120,144 +330,131 @@ const DocumentDashboard = () => {
     fetchUserDocuments();
   }, [user?.username, order]);
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setOrder(event.target.value as BlogSortOrder);
-  };
+  // Memoize loading component
+  const loadingComponent = useMemo(
+    () => (
+      <div className="col-span-full flex items-center justify-center py-8">
+        <CircularProgress
+          size={32}
+          sx={{ color: 'var(--loader-color)' }}
+          style={{ '--loader-color': 'rgb(79 70 229)' } as React.CSSProperties}
+        />
+        <span className="ml-2 text-gray-700 dark:text-gray-300">
+          Loading documents...
+        </span>
+      </div>
+    ),
+    [],
+  );
 
-  const createNewDocument = async () => {
-    try {
-      const newBlogPayload: CreateBlogPayload = {
-        title: 'Untitled Document',
-        isPublished: false,
-        content: '<p></p>',
-      };
-      const createdBlog = await createNewBlog(newBlogPayload);
-      navigate(`/docs/${createdBlog.id}`);
-    } catch (error) {
-      showSnackbar('Failed to create blog', 'error');
-      console.error('Error creating document:', error);
-    }
-  };
+  // Memoize error component
+  const errorComponent = useMemo(
+    () => (
+      <div className="col-span-full flex items-center justify-center py-8 text-red-500 dark:text-red-400">
+        <span>{error}</span>
+      </div>
+    ),
+    [error],
+  );
 
-  const createTutorialDocument = async () => {
-    try {
-      const payload: CreateBlogPayload = {
-        title: 'Untitled Tutorial',
-        isPublished: false,
-        content: TUTORIAL_TEMPLATE_HTML,
-      };
-      const newBlog = await createNewBlog(payload);
-      navigate(`/docs/${newBlog.id}`);
-    } catch (err) {
-      showSnackbar('Failed to create tutorial', 'error');
-      console.error(err);
-    }
-  };
-
-  const handleDocumentClick = (blogId: number) => {
-    if (menuState.anchorEl && menuState.currentBlogId === blogId) {
-      handleMenuClose();
-      return;
-    }
-    navigate(`/docs/${blogId}`);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  const truncateTitle = (title: string, maxLength: number = 30) => {
-    return title.length > maxLength
-      ? `${title.substring(0, maxLength)}...`
-      : title;
-  };
-
-  const handleMenuClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    blogId: number,
-  ) => {
-    event.stopPropagation();
-    setMenuState({ anchorEl: event.currentTarget, currentBlogId: blogId });
-  };
-
-  const handleMenuClose = () => {
-    setMenuState({ anchorEl: null, currentBlogId: null });
-  };
-
-  const onEditMenuClick = (blogId: number) => {
-    handleMenuClose();
-    navigate(`/docs/${blogId}`);
-  };
-
-  const onDeleteMenuClick = async (blogId: number) => {
-    handleMenuClose(); // Close menu first
-    const blog = userBlogs.find((b) => b.id === blogId);
-    setDeleteConfirmState({
-      open: true,
-      blogId,
-      blogTitle: blog?.title || null,
-    });
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteConfirmState.blogId) {
-      deleteBlogMutation(deleteConfirmState.blogId);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteConfirmState({ open: false, blogId: null, blogTitle: null });
-  };
+  // Memoize empty state component
+  const emptyStateComponent = useMemo(
+    () => (
+      <div className="col-span-full flex flex-col items-center justify-center py-12">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-500">
+            <IoBookOutline className="h-full w-full" />
+          </div>
+          <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">
+            No documents found
+          </h3>
+          <p className="mb-6 text-gray-500 dark:text-gray-400">
+            {emptyStateMessage}
+          </p>
+          <button
+            onClick={handleCreateBlankDocument}
+            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
+          >
+            <MdOutlineAdd className="mr-2 h-4 w-4" />
+            Create Document
+          </button>
+        </div>
+      </div>
+    ),
+    [emptyStateMessage, handleCreateBlankDocument],
+  );
 
   return (
     <div className="custom-scrollbar flex h-screen flex-col items-center overflow-auto rounded-t-3xl">
       {/* Top Templates Section */}
-      <div className="border-mountain-50 dark:border-mountain-700 flex h-fit w-full justify-center bg-white">
+      <div className="border-mountain-50 dark:border-mountain-700 dark:bg-mountain-900 flex h-fit w-full justify-center bg-white">
         <div className="flex h-full w-fit flex-col items-center justify-center space-y-2 p-4">
           <div className="flex h-full space-x-4">
             {/* Blank Document Template */}
             <div
-              className="flex cursor-pointer flex-col justify-center space-y-4"
-              onClick={() => createNewDocument()}
+              className="group flex cursor-pointer flex-col justify-center space-y-4"
+              onClick={handleCreateBlankDocument}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ')
+                  handleCreateBlankDocument();
+              }}
+              aria-label="Create Blank Document"
             >
-              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-colors hover:border-indigo-600 dark:hover:border-indigo-400">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700">
+              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-all duration-200 group-hover:scale-105 hover:border-indigo-600 hover:shadow-lg dark:hover:border-indigo-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 transition-transform group-hover:scale-110 dark:from-indigo-700 dark:to-purple-700">
                   <MdOutlineAdd className="size-10 text-gray-800 dark:text-gray-200" />
                 </div>
               </div>
-              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm">
+              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm font-medium">
                 Blank Document
               </p>
+              <p className="text-mountain-600 dark:text-mountain-400 text-center text-xs">
+                Start typing to create
+              </p>
             </div>
+
             {/* Tutorial Template */}
             <div
-              className="flex cursor-pointer flex-col justify-center space-y-4"
-              onClick={() => createTutorialDocument()}
+              className="group flex cursor-pointer flex-col justify-center space-y-4"
+              onClick={handleCreateTutorialDocument}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ')
+                  handleCreateTutorialDocument();
+              }}
+              aria-label="Create Tutorial Document"
             >
-              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-colors hover:border-indigo-600 dark:hover:border-indigo-400">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 dark:from-indigo-700 dark:to-purple-700">
+              <div className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-600 flex h-48 w-42 items-center justify-center border-1 border-white transition-all duration-200 group-hover:scale-105 hover:border-indigo-600 hover:shadow-lg dark:hover:border-indigo-400">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-200 to-purple-200 transition-transform group-hover:scale-110 dark:from-indigo-700 dark:to-purple-700">
                   <IoBookOutline className="size-10 text-gray-800 dark:text-gray-200" />
                 </div>
               </div>
-              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm">
+              <p className="text-mountain-800 dark:text-mountain-200 text-center text-sm font-medium">
                 Tutorial Template
+              </p>
+              <p className="text-mountain-600 dark:text-mountain-400 text-center text-xs">
+                Pre-formatted structure
               </p>
             </div>
           </div>
         </div>
       </div>
+
       {/* Documents Section */}
-      <div className="border-mountain-200 flex w-full flex-col space-y-6 border-t-1">
+      <div className="border-mountain-200 dark:border-mountain-700 flex w-full flex-col space-y-6 border-t-1">
         {/* Header with Filter */}
-        <div className="dark:bg-mountain-800 sticky top-0 flex h-fit w-full items-center justify-between bg-white px-4 shadow-md">
-          <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Recent projects
-          </p>
+        <div className="dark:bg-mountain-800 sticky top-0 flex h-fit w-full items-center justify-between bg-white px-4 py-3 shadow-md">
+          <div>
+            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+              Recent projects
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {documentCountText}
+            </p>
+          </div>
           <div className="flex items-center">
             <div className="flex">
               <FormControl sx={{ m: 1, minWidth: 120 }}>
@@ -275,7 +472,6 @@ const DocumentDashboard = () => {
                         boxShadow: 3,
                         borderRadius: 2,
                         border: '1px solid var(--select-border, #d1d5db)',
-                        // Add backdrop filter for blur effect
                         backdropFilter: 'blur(8px)',
                         '& .MuiMenuItem-root': {
                           color: 'var(--select-text, #374151)',
@@ -331,108 +527,23 @@ const DocumentDashboard = () => {
 
         {/* Documents Grid */}
         <div className="grid min-h-[calc(100vh-4rem)] grid-cols-2 items-start gap-6 p-6 pb-96 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {isLoading ? (
-            <div className="col-span-full flex items-center justify-center py-8">
-              <CircularProgress
-                size={32}
-                sx={{ color: 'var(--loader-color)' }}
-                style={
-                  { '--loader-color': 'rgb(79 70 229)' } as React.CSSProperties
-                }
-              />
-              <span className="ml-2 text-gray-700 dark:text-gray-300">
-                Loading documents...
-              </span>
-            </div>
-          ) : error ? (
-            <div className="col-span-full flex items-center justify-center py-8 text-red-500 dark:text-red-400">
-              <span>{error}</span>
-            </div>
-          ) : userBlogs.length === 0 ? (
-            <div className="col-span-full flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
-              <span>No documents found for the selected criteria.</span>
-            </div>
-          ) : (
-            userBlogs.map((blog) => (
-              <div
-                key={blog.id}
-                className="dark:bg-mountain-800 border-mountain-200 dark:border-mountain-600 flex cursor-pointer flex-col items-center justify-center space-y-4 rounded-lg border bg-white pb-2 transition-colors duration-200 hover:border-indigo-600 dark:hover:border-indigo-400"
-                onClick={() => handleDocumentClick(blog.id)}
-              >
-                {/* Document Thumbnail */}
-                <div className="bg-mountain-50 dark:bg-mountain-700 border-mountain-50 dark:border-mountain-600 flex aspect-square w-full items-center justify-center overflow-hidden rounded-t-lg border">
-                  <img
-                    src={getThumbnail(blog)}
-                    alt={blog.title}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      // Fallback to placeholder if image fails to load
-                      e.currentTarget.src = 'https://placehold.co/600x400';
-                    }}
-                  />
-                </div>
-
-                {/* Document Info */}
-                <div className="flex w-full flex-col items-start justify-start space-y-2">
-                  <p
-                    className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-200 line-clamp-1 w-full bg-white px-2 text-left text-sm select-none"
-                    title={blog.title}
-                  >
-                    {truncateTitle(blog.title)}
-                  </p>
-                  <div className="flex w-full items-center justify-between">
-                    <p className="dark:bg-mountain-800 text-mountain-800 dark:text-mountain-300 w-full truncate bg-white px-2 text-left text-xs select-none">
-                      {formatDate(blog.createdAt)}
-                    </p>
-                    <IconButton
-                      onClick={(event) => handleMenuClick(event, blog.id)}
-                      className="hover:bg-mountain-50 dark:bg-mountain-800 dark:hover:bg-mountain-700 text-mountain-600 dark:text-mountain-400 mr-2 h-6 w-6 cursor-pointer bg-white"
-                      size="small"
-                    >
-                      <IoMdMore className="size-5" />
-                    </IconButton>
-                    <Menu
-                      anchorEl={menuState.anchorEl}
-                      open={
-                        menuState.currentBlogId === blog.id &&
-                        Boolean(menuState.anchorEl)
-                      }
-                      onClose={handleMenuClose}
-                      onClick={(e) => e.stopPropagation()}
-                      PaperProps={{
-                        sx: {
-                          backgroundColor: 'var(--menu-bg)',
-                          color: 'var(--menu-text)',
-                          border: '1px solid var(--menu-border)',
-                          '& .MuiMenuItem-root': {
-                            color: 'var(--menu-text)',
-                            '&:hover': {
-                              backgroundColor: 'var(--menu-hover)',
-                            },
-                          },
-                        },
-                      }}
-                      style={
-                        {
-                          '--menu-bg': 'white',
-                          '--menu-text': '#374151',
-                          '--menu-border': '#d1d5db',
-                          '--menu-hover': '#f3f4f6',
-                        } as React.CSSProperties
-                      }
-                    >
-                      <MenuItem onClick={() => onEditMenuClick(blog.id)}>
-                        Edit
-                      </MenuItem>
-                      <MenuItem onClick={() => onDeleteMenuClick(blog.id)}>
-                        Delete
-                      </MenuItem>
-                    </Menu>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+          {isLoading
+            ? loadingComponent
+            : error
+              ? errorComponent
+              : userBlogs.length === 0
+                ? emptyStateComponent
+                : userBlogs.map((blog) => (
+                    <BlogItem
+                      key={blog.id}
+                      blog={blog}
+                      onDocumentClick={handleDocumentClick}
+                      onMenuClick={handleMenuClick}
+                      onEditClick={handleEditMenuClick}
+                      onDeleteClick={handleDeleteMenuClick}
+                      menuState={menuState}
+                    />
+                  ))}
         </div>
       </div>
 
