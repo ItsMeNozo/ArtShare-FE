@@ -21,6 +21,7 @@ interface TextEditorHeaderProps {
   isPublished: boolean;
   tooltipOpen: boolean;
   saveStatus?: React.ReactNode;
+  isTitleLoading?: boolean; // MODIFIED: Add new prop
 }
 
 const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
@@ -31,6 +32,7 @@ const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
   isPublished,
   tooltipOpen,
   saveStatus,
+  isTitleLoading, // MODIFIED: Destructure new prop
 }) => {
   const { user, loading } = useUser();
   const navigate = useNavigate();
@@ -82,6 +84,8 @@ const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
           style={{ width: `${dynamicWidth}px` }}
           className="dark:bg-mountain-800/80 dark:border-mountain-600 placeholder:text-mountain-600 dark:placeholder:text-mountain-400 h-12 flex-shrink rounded-full border border-gray-200 bg-white/60 px-4 text-gray-900 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-blue-500 dark:text-gray-100 dark:focus:ring-blue-400"
           placeholder="Name Your Document Here..."
+          // MODIFIED: Disable input based on the loading prop
+          disabled={isTitleLoading}
         />
         {saveStatus && <div className="flex-shrink-0">{saveStatus}</div>}
       </div>
