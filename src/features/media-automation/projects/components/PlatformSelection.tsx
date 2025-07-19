@@ -1,19 +1,15 @@
-// import api from '@/api/baseApi';
 import InlineErrorMessage from '@/components/InlineErrorMessage';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { SharePlatformName } from '@/features/media-automation/types';
-// import { useSnackbar } from '@/hooks/useSnackbar';
-import { Typography } from '@mui/material';
+import {
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { ErrorMessage, useFormikContext } from 'formik';
 import { useEffect, useState } from 'react';
-import { FaFacebookSquare, FaInstagram } from 'react-icons/fa';
-import { PiArrowsClockwise } from 'react-icons/pi';
+import { FaFacebookSquare } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useFacebookAccountInfo } from '../../social-links/hooks/useFacebook';
 import { useFetchLinkedPlatforms } from '../hooks/useFetchLinkedPlatforms';
@@ -27,10 +23,9 @@ const name = 'platform';
 type PlatformSelectionProps = {
   isEditMode?: boolean;
 };
+
 const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   const { setFieldValue, getFieldMeta } = useFormikContext<ProjectFormValues>();
-  // const { showSnackbar } = useSnackbar();
-  // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const initialPlatform = getFieldMeta(name).initialValue as FormPlatform;
   const [platformTypeToFetch, setPlatformTypeToFetch] =
@@ -44,13 +39,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
     null,
   );
 
-  // const [platformToReconnect, setPlatformToReconnect] =
-  //   useState<Platform | null>(null);
-  const {
-    data: fetchedPlatforms = [],
-    isLoading,
-    error,
-  } = useFetchLinkedPlatforms({
+  const { data: fetchedPlatforms = [], isLoading } = useFetchLinkedPlatforms({
     platformName: platformTypeToFetch,
   });
 
@@ -68,70 +57,23 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
     }
   }, [fetchedPlatforms, initialPlatform]);
 
-  // const handleMenuOpen = (
-  //   event: React.MouseEvent<HTMLElement>,
-  //   platform: Platform,
-  // ) => {
-  //   event.stopPropagation();
-  //   setAnchorEl(event.currentTarget);
-
-  //   setPlatformToReconnect(platform);
-  // };
-
-  // const handleMenuClose = () => {
-  //   setAnchorEl(null);
-  //   setPlatformToReconnect(null);
-  // };
-
-  const handlePlatformSelected = (platform: Platform) => {
-    setSelectedPlatform(platform);
-    setFieldValue(`${name}.id`, platform.id);
-    setFieldValue(`${name}.name`, platform.name);
+  const handlePlatformSelected = (platformId: string) => {
+    const platform = fetchedPlatforms.find(
+      (p) => p.id.toString() === platformId,
+    );
+    if (platform) {
+      setSelectedPlatform(platform);
+      setFieldValue(`${name}.id`, platform.id);
+      setFieldValue(`${name}.name`, platform.name);
+    }
   };
-  const handlePlatformTypeChange = (value: SharePlatformName) => {
+
+  const handlePlatformTypeChange = (event: SelectChangeEvent<string>) => {
+    const value = event.target.value as SharePlatformName;
     setPlatformTypeToFetch(value);
     setSelectedPlatform(null);
-    // Reset the Formik field value when the type changes
     setFieldValue(`${name}.id`, -1);
   };
-
-  // const handleReconnectClick = () => {
-  //   if (platformToReconnect) {
-  //     console.log(
-  //       `Reconnecting platform: ${platformToReconnect.config.page_name}`,
-  //     );
-
-  //     handleReconnect(platformToReconnect);
-  //   }
-  //   handleMenuClose();
-  // };
-
-  // const handleReconnect = async (platform?: Platform) => {
-  //   try {
-  //     if (platform) {
-  //       console.log(
-  //         `Initiating reconnection for ${platform.name} page: ${platform.config.page_name}`,
-  //       );
-  //     }
-  //     const currentPageUrl = window.location.href;
-  //     const encodedRedirectUrl = encodeURIComponent(currentPageUrl);
-
-  //     console.log(
-  //       `Initiating reconnection. Will redirect to: ${currentPageUrl}`,
-  //     );
-
-  //     const response = await api.get(
-  //       `/facebook-integration/initiate-connection-url?successUrl=${encodedRedirectUrl}&errorUrl=${encodedRedirectUrl}`,
-  //     );
-  //     const { facebookLoginUrl } = response.data;
-  //     if (facebookLoginUrl) {
-  //       window.location.href = facebookLoginUrl;
-  //     }
-  //   } catch (error) {
-  //     console.error('Failed to get reconnection URL', error);
-  //     showSnackbar('Could not initiate reconnection. Please try again later.');
-  //   }
-  // };
 
   const isTokenExpired = (expiryDate: string | null) => {
     if (!expiryDate) return false;
@@ -139,14 +81,9 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   };
 
   useEffect(() => {
-    if (
-      !selectedPlatform && // Only auto-select if none is selected yet
-      fetchedPlatforms.length > 0
-    ) {
+    if (!selectedPlatform && fetchedPlatforms.length > 0) {
       const firstPlatform = fetchedPlatforms[0];
       setSelectedPlatform(firstPlatform);
-
-      // Update Formik values too
       setFieldValue(`${name}.id`, firstPlatform.id);
       setFieldValue(`${name}.name`, firstPlatform.name);
     }
@@ -154,12 +91,14 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
 
   useEffect(() => {
     if (!isEditMode) {
-      const initialType = allAvailablePlatformTypes[0];
+      const initialType = allAvailablePlatformTypes.find(
+        (type) => type !== 'INSTAGRAM',
+      );
       if (initialType) {
-        handlePlatformTypeChange(initialType);
+        setPlatformTypeToFetch(initialType);
       }
     }
-  }, []);
+  }, [isEditMode]);
 
   const { data: fbAccountInfo } = useFacebookAccountInfo();
   const facebookProfile =
@@ -174,63 +113,69 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
   return (
     <div className="flex h-full flex-col">
       <div className="relative flex h-full w-xl flex-col items-center justify-start">
-        <div className="flex w-fit items-center justify-center rounded-full bg-indigo-50 pl-2">
+        <div className="flex w-fit items-center justify-center rounded-full bg-indigo-50 p-1">
           <Typography
             variant="body1"
             component="h1"
-            className="mr-2 font-normal"
+            className="mr-2 pl-2 font-normal"
           >
             {isEditMode ? 'Edit' : 'Create'}{' '}
             <span className="font-semibold">Automation Project</span>
           </Typography>
           <Select
             disabled={isEditMode}
-            onValueChange={handlePlatformTypeChange}
-            value={selectedPlatform?.name || platformTypeToFetch || ''}
+            onChange={handlePlatformTypeChange}
+            value={platformTypeToFetch || ''}
+            className="rounded-full bg-white text-lg font-medium"
+            sx={{
+              '.MuiOutlinedInput-notchedOutline': { border: 0 },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 0 },
+              minWidth: '180px',
+            }}
           >
-            <SelectTrigger className="w-42 cursor-pointer rounded-full bg-white text-lg font-medium data-[size=default]:h-10">
-              <SelectValue placeholder="Choose Platform" />
-            </SelectTrigger>
-            <SelectContent className="border-mountain-100 w-full">
-              {allAvailablePlatformTypes.map((type) => (
-                <SelectItem key={type} value={type} className="text-lg">
-                  {type === 'FACEBOOK' ? (
-                    <img
-                      src={fb_icon}
-                      alt="Facebook"
-                      className="inline-block h-6 w-6"
-                    />
-                  ) : type === 'INSTAGRAM' ? (
-                    <img src={ins_icon} className="inline-block h-6 w-6" />
-                  ) : null}
+            {allAvailablePlatformTypes.map((type) =>
+              type === 'INSTAGRAM' ? (
+                <Tooltip
+                  key={type}
+                  title="Instagram integration is coming soon!"
+                  placement="right"
+                >
+                  {/* The span is necessary for the tooltip to work on a disabled item */}
+                  <span>
+                    <MenuItem value={type} disabled className="text-lg">
+                      <img
+                        src={ins_icon}
+                        alt="Instagram"
+                        className="mr-2 inline-block h-6 w-6"
+                      />
+                      {type.charAt(0) + type.slice(1).toLowerCase()}
+                    </MenuItem>
+                  </span>
+                </Tooltip>
+              ) : (
+                <MenuItem key={type} value={type} className="text-lg">
+                  <img
+                    src={fb_icon}
+                    alt="Facebook"
+                    className="mr-2 inline-block h-6 w-6"
+                  />
                   {type.charAt(0) + type.slice(1).toLowerCase()}
-                </SelectItem>
-              ))}
-            </SelectContent>
+                </MenuItem>
+              ),
+            )}
           </Select>
           <ErrorMessage name={`${name}.id`}>
             {(errorMsg) => <InlineErrorMessage errorMsg={errorMsg} />}
           </ErrorMessage>
         </div>
-        <div className="flex h-full w-full flex-col items-center justify-center space-y-2">
+        <div className="mt-4 flex h-full w-full flex-col items-center justify-center space-y-2">
           <div className="flex w-full justify-center">
             {isLoading && (
               <div className="group relative flex h-42 w-xl cursor-not-allowed flex-col items-center justify-center p-4 text-center">
                 <p>Loading platforms...</p>
               </div>
             )}
-            {!isLoading && error && platformTypeToFetch === 'INSTAGRAM' && (
-              <div className="group border-mountain-200 relative flex h-42 w-xl cursor-not-allowed flex-col items-center justify-center rounded-3xl border bg-gray-100 p-4 text-center opacity-80">
-                <FaInstagram className="mb-2 h-10 w-10 text-gray-500" />
-                <p className="text-sm font-semibold text-gray-700">
-                  Instagram integration is coming soon!
-                </p>
-                <p className="text-xs text-gray-500">
-                  Please select another platform to continue.
-                </p>
-              </div>
-            )}
-            {!isLoading && !error && platformTypeToFetch === 'FACEBOOK' && (
+            {!isLoading && platformTypeToFetch === 'FACEBOOK' && (
               <>
                 {fetchedPlatforms.length > 0 ? (
                   <div className="flex h-42 w-full flex-col items-center justify-center space-y-2">
@@ -239,6 +184,7 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
                         <img
                           src={facebookProfile?.profilePicture}
                           className="size-20 rounded-full"
+                          alt="Facebook Profile"
                         />
                         <span className="text-sm font-medium">
                           {facebookProfile?.name}
@@ -250,41 +196,49 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
                         <div className="rounded-full bg-gray-200 p-2 px-4 select-none">
                           <p>Target Page</p>
                         </div>
-                        <button
-                          type="button"
-                          key={selectedPlatform.id}
-                          className={`absolute top-1/2 left-1/2 flex h-12 w-fit -translate-x-1/2 -translate-y-1/2 items-center space-x-4 transition`}
-                          onClick={() =>
-                            handlePlatformSelected(selectedPlatform)
+                        <Select
+                          value={selectedPlatform.id.toString()}
+                          onChange={(e) =>
+                            handlePlatformSelected(e.target.value)
                           }
-                        >
-                          <div className="flex items-center space-x-2">
-                            {selectedPlatform.name === 'FACEBOOK' && (
-                              <FaFacebookSquare className="size-4 shrink-0 rounded-full text-blue-700" />
-                            )}
-                            <span className="line-clamp-1 w-24 text-left">
-                              {selectedPlatform.config.pageName}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div
-                              className={`h-2 w-2 rounded-full ${isTokenExpired(selectedPlatform.tokenExpiresAt) ? 'bg-red-500' : 'bg-green-500'}`}
-                            />
-                            <span className="text-xs capitalize">
-                              {isTokenExpired(selectedPlatform.tokenExpiresAt)
-                                ? 'Expired'
-                                : selectedPlatform.status.toLowerCase()}
-                            </span>
-                          </div>
-                        </button>
-                        <button
                           disabled={isEditMode}
-                          type="button"
-                          className="flex cursor-pointer items-center space-x-1 rounded-full p-2 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+                          className="absolute top-1/2 left-1/2 h-12 -translate-x-1/2 -translate-y-1/2"
+                          sx={{
+                            '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              border: 0,
+                            },
+                            minWidth: '250px',
+                          }}
                         >
-                          <p className="text-sm">Change page</p>
-                          <PiArrowsClockwise className="inline-block size-4" />
-                        </button>
+                          {fetchedPlatforms.map((platform) => (
+                            <MenuItem
+                              key={platform.id}
+                              value={platform.id.toString()}
+                            >
+                              <div className="flex w-full items-center space-x-2">
+                                <FaFacebookSquare className="size-4 shrink-0 text-blue-700" />
+                                <span className="line-clamp-1 flex-grow">
+                                  {platform.config.pageName}
+                                </span>
+                                <div className="flex items-center space-x-1">
+                                  <div
+                                    className={`h-2 w-2 rounded-full ${
+                                      isTokenExpired(platform.tokenExpiresAt)
+                                        ? 'bg-red-500'
+                                        : 'bg-green-500'
+                                    }`}
+                                  />
+                                  <span className="text-xs capitalize">
+                                    {isTokenExpired(platform.tokenExpiresAt)
+                                      ? 'Expired'
+                                      : platform.status.toLowerCase()}
+                                  </span>
+                                </div>
+                              </div>
+                            </MenuItem>
+                          ))}
+                        </Select>
                       </div>
                     )}
                   </div>
@@ -315,12 +269,14 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
     </div>
   );
 };
+
 export default PlatformSelection;
 
 const allAvailablePlatformTypes: SharePlatformName[] = [
   'FACEBOOK',
   'INSTAGRAM',
 ];
+
 const isValidInitialPlatform = (
   platform: FormPlatform | null | undefined,
 ): boolean => {

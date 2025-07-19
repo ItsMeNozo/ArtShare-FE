@@ -1,6 +1,8 @@
+import ConfirmationDialog from '@/components/ConfirmationDialog';
 import Loading from '@/components/loading/Loading';
 import { getStatusChipProps } from '@/features/media-automation/auto-posts/utils';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import {
   Button,
@@ -12,6 +14,7 @@ import {
   TableRow,
   Tooltip,
 } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AiFillEdit } from 'react-icons/ai';
 import { IoTrashBin } from 'react-icons/io5';
@@ -20,10 +23,17 @@ import {
   Order,
   SortableKeysItemTable,
 } from '../../../projects/types/automation-project';
+import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
 import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import PostsTableHeader from './AutoPostsTableHeader';
 
 const AutoPostsTable = () => {
+  const {
+    isDialogOpen: isDeleteDialogOpen,
+    itemToConfirm: postToDelete,
+    openDialog: openDeleteDialog,
+    closeDialog: closeDeleteDialog,
+  } = useConfirmationDialog<number>();
   const projectId = useNumericParam('projectId');
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<SortableKeysItemTable>('content');
@@ -31,6 +41,7 @@ const AutoPostsTable = () => {
   const [page] = useState(1);
   const [rowsPerPage] = useState(7);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: projectDetails } = useGetProjectDetails(projectId);
   const { data: fetchedPostsResponse, isLoading } = useGetAutoPosts({
@@ -39,6 +50,14 @@ const AutoPostsTable = () => {
     order,
     page,
     limit: rowsPerPage,
+  });
+
+  const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects', 'list'] });
+      queryClient.invalidateQueries({ queryKey: ['auto-posts'] });
+      closeDeleteDialog();
+    },
   });
 
   const posts = fetchedPostsResponse?.data ?? [];
@@ -89,6 +108,16 @@ const AutoPostsTable = () => {
 
   const handleRowClick = (postId: number) => {
     navigate(`/auto/projects/${projectDetails!.id}/posts/${postId}/edit`);
+  };
+
+  const handleDeleteClick = (postId: number) => {
+    openDeleteDialog(postId);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (postToDelete) {
+      deletePost(postToDelete);
+    }
   };
 
   if (isLoading || !projectDetails) {
@@ -175,7 +204,13 @@ const AutoPostsTable = () => {
                         </Button>
                       </Tooltip>
                       <Tooltip title="Delete">
-                        <Button className="border-mountain-200 border-1 bg-red-50 py-2 font-normal">
+                        <Button
+                          className="border-mountain-200 border-1 bg-red-50 py-2 font-normal"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(row.id);
+                          }}
+                        >
                           <IoTrashBin className="size-5 text-red-600" />
                         </Button>
                       </Tooltip>
@@ -214,6 +249,15 @@ const AutoPostsTable = () => {
           </Table>
         </TableContainer>
       </div>
+      <ConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Post"
+        contentText="Are you sure you want to delete this post? This action cannot be undone."
+        confirmButtonText="Delete"
+        isConfirming={isDeleting}
+      />
     </div>
   );
 };
