@@ -44,22 +44,30 @@ export const rateBlog = async (
   return response.data;
 };
 
+export interface BlogQueryParams {
+  take?: number;
+  skip?: number;
+  sortBy?: 'latest' | 'oldest';
+  dateRange?: 'last7days' | 'last30days' | 'all';
+  sortField?: 'createdAt' | 'updatedAt';
+}
+
 /**
- * Fetch blogs by username.
- * GET /blogs/user/:username
+ * Fetch blogs by username with server-side filtering, sorting, and pagination.
+ * The backend for this endpoint returns a direct array of blogs.
  */
 export const fetchBlogsByUsername = async (
   username: string,
-  params?: { take?: number; skip?: number },
+  params?: BlogQueryParams,
 ): Promise<Blog[]> => {
-  // Only use BackendBlogListItemDto if this endpoint actually returns that structure
+  // Expect a direct array of blog DTOs from the API
   const response = await api.get<SimpleBlogResponseDto[]>(
     `/blogs/user/${username}`,
     { params },
   );
+
   return response.data.map(mapSimpleBlogResponseToBlog);
 };
-
 /**
  * Fetch relevant blogs for a given blog.
  * GET /blogs/:blogId/relevant
