@@ -121,7 +121,7 @@ const BlogItem = React.memo(
     menuState,
   }: {
     blog: Blog;
-    onDocumentClick: (id: number) => void;
+    onDocumentClick: (id: number, title: string) => void;
     onMenuClick: (
       event: React.MouseEvent<HTMLButtonElement>,
       id: number,
@@ -135,9 +135,15 @@ const BlogItem = React.memo(
     const handleClick = useCallback(
       (_event: React.MouseEvent<HTMLDivElement>) => {
         if (menuState.anchorEl && menuState.currentBlogId === blog.id) return;
-        onDocumentClick(blog.id);
+        onDocumentClick(blog.id, blog.title);
       },
-      [blog.id, onDocumentClick, menuState.anchorEl, menuState.currentBlogId],
+      [
+        blog.id,
+        blog.title,
+        onDocumentClick,
+        menuState.anchorEl,
+        menuState.currentBlogId,
+      ],
     );
 
     const handleContextMenu = useCallback(
@@ -277,12 +283,12 @@ const DocumentDashboard = () => {
       handleCreateTutorialDocument: () =>
         navigate('/docs/new?template=tutorial'),
 
-      handleDocumentClick: (blogId: number) => {
+      handleDocumentClick: (blogId: number, title: string) => {
         if (menuState.anchorEl && menuState.currentBlogId === blogId) {
           setMenuState({ anchorEl: null, currentBlogId: null });
           return;
         }
-        navigate(`/docs/${blogId}`);
+        navigate(`/docs/${blogId}`, { state: { title } });
       },
 
       handleMenuClick: (
@@ -317,8 +323,13 @@ const DocumentDashboard = () => {
       },
 
       handleEditMenuClick: (blogId: number) => {
+        const blog = userBlogs.find((b) => b.id === blogId);
         setMenuState({ anchorEl: null, currentBlogId: null });
-        navigate(`/docs/${blogId}`);
+        if (blog) {
+          navigate(`/docs/${blogId}`, { state: { title: blog.title } });
+        } else {
+          navigate(`/docs/${blogId}`);
+        }
       },
 
       handleDeleteMenuClick: (blogId: number) => {

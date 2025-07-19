@@ -125,14 +125,15 @@ const WriteBlog = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const searchParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search],
-  );
+  const templateType = new URLSearchParams(location.search).get('template');
   const isNewDocument = blogId === 'new';
-  const templateType = searchParams.get('template');
 
-  const [blogTitle, setBlogTitle] = useState('Untitled Document');
+  const preloadedTitle = location.state?.title;
+
+  const [blogTitle, setBlogTitle] = useState(
+    preloadedTitle || (isNewDocument ? 'Untitled Document' : ''),
+  );
+
   const [isApiLoading, setIsApiLoading] = useState(!isNewDocument);
   const [isContentReady, setIsContentReady] = useState(isNewDocument);
   const [isPublished, setIsPublished] = useState(false);
@@ -148,6 +149,8 @@ const WriteBlog = () => {
     null,
   );
   const [initialContent, setInitialContent] = useState<string | null>(null);
+
+  // --- Other hooks and functions remain largely unchanged ---
 
   const hasContentToSave = useCallback(() => {
     const content = editorRef.current?.getContent() || '';
@@ -350,7 +353,7 @@ const WriteBlog = () => {
           templateType === 'tutorial' ? TUTORIAL_TEMPLATE_HTML : '';
         setInitialContent(content);
         setIsApiLoading(false);
-        setIsContentReady(true); // For new docs, it's ready immediately
+        setIsContentReady(true);
         return;
       }
 
@@ -362,12 +365,13 @@ const WriteBlog = () => {
           throw new Error('Invalid blog ID');
         }
 
-        setIsApiLoading(true);
+        // isApiLoading is already true, so no need to set it again.
         const blog = await fetchBlogDetails(numericBlogId);
 
+        // This will now confirm or update the preloaded title
         setBlogTitle(blog.title || 'Untitled Document');
         setIsPublished(blog.isPublished || false);
-        setInitialContent(blog.content || ''); // Store fetched content in state
+        setInitialContent(blog.content || '');
       } catch (error) {
         handleApiError(error, 'Failed to load blog content.');
       } finally {
@@ -376,7 +380,8 @@ const WriteBlog = () => {
     };
 
     initializeEditor();
-  }, [blogId, isNewDocument, templateType, handleApiError]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blogId, isNewDocument, templateType]); // handleApiError was removed from deps to prevent re-triggering
 
   useEffect(() => {
     if (initialContent !== null && editorRef.current) {
@@ -450,18 +455,13 @@ const WriteBlog = () => {
             isPublished={isPublished}
             tooltipOpen={tooltipOpen}
             saveStatus={statusComponent}
+            isTitleLoading={isApiLoading}
           />
           <div className="border-mountain-100 bg-mountain-50 dark:border-mountain-700 dark:bg-mountain-900 h-full w-full border-l">
-            {/* --- START: THE ONLY SECTION THAT NEEDS TO CHANGE --- */}
-
-            {/* Conditionally render the LoadingScreen on top if needed. */}
             {(isApiLoading || !isContentReady) && <LoadingScreen />}
-
-            {/* The Toolbar and the Editor's container are now ALWAYS rendered. */}
             <Toolbar />
             <div className="sidebar dark:print:bg-mountain-950 fixed h-screen w-full overflow-x-hidden pb-20 print:bg-white print:p-0">
               <div
-                // This inline style is the key. It hides the editor without unmounting it.
                 style={{
                   visibility:
                     isApiLoading || !isContentReady ? 'hidden' : 'visible',
@@ -471,8 +471,6 @@ const WriteBlog = () => {
                 <Editor ref={editorRef} onChange={handleEditorChange} />
               </div>
             </div>
-
-            {/* --- END: THE ONLY SECTION THAT NEEDS TO CHANGE --- */}
           </div>
         </div>
       </div>
