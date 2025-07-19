@@ -29,6 +29,15 @@
       "prettier --write --ignore-unknown"
     ]
   },
+  "overrides": {
+    "rollup": {
+      "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "4.40.2"
+      }
+    },
+    "esbuild": "^0.25.6",
+    "lightningcss": "^1.29.3"
+  },
   "dependencies": {
     "@achmadk/react-loading-overlay": "^3.0.5",
     "@emotion/react": "^11.14.0",
