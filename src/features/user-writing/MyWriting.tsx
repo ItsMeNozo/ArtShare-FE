@@ -131,7 +131,7 @@ const WriteBlog = () => {
   const preloadedTitle = location.state?.title;
 
   const [blogTitle, setBlogTitle] = useState(
-    preloadedTitle || (isNewDocument ? 'Untitled Document' : ''),
+    preloadedTitle || (isNewDocument ? '' : ''),
   );
 
   const [isApiLoading, setIsApiLoading] = useState(!isNewDocument);
@@ -149,6 +149,7 @@ const WriteBlog = () => {
     null,
   );
   const [initialContent, setInitialContent] = useState<string | null>(null);
+  const [isPublishDisabled, setIsPublishDisabled] = useState(true);
 
   // --- Other hooks and functions remain largely unchanged ---
 
@@ -262,8 +263,9 @@ const WriteBlog = () => {
         titleSaveDebounceRef.current = setTimeout(async () => {
           updateSaveStatus('saving');
           try {
+            const trimmed = newTitle.trim();
             await updateExistingBlog(numericBlogId, {
-              title: newTitle.trim() || 'Untitled Document',
+              title: trimmed && trimmed !== 'Untitled Document' ? trimmed : '',
               isPublished: false,
             });
             updateSaveStatus('saved', new Date());
@@ -300,7 +302,13 @@ const WriteBlog = () => {
       const content = editorRef.current.getContent();
       const images = editorRef.current.getImages() || [];
       const numericBlogId = parseInt(blogId, 10);
-      const titleToSave = currentTitle.trim() || 'Untitled Document';
+      // Only send 'Untitled Document' if user actually typed it
+      const trimmedTitle =
+        currentTitle && currentTitle.trim() ? currentTitle.trim() : '';
+      const titleToSave =
+        trimmedTitle && trimmedTitle !== 'Untitled Document'
+          ? trimmedTitle
+          : '';
 
       const payload: UpdateBlogPayload = {
         title: titleToSave,
@@ -404,7 +412,10 @@ const WriteBlog = () => {
       try {
         await updateExistingBlog(parseInt(blogId, 10), {
           content,
-          title: blogTitle,
+          title:
+            blogTitle && blogTitle.trim() !== ''
+              ? blogTitle
+              : 'Untitled Document',
           isPublished: false,
         });
         setHasUnsavedChanges(false);
@@ -443,6 +454,13 @@ const WriteBlog = () => {
     };
   }, [isNewDocument, hasContentForCreation, hasUnsavedChanges, clearTimers]);
 
+  useEffect(() => {
+    // Only allow publish if user typed a real title
+    const isTitleEmpty = !blogTitle || blogTitle.trim() === '';
+    const isContentEmpty = !hasContentForCreation;
+    setIsPublishDisabled(isTitleEmpty || isContentEmpty);
+  }, [blogTitle, hasContentForCreation]);
+
   return (
     <>
       <div className="dark:bg-mountain-950 flex h-full w-full flex-row bg-white">
@@ -450,12 +468,14 @@ const WriteBlog = () => {
           <TextEditorHeader
             handleExport={handleExportDocument}
             handleSaveBlog={handleSaveBlog}
-            text={blogTitle}
+            text={blogTitle || 'Untitled Document'}
             setText={handleTitleChange}
             isPublished={isPublished}
             tooltipOpen={tooltipOpen}
             saveStatus={statusComponent}
             isTitleLoading={isApiLoading}
+            isPublishDisabled={isPublishDisabled}
+            isTitleEmpty={!blogTitle || blogTitle.trim() === ''}
           />
           <div className="border-mountain-100 bg-mountain-50 dark:border-mountain-700 dark:bg-mountain-900 h-full w-full border-l">
             {(isApiLoading || !isContentReady) && <LoadingScreen />}
@@ -497,7 +517,6 @@ const WriteBlog = () => {
           animation: spin 1s linear infinite;
           will-change: transform;
         }
-        
         .loading-spinner-large {
           width: 32px;
           height: 32px;
@@ -507,10 +526,12 @@ const WriteBlog = () => {
           animation: spin 1s linear infinite;
           will-change: transform;
         }
-        
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        .title-empty {
+          color: #a3a3a3 !important; /* Tailwind's text-gray-400 */
         }
       `}</style>
     </>
