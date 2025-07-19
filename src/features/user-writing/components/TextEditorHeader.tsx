@@ -21,7 +21,9 @@ interface TextEditorHeaderProps {
   isPublished: boolean;
   tooltipOpen: boolean;
   saveStatus?: React.ReactNode;
-  isTitleLoading?: boolean; // MODIFIED: Add new prop
+  isTitleLoading?: boolean;
+  isPublishDisabled?: boolean;
+  isTitleEmpty?: boolean;
 }
 
 const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
@@ -32,7 +34,9 @@ const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
   isPublished,
   tooltipOpen,
   saveStatus,
-  isTitleLoading, // MODIFIED: Destructure new prop
+  isTitleLoading,
+  isPublishDisabled,
+  isTitleEmpty,
 }) => {
   const { user, loading } = useUser();
   const navigate = useNavigate();
@@ -82,9 +86,8 @@ const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
           value={text}
           onChange={(e) => setText(e.target.value)}
           style={{ width: `${dynamicWidth}px` }}
-          className="dark:bg-mountain-800/80 dark:border-mountain-600 placeholder:text-mountain-600 dark:placeholder:text-mountain-400 h-12 flex-shrink rounded-full border border-gray-200 bg-white/60 px-4 text-gray-900 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-blue-500 dark:text-gray-100 dark:focus:ring-blue-400"
+          className={`dark:bg-mountain-800/80 dark:border-mountain-600 placeholder:text-mountain-600 dark:placeholder:text-mountain-400 h-12 flex-shrink rounded-full border border-gray-200 bg-white/60 px-4 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${isTitleEmpty ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}
           placeholder="Name Your Document Here..."
-          // MODIFIED: Disable input based on the loading prop
           disabled={isTitleLoading}
         />
         {saveStatus && <div className="flex-shrink-0">{saveStatus}</div>}
@@ -112,7 +115,8 @@ const TextEditorHeader: React.FC<TextEditorHeaderProps> = ({
 
         <Button
           onClick={() => handleSaveBlog(text)}
-          className="flex h-9 items-center gap-2 rounded-full border border-emerald-700 bg-green-600 px-4 font-medium text-white shadow transition-colors hover:bg-green-700 hover:brightness-95 dark:border-emerald-800 dark:bg-green-700 dark:hover:bg-green-800"
+          disabled={isPublishDisabled}
+          className="flex h-9 items-center gap-2 rounded-full border border-emerald-700 bg-green-600 px-4 font-medium text-white shadow transition-colors hover:bg-green-700 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-emerald-800 dark:bg-green-700 dark:hover:bg-green-800"
         >
           <AiOutlineSave className="h-4 w-4" />
           <span className="whitespace-nowrap">
