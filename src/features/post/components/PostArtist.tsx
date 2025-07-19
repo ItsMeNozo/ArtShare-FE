@@ -72,14 +72,14 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
 
   if (!artist) {
     return (
-      <div className="m-4 flex items-center justify-center">
+      <div className="flex justify-center items-center m-4">
         Artist not found or data is unavailable.
       </div>
     );
   }
 
   return (
-    <div className="dark:bg-mountain-950 md:border-b-mountain-200 overflow-none rounded-2xl bg-white p-4 shadow md:rounded-b-none md:border-b">
+    <div className="bg-white dark:bg-mountain-950 p-4 md:border-b md:border-b-mountain-200 rounded-2xl md:rounded-b-none overflow-none">
       <CardHeader
         className="p-0"
         action={
@@ -99,15 +99,15 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
         }
       />
       <CardContent
-        className="group dark:hover:bg-mountain-800/50 flex cursor-pointer flex-col gap-4 rounded-lg p-2 transition-colors duration-200 hover:bg-gray-50"
+        className="group flex flex-col gap-4 hover:bg-gray-50 dark:hover:bg-mountain-800/50 p-2 rounded-lg transition-colors duration-200 cursor-pointer"
         onClick={() => navigate(`/${artist.username}`)}
       >
-        <div className="flex cursor-pointer gap-4">
-          <div className="flex-shrink-0 overflow-hidden rounded-full ring-2 ring-transparent transition-all duration-200 group-hover:ring-blue-500/30">
+        <div className="flex gap-4 cursor-pointer">
+          <div className="flex-shrink-0 rounded-full ring-2 ring-transparent group-hover:ring-blue-500/30 overflow-hidden transition-all duration-200">
             {artist.profilePictureUrl ? (
               <img
                 src={artist.profilePictureUrl}
-                className="h-20 w-20 object-cover"
+                className="w-20 h-20 object-cover"
                 alt={`${artist.username}'s profile`}
               />
             ) : (
@@ -120,10 +120,10 @@ const PostArtist = ({ artist, postData }: { artist: User; postData: Post }) => {
             )}
           </div>
           <div className="flex flex-col pt-0.5">
-            <div className="text-xl font-bold transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+            <div className="font-bold dark:group-hover:text-blue-400 group-hover:text-blue-600 text-xl transition-colors duration-200">
               {artist.fullName || 'Unknown fullname'}
             </div>
-            <div className="line-clamp-1 text-sm transition-colors duration-200 group-hover:text-blue-500 dark:group-hover:text-blue-300">
+            <div className="dark:group-hover:text-blue-300 group-hover:text-blue-500 text-sm line-clamp-1 transition-colors duration-200">
               @{artist.username}
             </div>
           </div>

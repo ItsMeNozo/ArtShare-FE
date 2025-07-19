@@ -1,39 +1,39 @@
-import { Button, Tooltip } from '@mui/material';
-import { Plus } from 'lucide-react';
-import React, { Dispatch, SetStateAction, useRef, useState } from 'react';
-import { ChromePicker } from 'react-color';
-import Draggable from 'react-draggable';
-import { MdOutlineSaveAlt } from 'react-icons/md';
-import ZoomTool from './Zoom';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import ZoomTool from "./Zoom";
+import { Tooltip } from "@mui/material";
+import { Lock, Plus } from "lucide-react";
+import Draggable from "react-draggable";
+import { Sketch } from '@uiw/react-color';
+import { IoLayersOutline } from "react-icons/io5";
 
 interface LayerToolsBarProp {
   layers: Layer[];
   zoomLevel: number;
+  currentZIndex: number;
   selectedLayerId: string | null;
   setLayers: Dispatch<SetStateAction<Layer[]>>;
   handleZoomIn: () => void;
   handleZoomOut: () => void;
   setSelectedLayerId: Dispatch<SetStateAction<string | null>>;
-  handleDownload: () => void;
 }
 
 const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   layers,
   zoomLevel,
   selectedLayerId,
+  currentZIndex,
   setLayers,
   handleZoomIn,
   handleZoomOut,
   setSelectedLayerId,
-  handleDownload,
 }) => {
   const [openColorSettings, setOpenColorSettings] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = () => {
       const imageSrc = reader.result as string;
@@ -73,6 +73,8 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             saturation: 100,
             hue: 0,
             sepia: 0,
+            zIndex: currentZIndex,
+            isLocked: false,
           },
         ]);
       };
@@ -82,20 +84,35 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setOpenColorSettings(false); // Close the color picker
+      }
+    }
+    if (openColorSettings) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openColorSettings]);
+
   return (
-    <div className="relative z-50 flex h-full">
-      <div className="border-mountain-200 flex h-full w-28 flex-col justify-between rounded-lg rounded-r-none border bg-white">
+    <div className="z-50 relative flex h-full">
+      <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full">
         <div className="flex flex-col space-y-2">
           {/* Layers Header */}
-          <div className="border-mountain-400 text-mountain-800 flex h-10 items-center justify-center border-b-1 bg-white font-medium">
-            Layers
+          <div className="flex justify-center items-center space-x-2 bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
+            <IoLayersOutline />
+            <span>Layers</span>
           </div>
           <Tooltip title="Add Layer" arrow placement="right">
             <div
-              className="border-mountain-400 flex h-10 w-full items-center justify-center p-2 py-0 hover:cursor-pointer"
+              className="flex justify-center items-center p-2 py-0 border-mountain-400 w-full h-10 hover:cursor-pointer"
               onClick={() => document.getElementById('image-upload')?.click()}
             >
-              <div className="border-mountain-200 flex h-full w-full items-center justify-center border">
+              <div className="flex justify-center items-center border border-mountain-200 w-full h-full">
                 <Plus className="size-4" />
               </div>
               <input
@@ -113,17 +130,16 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             .map((layer) => (
               <div
                 key={layer.id}
-                className="flex h-20 w-full items-center justify-center rounded-sm px-2 hover:cursor-pointer"
+                className="relative flex justify-center items-center px-2 rounded-sm w-full h-20 hover:cursor-pointer"
                 onClick={() => setSelectedLayerId(layer.id)}
               >
                 {layer.type === 'image' ? (
                   <img
                     src={layer.src}
-                    className={`h-20 w-full rounded-sm border-1 object-cover ${
-                      selectedLayerId === layer.id
-                        ? 'border-indigo-400'
-                        : 'border-mountain-200'
-                    }`}
+                    className={`rounded-sm w-full h-20 object-cover border-1 ${selectedLayerId === layer.id
+                      ? "border-indigo-400"
+                      : "border-mountain-200"
+                      }`}
                     alt="Layer Preview"
                   />
                 ) : (
@@ -134,16 +150,19 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                       <div
                         style={{
                           position: 'absolute',
-                          fontSize: layer.fontSize * 0.5,
+                          fontSize: '12px',
                           color: layer.color,
                         }}
-                        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex-nowrap text-nowrap"
+                        className="top-1/2 left-1/2 flex-nowrap text-nowrap -translate-x-1/2 -translate-y-1/2"
                       >
-                        {layer.text || 'Preview text'}
+                        {layer.text || 'Text Layer'}
                       </div>
                     )}
                   </div>
                 )}
+                <div className={`${layer.isLocked ? '' : 'hidden'} right-2 bottom-1 z-50 absolute flex bg-mountain-950/50 p-2`}>
+                  <Lock className="size-3 text-white" />
+                </div>
               </div>
             ))}
           <Tooltip title="Set Color" arrow placement="right">
@@ -164,21 +183,21 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                       : '#fffff',
                 }}
               />
-              <span className="text-mountain-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs italic">
+              <span className="top-1/2 left-1/2 absolute text-mountain-400 text-xs italic -translate-x-1/2 -translate-y-1/2">
                 Background
               </span>
             </div>
           </Tooltip>
           {openColorSettings && selectedLayerId === layers[0].id && (
             <Draggable handle=".drag-handle">
-              <div className="absolute z-50 rounded border bg-white shadow-md">
-                <div className="drag-handle cursor-move rounded-t bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-700">
-                  🎨 Background Color
+              <div ref={pickerRef} className="z-50 absolute bg-white shadow-md rounded">
+                <div className="bg-mountain-100 px-3 py-1 rounded-t font-normal text-mountain-950 text-sm cursor-move drag-handle">
+                  🎨 Color Picker
                 </div>
-                {layers[0].type === 'image' && (
-                  <ChromePicker
+                {layers[0].type === "image" && (
+                  <Sketch
                     color={(layers[0] as ImageLayer).backgroundColor}
-                    onChangeComplete={(color) => {
+                    onChange={(color) => {
                       const updated = [...layers];
                       const imageLayer = updated[0] as ImageLayer;
                       imageLayer.backgroundColor = color.hex;
@@ -189,22 +208,6 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
               </div>
             </Draggable>
           )}
-        </div>
-        <div className="border-mountain-200 flex flex-col space-y-2 border-t-1 py-2">
-          <div className="border-mountain-400 flex h-10 w-full items-center justify-center p-2 py-0 hover:cursor-pointer">
-            <Button className="hover:bg-mountain-50 border-mountain-200 flex h-full w-full items-center justify-center rounded-lg border bg-white hover:cursor-pointer">
-              <p className="font-normal">Close</p>
-            </Button>
-          </div>
-          <div
-            onClick={handleDownload}
-            className="border-mountain-400 flex h-10 w-full items-center justify-center p-2 py-0 hover:cursor-pointer"
-          >
-            <Button className="border-mountain-200 flex h-full w-full items-center justify-center rounded-lg border bg-indigo-200 hover:cursor-pointer hover:bg-indigo-100">
-              <MdOutlineSaveAlt className="mr-1" />
-              <p className="font-normal">Export</p>
-            </Button>
-          </div>
         </div>
       </div>
       <ZoomTool

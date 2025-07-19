@@ -1,7 +1,6 @@
 //Components
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import OpacitySlider from '../sliders/OpacitySlider';
+import { Label } from "@/components/ui/label";
+import OpacitySlider from "../sliders/OpacitySlider";
 
 //Icons
 import { GoTrash } from 'react-icons/go';
@@ -36,17 +35,8 @@ const CropPanel: React.FC<PanelsProp> = ({
   return (
     <>
       <div className="flex flex-col space-y-2">
-        <Label className="font-medium">Layer Name</Label>
-        <Input
-          className="bg-mountain-50 placeholder:text-mountain-600 flex w-full border"
-          placeholder="Input Layer Name"
-          defaultValue="Background"
-        />
-      </div>
-      <hr className="border-mountain-100 flex w-full border-t-1" />
-      <div className="flex flex-col space-y-2">
         <Label className="font-medium">Layer position</Label>
-        <div className="flex justify-between gap-x-4">
+        <div className="flex justify-between gap-4 w-full">
           <LayerPosition
             label={'X'}
             position={layers.find((layer) => layer.id === selectedLayerId)?.x!}
@@ -75,26 +65,26 @@ const CropPanel: React.FC<PanelsProp> = ({
           onChange={handleRotationChange}
         />
       </div>
-      <div className="flex w-full space-x-2">
+      <div className="flex space-x-2 w-full">
         <div
           onClick={toggleFlipHorizontal}
-          className="bg-mountain-50 hover:bg-mountain-100 border-mountain-200 flex h-10 w-[25%] items-center justify-center rounded-lg border shadow-sm select-none"
+          className="flex justify-center items-center bg-mountain-50 hover:bg-mountain-100 shadow-sm border border-mountain-200 rounded-lg w-[25%] h-10 select-none"
         >
           <PiFlipHorizontalLight className="flex size-5" />
         </div>
         <div
           onClick={toggleFlipVertical}
-          className="bg-mountain-50 hover:bg-mountain-100 border-mountain-200 flex h-10 w-[25%] items-center justify-center rounded-lg border shadow-sm select-none"
+          className="flex justify-center items-center bg-mountain-50 hover:bg-mountain-100 shadow-sm border border-mountain-200 rounded-lg w-[25%] h-10 select-none"
         >
           <PiFlipVerticalLight className="flex size-5" />
         </div>
         <div
           onClick={() => handleDuplicate(layers[layers.length - 1].id)}
-          className="bg-mountain-50 hover:bg-mountain-100 border-mountain-200 flex h-10 w-[25%] items-center justify-center rounded-lg border shadow-sm select-none"
+          className="flex justify-center items-center bg-mountain-50 hover:bg-mountain-100 shadow-sm border border-mountain-200 rounded-lg w-[25%] h-10 select-none"
         >
           <IoDuplicateOutline className="flex size-5" />
         </div>
-        <div className="bg-mountain-50 hover:bg-mountain-100 border-mountain-200 flex h-10 w-[25%] items-center justify-center rounded-lg border shadow-sm select-none">
+        <div className="flex justify-center items-center bg-mountain-50 hover:bg-mountain-100 shadow-sm border border-mountain-200 rounded-lg w-[25%] h-10 select-none">
           <GoTrash className="flex size-5" />
         </div>
       </div>

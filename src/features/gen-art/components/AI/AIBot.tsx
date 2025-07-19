@@ -88,16 +88,16 @@ const AIBotPopover = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="hover:bg-mountain-50 border-mountain-300 ml-4 h-15 w-15 rounded-full border bg-white shadow-md hover:cursor-pointer">
+        <Button className="bg-white hover:bg-mountain-50 shadow-md ml-4 border border-mountain-300 rounded-full w-15 h-15 hover:cursor-pointer">
           <RiChatAiLine className="size-8 text-indigo-950" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
         side="top"
-        className="border-mountain-200 mb-4 h-[600px] w-[400px] rounded-xl border bg-white p-0 shadow-xl"
+        className="bg-white shadow-xl mb-4 p-0 border border-mountain-200 rounded-xl w-[400px] h-128"
       >
-        <div className="border-mountain-100 flex h-16 items-center justify-between border-b p-3">
-          <span className="text-mountain-700 text-base font-semibold">
+        <div className="flex justify-between items-center p-3 border-mountain-100 border-b h-16">
+          <span className="font-semibold text-mountain-700 text-base">
             ArtShare AI Bot
           </span>
           <Button
@@ -105,27 +105,27 @@ const AIBotPopover = () => {
               clearChat();
               showSnackbar('Started new chat');
             }}
-            className="flex bg-indigo-50 text-indigo-950"
+            className='flex bg-indigo-50 hover:bg-indigo-100 text-indigo-950 cursor-pointer'
           >
             <RiChatNewLine />
             <p>New Chat</p>
           </Button>
         </div>
-        <div className="relative flex h-[536px] w-full flex-col items-center">
+        <div className="relative flex flex-col items-center w-full h-112">
           <div
             ref={scrollRef}
-            className="custom-scrollbar flex h-full w-full flex-col overflow-y-auto pb-24"
+            className="flex flex-col pb-12 w-full h-full overflow-y-auto custom-scrollbar"
           >
             {messages.length === 0 ? (
-              <div className="mt-20 flex flex-col items-center space-y-6 text-xs">
-                <div className="flex flex-col items-center justify-center space-y-2">
-                  <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className="bg-mountain-950 border-mountain-300 flex h-15 w-15 items-center justify-center rounded-xl border bg-gradient-to-r shadow">
+              <div className="flex flex-col items-center space-y-6 mt-12 text-xs">
+                <div className="flex flex-col justify-center items-center space-y-2">
+                  <div className="flex flex-col justify-center items-center space-y-4">
+                    <div className="flex justify-center items-center bg-mountain-950 bg-gradient-to-r shadow border border-mountain-300 rounded-xl w-15 h-15">
                       <RiRobot2Line className="size-6 text-white" />
                     </div>
-                    <p className="text-base font-medium">Imagine Bot</p>
+                    <p className="font-medium text-base">Imagine Bot</p>
                   </div>
-                  <p className="text-mountain-600 flex w-[360px] text-center text-sm">
+                  <p className="flex w-[360px] text-mountain-600 text-sm text-center">
                     Spark your creativity with Imagine Bot! Generate unique
                     prompts to inspire your next visual masterpiece.
                   </p>
@@ -135,7 +135,7 @@ const AIBotPopover = () => {
                     <div
                       key={index}
                       onClick={() => handleExampleClick(prompt)}
-                      className="hover:bg-mountain-50 text-mountain-600 hover:text-mountain-950 flex w-fit rounded-full border p-2 px-4 transition-colors hover:cursor-pointer"
+                      className="flex hover:bg-mountain-50 p-2 px-4 border rounded-full w-fit text-mountain-600 hover:text-mountain-950 transition-colors hover:cursor-pointer"
                     >
                       <p>{prompt}</p>
                     </div>
@@ -143,39 +143,38 @@ const AIBotPopover = () => {
                 </div>
               </div>
             ) : (
-              <div className="mt-8 flex flex-col space-y-4 px-4">
+              <div className="flex flex-col space-y-4 mt-8 px-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
                     className={`flex ${message.role === 'USER' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[70%] rounded-xl p-4 ${
-                        message.role === 'USER'
-                          ? 'text-mountain-50 bg-indigo-600'
-                          : 'bg-mountain-100'
-                      }`}
+                      className={`max-w-[70%] rounded-xl p-4 ${message.role === 'USER'
+                        ? 'text-mountain-50 bg-indigo-600'
+                        : 'bg-mountain-100'
+                        }`}
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
 
                       {message.role === 'ASSISTANT' &&
                         message.generatedPrompts && (
                           <div className="space-y-2">
-                            <p className="text-mountain-500 mb-2 text-xs">
+                            <p className="mb-2 text-mountain-500 text-xs">
                               Click any prompt to copy:
                             </p>
                             {message.generatedPrompts.map((prompt, index) => (
                               <div
                                 key={index}
                                 onClick={() => handlePromptClick(prompt)}
-                                className="group border-mountain-200 cursor-pointer rounded-lg border bg-white p-3 transition-all hover:border-indigo-400 hover:shadow-md"
+                                className="group bg-white hover:shadow-md p-3 border border-mountain-200 hover:border-indigo-400 rounded-lg transition-all cursor-pointer"
                               >
-                                <div className="flex items-center justify-between">
-                                  <span className="text-mountain-400 text-xs opacity-0 transition-opacity group-hover:opacity-100">
+                                <div className="flex justify-between items-center">
+                                  <span className="opacity-0 group-hover:opacity-100 text-mountain-400 text-xs transition-opacity">
                                     📋 Copy
                                   </span>
                                 </div>
-                                <p className="text-mountain-700 mt-1 text-sm">
+                                <p className="mt-1 text-mountain-700 text-sm">
                                   {prompt}
                                 </p>
                               </div>
@@ -187,7 +186,7 @@ const AIBotPopover = () => {
                 ))}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-mountain-100 flex items-center space-x-2 rounded-lg p-4">
+                    <div className="flex items-center space-x-2 bg-mountain-100 p-4 rounded-lg">
                       <CircularProgress size={20} />
                       <span className="text-mountain-600 text-sm">
                         Generating ideas...
@@ -216,16 +215,15 @@ const AIBotPopover = () => {
                 }}
                 placeholder="Type your idea..."
                 disabled={isLoading}
-                className="placeholder:text-mountain-400 custom-scrollbar flex h-full w-full resize-none overflow-y-auto rounded-xl bg-white p-2 pr-24 text-sm outline-none focus:border-transparent focus:ring-0 focus:outline-none"
+                className="flex bg-white p-2 pr-24 focus:border-transparent rounded-xl outline-none focus:outline-none focus:ring-0 w-full h-full overflow-y-auto placeholder:text-mountain-400 text-sm resize-none custom-scrollbar"
               />
               <Button
                 onClick={handleGenerate}
                 disabled={isLoading || !userPrompt.trim()}
-                className={`absolute right-4 -bottom-2 flex -translate-y-1/2 items-center px-4 ${
-                  isLoading || !userPrompt.trim()
-                    ? 'bg-mountain-200 text-mountain-950 cursor-not-allowed'
-                    : 'bg-indigo-400 hover:cursor-pointer hover:bg-indigo-300'
-                }`}
+                className={`absolute right-4 -bottom-2 flex -translate-y-1/2 items-center px-4 ${isLoading || !userPrompt.trim()
+                  ? 'bg-mountain-200 text-mountain-950 cursor-not-allowed'
+                  : 'bg-indigo-400 hover:cursor-pointer hover:bg-indigo-300'
+                  }`}
               >
                 {isLoading ? (
                   <CircularProgress size={20} color="inherit" />

@@ -6,7 +6,7 @@ export const MediaPreviewContainer: React.FC<BoxProps> = ({
   ...props
 }) => (
   <Box
-    className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
+    className="flex flex-col justify-center items-center bg-mountain-100/80 border border-gray-500 border-dashed rounded-lg w-full h-full"
     {...props}
   >
     {children}

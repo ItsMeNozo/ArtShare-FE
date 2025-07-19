@@ -52,6 +52,7 @@ const DocumentDashboard = lazy(
 const MyWriting = lazy(() => import('@/features/user-writing/MyWriting'));
 const ArtGeneration = lazy(() => import('@/features/gen-art/ArtGenAI'));
 const ImageEditor = lazy(() => import('@/features/edit-image/EditImage'));
+const BrowseImage = lazy(() => import('@/features/edit-image/BrowseImage'));
 
 const SocialLinksPage = lazy(
   () =>
@@ -229,6 +230,7 @@ const routeConfig: RouteObject[] = [
         children: [
           { path: '/docs/:blogId', element: <MyWriting /> },
           { path: '/image/tool/editor', element: <ImageEditor /> },
+          { path: '/image/tool/editor/new', element: <BrowseImage /> },
           { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
         ],
       },
