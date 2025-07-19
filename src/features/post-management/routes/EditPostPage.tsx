@@ -8,7 +8,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PostForm from '../components/PostForm';
 import { useUpdatePost } from '../hooks/useUpdatePost';
-import { PostFormValues } from '../types/post-form-values.type';
+import {
+  defaultPostFormValues,
+  PostFormValues,
+} from '../types/post-form-values.type';
 import { PostMedia } from '../types/post-media';
 
 /**
@@ -65,8 +68,7 @@ const EditPostPage: React.FC = () => {
 
   const initialFormValues = useMemo((): PostFormValues => {
     if (!fetchedPost) {
-      console.error('Fetched post data is not available');
-      throw new Error('Fetched post data is not available');
+      return defaultPostFormValues;
     }
     return {
       title: fetchedPost.title,

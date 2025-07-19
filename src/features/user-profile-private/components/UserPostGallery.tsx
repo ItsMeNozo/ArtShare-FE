@@ -1,43 +1,41 @@
-import IGallery, { GalleryPhoto } from '@/components/gallery/Gallery';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import React from 'react';
-import { RenderPhotoContext } from 'react-photo-album';
-import { SelectedCollectionId } from '../types/collection';
-import {
-  CollectionImageRenderer,
-  CollectionImageRendererOptions,
-} from './CollectionImageRenderer';
 
-interface CollectionGalleryProps {
+import IGallery, { GalleryPhoto } from '@/components/gallery/Gallery';
+
+import { RenderPhotoContext } from 'react-photo-album';
+import { UserPostRenderer, UserPostRendererOptions } from './UserPostRenderer';
+
+interface UserPostGalleryProps {
   photos: GalleryPhoto[];
   isLoading: boolean;
   isError: boolean;
   error: string | null;
-  selectedCollectionId: SelectedCollectionId;
-  onRemovePost: (postId: number) => void;
-  isReadOnly?: boolean;
+  username: string;
+  isOwner: boolean;
+  onPostDeleted: (postId: number) => void;
 }
 
-export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
+export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
   photos,
   isLoading,
   isError,
   error,
-  onRemovePost,
-  selectedCollectionId,
-  isReadOnly = false,
+  username,
+  isOwner,
+  onPostDeleted,
 }) => {
   const renderPhotoCallback = React.useCallback(
     (_: unknown, context: RenderPhotoContext<GalleryPhoto>) => {
-      const options: CollectionImageRendererOptions = {
-        onRemovePost,
-        selectedCollectionId,
-        isReadOnly,
+      const options: UserPostRendererOptions = {
+        isOwner,
+        onPostDeleted,
+        username,
       };
 
-      return CollectionImageRenderer(context, options);
+      return UserPostRenderer(context, options);
     },
-    [onRemovePost, selectedCollectionId, isReadOnly],
+    [isOwner, onPostDeleted, username],
   );
 
   if (isLoading) {
@@ -59,7 +57,7 @@ export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography color="error">
-          {error || 'An error occurred while loading the gallery.'}
+          {error || 'An error occurred while loading the posts.'}
         </Typography>
       </Box>
     );
@@ -68,9 +66,7 @@ export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
   if (photos.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
-        <Typography color="text.secondary">
-          This collection has no items.
-        </Typography>
+        <Typography color="text.secondary">No posts available.</Typography>
       </Box>
     );
   }

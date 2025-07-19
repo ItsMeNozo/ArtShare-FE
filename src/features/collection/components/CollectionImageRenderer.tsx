@@ -1,17 +1,10 @@
+import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { GalleryPhoto } from '@/components/gallery/Gallery';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { formatCount } from '@/utils/common';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { Images } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 import { AiOutlineLike } from 'react-icons/ai';
 import { BiCommentDetail } from 'react-icons/bi';
 import { FiX as DeleteIcon } from 'react-icons/fi';
@@ -23,6 +16,7 @@ import { SelectedCollectionId } from '../types/collection';
 export interface CollectionImageRendererOptions {
   selectedCollectionId: SelectedCollectionId;
   onRemovePost: (postId: number) => void;
+  isReadOnly?: boolean;
 }
 
 export const CollectionImageRenderer = (
@@ -30,30 +24,33 @@ export const CollectionImageRenderer = (
   options: CollectionImageRendererOptions,
 ) => {
   const { photo, width, height } = context;
-  const { onRemovePost, selectedCollectionId } = options;
+  const { onRemovePost, selectedCollectionId, isReadOnly = false } = options;
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const {
+    isDialogOpen,
+    itemToConfirm: postToRemove,
+    openDialog,
+    closeDialog,
+  } = useConfirmationDialog<number>();
 
-  const canDelete = typeof selectedCollectionId === 'number';
+  const canDelete = typeof selectedCollectionId === 'number' && !isReadOnly;
 
   const handleOpenDeleteDialog = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
+    openDialog(photo.postId);
   };
 
   const handleConfirmDelete = () => {
-    onRemovePost(photo.postId);
-    handleCloseDeleteDialog();
+    if (postToRemove) {
+      onRemovePost(postToRemove);
+    }
+    closeDialog();
   };
 
   return (
     <div
-      className="group relative cursor-pointer rounded-lg border border-transparent hover:border-gray-300"
+      className="relative border border-transparent rounded-lg cursor-pointer group hover:border-gray-300"
       style={{
         height: height,
         width: width,
@@ -90,26 +87,26 @@ export const CollectionImageRenderer = (
       )}
       {/* --- End Delete Button --- */}
 
-      <Link to={`/posts/${photo.postId}`} className="block h-full w-full">
+      <Link to={`/posts/${photo.postId}`} className="block w-full h-full">
         <img
           key={photo.key || photo.src}
           src={photo.src}
-          className="h-full w-full rounded-lg object-cover"
+          className="object-cover w-full h-full rounded-lg"
           style={{ display: 'block' }}
         />
         {/* Overlay */}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="absolute inset-0 flex flex-col items-start justify-end p-4 text-white transition-opacity duration-300 rounded-lg opacity-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:opacity-100">
           {photo.postLength > 1 && (
-            <div className="pointer-events-auto absolute top-2 left-2 flex items-center justify-center rounded-full bg-black/40 p-1">
+            <div className="absolute flex items-center justify-center p-1 rounded-full pointer-events-auto top-2 left-2 bg-black/40">
               <Images size={14} />
             </div>
           )}
-          <div className="flex w-full items-end justify-between gap-2">
+          <div className="flex items-end justify-between w-full gap-2">
             <div title={`${photo.title}\n${photo.author}`}>
-              <span className="line-clamp-1 text-sm font-semibold">
+              <span className="text-sm font-semibold line-clamp-1">
                 {photo.title}
               </span>
-              <span className="line-clamp-1 text-xs">{photo.author}</span>
+              <span className="text-xs line-clamp-1">{photo.author}</span>
             </div>
             <div className="flex flex-col items-end space-y-0.5">
               <div className="flex items-center space-x-1">
@@ -135,32 +132,16 @@ export const CollectionImageRenderer = (
         </div>
       </Link>
 
-      {/* --- Confirmation Dialog --- */}
-      <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <DialogTitle id="alert-dialog-title">Confirm Removal</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove the post "
-            {photo.title || 'this post'}" from the collection?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions className="p-4">
-          <Button onClick={handleCloseDeleteDialog} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} variant="contained" autoFocus>
-            Remove
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* --- End Confirmation Dialog --- */}
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Delete Post"
+        contentText={`Are you sure you want to remove the post "${
+          photo.title || 'this post'
+        }" from the collection?`}
+        confirmButtonText="Remove"
+      />
     </div>
   );
 };
