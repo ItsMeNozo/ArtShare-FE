@@ -15,6 +15,7 @@ interface CollectionGalleryProps {
   error: string | null;
   selectedCollectionId: SelectedCollectionId;
   onRemovePost: (postId: number) => void;
+  isReadOnly?: boolean;
 }
 
 export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
@@ -24,17 +25,19 @@ export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
   error,
   onRemovePost,
   selectedCollectionId,
+  isReadOnly = false,
 }) => {
   const renderPhotoCallback = React.useCallback(
     (_: unknown, context: RenderPhotoContext<GalleryPhoto>) => {
       const options: CollectionImageRendererOptions = {
         onRemovePost,
         selectedCollectionId,
+        isReadOnly,
       };
 
       return CollectionImageRenderer(context, options);
     },
-    [onRemovePost, selectedCollectionId],
+    [onRemovePost, selectedCollectionId, isReadOnly],
   );
 
   if (isLoading) {

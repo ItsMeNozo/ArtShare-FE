@@ -9,19 +9,19 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { MoreHorizontal } from 'lucide-react';
-import { MouseEvent, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { BiEdit } from 'react-icons/bi';
 import { HiUserAdd } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { followUser, unfollowUser } from './api/follow.api';
-import { getUserProfileByUsername, UserProfile } from './api/user-profile.api';
 import ProfileHeader from './components/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo';
 import ReportDialog from './components/ReportDialog';
 import { useReportUser } from './hooks/useReportUser';
+import { useUserProfile } from './hooks/useUserProfile';
 
 export const UserProfileCard = () => {
   const { username } = useParams();
@@ -33,33 +33,12 @@ export const UserProfileCard = () => {
 
   console.log('🎭 UserProfileCard rendered with username:', username);
 
-  // Memoize the query function to prevent unnecessary re-renders
-  const queryFn = useMemo(() => {
-    console.log('🏗️ Creating query function for username:', username);
-    return () => getUserProfileByUsername(username);
-  }, [username]);
-
   const {
     data: profileData,
     isLoading,
     isError,
     error,
-  } = useQuery<UserProfile, Error>({
-    queryKey: ['userProfile', username],
-    queryFn,
-    enabled: !!username && username.trim() !== '', // Ensure username is not empty
-    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
-    retry: (failureCount, error) => {
-      // Don't retry on 404 (user not found)
-      if (error && 'status' in error && error.status === 404) {
-        return false;
-      }
-      // Retry up to 2 times for other errors
-      return failureCount < 2;
-    },
-  });
+  } = useUserProfile(username);
 
   useEffect(() => {
     // Once the profile refetch shows isFollowing === false, drop the flag
@@ -220,8 +199,8 @@ export const UserProfileCard = () => {
   const isFollowing = profileData?.isFollowing;
 
   return (
-    <div className="flex h-full w-full items-end justify-between pb-4">
-      <div className="flex w-full items-end space-x-4">
+    <div className="flex items-end justify-between w-full h-full pb-4">
+      <div className="flex items-end w-full space-x-4">
         {profileData.profilePictureUrl ? (
           <ProfileHeader
             name={profileData?.fullName ?? ''}
@@ -238,7 +217,7 @@ export const UserProfileCard = () => {
             />
           </Box>
         )}
-        <div className="flex w-full items-center justify-between">
+        <div className="flex items-center justify-between w-full">
           <ProfileInfo
             name={profileData?.fullName ?? ''}
             username={profileData.username ?? ''}
