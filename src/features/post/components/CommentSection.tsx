@@ -374,7 +374,7 @@ const CommentRow = ({
               >
                 <ReactTimeAgo
                   date={new Date(comment.updatedAt)}
-                  timeStyle="mini-now"
+                  timeStyle="round-minute"
                 />
                 {new Date(comment.updatedAt).getTime() !==
                   new Date(comment.createdAt).getTime() && ' (edited)'}
