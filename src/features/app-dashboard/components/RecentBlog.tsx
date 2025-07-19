@@ -25,17 +25,17 @@ const RecentBlog = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-y-4 space-y-6 px-4 py-4">
+      <div className="flex flex-col gap-y-4 space-y-6 py-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex space-x-4">
-            <Skeleton className="rounded-md w-48 h-28" />
+          <div key={i} className="flex space-x-4 bg-mountain-100 p-4 rounded-lg animate-pulse">
+            <Skeleton className="bg-mountain-200 rounded-md w-64 h-48" />
             <div className="flex flex-col flex-1 space-y-2">
-              <Skeleton className="w-3/4 h-5" />
-              <Skeleton className="w-full h-4" />
-              <Skeleton className="w-5/6 h-4" />
+              <Skeleton className="bg-mountain-200 w-3/4 h-5" />
+              <Skeleton className="bg-mountain-200 w-full h-4" />
+              <Skeleton className="bg-mountain-200 w-5/6 h-4" />
               <div className="flex space-x-2 mt-2">
-                <Skeleton className="rounded-full w-20 h-6" />
-                <Skeleton className="rounded-full w-14 h-6" />
+                <Skeleton className="bg-mountain-200 rounded-full w-20 h-6" />
+                <Skeleton className="bg-mountain-200 rounded-full w-14 h-6" />
               </div>
             </div>
           </div>

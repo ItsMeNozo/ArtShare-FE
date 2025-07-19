@@ -222,9 +222,9 @@ const routeConfig: RouteObject[] = [
       {
         element: (
           <RequireOnboard>
-            {/* <ProtectedInAppRoute> */}
-            <Outlet />
-            {/* </ProtectedInAppRoute> */}
+            <ProtectedInAppRoute>
+              <Outlet />
+            </ProtectedInAppRoute>
           </RequireOnboard>
         ),
         children: [
