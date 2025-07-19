@@ -1,17 +1,10 @@
+import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { GalleryPhoto } from '@/components/gallery/Gallery';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { formatCount } from '@/utils/common';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { Images } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 import { AiOutlineLike } from 'react-icons/ai';
 import { BiCommentDetail } from 'react-icons/bi';
 import { FiX as DeleteIcon } from 'react-icons/fi';
@@ -32,23 +25,26 @@ export const CollectionImageRenderer = (
   const { photo, width, height } = context;
   const { onRemovePost, selectedCollectionId } = options;
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const {
+    isDialogOpen,
+    itemToConfirm: postToRemove,
+    openDialog,
+    closeDialog,
+  } = useConfirmationDialog<number>();
 
   const canDelete = typeof selectedCollectionId === 'number';
 
   const handleOpenDeleteDialog = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
+    openDialog(photo.postId);
   };
 
   const handleConfirmDelete = () => {
-    onRemovePost(photo.postId);
-    handleCloseDeleteDialog();
+    if (postToRemove) {
+      onRemovePost(postToRemove);
+    }
+    closeDialog();
   };
 
   return (
@@ -135,32 +131,16 @@ export const CollectionImageRenderer = (
         </div>
       </Link>
 
-      {/* --- Confirmation Dialog --- */}
-      <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <DialogTitle id="alert-dialog-title">Confirm Removal</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove the post "
-            {photo.title || 'this post'}" from the collection?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions className="p-4">
-          <Button onClick={handleCloseDeleteDialog} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmDelete} variant="contained" autoFocus>
-            Remove
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* --- End Confirmation Dialog --- */}
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Delete Post"
+        contentText={`Are you sure you want to remove the post "${
+          photo.title || 'this post'
+        }" from the collection?`}
+        confirmButtonText="Remove"
+      />
     </div>
   );
 };
