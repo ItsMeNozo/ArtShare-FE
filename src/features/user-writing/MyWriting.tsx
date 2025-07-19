@@ -207,7 +207,11 @@ const WriteBlog = () => {
   }, []);
 
   const handleApiError = useCallback(
-    (error: unknown, defaultMessage: string) => {
+    (
+      error: unknown,
+      defaultMessage: string,
+      shouldNavigateAway: boolean = true,
+    ) => {
       const errorMessage =
         error instanceof AxiosError
           ? error.response?.data?.message || defaultMessage
@@ -218,7 +222,10 @@ const WriteBlog = () => {
       showSnackbar(errorMessage, 'error');
       console.error(error);
       setIsApiLoading(false);
-      navigate('/blogs', { replace: true });
+
+      if (shouldNavigateAway) {
+        navigate('/blogs', { replace: true });
+      }
     },
     [showSnackbar, navigate],
   );
@@ -229,7 +236,7 @@ const WriteBlog = () => {
     setIsCreating(true);
     try {
       const payload: CreateBlogPayload = {
-        title: blogTitle,
+        title: blogTitle?.trim() || 'Untitled Document',
         isPublished: false,
         content: editorRef.current?.getContent() || '',
       };
@@ -244,7 +251,7 @@ const WriteBlog = () => {
       setHasUnsavedChanges(false);
       updateSaveStatus('saved', new Date());
     } catch (error) {
-      handleApiError(error, 'Failed to create document');
+      handleApiError(error, 'Failed to create document', false);
     } finally {
       setIsCreating(false);
     }
@@ -302,13 +309,13 @@ const WriteBlog = () => {
           try {
             const trimmed = newTitle.trim();
             await updateExistingBlog(numericBlogId, {
-              title: trimmed && trimmed !== 'Untitled Document' ? trimmed : '',
+              title: trimmed || 'Untitled Document',
               isPublished: false,
             });
             updateSaveStatus('saved', new Date());
             setHasUnsavedChanges(false);
           } catch (error) {
-            handleApiError(error, 'Failed to save title');
+            handleApiError(error, 'Failed to save title', false);
             updateSaveStatus('error');
             setHasUnsavedChanges(true);
           }
@@ -341,10 +348,7 @@ const WriteBlog = () => {
       const numericBlogId = parseInt(blogId, 10);
 
       const trimmedTitle = currentTitle?.trim() || '';
-      const titleToSave =
-        trimmedTitle && trimmedTitle !== 'Untitled Document'
-          ? trimmedTitle
-          : '';
+      const titleToSave = trimmedTitle || 'Untitled Document';
 
       const payload: UpdateBlogPayload = {
         title: titleToSave,
@@ -363,7 +367,7 @@ const WriteBlog = () => {
         navigate(`/blogs/${updatedBlog.id}`);
       } catch (error) {
         updateSaveStatus('error');
-        handleApiError(error, 'Failed to save blog.');
+        handleApiError(error, 'Failed to save blog.', false);
       }
     },
     [blogId, navigate, updateSaveStatus, handleApiError],
@@ -435,9 +439,8 @@ const WriteBlog = () => {
     if (initialContent !== null && editorRef.current) {
       editorRef.current.setContent(initialContent);
       setIsContentReady(true);
-      setHasContentForCreation(hasContentToSave());
     }
-  }, [initialContent, hasContentToSave]);
+  }, [initialContent]);
 
   // Auto-save logic
   useEffect(() => {
