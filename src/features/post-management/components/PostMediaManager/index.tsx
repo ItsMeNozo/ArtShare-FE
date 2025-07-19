@@ -1,14 +1,14 @@
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { MdClose } from 'react-icons/md';
 import { RiImageCircleAiLine } from 'react-icons/ri';
 import { TbDeviceDesktop } from 'react-icons/tb';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import TabValue from '../../enum/media-tab-value';
 import MediaUploadTab from './MediaUploadTab';
-
+import { useLocation } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { IoSparkles } from 'react-icons/io5';
-import { LuImageOff } from 'react-icons/lu';
 import {
   MAX_IMAGES,
   MAX_VIDEO,
@@ -55,7 +54,6 @@ export default function PostMediaManager({
   onMediasChanged,
 }: MediaSelectorPanelProps) {
   const { showSnackbar } = useSnackbar();
-
   const [tabValue, setTabValue] = useState<TabValue>(
     hasArtNovaImages ? TabValue.BROWSE_GENAI : TabValue.UPLOAD_MEDIA,
   );
@@ -64,6 +62,8 @@ export default function PostMediaManager({
   const [matureDialogOpen, setMatureDialogOpen] = useState(false);
   const [selectedPreviewMedia, setSelectedPreviewMedia] =
     useState<PostMedia | null>(null);
+  const location = useLocation();
+  const hasProcessedImageRef = useRef(false);
 
   const handleTabChange = (newTab: TabValue) => {
     if (
@@ -103,6 +103,31 @@ export default function PostMediaManager({
       handleIsMatureAutoDetected(false);
     }
   }, [postMedias, isMatureAutoDetected, handleIsMatureAutoDetected]);
+
+  useEffect(() => {
+    if (hasProcessedImageRef.current) return;
+    const state = location.state as {
+      fromEditorImage?: { fileUrl: string; fileName: string };
+    };
+    if (!state?.fromEditorImage) return;
+    hasProcessedImageRef.current = true;
+    const { fileUrl, fileName } = state.fromEditorImage;
+    fetch(fileUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], fileName, { type: blob.type });
+        const newMedia = {
+          file,
+          type: MEDIA_TYPE.IMAGE,
+          url: URL.createObjectURL(file),
+        };
+        setPostMedias((prev) => [...prev, newMedia]);
+        onThumbnailAddedOrRemoved?.(file);
+        setHasArtNovaImages?.(false);
+        onMediasChanged?.();
+      })
+      .catch((err) => console.error("Failed to load image from editor:", err));
+  }, []);
 
   const { mutateAsync: checkMaturityForNewItems } = useCheckMaturity();
 
@@ -255,20 +280,20 @@ export default function PostMediaManager({
     postMedias.filter((media) => media.type === MEDIA_TYPE.VIDEO).length > 0;
 
   return (
-    <Box className="dark:bg-mountain-900 flex h-full w-[60%] flex-col items-start rounded-md text-gray-900 dark:text-white">
+    <Box className="flex flex-col items-start dark:bg-mountain-900 rounded-md w-[60%] h-full text-gray-900 dark:text-white">
       {/* Tabs */}
-      <div className="border-mountain-200 z-20 mb-3 flex w-full gap-x-1 rounded-full border bg-white p-1.25">
+      <div className="z-20 flex gap-x-1 bg-white mb-3 p-1.25 border border-mountain-200 rounded-full w-full">
         <MediaUploadTab
           isActive={tabValue === TabValue.UPLOAD_MEDIA}
           onClick={() => handleTabChange(TabValue.UPLOAD_MEDIA)}
-          icon={<TbDeviceDesktop className="mr-0.5 h-5 w-5" />}
+          icon={<TbDeviceDesktop className="mr-0.5 w-5 h-5" />}
           label="Upload from Device"
           examples="(images, video)"
         />
         <MediaUploadTab
           isActive={tabValue === TabValue.BROWSE_GENAI}
           onClick={() => handleTabChange(TabValue.BROWSE_GENAI)}
-          icon={<RiImageCircleAiLine className="mr-2 h-5 w-5 text-sm" />}
+          icon={<RiImageCircleAiLine className="mr-2 w-5 h-5 text-sm" />}
           label="Post My AI Images"
           examples=""
         />
@@ -291,7 +316,7 @@ export default function PostMediaManager({
               }}
             >
               <Box
-                className="absolute top-2 z-50 mb-2 flex w-full items-center justify-between space-x-2 rounded-lg p-1 px-2"
+                className="top-2 z-50 absolute flex justify-between items-center space-x-2 mb-2 p-1 px-2 rounded-lg w-full"
                 sx={{ flexShrink: 0 }}
               >
                 <InfoMediaRemaining
@@ -320,7 +345,7 @@ export default function PostMediaManager({
                   justifyContent: 'center',
                   overflow: 'hidden',
                 }}
-                className="bg-mountain-100 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
+                className="flex flex-col justify-center items-center bg-mountain-100/80 border border-gray-500 border-dashed rounded-lg w-full h-full"
               >
                 {selectedPreviewMedia ? (
                   <MediaPreviewer media={selectedPreviewMedia} />
@@ -335,7 +360,7 @@ export default function PostMediaManager({
               </Box>
               {/* Carousel */}
               <Box
-                className="custom-scrollbar flex h-fit space-x-2 pt-3"
+                className="flex space-x-2 pt-3 h-fit custom-scrollbar"
                 sx={{
                   flexShrink: 0,
                 }}
@@ -343,7 +368,7 @@ export default function PostMediaManager({
                 {postMedias.map((media, i) => (
                   <Box
                     key={i}
-                    className="bounce-item relative cursor-pointer rounded-md border-1"
+                    className="relative border-1 rounded-md cursor-pointer bounce-item"
                     sx={{
                       borderColor:
                         selectedPreviewMedia?.file === media.file
@@ -367,10 +392,10 @@ export default function PostMediaManager({
                         handleRemoveMediaPreview(media);
                       }}
                       size="small"
-                      className="group absolute -top-2 -right-2 bg-gray-600 opacity-60 hover:bg-gray-400"
+                      className="group -top-2 -right-2 absolute bg-gray-600 hover:bg-gray-400 opacity-60"
                     >
                       <MdClose
-                        className="text-sm text-white group-hover:text-black"
+                        className="text-white group-hover:text-black text-sm"
                         size={16}
                       />
                     </IconButton>
@@ -391,16 +416,13 @@ export default function PostMediaManager({
         }}
       </AutoSizer>
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="flex w-108 flex-col">
+        <DialogContent className="flex flex-col w-108">
           <DialogHeader>
             <DialogTitle>Change Tab Confirmation</DialogTitle>
             <DialogDescription>
               Switch tabs, your changes will be removed. Are you sure?
             </DialogDescription>
           </DialogHeader>
-          <div className="bg-mountain-100 flex items-center justify-center py-6">
-            <LuImageOff className="text-mountain-600 size-12" />
-          </div>
           <DialogFooter>
             <Button
               className="bg-mountain-100 hover:bg-mountain-100/80"
@@ -409,7 +431,7 @@ export default function PostMediaManager({
               Cancel
             </Button>
             <Button
-              className="text-mountain-50 bg-red-700 hover:bg-red-700/80"
+              className="bg-red-700 hover:bg-red-700/80 text-mountain-50"
               onClick={() => {
                 setPostMedias([]);
                 setTabValue(pendingTab!);
@@ -425,7 +447,7 @@ export default function PostMediaManager({
         </DialogContent>
       </Dialog>
       <Dialog open={matureDialogOpen} onOpenChange={setMatureDialogOpen}>
-        <DialogContent className="flex w-108 flex-col">
+        <DialogContent className="flex flex-col w-108">
           <DialogHeader>
             <DialogTitle>Mature content detected</DialogTitle>
             <DialogDescription>

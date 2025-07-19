@@ -2,308 +2,579 @@ import { TUTORIAL_TEMPLATE_HTML } from '@/constants/template';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { Blog } from '@/types/blog';
 import { AxiosError } from 'axios';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchBlogDetails } from '../blog-details/api/blog';
-import { UpdateBlogPayload, updateExistingBlog } from './api/blog.api';
+import {
+  CreateBlogPayload,
+  createNewBlog,
+  UpdateBlogPayload,
+  updateExistingBlog,
+} from './api/blog.api';
 import { AutoSaveStatus } from './components/AutoSaveStatus';
 import Editor, { EditorHandle } from './components/Editor';
 import TextEditorHeader from './components/TextEditorHeader';
 import Toolbar from './components/Toolbar';
 
+type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
+
+interface AutoSaveStatusProps {
+  status: SaveStatus;
+  lastSaved?: Date;
+  isNewDocument: boolean;
+  createdDocId: number | null;
+  isCreating: boolean;
+  hasContent: boolean;
+}
+
+interface DialogProps {
+  open: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isCreating?: boolean;
+}
+
+const DEBOUNCE_DELAYS = {
+  create: 500,
+  titleSave: 800,
+  autoSave: 2000,
+} as const;
+
+const DIALOG_CONTENT = {
+  creating: {
+    title: 'Discard document?',
+    message:
+      'Your document will be created once you start typing. Are you sure you want to leave?',
+    confirmText: 'Leave',
+  },
+  unsaved: {
+    title: 'Discard unsaved changes?',
+    message:
+      'You have unsaved changes that will be lost if you leave this page.',
+    confirmText: 'Discard',
+  },
+} as const;
+
+const StatusIndicator = ({
+  className,
+  text,
+}: {
+  className: string;
+  text: string;
+}) => (
+  <div className={`flex items-center space-x-2 text-sm ${className}`}>
+    <div className="h-2 w-2 rounded-full bg-current opacity-60"></div>
+    <span>{text}</span>
+  </div>
+);
+
+const LoadingSpinner = ({ size = 'sm' }: { size?: 'sm' | 'lg' }) => (
+  <div className={`loading-spinner${size === 'lg' ? '-large' : ''}`}></div>
+);
+
+const EnhancedAutoSaveStatus = ({
+  status,
+  lastSaved,
+  isNewDocument,
+  createdDocId,
+  isCreating,
+  hasContent,
+}: AutoSaveStatusProps) => {
+  if (isNewDocument && !createdDocId) {
+    if (isCreating) {
+      return (
+        <div className="flex items-center space-x-2 text-sm text-blue-600 dark:text-blue-400">
+          <LoadingSpinner />
+          <span>Creating document...</span>
+        </div>
+      );
+    }
+
+    if (!hasContent) {
+      return (
+        <StatusIndicator
+          className="text-gray-500 dark:text-gray-400"
+          text="Start typing to create document"
+        />
+      );
+    }
+  }
+
+  return <AutoSaveStatus status={status} lastSaved={lastSaved} />;
+};
+
+const UnsavedChangesDialog = ({
+  open,
+  onConfirm,
+  onCancel,
+  isCreating = false,
+}: DialogProps) => {
+  if (!open) return null;
+
+  const content = isCreating ? DIALOG_CONTENT.creating : DIALOG_CONTENT.unsaved;
+
+  return (
+    <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+      <div className="dark:bg-mountain-800 mx-4 w-full max-w-md rounded-lg bg-white p-6">
+        <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
+          {content.title}
+        </h3>
+        <p className="mb-6 text-gray-600 dark:text-gray-400">
+          {content.message}
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onCancel}
+            className="dark:bg-mountain-600 dark:hover:bg-mountain-500 rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300 dark:text-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
+          >
+            {content.confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LoadingScreen = () => (
+  <div className="dark:bg-mountain-950 flex h-screen w-full items-center justify-center bg-white">
+    <div className="flex flex-col items-center space-y-4">
+      <LoadingSpinner size="lg" />
+      <span className="text-gray-700 dark:text-gray-300">
+        Loading editor data...
+      </span>
+    </div>
+  </div>
+);
+
 const WriteBlog = () => {
   const editorRef = useRef<EditorHandle>(null);
+  const createDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const titleSaveDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveRef = useRef<NodeJS.Timeout | null>(null);
+
   const { showSnackbar } = useSnackbar();
   const { blogId } = useParams<{ blogId: string }>();
   const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const isNewDocument = blogId === 'new';
-  const templateType = searchParams.get('template');
-
-  const [blogTitle, setBlogTitle] = useState('Untitled Document');
-  const [isApiLoading, setIsApiLoading] = useState(!isNewDocument);
-  const [isContentLoadedIntoEditor, setIsContentLoadedIntoEditor] =
-    useState(isNewDocument);
-  const [initialFetchedContent, setInitialFetchedContent] = useState<
-    string | null
-  >(
-    isNewDocument
-      ? templateType === 'tutorial'
-        ? TUTORIAL_TEMPLATE_HTML
-        : ''
-      : null,
-  );
-  const [isPublished, setIsPublished] = useState(false);
-  const [tooltipOpen, setTooltipOpen] = useState<boolean>(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<
-    'saved' | 'saving' | 'unsaved' | 'error'
-  >('saved');
-  const [lastSaved, setLastSaved] = useState<Date | undefined>(undefined);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log('@@ has unsaved changes', hasUnsavedChanges, blogId);
-    if (!hasUnsavedChanges || !blogId || blogId === 'new') return;
+  const templateType = new URLSearchParams(location.search).get('template');
+  const isNewDocument = blogId === 'new';
+  const preloadedTitle = location.state?.title;
 
-    const autoSaveTimer = setTimeout(async () => {
-      const content = editorRef.current?.getContent();
-      if (content && blogId !== 'new') {
-        try {
-          await updateExistingBlog(parseInt(blogId, 10), {
-            content,
-            title: blogTitle,
-            isPublished: false, // Keep as draft
-          });
-          setHasUnsavedChanges(false); // Reset after successful save
-          console.log('Auto-saved successfully');
-        } catch (error) {
-          console.error('Auto-save failed:', error);
-        }
+  // State management
+  const [blogTitle, setBlogTitle] = useState(
+    preloadedTitle || (isNewDocument ? '' : ''),
+  );
+  const [isApiLoading, setIsApiLoading] = useState(!isNewDocument);
+  const [isContentReady, setIsContentReady] = useState(isNewDocument);
+  const [isPublished, setIsPublished] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const [lastSaved, setLastSaved] = useState<Date | undefined>(undefined);
+  const [createdDocId, setCreatedDocId] = useState<number | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [hasContentForCreation, setHasContentForCreation] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(
+    null,
+  );
+  const [initialContent, setInitialContent] = useState<string | null>(null);
+
+  const hasContentToSave = useCallback(() => {
+    const content = editorRef.current?.getContent() || '';
+    return content.replace(/<[^>]*>/g, '').trim().length > 0;
+  }, []);
+
+  const clearTimers = useCallback(() => {
+    [createDebounceRef, titleSaveDebounceRef, autoSaveRef].forEach((ref) => {
+      if (ref.current) {
+        clearTimeout(ref.current);
+        ref.current = null;
       }
-    }, 5000); // Auto-save every 5 seconds
+    });
+  }, []);
 
-    return () => clearTimeout(autoSaveTimer);
-  }, [hasUnsavedChanges, blogId, blogTitle]);
+  const updateSaveStatus = useCallback((status: SaveStatus, saved?: Date) => {
+    setSaveStatus(status);
+    if (saved) setLastSaved(saved);
+  }, []);
 
-  // Add a function to handle editor content changes
-  const handleEditorChange = () => {
-    if (!isNewDocument && blogId !== 'new') {
-      setHasUnsavedChanges(true);
-    }
-  };
+  const handleApiError = useCallback(
+    (
+      error: unknown,
+      defaultMessage: string,
+      shouldNavigateAway: boolean = true,
+    ) => {
+      const errorMessage =
+        error instanceof AxiosError
+          ? error.response?.data?.message || defaultMessage
+          : error instanceof Error
+            ? error.message
+            : defaultMessage;
 
-  // Also trigger on title changes
-  const handleTitleChange = (newTitle: string) => {
-    setBlogTitle(newTitle);
-    if (!isNewDocument && blogId !== 'new') {
-      setHasUnsavedChanges(true);
-    }
-  };
-
-  useEffect(() => {
-    // Skip API call for new documents
-    if (isNewDocument) {
+      showSnackbar(errorMessage, 'error');
+      console.error(error);
       setIsApiLoading(false);
-      if (editorRef.current) {
-        const content =
-          templateType === 'tutorial' ? TUTORIAL_TEMPLATE_HTML : '';
-        editorRef.current.setContent(content);
-        editorRef.current.focus();
-      }
-      return;
-    }
 
-    if (!blogId) {
-      showSnackbar('No blog ID provided.', 'error');
-      navigate('/blogs', { replace: true });
-      return;
-    }
-
-    setIsApiLoading(true);
-    setIsContentLoadedIntoEditor(false);
-    setInitialFetchedContent(null);
-    const numericBlogId = parseInt(blogId, 10);
-
-    if (isNaN(numericBlogId)) {
-      showSnackbar('Invalid blog ID format.', 'error');
-      navigate('/blogs', { replace: true });
-      setIsApiLoading(false);
-      return;
-    }
-
-    fetchBlogDetails(numericBlogId)
-      .then((fetchedBlog: Blog) => {
-        setBlogTitle(fetchedBlog.title || 'Untitled Document');
-        setIsPublished(fetchedBlog.isPublished || false);
-        const contentToSet = fetchedBlog.content || '';
-        setInitialFetchedContent(contentToSet);
-
-        if (editorRef.current) {
-          editorRef.current.setContent(contentToSet);
-          setIsContentLoadedIntoEditor(true);
-          editorRef.current.focus();
-        }
-      })
-      .catch((error: unknown) => {
-        console.error('Error fetching blog content:', error);
-        let errorMessage = 'Failed to load blog content.';
-        if (error instanceof AxiosError) {
-          errorMessage = error.response?.data?.message || errorMessage;
-        } else if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-        showSnackbar(errorMessage, 'error');
+      if (shouldNavigateAway) {
         navigate('/blogs', { replace: true });
-      })
-      .finally(() => {
-        setIsApiLoading(false);
-      });
-  }, [blogId, navigate, showSnackbar, isNewDocument, templateType]);
-
-  // This effect ensures content is set if the editor wasn't ready during the fetch's .then()
-  useEffect(() => {
-    if (
-      !isApiLoading &&
-      editorRef.current &&
-      initialFetchedContent !== null &&
-      !isContentLoadedIntoEditor
-    ) {
-      editorRef.current.setContent(initialFetchedContent);
-      setIsContentLoadedIntoEditor(true);
-      // Add focus to ensure editor is interactive
-      setTimeout(() => {
-        if (editorRef.current) {
-          editorRef.current.focus();
-        }
-      }, 100);
-
-      setTimeout(() => {
-        if (editorRef.current) {
-          editorRef.current.focus();
-        }
-      }, 500);
-    }
-  }, [isApiLoading, initialFetchedContent, isContentLoadedIntoEditor]);
-
-  useEffect(() => {
-    if (isContentLoadedIntoEditor && editorRef.current && !isApiLoading) {
-      // Multiple focus attempts to ensure it works
-      const focusAttempts = [100, 300, 600, 1000];
-
-      focusAttempts.forEach((delay) => {
-        setTimeout(() => {
-          if (editorRef.current) {
-            editorRef.current.focus();
-          }
-        }, delay);
-      });
-    }
-  }, [isContentLoadedIntoEditor, isApiLoading]);
-
-  // Update the auto-save effect
-  useEffect(() => {
-    if (!hasUnsavedChanges || !blogId || blogId === 'new') return;
-
-    // Set status to unsaved when changes are detected
-    setSaveStatus('unsaved');
-
-    const autoSaveTimer = setTimeout(async () => {
-      const content = editorRef.current?.getContent();
-      if (content && blogId !== 'new') {
-        setSaveStatus('saving');
-        try {
-          await updateExistingBlog(parseInt(blogId, 10), {
-            content,
-            title: blogTitle,
-            isPublished: false,
-          });
-          setHasUnsavedChanges(false);
-          setSaveStatus('saved');
-          setLastSaved(new Date());
-          console.log('Auto-saved successfully');
-        } catch (error) {
-          console.error('Auto-save failed:', error);
-          setSaveStatus('error');
-        }
       }
-    }, 5000);
+    },
+    [showSnackbar, navigate],
+  );
 
-    return () => clearTimeout(autoSaveTimer);
-  }, [hasUnsavedChanges, blogId, blogTitle]);
+  const createNewDocument = useCallback(async () => {
+    if (!isNewDocument || createdDocId || isCreating) return;
 
-  if (isApiLoading) {
-    return (
-      <div className="dark:bg-mountain-950 flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center space-y-2">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500 dark:border-blue-400"></div>
-          <span className="text-gray-700 dark:text-gray-300">
-            Loading editor data...
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  const handleExportDocument = async () => {
-    if (!editorRef.current || !blogId) return;
-
-    const link = `http://localhost:5173/blogs/${blogId}`; // replace with your dynamic link
+    setIsCreating(true);
     try {
+      const payload: CreateBlogPayload = {
+        title: blogTitle?.trim() || 'Untitled Document',
+        isPublished: false,
+        content: editorRef.current?.getContent() || '',
+      };
+
+      const newBlog = await createNewBlog(payload);
+      setCreatedDocId(newBlog.id);
+      navigate(`/docs/${newBlog.id}`, {
+        replace: true,
+        state: { preserveContent: true },
+      });
+
+      setHasUnsavedChanges(false);
+      updateSaveStatus('saved', new Date());
+    } catch (error) {
+      handleApiError(error, 'Failed to create document', false);
+    } finally {
+      setIsCreating(false);
+    }
+  }, [
+    isNewDocument,
+    createdDocId,
+    isCreating,
+    blogTitle,
+    navigate,
+    handleApiError,
+    updateSaveStatus,
+  ]);
+
+  const handleEditorChange = useCallback(() => {
+    const hasContent = hasContentToSave();
+    setHasContentForCreation(hasContent);
+
+    if (isNewDocument && !createdDocId && !isCreating && hasContent) {
+      clearTimeout(createDebounceRef.current!);
+      createDebounceRef.current = setTimeout(
+        createNewDocument,
+        DEBOUNCE_DELAYS.create,
+      );
+      return;
+    }
+
+    if (!isNewDocument && blogId !== 'new') {
+      setHasUnsavedChanges(true);
+      updateSaveStatus('unsaved');
+    }
+  }, [
+    isNewDocument,
+    createdDocId,
+    isCreating,
+    blogId,
+    hasContentToSave,
+    createNewDocument,
+    updateSaveStatus,
+  ]);
+
+  const handleTitleChange = useCallback(
+    async (newTitle: string) => {
+      setBlogTitle(newTitle);
+
+      if (!isNewDocument && blogId !== 'new' && blogId) {
+        const numericBlogId = parseInt(blogId, 10);
+        if (isNaN(numericBlogId)) return;
+
+        clearTimeout(titleSaveDebounceRef.current!);
+        setHasUnsavedChanges(true);
+        updateSaveStatus('unsaved');
+
+        titleSaveDebounceRef.current = setTimeout(async () => {
+          updateSaveStatus('saving');
+          try {
+            const trimmed = newTitle.trim();
+            await updateExistingBlog(numericBlogId, {
+              title: trimmed || 'Untitled Document',
+              isPublished: false,
+            });
+            updateSaveStatus('saved', new Date());
+            setHasUnsavedChanges(false);
+          } catch (error) {
+            handleApiError(error, 'Failed to save title', false);
+            updateSaveStatus('error');
+            setHasUnsavedChanges(true);
+          }
+        }, DEBOUNCE_DELAYS.titleSave);
+      }
+    },
+    [isNewDocument, blogId, updateSaveStatus, handleApiError],
+  );
+
+  const handleExportDocument = useCallback(async () => {
+    if (!blogId) return;
+
+    try {
+      const link = `${window.location.origin}/blogs/${blogId}`;
       await navigator.clipboard.writeText(link);
       setTooltipOpen(true);
-      setTimeout(() => {
-        setTooltipOpen(false);
-      }, 1500);
+      setTimeout(() => setTooltipOpen(false), 1500);
     } catch (err) {
       console.error('Failed to copy!', err);
     }
-  };
+  }, [blogId]);
 
-  const handleSaveBlog = async (currentTitle: string) => {
-    if (!editorRef.current || !blogId) return;
+  const handleSaveBlog = useCallback(
+    async (currentTitle: string) => {
+      if (!editorRef.current || !blogId) return;
 
-    setSaveStatus('saving');
-    const content = editorRef.current?.getContent();
-    const images = editorRef.current?.getImages() || [];
-    const numericBlogId = parseInt(blogId, 10);
-    const titleToSave = currentTitle.trim() || 'Untitled Document';
+      updateSaveStatus('saving');
+      const content = editorRef.current.getContent();
+      const images = editorRef.current.getImages() || [];
+      const numericBlogId = parseInt(blogId, 10);
 
-    const payload: UpdateBlogPayload = {
-      title: titleToSave,
-      isPublished: true,
-      pictures: images.map((img) => img.src),
-      content,
+      const trimmedTitle = currentTitle?.trim() || '';
+      const titleToSave = trimmedTitle || 'Untitled Document';
+
+      const payload: UpdateBlogPayload = {
+        title: titleToSave,
+        isPublished: true,
+        pictures: images.map((img) => img.src),
+        content,
+      };
+
+      try {
+        const updatedBlog: Blog = await updateExistingBlog(
+          numericBlogId,
+          payload,
+        );
+        updateSaveStatus('saved', new Date());
+        setHasUnsavedChanges(false);
+        navigate(`/blogs/${updatedBlog.id}`);
+      } catch (error) {
+        updateSaveStatus('error');
+        handleApiError(error, 'Failed to save blog.', false);
+      }
+    },
+    [blogId, navigate, updateSaveStatus, handleApiError],
+  );
+
+  const isPublishDisabled = useMemo(() => {
+    const isTitleEmpty = !blogTitle?.trim();
+    const isContentEmpty = !hasContentForCreation;
+    return isTitleEmpty || isContentEmpty;
+  }, [blogTitle, hasContentForCreation]);
+
+  const statusComponent = useMemo(
+    () => (
+      <EnhancedAutoSaveStatus
+        status={saveStatus}
+        lastSaved={lastSaved}
+        isNewDocument={isNewDocument}
+        createdDocId={createdDocId}
+        isCreating={isCreating}
+        hasContent={hasContentForCreation}
+      />
+    ),
+    [
+      saveStatus,
+      lastSaved,
+      isNewDocument,
+      createdDocId,
+      isCreating,
+      hasContentForCreation,
+    ],
+  );
+
+  // Initialize editor
+  useEffect(() => {
+    const initializeEditor = async () => {
+      if (isNewDocument) {
+        const content =
+          templateType === 'tutorial' ? TUTORIAL_TEMPLATE_HTML : '';
+        setInitialContent(content);
+        setIsApiLoading(false);
+        setIsContentReady(true);
+        return;
+      }
+
+      if (!blogId) return;
+
+      try {
+        const numericBlogId = parseInt(blogId, 10);
+        if (isNaN(numericBlogId)) {
+          throw new Error('Invalid blog ID');
+        }
+
+        const blog = await fetchBlogDetails(numericBlogId);
+        setBlogTitle(blog.title || 'Untitled Document');
+        setIsPublished(blog.isPublished || false);
+        setInitialContent(blog.content || '');
+      } catch (error) {
+        handleApiError(error, 'Failed to load blog content.');
+      } finally {
+        setIsApiLoading(false);
+      }
     };
 
-    try {
-      const updatedBlog: Blog = await updateExistingBlog(
-        numericBlogId,
-        payload,
-      );
-      setSaveStatus('saved');
-      setLastSaved(new Date());
-      setHasUnsavedChanges(false);
-      navigate(`/blogs/${updatedBlog.id}`);
-    } catch (error: unknown) {
-      setSaveStatus('error');
-      let errorMessage = 'Failed to save blog.';
-      if (error instanceof AxiosError) {
-        errorMessage = error.response?.data?.message || errorMessage;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      showSnackbar(errorMessage, 'error');
+    initializeEditor();
+  }, [blogId, isNewDocument, templateType, handleApiError]);
+
+  // Set initial content
+  useEffect(() => {
+    if (initialContent !== null && editorRef.current) {
+      editorRef.current.setContent(initialContent);
+      setIsContentReady(true);
     }
-  };
+  }, [initialContent]);
+
+  // Auto-save logic
+  useEffect(() => {
+    if (!hasUnsavedChanges || !blogId || blogId === 'new' || isCreating) return;
+
+    updateSaveStatus('unsaved');
+    clearTimeout(autoSaveRef.current!);
+
+    autoSaveRef.current = setTimeout(async () => {
+      const content = editorRef.current?.getContent();
+      if (!content) return;
+
+      updateSaveStatus('saving');
+      try {
+        await updateExistingBlog(parseInt(blogId, 10), {
+          content,
+          title: blogTitle?.trim() || 'Untitled Document',
+          isPublished: false,
+        });
+        setHasUnsavedChanges(false);
+        updateSaveStatus('saved', new Date());
+      } catch (error) {
+        console.error('Auto-save failed:', error);
+        updateSaveStatus('error');
+      }
+    }, DEBOUNCE_DELAYS.autoSave);
+
+    return () => clearTimeout(autoSaveRef.current!);
+  }, [hasUnsavedChanges, blogId, blogTitle, isCreating, updateSaveStatus]);
+
+  // Focus editor when ready
+  useEffect(() => {
+    if (isContentReady && !isApiLoading && editorRef.current) {
+      const timeoutId = setTimeout(() => editorRef.current?.focus(), 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isContentReady, isApiLoading]);
+
+  // Handle beforeunload and cleanup
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (
+        (isNewDocument && hasContentForCreation) ||
+        (!isNewDocument && hasUnsavedChanges)
+      ) {
+        event.preventDefault();
+        event.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      clearTimers();
+    };
+  }, [isNewDocument, hasContentForCreation, hasUnsavedChanges, clearTimers]);
+
+  const titleDisplay = blogTitle || 'Untitled Document';
+  const isTitleEmpty = !blogTitle?.trim();
 
   return (
-    <div className="dark:bg-mountain-950 flex h-full w-full flex-row bg-white">
-      <div className="flex h-full w-[calc(100vw-16rem)] flex-1 flex-shrink flex-col">
-        <TextEditorHeader
-          handleExport={handleExportDocument}
-          handleSaveBlog={handleSaveBlog}
-          text={blogTitle}
-          setText={handleTitleChange}
-          isPublished={isPublished}
-          tooltipOpen={tooltipOpen}
-          saveStatus={
-            <AutoSaveStatus status={saveStatus} lastSaved={lastSaved} />
-          }
-        />
-        <div className="bg-mountain-50 dark:bg-mountain-900 border-l-mountain-100 dark:border-l-mountain-700 h-full w-full border-l-1">
-          <Toolbar />
-          <div className="dark:print:bg-mountain-950 sidebar fixed h-screen w-full overflow-x-hidden pb-20 print:bg-white print:p-0">
-            {/* <div className="right-60 bottom-4 z-50 fixed flex justify-center items-center bg-gradient-to-b from-blue-400 to-purple-400 shadow-md rounded-full w-14 h-14 hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
-              <LuPencilLine className="size-6 text-white" />
-            </div> */}
-            <div className="mx-auto mt-6 flex min-h-[1123px] w-[794px] min-w-max overflow-y-hidden py-4 pb-20 print:w-full print:py-0">
-              <Editor ref={editorRef} onChange={handleEditorChange} />
+    <>
+      <div className="dark:bg-mountain-950 flex h-full w-full flex-row bg-white">
+        <div className="flex h-full w-[calc(100vw-16rem)] flex-1 flex-col">
+          <TextEditorHeader
+            handleExport={handleExportDocument}
+            handleSaveBlog={handleSaveBlog}
+            text={titleDisplay}
+            setText={handleTitleChange}
+            isPublished={isPublished}
+            tooltipOpen={tooltipOpen}
+            saveStatus={statusComponent}
+            isTitleLoading={isApiLoading}
+            isPublishDisabled={isPublishDisabled}
+            isTitleEmpty={isTitleEmpty}
+            hasContent={hasContentForCreation}
+          />
+          <div className="border-mountain-100 bg-mountain-50 dark:border-mountain-700 dark:bg-mountain-900 h-full w-full border-l">
+            {(isApiLoading || !isContentReady) && <LoadingScreen />}
+            <Toolbar />
+            <div className="sidebar dark:print:bg-mountain-950 fixed h-screen w-full overflow-x-hidden pb-20 print:bg-white print:p-0">
+              <div
+                style={{
+                  visibility:
+                    isApiLoading || !isContentReady ? 'hidden' : 'visible',
+                }}
+                className="mx-auto mt-6 flex min-h-[1123px] w-[794px] min-w-max py-4 pb-20 print:w-full print:py-0"
+              >
+                <Editor ref={editorRef} onChange={handleEditorChange} />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <UnsavedChangesDialog
+        open={showExitDialog}
+        onConfirm={() => {
+          if (pendingNavigation) navigate(pendingNavigation);
+          setShowExitDialog(false);
+          setPendingNavigation(null);
+        }}
+        onCancel={() => {
+          setShowExitDialog(false);
+          setPendingNavigation(null);
+        }}
+        isCreating={isNewDocument && hasContentForCreation}
+      />
+
+      <style>{`
+        .loading-spinner {
+          width: 12px;
+          height: 12px;
+          border: 2px solid transparent;
+          border-top: 2px solid currentColor;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          will-change: transform;
+        }
+        .loading-spinner-large {
+          width: 32px;
+          height: 32px;
+          border: 3px solid #e5e7eb;
+          border-top: 3px solid #6366f1;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          will-change: transform;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </>
   );
 };
 

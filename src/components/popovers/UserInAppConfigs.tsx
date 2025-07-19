@@ -58,71 +58,69 @@ const UserInAppConfigs = () => {
   if (loading)
     return (
       <>
-        <Skeleton className="dark:bg-mountain-900 h-10 w-10 rounded-full" />
+        <Skeleton className="dark:bg-mountain-900 rounded-full w-10 h-10" />
       </>
     );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div>
-          <Button
-            title="User menu"
-            className={`flex items-center rounded-full`}
-            onClick={() => setOpen(!open)}
-            disableRipple
-            sx={{
-              p: 0,
-              minWidth: 0,
-              width: 40,
-              height: 40,
-            }}
-          >
-            {user ? (
-              user.profilePictureUrl ? (
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={user.profilePictureUrl} />
-                  <AvatarFallback>
-                    <BoringAvatar
-                      size={40}
-                      name={user.username}
-                      variant="beam"
-                      colors={[
-                        '#84bfc3',
-                        '#fff5d6',
-                        '#ffb870',
-                        '#d96153',
-                        '#000511',
-                      ]}
-                    />
-                  </AvatarFallback>
-                </Avatar>
-              ) : (
-                <BoringAvatar
-                  size={40}
-                  name={user.username}
-                  variant="beam"
-                  colors={[
-                    '#84bfc3',
-                    '#fff5d6',
-                    '#ffb870',
-                    '#d96153',
-                    '#000511',
-                  ]}
-                />
-              )
+        <Button
+          title="User menu"
+          className={`flex items-center rounded-full`}
+          onClick={() => setOpen(!open)}
+          disableRipple
+          sx={{
+            p: 0,
+            minWidth: 0,
+            width: 40,
+            height: 40,
+          }}
+        >
+          {user ? (
+            user.profilePictureUrl ? (
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={user.profilePictureUrl} />
+                <AvatarFallback>
+                  <BoringAvatar
+                    size={40}
+                    name={user.username}
+                    variant="beam"
+                    colors={[
+                      '#84bfc3',
+                      '#fff5d6',
+                      '#ffb870',
+                      '#d96153',
+                      '#000511',
+                    ]}
+                  />
+                </AvatarFallback>
+              </Avatar>
             ) : (
-              <MdMoreVert className="size-5" />
-            )}
-          </Button>
-        </div>
+              <BoringAvatar
+                size={40}
+                name={user.username}
+                variant="beam"
+                colors={[
+                  '#84bfc3',
+                  '#fff5d6',
+                  '#ffb870',
+                  '#d96153',
+                  '#000511',
+                ]}
+              />
+            )
+          ) : (
+            <MdMoreVert className="size-5" />
+          )}
+        </Button>
       </PopoverTrigger>
-      <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-4 w-64 p-0 py-2">
+      <PopoverContent className="dark:bg-mountain-900 mt-4 p-0 py-2 border-mountain-100 dark:border-mountain-700 w-64">
         {user && (
           <>
             <div className="flex items-center space-x-2 p-3">
               {user.profilePictureUrl ? (
-                <Avatar className="h-10 w-10">
+                <Avatar className="w-10 h-10">
                   <AvatarImage src={user.profilePictureUrl} />
                   <AvatarFallback>
                     <BoringAvatar
@@ -160,35 +158,35 @@ const UserInAppConfigs = () => {
                 <p className="text-mountain-500 text-xs">{user.email}</p>
               </div>
             </div>
-            <hr className="border-mountain-100 dark:border-mountain-800 my-2" />
+            <hr className="my-2 border-mountain-100 dark:border-mountain-800" />
             <Link
               to={`/${user.username}`}
-              className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex items-center space-x-2 p-3"
+              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
             >
               <FaRegCircleUser className="text-mountain-600" />
               <p className="text-sm">My Profile</p>
             </Link>
-            <div className="xs:hidden hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full p-3 py-2 hover:cursor-pointer">
+            <div className="xs:hidden flex hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
               <MdMailOutline className="" />
               <p className="text-sm">Messages</p>
             </div>
-            <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2 hover:cursor-pointer">
+            <div className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer">
               <LuSettings className="text-mountain-600" />
               <p className="text-sm">Settings</p>
             </div>
             <Link
               to={'/app-subscription'}
-              className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex items-center space-x-2 p-3"
+              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
             >
               <TbChessQueen className="text-mountain-600" />
               <p className="text-sm">App Subscription</p>
             </Link>
-            <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
+            <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
           </>
         )}
 
         {/* Theme Toggle */}
-        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
+        <div className="flex justify-between items-center hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full h-full">
           <span className="text-sm">Theme</span>
           <div className="flex space-x-2">
             <Button onClick={toggleTheme}>
@@ -200,10 +198,10 @@ const UserInAppConfigs = () => {
           </div>
         </div>
 
-        <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
+        <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
 
         {/* Content Settings */}
-        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
+        <div className="flex justify-between items-center hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full h-full">
           <span className="text-sm">Mature Content</span>
           <Switch
             checked={matureContent}
@@ -212,7 +210,7 @@ const UserInAppConfigs = () => {
           />
         </div>
 
-        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
+        <div className="flex justify-between items-center hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full h-full">
           <span className="text-sm">AI Content</span>
           <Switch
             checked={aiContent}
@@ -222,17 +220,17 @@ const UserInAppConfigs = () => {
         </div>
         {/* Show these options only if the user is not logged in */}
         <>
-          <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
-          <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2">
+          <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
+          <div className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full">
             <p className="text-sm">Help Center</p>
           </div>
         </>
         {/* Show these options only if the user is logged in */}
         {user && (
           <>
-            <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
+            <hr className="my-2 border-mountain-100 dark:border-mountain-800 border-t-1" />
             <div
-              className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2 hover:cursor-pointer"
+              className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3 py-2 w-full hover:cursor-pointer"
               onClick={handleLogout}
             >
               <p className="text-sm">Logout</p>

@@ -49,7 +49,7 @@ const BrowseBlogs: React.FC = () => {
   return (
     <div className="dark:bg-mountain-950 flex h-screen overflow-hidden rounded-t-3xl">
       <div className="flex min-h-screen flex-1 flex-col">
-        <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 sticky top-0 z-60 border-b-1 bg-white p-4 shadow-sm">
+        <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 sticky top-0 z-30 border-b-1 bg-white p-4 shadow-sm">
           <div className="flex items-center space-x-4">
             <Paper
               elevation={0}

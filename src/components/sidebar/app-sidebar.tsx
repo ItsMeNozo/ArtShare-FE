@@ -37,11 +37,11 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
     >
       <div className="flex flex-col">
         {/* Sidebar Header */}
-        <div className="flex h-16 items-center justify-between px-4">
+        <div className="flex justify-between items-center px-4 h-16">
           <div
             className={`flex items-center overflow-hidden transition-all duration-500 ease-in-out ${expand ? 'w-auto opacity-100' : 'opacity-0'}`}
           >
-            <img src={app_logo} className="mr-2 flex h-6 w-6 rounded-sm" />
+            <img src={app_logo} className="flex mr-2 rounded-sm w-7 h-7" />
             <p className="font-medium text-gray-800 dark:text-gray-100">
               ArtShare
             </p>
@@ -62,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
         <div
           className={`text-mountain-800 flex h-[calc(100vh)] flex-col space-y-6 overflow-x-hidden px-2 dark:text-gray-300`}
         >
-          <div className="flex w-full flex-col items-center justify-between space-y-1">
+          <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
               { icon: Home, label: 'Dashboard', href: '/dashboard' },
               {
@@ -87,28 +87,25 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${
-                      isActive ? 'text-white' : 'text-violet-900'
-                    } `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
-                            backgroundImage:
-                              'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
-                          }
+                          backgroundImage:
+                            'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
+                        }
                         : undefined
                     }
                   >
-                    <item.icon className="size-5 flex-shrink-0" />
+                    <item.icon className="flex-shrink-0 size-5" />
                     <div
-                      className={`origin-left overflow-hidden transition-all duration-500 ${
-                        expand ? 'ml-2 w-auto' : 'w-0'
-                      }`}
+                      className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'
+                        }`}
                     >
                       <p
-                        className={`text-nowrap transition-opacity duration-500 ${
-                          expand ? 'opacity-100' : 'opacity-0'
-                        } ${isActive ? 'font-medium' : 'font-normal'}`}
+                        className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'
+                          } ${isActive ? 'font-medium' : 'font-normal'}`}
                       >
                         {item.label}
                       </p>
@@ -118,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               );
             })}
           </div>
-          <div className="flex w-full flex-col items-center justify-between space-y-1">
+          <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
               { icon: LuBookOpenText, label: 'My Post', href: '/posts/new' },
               { icon: HiOutlineNewspaper, label: 'My Writing', href: '/docs' },
@@ -141,19 +138,18 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${
-                      isActive ? 'text-white' : 'text-violet-900'
-                    } `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
-                            backgroundImage:
-                              'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
-                          }
+                          backgroundImage:
+                            'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
+                        }
                         : undefined
                     }
                   >
-                    <item.icon className="size-5 flex-shrink-0" />
+                    <item.icon className="flex-shrink-0 size-5" />
                     <div
                       className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                     >
@@ -168,18 +164,10 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               );
             })}
           </div>
-          <div className="flex w-full flex-col items-center justify-between space-y-1">
+          <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
-              {
-                icon: RiImageAiLine,
-                label: 'Image Generation',
-                href: '/image/tool/text-to-image',
-              },
-              {
-                icon: RiImageEditLine,
-                label: 'Image Editor',
-                href: '/image/tool/editor',
-              },
+              { icon: RiImageAiLine, label: 'Image Generation', href: '/image/tool/text-to-image' },
+              { icon: RiImageEditLine, label: 'Image Editor', href: '/image/tool/editor/new' },
             ].map((item) => {
               const isActive =
                 pathname === item.href ||
@@ -194,19 +182,18 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${
-                      isActive ? 'text-white' : 'text-violet-900'
-                    } `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
-                            backgroundImage:
-                              'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
-                          }
+                          backgroundImage:
+                            'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
+                        }
                         : undefined
                     }
                   >
-                    <item.icon className="size-5 flex-shrink-0" />
+                    <item.icon className="flex-shrink-0 size-5" />
                     <div
                       className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                     >
@@ -221,7 +208,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               );
             })}
           </div>
-          <div className="flex w-full flex-col items-start justify-between space-y-1">
+          <div className="flex flex-col justify-between items-start space-y-1 w-full">
             <p
               className={`px-4 text-sm text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} font-normal`}
             >
@@ -252,19 +239,18 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${
-                      isActive ? 'text-white' : 'text-violet-900'
-                    } `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                      } `}
                     style={
                       isActive
                         ? {
-                            backgroundImage:
-                              'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
-                          }
+                          backgroundImage:
+                            'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
+                        }
                         : undefined
                     }
                   >
-                    <item.icon className="size-5 flex-shrink-0" />
+                    <item.icon className="flex-shrink-0 size-5" />
                     <div
                       className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                     >
