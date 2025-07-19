@@ -174,6 +174,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
                 <ReactTimeAgo
                   date={new Date(postData.createdAt)}
                   locale="en-US"
+                  timeStyle="round-minute"
                 />
               ) : (
                 'Unknown time'
