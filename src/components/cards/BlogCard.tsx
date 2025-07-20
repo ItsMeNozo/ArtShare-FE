@@ -137,7 +137,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
             <span className="text-gray-500 dark:text-gray-500">•</span>
             <span className="truncate text-xs text-gray-500 dark:text-gray-400">
               {dateCreated && !isNaN(new Date(dateCreated).getTime()) ? (
-                <ReactTimeAgo date={new Date(dateCreated)} locale="en-US" timeStyle="round-minute" />
+                <ReactTimeAgo className='capitalize' date={new Date(dateCreated)} locale="en-US" timeStyle="round-minute" />
               ) : (
                 'Unknown time'
               )}

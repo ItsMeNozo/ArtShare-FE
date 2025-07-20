@@ -172,6 +172,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               {postData.createdAt &&
               !isNaN(new Date(postData.createdAt).getTime()) ? (
                 <ReactTimeAgo
+                  className='capitalize'
                   date={new Date(postData.createdAt)}
                   locale="en-US"
                   timeStyle="round-minute"

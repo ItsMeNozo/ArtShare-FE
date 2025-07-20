@@ -150,7 +150,7 @@ const BlogItem: React.FC<BlogItemProps> = ({
               <span className="text-gray-500 dark:text-gray-500">•</span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {createdAt && !isNaN(new Date(createdAt).getTime()) ? (
-                  <ReactTimeAgo date={new Date(createdAt)} locale="en-US" timeStyle="round-minute" />
+                  <ReactTimeAgo className='capitalize' date={new Date(createdAt)} locale="en-US" timeStyle="round-minute" />
                 ) : (
                   'Unknown time'
                 )}
