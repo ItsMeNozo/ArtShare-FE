@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import AttributeFilters from '@/features/explore/components/AttributeFilters';
-import MediumFilters from '@/features/explore/components/MediumFilters';
+import AttributeFilters from '@/features/explore/components/MediumFilters1';
+import MediumFilters from '@/features/explore/components/AtributeFilters';
 import { useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
 import { IoMdArrowDropdown } from 'react-icons/io';

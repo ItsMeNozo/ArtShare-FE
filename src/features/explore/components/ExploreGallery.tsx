@@ -6,15 +6,15 @@ import { ExploreTab } from '../types';
 
 interface ExploreGalleryProps {
   tab: ExploreTab;
-  selectedMedium: string | null;
-  selectedAttributes: string[];
+  selectedAttribute: string | null;
+  selectedMediums: string[];
   isAi: boolean;
 }
 
 export const ExploreGallery: React.FC<ExploreGalleryProps> = ({
   tab,
-  selectedMedium,
-  selectedAttributes,
+  selectedAttribute,
+  selectedMediums,
   isAi,
 }) => {
   const {
@@ -27,8 +27,8 @@ export const ExploreGallery: React.FC<ExploreGalleryProps> = ({
     isFetchingNextPage,
   } = useGetPosts({
     tab,
-    attributes: selectedAttributes,
-    medium: selectedMedium,
+    mediums: selectedMediums,
+    attribute: selectedAttribute,
     isAi,
   });
 

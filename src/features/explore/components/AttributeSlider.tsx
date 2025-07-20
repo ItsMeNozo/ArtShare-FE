@@ -1,12 +1,12 @@
 import { HorizontalSlider } from '@/components/sliders/HorizontalSlider';
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Category } from '@/types';
 import React from 'react';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import './scrollbar.css';
-import { Skeleton } from '@/components/ui/skeleton';
 
-export interface MediumSliderProps {
+export interface AttributeSliderProps {
   onSelectCategory: (categoryName: string | null) => void;
   selectedCategory: string | null;
   data: Category[];
@@ -14,7 +14,7 @@ export interface MediumSliderProps {
   isError?: boolean;
 }
 
-export const MediumSlider: React.FC<MediumSliderProps> = ({
+export const AttributeSlider: React.FC<AttributeSliderProps> = ({
   onSelectCategory,
   selectedCategory,
   data,
@@ -30,20 +30,22 @@ export const MediumSlider: React.FC<MediumSliderProps> = ({
 
     return (
       <div
-        className={`category-item flex max-w-48 items-center justify-center ${isSelected
-          ? 'bg-mountain-200 dark:bg-mountain-800'
-          : 'hover:bg-mountain-100 dark:hover:bg-mountain-900'
-          } cursor-pointer gap-2 rounded-lg border p-2 ${isSelected ? 'border-primary-500' : 'border-transparent'
-          }`}
+        className={`category-item flex max-w-48 items-center justify-center ${
+          isSelected
+            ? 'bg-mountain-200 dark:bg-mountain-800'
+            : 'hover:bg-mountain-100 dark:hover:bg-mountain-900'
+        } cursor-pointer gap-2 rounded-lg border p-2 ${
+          isSelected ? 'border-primary-500' : 'border-transparent'
+        }`}
         onClick={() => onSelectCategory(category.name)}
         title={category.name}
       >
         <ImageWithFallback
           src={imageUrl}
           alt={category.name}
-          className="border dark:border-mountain-700 rounded-lg w-10 h-10 object-center object-cover aspect-[1/1]"
+          className="dark:border-mountain-700 aspect-[1/1] h-10 w-10 rounded-lg border object-cover object-center"
         />
-        <span className="text-mountain-800 dark:text-mountain-200 text-sm line-clamp-2">
+        <span className="text-mountain-800 dark:text-mountain-200 line-clamp-2 text-sm">
           {category.name}
         </span>
       </div>
@@ -56,19 +58,19 @@ export const MediumSlider: React.FC<MediumSliderProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex gap-2 p-2 h-full">
-        <Skeleton className="bg-mountain-200/60 w-48 h-10" />
-        <Skeleton className="bg-mountain-200/60 w-48 h-10" />
-        <Skeleton className="bg-mountain-200/60 w-48 h-10" />
-        <Skeleton className="bg-mountain-200/60 w-48 h-10" />
-        <Skeleton className="bg-mountain-200/60 w-48 h-10" />
+      <div className="flex h-full gap-2 p-2">
+        <Skeleton className="bg-mountain-200/60 h-10 w-48" />
+        <Skeleton className="bg-mountain-200/60 h-10 w-48" />
+        <Skeleton className="bg-mountain-200/60 h-10 w-48" />
+        <Skeleton className="bg-mountain-200/60 h-10 w-48" />
+        <Skeleton className="bg-mountain-200/60 h-10 w-48" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex flex-grow justify-center items-center p-4 min-h-[76px] text-red-500 text-center">
+      <div className="flex min-h-[76px] flex-grow items-center justify-center p-4 text-center text-red-500">
         Failed to load attributes.
       </div>
     );
@@ -76,7 +78,7 @@ export const MediumSlider: React.FC<MediumSliderProps> = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex flex-grow justify-center items-center p-4 min-h-[76px] text-gray-500 text-center">
+      <div className="flex min-h-[76px] flex-grow items-center justify-center p-4 text-center text-gray-500">
         No attributes found.
       </div>
     );
