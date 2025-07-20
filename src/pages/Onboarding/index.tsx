@@ -1,3 +1,7 @@
+// Error response type for Axios
+type ErrorResponse = {
+  message?: string | { message?: string };
+};
 import api from '@/api/baseApi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +41,7 @@ const OnboardingProfile: React.FC = () => {
     formState: { errors, isSubmitting },
     reset,
     watch,
+    setError,
   } = useForm<ProfileForm>({
     defaultValues: {
       fullName: '',
@@ -109,15 +114,32 @@ const OnboardingProfile: React.FC = () => {
     } catch (err: unknown) {
       // ──── 1. Axios error? ───────────────────────────────────────
       if (axios.isAxiosError(err)) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
+        const axiosErr = err as AxiosError<ErrorResponse>;
+        // Try to extract the username conflict message from nested structure
+        let msg = '';
+        if (axiosErr.response?.data?.message) {
+          if (typeof axiosErr.response.data.message === 'string') {
+            msg = axiosErr.response.data.message;
+          } else if (
+            typeof axiosErr.response.data.message === 'object' &&
+            axiosErr.response.data.message.message
+          ) {
+            msg = axiosErr.response.data.message.message;
+          }
+        } else {
+          msg = axiosErr.message;
+        }
 
-        const msg = axiosErr.response?.data?.message ?? axiosErr.message;
-
-        if (msg.includes('Duplicate value for field(s): username')) {
-          showDialog(
-            false,
-            'Username already exists. Please choose a different username.',
-          );
+        // Check for username conflict (409)
+        if (
+          axiosErr.response?.status === 409 &&
+          msg.toLowerCase().includes('username') &&
+          msg.toLowerCase().includes('in use')
+        ) {
+          setError('username', {
+            type: 'manual',
+            message: msg || 'Username is already in use.',
+          });
           document.getElementById('username')?.focus();
         } else {
           showDialog(false, msg || 'Failed to update profile');

@@ -20,8 +20,8 @@ import {
   cameraOptions,
   lightingOptions,
   ModelKey,
-} from './enum';
-import { MockModelOptionsData } from './mock/Data';
+} from "./enum";
+import { MockModelOptionsData } from "./data/Data";
 
 //API Backend
 import {
@@ -189,31 +189,33 @@ const ArtGenAI = () => {
   }, [promptExpanded]);
 
   return (
-    <div className="flex h-screen w-full p-4 pr-0">
-      <SettingsPanel
-        isExpanded={expanded}
-        setIsExpanded={setExpanded}
-        numberOfImages={numberOfImages}
-        setNumberOfImages={setNumberOfImages}
-        aspectRatio={aspectRatio}
-        setAspectRatio={setAspectRatio}
-        lighting={lighting}
-        setLighting={setLighting}
-        camera={camera}
-        setCamera={setCamera}
-        style={style}
-        setStyle={setStyle}
-      />
-      <div className="flex h-full w-full flex-col">
-        <div className="border-mountain-200 flex flex-col items-end border-b-1 pr-4">
+    <div className="flex pr-0 w-full h-screen">
+      <div className='absolute flex p-2 h-full'>
+        <SettingsPanel
+          isExpanded={expanded}
+          setIsExpanded={setExpanded}
+          numberOfImages={numberOfImages}
+          setNumberOfImages={setNumberOfImages}
+          aspectRatio={aspectRatio}
+          setAspectRatio={setAspectRatio}
+          lighting={lighting}
+          setLighting={setLighting}
+          camera={camera}
+          setCamera={setCamera}
+          style={style}
+          setStyle={setStyle}
+        />
+      </div>
+      <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col items-end border-mountain-200 border-b-1">
           <AIHeader />
         </div>
-        <div className="from-mountain-50 relative flex h-full w-full justify-end bg-gradient-to-b to-white">
+        <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div
-            className={`custom-scrollbar relative flex h-full flex-col ${expanded ? 'w-[80%]' : 'w-full delay-300'} items-start transition-all duration-200 ease-in-out`}
+            className={`custom-scrollbar relative flex h-full flex-col ${expanded ? 'w-[calc(100vw-18rem)]' : 'w-full delay-300'} items-start transition-all duration-200 ease-in-out`}
           >
             {loading ? (
-              <div className="mt-4 flex h-full w-full items-start justify-center">
+              <div className="flex justify-center items-start mt-4 w-full h-full">
                 <div className="flex items-center space-x-4">
                   <CircularProgress size={32} thickness={4} />
                 </div>
@@ -221,14 +223,14 @@ const ArtGenAI = () => {
             ) : (
               <div
                 ref={scrollRef}
-                className="custom-scrollbar flex h-full w-full flex-col space-y-10 overflow-y-auto p-4"
+                className="flex flex-col space-y-10 p-4 w-full h-full overflow-y-auto custom-scrollbar"
               >
                 {displayedResults && displayedResults.length > 0 ? (
                   displayedResults.map((result) => (
                     <PromptResult key={result.id} result={result} />
                   ))
                 ) : (
-                  <div className="text-mountain-600 flex h-full w-full items-center justify-center">
+                  <div className="flex justify-center items-center w-full h-full text-mountain-600">
                     <BiInfoCircle className="mr-2 size-5" />
                     <p className="">
                       There is no prompt result. What's on your mind?
@@ -241,7 +243,6 @@ const ArtGenAI = () => {
               </div>
             )}
           </div>
-          <div className="absolute bottom-0 z-0 flex h-40 w-full bg-white blur-3xl" />
         </div>
         {/* Prompt Chat */}
         <div
@@ -263,9 +264,8 @@ const ArtGenAI = () => {
             </div>
             <div
               onClick={() => handlePrompt()}
-              className={`${
-                promptExpanded && 'pointer-events-none rounded-t-none'
-              } line-clamp-1 flex h-15 w-[718px] items-center overflow-y-auto rounded-xl bg-white px-2 py-4 text-sm hover:cursor-pointer`}
+              className={`${promptExpanded && 'pointer-events-none rounded-t-none'
+                } line-clamp-1 flex h-15 w-[718px] items-center overflow-y-auto rounded-xl bg-white px-2 py-4 text-sm hover:cursor-pointer`}
             >
               {userPrompt ? (
                 <p
@@ -283,7 +283,7 @@ const ArtGenAI = () => {
             </div>
             <Button
               onClick={handleGenerate}
-              className="absolute right-4 -bottom-2 flex -translate-y-1/2 items-center bg-indigo-100 px-4"
+              className="right-4 -bottom-2 absolute flex items-center bg-indigo-100 px-4 -translate-y-1/2"
             >
               Generate
             </Button>

@@ -11,15 +11,14 @@ const MediaPreviewer: React.FC<MediaPreviewerProps> = ({ media }) => {
     <img
       src={media.url}
       alt="Preview"
-      className="aspect-video w-full object-cover"
-      style={{ maxHeight: '100%', maxWidth: '100%' }}
+      className="max-w-full max-h-full object-contain"
     />
   ) : (
     <Box className="relative w-full" sx={{ maxHeight: 500, minHeight: 300 }}>
       <video
         src={media.url}
         controls
-        className="w-full rounded object-contain"
+        className="rounded w-full object-contain"
         style={{
           maxHeight: '100%',
           width: '100%',

@@ -51,6 +51,80 @@ export type EditorHandle = {
   focus: () => void;
 };
 
+// Custom Image Extension with better attribute persistence
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      src: {
+        default: null,
+      },
+      alt: {
+        default: null,
+      },
+      title: {
+        default: null,
+      },
+      width: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('width'),
+        renderHTML: (attributes) => {
+          if (!attributes.width) return {};
+          return { width: attributes.width };
+        },
+      },
+      height: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('height'),
+        renderHTML: (attributes) => {
+          if (!attributes.height) return {};
+          return { height: attributes.height };
+        },
+      },
+      style: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('style'),
+        renderHTML: (attributes) => {
+          if (!attributes.style) return {};
+          return { style: attributes.style };
+        },
+      },
+      'data-align': {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-align'),
+        renderHTML: (attributes) => {
+          if (!attributes['data-align']) return {};
+          return { 'data-align': attributes['data-align'] };
+        },
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'img[src]',
+        getAttrs: (element) => {
+          const img = element as HTMLImageElement;
+          return {
+            src: img.getAttribute('src'),
+            alt: img.getAttribute('alt'),
+            title: img.getAttribute('title'),
+            width: img.getAttribute('width'),
+            height: img.getAttribute('height'),
+            style: img.getAttribute('style'),
+            'data-align': img.getAttribute('data-align'),
+          };
+        },
+      },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['img', HTMLAttributes];
+  },
+});
+
 // ...existing helper functions remain the same...
 const getMarkRange = ($pos?: ResolvedPos, type?: MarkType) => {
   if (!$pos || !type) {
@@ -322,8 +396,13 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
         }),
         Paragraph,
         Italic,
-        Image,
-        ImageResize,
+        // Use custom image instead of regular Image
+        CustomImage,
+        // Configure ImageResize with better attribute handling
+        ImageResize.configure({
+          inline: false,
+          allowBase64: true,
+        }),
         Table.configure({ resizable: true }),
         TableRow,
         TableHeader,
@@ -331,7 +410,12 @@ const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
         TaskList,
         TaskItem.configure({ nested: true }),
         Text,
-        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        // Include 'image' in TextAlign types to support image alignment
+        TextAlign.configure({
+          types: ['heading', 'paragraph', 'image'],
+          alignments: ['left', 'center', 'right', 'justify'],
+          defaultAlignment: 'left',
+        }),
         TextStyle,
         Underline,
         OrderedList,
