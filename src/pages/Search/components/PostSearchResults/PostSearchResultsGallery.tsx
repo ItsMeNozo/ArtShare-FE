@@ -5,14 +5,14 @@ import { useSearchPosts } from '../../hooks/useSearchPosts';
 
 interface PostSearchResultsGalleryProps {
   finalQuery: string | null;
-  selectedMedium: string | null;
-  selectedAttributes: string[];
+  selectedAttribute: string | null;
+  selectedMediums: string[];
   isAi: boolean;
 }
 
 export const PostSearchResultsGallery: React.FC<
   PostSearchResultsGalleryProps
-> = ({ finalQuery, selectedMedium, selectedAttributes, isAi }) => {
+> = ({ finalQuery, selectedAttribute, selectedMediums, isAi }) => {
   const {
     data: postsData,
     error: postsError,
@@ -23,8 +23,8 @@ export const PostSearchResultsGallery: React.FC<
     isFetchingNextPage,
   } = useSearchPosts({
     finalQuery,
-    medium: selectedMedium,
-    attributes: selectedAttributes,
+    attribute: selectedAttribute,
+    mediums: selectedMediums,
     isAi,
     enabled: !!finalQuery && finalQuery.length > 0,
   });

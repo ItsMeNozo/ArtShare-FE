@@ -79,6 +79,8 @@ export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
       isError={isError}
       error={error ? new Error(error) : null}
       renderPhoto={renderPhotoCallback}
+      hasNextPage={false}
+      fetchNextPage={() => {}}
     />
   );
 };
