@@ -130,7 +130,7 @@ const PostForm: React.FC<PostFormProps> = ({
       onSubmit={async (values, formikActions) =>
         await onSubmit(values, formikActions)
       }
-    // enableReinitialize // Important for forms whose initial values load asynchronously
+      // enableReinitialize // Important for forms whose initial values load asynchronously
     >
       {(formikProps: FormikProps<PostFormValues>) => {
         const {
@@ -150,10 +150,10 @@ const PostForm: React.FC<PostFormProps> = ({
 
         return (
           <>
-            <UnsavedChangesProtector isDirty={isValidToSubmit} />
-            <Form className="dark:bg-mountain-950 w-full h-full">
+            <UnsavedChangesProtector isDirty={isAllDirty && !isSubmitting} />
+            <Form className="dark:bg-mountain-950 h-full w-full">
               <Box
-                className="flex gap-3 p-4 w-full h-[calc(100vh-4rem)]"
+                className="flex h-[calc(100vh-4rem)] w-full gap-3 p-4"
                 style={{ overflow: 'hidden' }}
               >
                 {/* LEFT COLUMN */}
@@ -175,16 +175,16 @@ const PostForm: React.FC<PostFormProps> = ({
                   onMediasChanged={() => setMediasTouched(true)}
                 />
                 {/* RIGHT COLUMN: FORM FIELDS & ACTIONS */}
-                <Box className="flex flex-col space-y-3 w-[40%]">
+                <Box className="flex w-[40%] flex-col space-y-3">
                   {/* Form fields */}
-                  <Box className="relative pr-4 rounded-md w-full overflow-y-auto custom-scrollbar">
+                  <Box className="custom-scrollbar relative w-full overflow-y-auto rounded-md pr-4">
                     <Tooltip
                       title="Auto generate content (title, description, categories) based on images - Credit cost: ~2"
                       arrow
                       placement="left"
                     >
                       <Button
-                        className="top-2 z-50 sticky flex justify-center items-center bg-gradient-to-b from-blue-400 to-purple-400 shadow-md ml-auto p-0 rounded-full w-12 min-w-0 h-12 hover:scale-105 duration-300 ease-in-out hover:cursor-pointer transform"
+                        className="sticky top-2 z-50 ml-auto flex h-12 w-12 min-w-0 transform items-center justify-center rounded-full bg-gradient-to-b from-blue-400 to-purple-400 p-0 shadow-md duration-300 ease-in-out hover:scale-105 hover:cursor-pointer"
                         onClick={() => handleGenerateContent(setFieldValue)}
                       >
                         <FaMagic className="size-5 text-white" />
@@ -207,28 +207,28 @@ const PostForm: React.FC<PostFormProps> = ({
                       onThumbnailChange={() => setThumbnailTouched(true)}
                     />
                   </Box>
-                  <hr className="border-mountain-300 dark:border-mountain-700 border-t-1 w-full" />
+                  <hr className="border-mountain-300 dark:border-mountain-700 w-full border-t-1" />
                   {/* Bottom actions */}
-                  <Box className="flex justify-end bg-none mt-auto pr-4 w-full">
+                  <Box className="mt-auto flex w-full justify-end bg-none pr-4">
                     <Button
                       type="submit"
                       variant="contained"
                       disabled={!isValidToSubmit}
                       className="ml-auto rounded-md"
-                    // sx={{
-                    //   textTransform: 'none',
-                    //   background: isValidToSubmit
-                    //     ? 'linear-gradient(to right, #3730a3, #5b21b6, #4c1d95)' // indigo-violet gradient
-                    //     : 'linear-gradient(to right, #9ca3af, #6b7280)', // Tailwind's gray-400 to gray-500
-                    //   color: 'white',
-                    //   opacity: isValidToSubmit ? 1 : 0.6,
-                    //   pointerEvents: isValidToSubmit ? 'auto' : 'none',
-                    //   '&:hover': {
-                    //     background: isValidToSubmit
-                    //       ? 'linear-gradient(to right, #312e81, #4c1d95, #3b0764)'
-                    //       : 'linear-gradient(to right, #9ca3af, #6b7280)',
-                    //   },
-                    // }}
+                      // sx={{
+                      //   textTransform: 'none',
+                      //   background: isValidToSubmit
+                      //     ? 'linear-gradient(to right, #3730a3, #5b21b6, #4c1d95)' // indigo-violet gradient
+                      //     : 'linear-gradient(to right, #9ca3af, #6b7280)', // Tailwind's gray-400 to gray-500
+                      //   color: 'white',
+                      //   opacity: isValidToSubmit ? 1 : 0.6,
+                      //   pointerEvents: isValidToSubmit ? 'auto' : 'none',
+                      //   '&:hover': {
+                      //     background: isValidToSubmit
+                      //       ? 'linear-gradient(to right, #312e81, #4c1d95, #3b0764)'
+                      //       : 'linear-gradient(to right, #9ca3af, #6b7280)',
+                      //   },
+                      // }}
                     >
                       Submit
                     </Button>
