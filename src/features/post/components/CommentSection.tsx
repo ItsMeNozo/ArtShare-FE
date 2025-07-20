@@ -373,6 +373,7 @@ const CommentRow = ({
                 }
               >
                 <ReactTimeAgo
+                  className='capitalize'
                   date={new Date(comment.updatedAt)}
                   timeStyle="round-minute"
                 />
