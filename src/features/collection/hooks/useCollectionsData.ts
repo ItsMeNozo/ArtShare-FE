@@ -7,16 +7,6 @@ import {
 
 const STALE_TIME = 1000 * 60 * 5;
 
-/**
- * A custom hook to fetch collections data.
- * - If a `username` is provided, it fetches that user's PUBLIC collections.
- * - If no `username` is provided, it fetches the currently authenticated user's
- *   own collections (both public and private).
- *
- * @param username (Optional) The username of the user whose public collections to fetch.
- * @param options (Optional) Configuration options for the query, e.g., `{ enabled: false }`.
- * @returns The result of the useQuery hook for the collections data.
- */
 export function useCollectionsData(
   username?: string,
   options: { enabled?: boolean } = {},
