@@ -7,8 +7,10 @@ import { ExploreTab } from './types';
 
 const Explore: React.FC = () => {
   const [tab, setTab] = useState<ExploreTab>('Trending');
-  const [selectedMedium, setSelectedMedium] = useState<string | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+  const [selectedAttribute, setSelectedAttribute] = useState<string | null>(
+    null,
+  );
+  const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
   const [isAi, setIsAi] = useState(false);
   const token = localStorage.getItem('accessToken');
 
@@ -23,10 +25,10 @@ const Explore: React.FC = () => {
     <div className="relative flex h-screen min-h-0 flex-col">
       <div className="dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 sticky z-10 flex flex-col gap-4 rounded-t-3xl bg-gradient-to-t from-white px-4 py-1 pt-3 dark:bg-gradient-to-t">
         <FilterBar
-          selectedMedium={selectedMedium}
-          setSelectedMedium={setSelectedMedium}
-          selectedAttributes={selectedAttributes}
-          setSelectedAttributes={setSelectedAttributes}
+          selectedAttribute={selectedAttribute}
+          setSelectedAttribute={setSelectedAttribute}
+          selectedMediums={selectedMediums}
+          setSelectedMediums={setSelectedMediums}
           isAi={isAi}
           setIsAi={setIsAi}
         />
@@ -35,8 +37,8 @@ const Explore: React.FC = () => {
       <ExploreGallery
         key={tab}
         tab={tab}
-        selectedMedium={selectedMedium}
-        selectedAttributes={selectedAttributes}
+        selectedAttribute={selectedAttribute}
+        selectedMediums={selectedMediums}
         isAi={isAi}
       />
 

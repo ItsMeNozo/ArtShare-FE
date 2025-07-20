@@ -4,24 +4,26 @@ import { ExploreTab } from '../types';
 
 interface UseGetPostOptions {
   tab: ExploreTab;
-  attributes?: string[];
-  medium?: string | null;
+  mediums?: string[];
+  attribute?: string | null;
   isAi?: boolean;
   enabled?: boolean;
 }
 
 export function useGetPosts({
   tab,
-  attributes = [],
-  medium,
+  mediums = [],
+  attribute,
   isAi = false,
   enabled = true,
 }: UseGetPostOptions) {
   return useInfiniteQuery({
-    queryKey: ['posts', 'list', tab, attributes, medium, isAi],
+    queryKey: ['posts', 'list', tab, mediums, attribute, isAi],
     queryFn: async ({ pageParam = 1 }) => {
       const tabParam = tab === 'Trending' ? 'trending' : 'following';
-      const filterParams: string[] = attributes.concat(medium ? [medium] : []);
+      const filterParams: string[] = mediums.concat(
+        attribute ? [attribute] : [],
+      );
 
       const apiResponse = await getPosts(tabParam, {
         page: pageParam,
