@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import AttributeFilters from '@/features/explore/components/MediumFilters1';
-import MediumFilters from '@/features/explore/components/AtributeFilters';
+import AttributeFilters from '@/features/explore/components/AttributeFilters';
+import MediumFilters from '@/features/explore/components/MediumFilters';
 import { useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
 import { IoMdArrowDropdown } from 'react-icons/io';
@@ -14,8 +14,10 @@ interface PostSearchResultsProps {
 
 const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedMedium, setSelectedMedium] = useState<string | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
+  const [selectedAttribute, setSelectedAttribute] = useState<string | null>(
+    null,
+  );
+  const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
   const [isAi, setIsAi] = useState(false);
 
   return (
@@ -36,27 +38,9 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
 
           {showFilters && (
             <div className="flex gap-2">
-              <MediumFilters
-                selectedMedium={selectedMedium}
-                setSelectedMedium={setSelectedMedium}
-              >
-                {({ onClick }) => (
-                  <Button
-                    variant="outline"
-                    className="dark:bg-mountain-900 hover:bg-mountain-50 dark:hover:bg-mountain-800 border-mountain-200 dark:border-mountain-700 text-mountain-950 dark:text-mountain-200 flex w-auto cursor-pointer items-center justify-center rounded-full border bg-white px-3 py-1"
-                    onClick={onClick}
-                  >
-                    <TbCategory size={16} className="mr-1" />
-                    <p className="mr-1">Mediums</p>
-                    <IoMdArrowDropdown />
-                  </Button>
-                )}
-              </MediumFilters>
               <AttributeFilters
-                selectedAttributes={selectedAttributes}
-                setSelectedAttributes={setSelectedAttributes}
-                isAi={isAi}
-                setIsAi={setIsAi}
+                selectedAttribute={selectedAttribute}
+                setSelectedAttribute={setSelectedAttribute}
               >
                 {({ onClick }) => (
                   <Button
@@ -70,11 +54,29 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
                   </Button>
                 )}
               </AttributeFilters>
+              <MediumFilters
+                selectedMediums={selectedMediums}
+                setSelectedMediums={setSelectedMediums}
+                isAi={isAi}
+                setIsAi={setIsAi}
+              >
+                {({ onClick }) => (
+                  <Button
+                    variant="outline"
+                    className="dark:bg-mountain-900 hover:bg-mountain-50 dark:hover:bg-mountain-800 border-mountain-200 dark:border-mountain-700 text-mountain-950 dark:text-mountain-200 flex w-auto cursor-pointer items-center justify-center rounded-full border bg-white px-3 py-1"
+                    onClick={onClick}
+                  >
+                    <TbCategory size={16} className="mr-1" />
+                    <p className="mr-1">Mediums</p>
+                    <IoMdArrowDropdown />
+                  </Button>
+                )}
+              </MediumFilters>
             </div>
           )}
         </div>
 
-        {selectedAttributes.length === 0 && !selectedMedium && (
+        {selectedMediums.length === 0 && !selectedAttribute && (
           <div className="flex h-12 w-full items-center justify-center">
             <div className="text-mountain-400 dark:text-mountain-500">
               Tips: Want more specific results? Try adding filters.
@@ -85,8 +87,8 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
 
       <PostSearchResultsGallery
         finalQuery={finalQuery}
-        selectedMedium={selectedMedium}
-        selectedAttributes={selectedAttributes}
+        selectedAttribute={selectedAttribute}
+        selectedMediums={selectedMediums}
         isAi={isAi}
       />
     </div>
