@@ -1,5 +1,4 @@
 import { searchPosts } from '@/features/explore/api/get-post';
-import { postsToPhotos } from '@/features/explore/utils';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 interface UseSearchPostsParams {
@@ -26,7 +25,7 @@ export const useSearchPosts = (params: UseSearchPostsParams) => {
         isAi,
       });
 
-      return postsToPhotos(apiResponse);
+      return apiResponse;
     },
 
     getNextPageParam: (lastPage) => {

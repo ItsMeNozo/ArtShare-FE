@@ -1,7 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getPosts } from '../api/get-post';
 import { ExploreTab } from '../types';
-import { postsToPhotos } from '../utils';
 
 interface UseGetPostOptions {
   tab: ExploreTab;
@@ -30,7 +29,7 @@ export function useGetPosts({
         isAi,
       });
 
-      return postsToPhotos(apiResponse);
+      return apiResponse;
     },
     getNextPageParam: (lastPage) => {
       return lastPage.hasNextPage ? lastPage.page + 1 : undefined;

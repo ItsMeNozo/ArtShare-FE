@@ -347,7 +347,7 @@ const CollectionPage: React.FC = () => {
   const displayError = collectionsError || anyMutationError;
 
   return (
-    <Container maxWidth="xl" className="h-screen py-3">
+    <Container maxWidth="xl" className="h-screen overflow-y-auto py-3">
       {/* Header */}
       <Stack
         direction={{ xs: 'column', md: 'row' }}
