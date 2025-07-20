@@ -4,6 +4,7 @@ import Loading from '@/components/loading/Loading';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { Image } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -19,11 +20,11 @@ import PostImagesEditor from './PostImagesEditor';
 import { FacebookPostDialog } from './PostPreviewer';
 import PostScheduleEditor from './PostScheduleEditor';
 
-// import { Link, Element } from "react-scroll";
-
 const EditAutoPostForm = () => {
   const postId = useNumericParam('postId');
   const [openPreviewDialog, setOpenPreviewDialog] = useState(false);
+  const queryClient = useQueryClient();
+
   const { data: postToEdit, isLoading } = useGetAutoPostDetails(postId);
   const initialValues = useMemo((): AutoPostFormValues => {
     if (postToEdit) {
@@ -58,6 +59,12 @@ const EditAutoPostForm = () => {
         values,
       },
       {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['projects', 'list'] });
+          queryClient.invalidateQueries({
+            queryKey: ['auto-post', 'details', postId],
+          });
+        },
         onSettled: () => formikHelpers.setSubmitting(false),
       },
     );
@@ -104,7 +111,7 @@ const EditAutoPostForm = () => {
       initialValues={initialValues}
       validationSchema={AutoPostSchema}
       onSubmit={handleSubmit}
-      enableReinitialize // This is crucial to update the form when `initialValues` change (after data fetching)
+      enableReinitialize
     >
       {({ values, setFieldValue, errors, touched, isSubmitting }) => {
         return (
@@ -233,7 +240,7 @@ const AutoPostSchema = Yup.object().shape({
     .test(
       'has-text',
       'Post content cannot be empty.',
-      (value) => !!value?.replace(/<[^>]+>/g, '').trim(), // Strip HTML tags for validation
+      (value) => !!value?.replace(/<[^>]+>/g, '').trim(),
     ),
   images: Yup.array()
     .of(
