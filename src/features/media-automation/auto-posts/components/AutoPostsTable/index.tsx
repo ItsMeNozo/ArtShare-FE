@@ -1,6 +1,8 @@
+import ConfirmationDialog from '@/components/ConfirmationDialog';
 import Loading from '@/components/loading/Loading';
 import { getStatusChipProps } from '@/features/media-automation/auto-posts/utils';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import {
   Button,
@@ -20,6 +22,7 @@ import {
   Order,
   SortableKeysItemTable,
 } from '../../../projects/types/automation-project';
+import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
 import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import PostsTableHeader from './AutoPostsTableHeader';
 
@@ -87,8 +90,26 @@ const AutoPostsTable = () => {
     navigate(`/auto/projects/${projectDetails!.id}/posts/new`);
   };
 
+  const {
+    isDialogOpen,
+    itemToConfirm: postIdToDelete,
+    openDialog,
+    closeDialog,
+  } = useConfirmationDialog<number>();
+
   const handleRowClick = (postId: number) => {
     navigate(`/auto/projects/${projectDetails!.id}/posts/${postId}/edit`);
+  };
+
+  const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
+    onSuccess: () => {
+      closeDialog();
+    },
+  });
+
+  const handleConfirmDelete = () => {
+    if (!postIdToDelete) return;
+    deletePost(postIdToDelete);
   };
 
   if (isLoading || !projectDetails) {
@@ -100,6 +121,15 @@ const AutoPostsTable = () => {
       <div className="flex w-full">
         <p>Number Of Posts: {posts.length}</p>
       </div>
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Deletion"
+        contentText="Are you sure you want to permanently delete this post? This action cannot be undone."
+        confirmButtonText="Delete Post"
+        isConfirming={isDeleting}
+      />
       <div className="border-mountain-200 flex h-full w-full overflow-hidden rounded-3xl border bg-white">
         <TableContainer className="h-[calc(100vh-14rem)] flex-col justify-between overflow-hidden">
           <Table
@@ -175,7 +205,14 @@ const AutoPostsTable = () => {
                         </Button>
                       </Tooltip>
                       <Tooltip title="Delete">
-                        <Button className="border-mountain-200 border-1 bg-red-50 py-2 font-normal">
+                        <Button
+                          type="button"
+                          className="border-mountain-200 border-1 bg-red-50 py-2 font-normal"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            openDialog(row.id);
+                          }}
+                        >
                           <IoTrashBin className="size-5 text-red-600" />
                         </Button>
                       </Tooltip>
