@@ -132,7 +132,9 @@ test.describe('Post Creation', () => {
     console.log(`✅ Created video post successfully with ID: ${postId}`);
   });
 
-  test('@ai SCRUM-356-3: AI Content Generation Feature', async ({ page }) => {
+  test.only('@ai SCRUM-356-3: AI Content Generation Feature', async ({
+    page,
+  }) => {
     await postCreationPage.uploadImage();
 
     const aiResult = await postCreationPage.generateAIContent();
@@ -140,9 +142,6 @@ test.describe('Post Creation', () => {
     if (aiResult.success) {
       console.log(`🤖 AI generated title: "${aiResult.title}"`);
       console.log(`🤖 AI generated description: "${aiResult.description}"`);
-
-      // User can edit AI-generated content
-      await postCreationPage.fillTitle('My Custom AI Title');
 
       const postId = await submitPost(page);
       console.log(

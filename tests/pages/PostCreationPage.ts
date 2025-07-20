@@ -32,7 +32,7 @@ export class PostCreationPage {
     });
     this.submitButton = this.page.getByRole('button', { name: 'Submit' });
     this.aiGenerateButton = this.page.getByRole('button', {
-      name: 'Auto generate content (title, description, categories) - Credit cost: ~2',
+      name: 'Auto generate content',
     });
     this.previewImage = this.page.getByRole('img', { name: 'Preview' });
     this.previewVideo = this.page.locator('video');
