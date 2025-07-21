@@ -237,7 +237,7 @@ const PostForm: React.FC<PostFormProps> = ({
                       //   },
                       // }}
                     >
-                      {isEditMode ? 'Save Changes' : 'Submit'}
+                      { isEditMode ? 'Save Changes' : 'Submit' }
                     </Button>
                   </Box>
                 </Box>
