@@ -58,6 +58,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const handleGenerateContent = async (
     setFieldValue: FormikHelpers<PostFormValues>['setFieldValue'],
+    formikProps: FormikProps<PostFormValues>
   ) => {
     if (
       postMedias.filter((media) => media.type === MEDIA_TYPE.IMAGE).length === 0
@@ -86,6 +87,9 @@ const PostForm: React.FC<PostFormProps> = ({
           'categoryIds',
           categories.map((cate) => cate.id),
         );
+        setTimeout(() => {
+          formikProps.validateForm();
+        }, 0);
       },
     });
   };
@@ -145,7 +149,7 @@ const PostForm: React.FC<PostFormProps> = ({
         } = formikProps;
 
         const isAllDirty = mediasTouched || thumbnailTouched || dirty;
-
+        
         const isValidToSubmit = isAllDirty && !isSubmitting && isValid;
 
         return (
@@ -185,7 +189,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     >
                       <Button
                         className="top-2 z-50 sticky flex justify-center items-center bg-gradient-to-b from-blue-400 to-purple-400 shadow-md ml-auto p-0 rounded-full w-12 min-w-0 h-12 hover:scale-105 duration-300 ease-in-out hover:cursor-pointer transform"
-                        onClick={() => handleGenerateContent(setFieldValue)}
+                        onClick={() => handleGenerateContent(setFieldValue, formikProps)}
                       >
                         <FaMagic className="size-5 text-white" />
                       </Button>

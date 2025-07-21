@@ -376,6 +376,7 @@ const CommentRow = ({
                   className='capitalize'
                   date={new Date(comment.updatedAt)}
                   timeStyle="round-minute"
+                  tick={false}
                 />
                 {new Date(comment.updatedAt).getTime() !==
                   new Date(comment.createdAt).getTime() && ' (edited)'}

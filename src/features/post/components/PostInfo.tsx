@@ -176,6 +176,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
                   date={new Date(postData.createdAt)}
                   locale="en-US"
                   timeStyle="round-minute"
+                  tick={false}
                 />
               ) : (
                 'Unknown time'
