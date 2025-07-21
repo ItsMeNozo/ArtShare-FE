@@ -34,7 +34,7 @@ export interface PostFormProps {
 const PostForm: React.FC<PostFormProps> = ({
   initialFormValues,
   onSubmit,
-  // isEditMode,
+  isEditMode,
   postMedias,
   setPostMedias,
   thumbnail,
@@ -234,7 +234,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     //   },
                     // }}
                     >
-                      Submit
+                      { isEditMode ? 'Save Changes' : 'Submit' }
                     </Button>
                   </Box>
                 </Box>
