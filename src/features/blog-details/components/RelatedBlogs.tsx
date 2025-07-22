@@ -13,7 +13,7 @@ interface RelatedBlogsProps {
 }
 
 const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
-  const [skip, setSkip] = useState(0);
+  const [skip, setSkip] = useState(1);
   const take = 3;
 
   const {
@@ -23,7 +23,8 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
     error,
   } = useQuery<Blog[]>({
     queryKey: ['relatedBlogs', currentBlogId, take, skip],
-    queryFn: () => fetchRelevantBlogs(currentBlogId, { take, skip }),
+    queryFn: () =>
+      fetchRelevantBlogs(currentBlogId, { limit: take, page: skip }),
     placeholderData: (previousData) => previousData,
     staleTime: 5 * 60 * 1000,
   });
