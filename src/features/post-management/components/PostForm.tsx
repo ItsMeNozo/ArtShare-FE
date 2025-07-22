@@ -34,7 +34,7 @@ export interface PostFormProps {
 const PostForm: React.FC<PostFormProps> = ({
   initialFormValues,
   onSubmit,
-  // isEditMode,
+  isEditMode,
   postMedias,
   setPostMedias,
   thumbnail,
@@ -58,6 +58,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const handleGenerateContent = async (
     setFieldValue: FormikHelpers<PostFormValues>['setFieldValue'],
+    formikProps: FormikProps<PostFormValues>,
   ) => {
     if (
       postMedias.filter((media) => media.type === MEDIA_TYPE.IMAGE).length === 0
@@ -86,6 +87,9 @@ const PostForm: React.FC<PostFormProps> = ({
           'categoryIds',
           categories.map((cate) => cate.id),
         );
+        setTimeout(() => {
+          formikProps.validateForm();
+        }, 0);
       },
     });
   };
@@ -185,7 +189,9 @@ const PostForm: React.FC<PostFormProps> = ({
                     >
                       <Button
                         className="sticky top-2 z-50 ml-auto flex h-12 w-12 min-w-0 transform items-center justify-center rounded-full bg-gradient-to-b from-blue-400 to-purple-400 p-0 shadow-md duration-300 ease-in-out hover:scale-105 hover:cursor-pointer"
-                        onClick={() => handleGenerateContent(setFieldValue)}
+                        onClick={() =>
+                          handleGenerateContent(setFieldValue, formikProps)
+                        }
                       >
                         <FaMagic className="size-5 text-white" />
                       </Button>
@@ -230,7 +236,7 @@ const PostForm: React.FC<PostFormProps> = ({
                       //   },
                       // }}
                     >
-                      Submit
+                      {isEditMode ? 'Save Changes' : 'Submit'}
                     </Button>
                   </Box>
                 </Box>

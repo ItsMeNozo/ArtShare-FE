@@ -1,4 +1,6 @@
 import api from '@/api/baseApi';
+import ConfirmationDialog from '@/components/ConfirmationDialog';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { FaCalendarCheck, FaCalendarTimes } from 'react-icons/fa';
@@ -14,6 +16,12 @@ import {
 } from '../types/automation-project';
 
 const ProjectsPage = () => {
+  const {
+    isDialogOpen,
+    itemToConfirm: projectsToDelete,
+    openDialog: openDeleteDialog,
+    closeDialog: closeDeleteDialog,
+  } = useConfirmationDialog<readonly number[]>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -47,23 +55,26 @@ const ProjectsPage = () => {
       Promise.all(projectIds.map((id) => api.delete(`/auto-project/${id}`))),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['auto-projects'] });
+      await queryClient.invalidateQueries({ queryKey: ['projects', 'list'] });
       setSelected([]);
+      closeDeleteDialog();
     },
     onError: (err) => {
       console.error('Failed to delete project(s).', err);
+      closeDeleteDialog();
     },
   });
 
-  const handleDeleteProjects = (projectIds: readonly number[]) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete ${projectIds.length} project(s)?`,
-      )
-    ) {
-      return;
+  const handleDeleteRequest = (projectIds: readonly number[]) => {
+    if (projectIds.length > 0) {
+      openDeleteDialog(projectIds);
     }
-    deleteProjects(projectIds);
+  };
+
+  const handleConfirmDelete = () => {
+    if (projectsToDelete) {
+      deleteProjects(projectsToDelete);
+    }
   };
 
   const summaryStats: ProjectSummaryStats = useMemo(() => {
@@ -144,9 +155,23 @@ const ProjectsPage = () => {
         setPage={setPage}
         rowsPerPage={rowsPerPage}
         setRowsPerPage={setRowsPerPage}
-        onDelete={handleDeleteProjects}
+        onDelete={handleDeleteRequest}
         selected={selected}
         setSelected={setSelected}
+      />
+
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="Delete Project(s)"
+        contentText={`Are you sure you want to delete ${
+          projectsToDelete?.length === 1
+            ? 'this project'
+            : `${projectsToDelete?.length || 0} projects`
+        }? This action cannot be undone.`}
+        isConfirming={isDeleting}
+        confirmButtonText="Delete"
       />
     </div>
   );

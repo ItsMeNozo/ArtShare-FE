@@ -13,7 +13,9 @@ export const useFetchLinkedPlatforms = ({
   return useQuery({
     queryKey: ['linkedPlatforms', user, platformName],
     queryFn: () =>
-      fetchLinkedPlatforms({ platformName: platformName ?? undefined }),
+      fetchLinkedPlatforms({
+        platformName: platformName ?? undefined,
+      }),
     staleTime: 1000 * 60 * 3, // 5 minutes
     enabled: !!platformName,
   });

@@ -6,7 +6,7 @@ export const fetchPlatforms = async (
   platformName: string,
 ): Promise<Platform[]> => {
   const { data } = await api.get<Platform[]>('/platforms', {
-    params: { platformName },
+    params: { platformName: platformName.toUpperCase() },
   });
   return data;
 };
