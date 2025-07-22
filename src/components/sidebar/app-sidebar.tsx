@@ -5,22 +5,22 @@ import { Link, useLocation } from 'react-router-dom';
 import app_logo from '/logo_app_v_101.png';
 
 //Icons
-import { Home } from 'lucide-react';
+import { ChevronRight, Home } from 'lucide-react';
 import { GoSidebarExpand } from 'react-icons/go';
 import { HiOutlineNewspaper } from 'react-icons/hi2';
-import { IoReorderThreeOutline } from 'react-icons/io5';
-import { LuBookOpenText } from 'react-icons/lu';
+import { IoDocumentTextOutline, IoReorderThreeOutline } from 'react-icons/io5';
+import { LuBookOpenText, LuMessageCircleCode } from 'react-icons/lu';
 import {
   MdAutoMode,
   MdOutlineCollectionsBookmark,
   MdOutlineExplore,
   MdOutlineLibraryBooks,
-  MdOutlineManageAccounts,
 } from 'react-icons/md';
 import { RiImageAiLine, RiImageEditLine } from 'react-icons/ri';
 
 // import UserPlan from "./subscription";
 import { Tooltip } from '@mui/material';
+import { PiVideo } from 'react-icons/pi';
 
 type SidebarProps = {
   expand: boolean;
@@ -46,15 +46,14 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               ArtShare
             </p>
           </div>
-          <div className="flex-grow" />
           <div
             onClick={() => setExpand(!expand)}
-            className={`dark:hover:bg-mountain-800 max-pointer-events-none flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer`}
+            className={`dark:hover:bg-mountain-800 shrink-0 max-pointer-events-none flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer`}
           >
             {expand ? (
               <GoSidebarExpand className="size-5 text-gray-600 dark:text-gray-300" />
             ) : (
-              <IoReorderThreeOutline className="size-6 text-gray-600 dark:text-gray-300" />
+              <IoReorderThreeOutline className="mr-1.5 size-6 text-gray-600 dark:text-gray-300" />
             )}
           </div>
         </div>
@@ -64,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
         >
           <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
-              { icon: Home, label: 'Dashboard', href: '/dashboard' },
+              { icon: Home, label: 'Home', href: '/dashboard' },
               {
                 icon: MdOutlineExplore,
                 label: 'Explore Arts',
@@ -87,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                    className={`group hover:bg-mountain-50 text-[15px] flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 ${isActive ? 'text-white' : 'text-mountain-900'
                       } `}
                     style={
                       isActive
@@ -138,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                    className={`group text-[15px] hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 ${isActive ? 'text-white' : 'text-mountain-900'
                       } `}
                     style={
                       isActive
@@ -182,7 +181,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                    className={`group  hover:bg-mountain-50 text-[15px] flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 ${isActive ? 'text-white' : 'text-mountain-900'
                       } `}
                     style={
                       isActive
@@ -209,26 +208,14 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
             })}
           </div>
           <div className="flex flex-col justify-between items-start space-y-1 w-full">
-            <p
-              className={`px-4 text-sm text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} font-normal`}
-            >
-              Social Automation
-            </p>
             {[
-              {
-                icon: MdOutlineManageAccounts,
-                label: 'Link Socials',
-                href: '/auto/social-links',
-              },
               {
                 icon: MdAutoMode,
                 label: 'Post Automation',
                 href: '/auto/projects',
               },
             ].map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href === '/docs' && pathname.startsWith('/docs'));
+              const isActive = pathname === item.href
               return (
                 <Tooltip
                   title={item.label}
@@ -239,7 +226,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-4 ${isActive ? 'text-white' : 'text-violet-900'
+                    className={`group justify-between text-[15px] hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 ${isActive ? 'text-white' : 'text-mountain-900'
                       } `}
                     style={
                       isActive
@@ -250,16 +237,77 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                         : undefined
                     }
                   >
-                    <item.icon className="flex-shrink-0 size-5" />
-                    <div
-                      className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
-                    >
-                      <p
-                        className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} ${isActive ? 'font-medium' : 'font-normal'}`}
+                    <div className='flex items-center'>
+                      <item.icon className="flex-shrink-0 size-5" />
+                      <div
+                        className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                       >
-                        {item.label}
-                      </p>
+                        <p
+                          className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} ${isActive ? 'font-medium' : 'font-normal'}`}
+                        >
+                          {item.label}
+                        </p>
+                      </div>
                     </div>
+                    <p className={`p-2 py-1.5 bg-gradient-to-r from-mountain-200 to-mountain-100 rounded-md text-xs ${expand ? '' : 'hidden'}`}>Pro</p>
+                  </Link>
+                </Tooltip>
+              );
+            })}
+          </div>
+          <div className="flex flex-col justify-between items-start space-y-1 w-full">
+            {[
+              {
+                icon: LuMessageCircleCode,
+                label: 'Updates',
+                href: '/dashboard/updates',
+              },
+              {
+                icon: IoDocumentTextOutline,
+                label: 'Documentation',
+                href: 'https://artshare-docs.netlify.app/',
+              },
+              {
+                icon: PiVideo,
+                label: 'App Tutorials',
+                href: 'https://www.youtube.com/channel/UCpg3O1quTzj7QpDHdhu6pNw',
+              }
+            ].map((item, key) => {
+              const isActive = pathname === item.href
+              return (
+                <Tooltip
+                  title={item.label}
+                  key={item.label}
+                  placement="right"
+                  arrow
+                  disableHoverListener={expand}
+                >
+                  <Link
+                    to={item.href}
+                    target={key === 0 ? '_self' : '_blank'}
+                    className={`${isActive ? 'text-white' : 'text-mountain-900'} group justify-between text-[15px] hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 `}
+                    style={
+                      isActive
+                        ? {
+                          backgroundImage:
+                            'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
+                        }
+                        : undefined
+                    }
+                  >
+                    <div className='flex items-center'>
+                      <item.icon className="flex-shrink-0 size-5" />
+                      <div
+                        className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
+                      >
+                        <p
+                          className={`text-nowrap transition-opacity duration-500 ${expand ? 'opacity-100' : 'opacity-0'} font-normal`}
+                        >
+                          {item.label}
+                        </p>
+                      </div>
+                    </div>
+                    {key !== 0 && <ChevronRight className='size-4' />}
                   </Link>
                 </Tooltip>
               );
