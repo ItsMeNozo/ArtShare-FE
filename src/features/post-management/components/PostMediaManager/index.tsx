@@ -1,14 +1,3 @@
-import { useSnackbar } from '@/hooks/useSnackbar';
-import { MEDIA_TYPE } from '@/utils/constants';
-import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { MdClose } from 'react-icons/md';
-import { RiImageCircleAiLine } from 'react-icons/ri';
-import { TbDeviceDesktop } from 'react-icons/tb';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import TabValue from '../../enum/media-tab-value';
-import MediaUploadTab from './MediaUploadTab';
-import { useLocation } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { MEDIA_TYPE } from '@/utils/constants';
+import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { IoSparkles } from 'react-icons/io5';
+import { MdClose } from 'react-icons/md';
+import { RiImageCircleAiLine } from 'react-icons/ri';
+import { TbDeviceDesktop } from 'react-icons/tb';
+import { useLocation } from 'react-router-dom';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import TabValue from '../../enum/media-tab-value';
 import {
   MAX_IMAGES,
   MAX_VIDEO,
@@ -29,6 +28,7 @@ import { PostMedia } from '../../types/post-media';
 import AddMoreMediaButton from './AddMoreMediaButton';
 import InfoMediaRemaining from './InfoMediaRemaining';
 import MediaPreviewer from './MediaPreviewer';
+import MediaUploadTab from './MediaUploadTab';
 import SelectAiImagesPanel from './SelectAiImagesPanel';
 import SelectDeviceMediaPanel from './UploadFromDevice';
 
@@ -66,6 +66,7 @@ export default function PostMediaManager({
   const hasProcessedImageRef = useRef(false);
 
   const handleTabChange = (newTab: TabValue) => {
+    if (tabValue === newTab) return;
     if (
       hasArtNovaImages &&
       postMedias.length > 0 &&
@@ -126,7 +127,7 @@ export default function PostMediaManager({
         setHasArtNovaImages?.(false);
         onMediasChanged?.();
       })
-      .catch((err) => console.error("Failed to load image from editor:", err));
+      .catch((err) => console.error('Failed to load image from editor:', err));
   }, []);
 
   const { mutateAsync: checkMaturityForNewItems } = useCheckMaturity();

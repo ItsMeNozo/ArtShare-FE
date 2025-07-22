@@ -252,7 +252,7 @@ const Login = () => {
             Remember me
           </label>
           <div className="text-sm text-indigo-600 dark:text-indigo-300">
-            <Link to="/forgot-password">Forgot username or password?</Link>
+            <Link to="/forgot-password">Forgot password?</Link>
           </div>
         </div>
         <Button

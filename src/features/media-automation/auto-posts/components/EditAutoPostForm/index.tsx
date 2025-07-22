@@ -3,7 +3,8 @@ import InlineErrorMessage from '@/components/InlineErrorMessage';
 import Loading from '@/components/loading/Loading';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
@@ -32,6 +33,8 @@ const EditAutoPostForm = () => {
   const handleAddPost = () => {
     navigate(`/auto/projects/${projectId}/posts/new`);
   };
+
+  const queryClient = useQueryClient();
 
   const { data: postToEdit, isLoading } = useGetAutoPostDetails(postId);
   const initialValues = useMemo((): AutoPostFormValues => {
@@ -67,6 +70,12 @@ const EditAutoPostForm = () => {
         values,
       },
       {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['projects', 'list'] });
+          queryClient.invalidateQueries({
+            queryKey: ['auto-post', 'details', postId],
+          });
+        },
         onSettled: () => formikHelpers.setSubmitting(false),
       },
     );
@@ -109,9 +118,9 @@ const EditAutoPostForm = () => {
       initialValues={initialValues}
       validationSchema={AutoPostSchema}
       onSubmit={handleSubmit}
-      enableReinitialize // This is crucial to update the form when `initialValues` change (after data fetching)
+      enableReinitialize
     >
-      {({ values, setFieldValue, errors, touched, isSubmitting }) => {
+      {({ values, setFieldValue, errors, touched, isSubmitting, dirty }) => {
         return (
           <Form className="flex flex-col bg-[#F2F4F7] rounded-t-3xl w-full h-[calc(100vh-4rem)]">
             <div className="flex items-center bg-white px-4 py-2 border-mountain-200 border-b-1 rounded-t-3xl w-full h-16 shrink-0">
@@ -147,7 +156,7 @@ const EditAutoPostForm = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !dirty}
                   >
                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                   </Button>
@@ -236,7 +245,7 @@ const AutoPostSchema = Yup.object().shape({
     .test(
       'has-text',
       'Post content cannot be empty.',
-      (value) => !!value?.replace(/<[^>]+>/g, '').trim(), // Strip HTML tags for validation
+      (value) => !!value?.replace(/<[^>]+>/g, '').trim(),
     ),
   images: Yup.array()
     .of(

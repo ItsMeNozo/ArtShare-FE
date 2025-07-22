@@ -313,9 +313,9 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               );
             })}
           </div>
-        </div>
-      </div>
-    </aside>
+        </div >
+      </div >
+    </aside >
   );
 };
 

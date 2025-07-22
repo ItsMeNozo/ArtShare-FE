@@ -1,12 +1,10 @@
 import { InfiniteScroll } from '@/components/InfiniteScroll';
 import Loading from '@/components/loading/Loading';
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { RowsPhotoAlbum } from 'react-photo-album';
 import useMeasure from 'react-use-measure';
 import { useSearchUsers } from '../../hooks/useSearchUsers';
-import { UserPhoto } from '../../types';
-import { transformUserToPhoto } from '../../utils/transformUserToPhoto';
 import { UserPhotoRenderer } from './UserPhotoRenderer';
 
 interface UserSearchResultsProps {
@@ -28,38 +26,12 @@ const UserSearchResults = ({ searchQuery }: UserSearchResultsProps) => {
     enabled: !!searchQuery,
   });
 
-  const [photos, setPhotos] = useState<UserPhoto[]>([]);
-
-  useEffect(() => {
-    if (!data) return;
-
-    const processNewUsers = async () => {
-      const lastPage = data.pages[data.pages.length - 1];
-      // If the last page is empty or undefined, return early
-      if (!lastPage || !lastPage.data) return;
-      const photoPromises = lastPage.data.map(transformUserToPhoto);
-      const newPhotos = await Promise.all(photoPromises);
-      const validNewPhotos = newPhotos.filter(
-        (p): p is UserPhoto => p !== null,
-      );
-
-      console.log('Fetched new photos:', validNewPhotos);
-      setPhotos((prevPhotos) => [...prevPhotos, ...validNewPhotos]);
-    };
-
-    const totalUsersFetched = data.pages.flatMap((page) => page.data).length;
-
-    if (totalUsersFetched > photos.length) {
-      processNewUsers();
-    }
-  }, [data, photos.length]);
-
-  useEffect(() => {
-    setPhotos([]);
-  }, [searchQuery]);
+  const photos = useMemo(() => {
+    return data?.pages.flatMap((page) => page.photos) ?? [];
+  }, [data]);
 
   return (
-    <Box ref={ref} className="flex h-screen max-h-[68vh] flex-col px-2">
+    <Box ref={ref}>
       {isLoading && photos.length === 0 && <Loading />}
       <InfiniteScroll
         data={photos}

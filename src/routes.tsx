@@ -154,6 +154,22 @@ const routeConfig: RouteObject[] = [
           </ProtectedAuthRoute>
         ),
       },
+      // No layout routes (tools that need full screen) - MUST come FIRST
+      {
+        element: (
+          <RequireOnboard>
+            <ProtectedInAppRoute>
+              <Outlet />
+            </ProtectedInAppRoute>
+          </RequireOnboard>
+        ),
+        children: [
+          { path: '/docs/:blogId', element: <MyWriting /> },
+          { path: '/image/tool/editor', element: <ImageEditor /> },
+          { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
+          { path: '/image/tool/editor/new', element: <BrowseImage /> },
+        ],
+      },
       // In-App Public
       {
         element: (

@@ -262,11 +262,6 @@ export default function ProjectTable({
     setDense(event.target.checked);
   };
 
-  const handleDelete = () => {
-    onDelete(selected);
-    setSelected([]);
-  };
-
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'draft':
@@ -296,7 +291,7 @@ export default function ProjectTable({
             numSelected={selected.length}
             dense={dense}
             handleChangeDense={handleChangeDense}
-            onDelete={handleDelete}
+            onDelete={() => onDelete(selected)}
           />
           <TableContainer className="flex-grow custom-scrollbar">
             {isLoading && (

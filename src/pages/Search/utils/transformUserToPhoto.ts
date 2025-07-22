@@ -1,6 +1,26 @@
+import { PaginatedResponse } from '@/api/types/paginated-response.type';
 import { PublicUserSearchDto, UserPhoto } from '../types';
 
-export const transformUserToPhoto = (
+interface TransformedUserPage {
+  photos: UserPhoto[];
+  hasNextPage: boolean;
+  page: number;
+}
+
+export const usersToPhotos = async (
+  usersResponse: PaginatedResponse<PublicUserSearchDto>,
+): Promise<TransformedUserPage> => {
+  const photoPromises = (usersResponse.data ?? []).map(transformUserToPhoto);
+  const resolvedPhotos = await Promise.all(photoPromises);
+  const validPhotos = resolvedPhotos.filter((photo) => photo !== null);
+  return {
+    photos: validPhotos,
+    hasNextPage: usersResponse.hasNextPage,
+    page: usersResponse.page,
+  };
+};
+
+const transformUserToPhoto = (
   user: PublicUserSearchDto,
 ): Promise<UserPhoto | null> => {
   return new Promise((resolve) => {

@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { searchUsers } from '../api/searchUsers.api';
+import { usersToPhotos } from '../utils/transformUserToPhoto';
 
 interface UserSearchUsersParams {
   searchQuery: string;
@@ -12,8 +13,16 @@ export const useSearchUsers = (params: UserSearchUsersParams) => {
   return useInfiniteQuery({
     queryKey: ['userSearch', searchQuery],
 
-    queryFn: ({ pageParam = 1 }) =>
-      searchUsers({ search: searchQuery, page: pageParam }),
+    queryFn: async ({ pageParam = 1 }) => {
+      const apiResponse = await searchUsers({
+        search: searchQuery,
+        page: pageParam,
+      });
+
+      console.log('useSearchUsers apiResponse:', apiResponse);
+
+      return usersToPhotos(apiResponse);
+    },
 
     getNextPageParam: (lastPage) => {
       return lastPage.hasNextPage ? lastPage.page + 1 : undefined;
