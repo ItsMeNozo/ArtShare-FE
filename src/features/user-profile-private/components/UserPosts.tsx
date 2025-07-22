@@ -18,7 +18,6 @@ const UserPosts = () => {
       try {
         setLoadingPosts(true);
         const userPosts = await fetchUserPosts(username, 1);
-        console.log('@@ User posts', userPosts);
         setPosts(userPosts);
       } catch (error) {
         console.error('Error fetching user posts:', error);
