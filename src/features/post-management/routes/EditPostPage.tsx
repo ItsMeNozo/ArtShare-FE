@@ -4,7 +4,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Box } from '@mui/material';
 import { FormikHelpers } from 'formik';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PostForm from '../components/PostForm';
 import { useUpdatePost } from '../hooks/useUpdatePost';
@@ -14,23 +14,18 @@ import {
 } from '../types/post-form-values.type';
 import { PostMedia } from '../types/post-media';
 
-/**
- * EditPostPage – fully‑screen page that reuses UploadPost components
- * Route: /posts/:postId/edit
- */
 const EditPostPage: React.FC = () => {
-  /** ──────────────────── fetch post data ─────────────────── */
   const { postId } = useParams<{ postId: string }>();
+  const navigate = useNavigate();
+  const { showSnackbar } = useSnackbar();
+
   const {
     data: fetchedPost,
     isLoading: isPostLoading,
     error: postError,
   } = useGetPostDetails(postId);
 
-  /** ─────────────────── internal UI state (mirrors UploadPost) ─────────────────── */
-  const navigate = useNavigate();
-  const { showSnackbar } = useSnackbar();
-
+  // Media state
   const [postMedias, setPostMedias] = useState<PostMedia[]>([]);
   const [thumbnail, setThumbnail] = useState<PostMedia | null>(null);
   const [originalThumbnail, setOriginalThumbnail] = useState<PostMedia | null>(
@@ -38,34 +33,7 @@ const EditPostPage: React.FC = () => {
   );
   const [hasArtNovaImages, setHasArtNovaImages] = useState(false);
 
-  /** ─────────────────── preload fetched post into state ─────────────────── */
-
-  useEffect(() => {
-    if (!fetchedPost) return;
-
-    setHasArtNovaImages(fetchedPost.aiCreated);
-
-    setThumbnail({
-      url: fetchedPost.thumbnailUrl,
-      type: MEDIA_TYPE.IMAGE,
-      file: new File([], 'template file for thumbnail'),
-    });
-    setOriginalThumbnail({
-      url: fetchedPost.thumbnailCropMeta.initialThumbnail,
-      type: MEDIA_TYPE.IMAGE,
-      file: new File([], 'template file for thumbnail'),
-    });
-
-    // build postMedias from postData.medias
-    const initialMedias = fetchedPost.medias.map((media) => ({
-      url: media.url,
-      type: media.mediaType,
-      file: new File([], 'template file for existing media'),
-    }));
-
-    setPostMedias(initialMedias);
-  }, [fetchedPost]);
-
+  // Initialize form values only when fetchedPost is available
   const initialFormValues = useMemo((): PostFormValues => {
     if (!fetchedPost) {
       return defaultPostFormValues;
@@ -79,10 +47,39 @@ const EditPostPage: React.FC = () => {
     };
   }, [fetchedPost]);
 
-  /** ─────────────────── submit ─────────────────── */
+  // Preload fetched post data into state
+  useEffect(() => {
+    if (!fetchedPost) return;
+
+    setHasArtNovaImages(fetchedPost.aiCreated);
+
+    // Set thumbnail
+    setThumbnail({
+      url: fetchedPost.thumbnailUrl,
+      type: MEDIA_TYPE.IMAGE,
+      file: new File([], 'existing-thumbnail'),
+    });
+
+    // Set original thumbnail
+    setOriginalThumbnail({
+      url: fetchedPost.thumbnailCropMeta.initialThumbnail,
+      type: MEDIA_TYPE.IMAGE,
+      file: new File([], 'existing-original-thumbnail'),
+    });
+
+    // Build postMedias from fetchedPost.medias
+    const initialMedias: PostMedia[] = fetchedPost.medias.map((media) => ({
+      url: media.url,
+      type: media.mediaType,
+      file: new File([], `existing-media-${media.id}`),
+    }));
+
+    setPostMedias(initialMedias);
+  }, [fetchedPost]);
 
   const { mutateAsync: updatePost } = useUpdatePost({
     onSuccess: (updatedPost) => {
+      showSnackbar('Post updated successfully!', 'success');
       navigate(`/posts/${updatedPost.id}`);
     },
     onError: (errorMessage) => {
@@ -90,49 +87,75 @@ const EditPostPage: React.FC = () => {
     },
   });
 
-  const handleSubmit = async (
-    values: PostFormValues,
-    formikActions: FormikHelpers<PostFormValues>,
-  ) => {
-    if (postMedias.length === 0) {
-      showSnackbar('At least one image or video is required.', 'error');
-      formikActions.setSubmitting(false);
-      return;
-    }
+  // Form submission handler
+  const handleSubmit = useCallback(
+    async (
+      values: PostFormValues,
+      formikActions: FormikHelpers<PostFormValues>,
+    ) => {
+      if (postMedias.length === 0) {
+        showSnackbar('At least one image or video is required.', 'error');
+        formikActions.setSubmitting(false);
+        return;
+      }
 
-    if (!thumbnail || !originalThumbnail) {
-      showSnackbar('Thumbnail is required.', 'error');
-      formikActions.setSubmitting(false);
-      return;
-    }
+      if (!thumbnail || !originalThumbnail) {
+        showSnackbar('Thumbnail is required.', 'error');
+        formikActions.setSubmitting(false);
+        return;
+      }
 
-    await updatePost(
-      {
-        postId: parseInt(postId!),
-        values,
-        postMedias,
-        thumbnail,
-        originalThumbnail,
-        hasArtNovaImages,
-        fetchedPost: fetchedPost!,
-      },
-      {
-        onSettled: () => {
-          formikActions.setSubmitting(false);
-        },
-      },
-    );
-  };
+      try {
+        await updatePost({
+          postId: parseInt(postId!),
+          values,
+          postMedias,
+          thumbnail,
+          originalThumbnail,
+          hasArtNovaImages,
+          fetchedPost: fetchedPost!,
+        });
+      } finally {
+        formikActions.setSubmitting(false);
+      }
+    },
+    [
+      postMedias,
+      thumbnail,
+      originalThumbnail,
+      hasArtNovaImages,
+      fetchedPost,
+      postId,
+      updatePost,
+      showSnackbar,
+    ],
+  );
 
-  /** ─────────────────── render ─────────────────── */
+  // Loading state
   if (isPostLoading) return <Loading />;
-  if (postError || !fetchedPost) {
+
+  // Error state
+  if (postError || !fetchedPost || !initialFormValues) {
+    const errorMessage =
+      postError instanceof Error
+        ? postError.message
+        : !fetchedPost
+          ? 'Post not found'
+          : 'Failed to load post data';
+
     return (
-      <Box className="flex h-full items-center justify-center text-red-500">
-        <p>
-          Error loading post:{' '}
-          {postError instanceof Error ? postError.message : 'Unknown error'}
-        </p>
+      <Box className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-red-500">
+            Error loading post: {errorMessage}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+          >
+            Try Again
+          </button>
+        </div>
       </Box>
     );
   }

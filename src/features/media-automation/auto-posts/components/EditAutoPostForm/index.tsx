@@ -113,7 +113,7 @@ const EditAutoPostForm = () => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ values, setFieldValue, errors, touched, isSubmitting }) => {
+      {({ values, setFieldValue, errors, touched, isSubmitting, dirty }) => {
         return (
           <Form className="bg-mountain-50 flex h-[calc(100vh-4rem)] w-full flex-col">
             <div className="border-mountain-200 flex h-20 w-full items-center border-b-1 bg-white px-4">
@@ -151,7 +151,7 @@ const EditAutoPostForm = () => {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !dirty}
                   >
                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                   </Button>

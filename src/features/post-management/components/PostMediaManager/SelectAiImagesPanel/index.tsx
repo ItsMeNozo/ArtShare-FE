@@ -17,7 +17,7 @@ import BrowsePromptHistory from './BrowsePromptHistory';
 const SelectAiImagesPanel: React.FC = () => {
   return (
     <MediaPreviewContainer>
-      <Dialog>
+      <Dialog modal={false}>
         <DialogTrigger>
           <Button
             variant="text"
@@ -40,7 +40,7 @@ const SelectAiImagesPanel: React.FC = () => {
         </DialogTrigger>
         <DialogContent
           hideCloseButton
-          className="flex h-[95%] min-w-[90%] flex-col gap-0 p-0"
+          className="z-50 flex h-[95%] min-w-[90%] flex-col gap-0 p-0"
         >
           <DialogTitle hidden />
           <DialogDescription hidden />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useBlocker, type BlockerFunction } from 'react-router-dom';
 import { UnsavedChangesModal } from './UnsavedChangesModal';
 
 interface UnsavedChangesProtectorProps {
@@ -17,8 +17,21 @@ export const UnsavedChangesProtector = ({
 }: UnsavedChangesProtectorProps) => {
   const [showModal, setShowModal] = useState(false);
 
-  // Blocker for Client-Side Navigation (react-router)
-  const blocker = useBlocker(isDirty);
+  const blocker = useBlocker((tx: Parameters<BlockerFunction>[0]) => {
+    if (!isDirty) return false;
+
+    const next = tx.nextLocation;
+
+    if (
+      (next.state as { skipUnsavedGuard?: boolean } | undefined)
+        ?.skipUnsavedGuard
+    )
+      return false;
+
+    if (next.pathname === location.pathname) return false;
+
+    return true; // block
+  });
 
   useEffect(() => {
     if (blocker.state === 'blocked') {

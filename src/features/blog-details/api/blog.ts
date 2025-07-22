@@ -74,9 +74,10 @@ export const fetchBlogsByUsername = async (
  */
 export const fetchRelevantBlogs = async (
   blogId: number,
-  params?: { take?: number; skip?: number },
+  params?: { limit?: number; page?: number },
 ): Promise<Blog[]> => {
   // Only use BackendBlogListItemDto if this endpoint actually returns that structure
+
   const response = await api.get<PaginatedResponse<SimpleBlogResponseDto>>(
     `/blogs/${blogId}/relevant`,
     {
