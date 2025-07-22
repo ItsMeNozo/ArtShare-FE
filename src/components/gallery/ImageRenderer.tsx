@@ -1,5 +1,5 @@
 import { formatCount } from '@/utils/common';
-import { Images, Image } from 'lucide-react';
+import { Images } from 'lucide-react';
 import { AiOutlineLike } from 'react-icons/ai';
 import { BiCommentDetail } from 'react-icons/bi';
 import { HiOutlineEye } from 'react-icons/hi';
@@ -47,13 +47,14 @@ export const ImageRenderer = (
         {/* Info Overlay (visible on hover) */}
         <div className="absolute inset-0 z-10 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <div className="absolute top-2 left-2 flex items-center justify-center gap-2">
-            { photo.postLength > 1 ?
-                <div className="rounded-full bg-black/40 p-1.5">
-                  <Images size={14} />
-                </div>
-              : <></>  
-            }
-  
+            {photo.postLength > 1 ? (
+              <div className="rounded-full bg-black/40 p-1.5">
+                <Images size={14} />
+              </div>
+            ) : (
+              <></>
+            )}
+
             {photo.aiCreated && (
               <img
                 src="/logo_app_v_101.png"
