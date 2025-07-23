@@ -46,7 +46,7 @@ const IGallery: React.FC<IGalleryProps> = ({
   const effectiveRenderPhoto = renderPhoto || ImageRenderer;
 
   return (
-    <div ref={ref} className="relative pb-20">
+    <div ref={ref} className="custom-scrollbar relative overflow-auto pb-20">
       <InfiniteScroll
         data={photos}
         isLoading={isLoading}

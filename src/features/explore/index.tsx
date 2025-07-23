@@ -22,7 +22,7 @@ const Explore: React.FC = () => {
   };
 
   return (
-    <div className="relative flex h-screen min-h-0 flex-col">
+    <div className="relative flex h-[calc(100vh-4em)] min-h-0 flex-col">
       <div className="dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 sticky z-10 flex flex-col gap-4 rounded-t-3xl bg-gradient-to-t from-white px-4 py-1 pt-3 dark:bg-gradient-to-t">
         <FilterBar
           selectedAttribute={selectedAttribute}

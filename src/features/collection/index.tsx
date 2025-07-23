@@ -347,7 +347,10 @@ const CollectionPage: React.FC = () => {
   const displayError = collectionsError || anyMutationError;
 
   return (
-    <Container maxWidth="xl" className="h-screen overflow-y-auto py-3">
+    <Container
+      maxWidth="xl"
+      className="custom-scrollbar h-[calc(100vh-4em)] overflow-y-auto py-3"
+    >
       {/* Header */}
       <Stack
         direction={{ xs: 'column', md: 'row' }}
