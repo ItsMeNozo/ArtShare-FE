@@ -54,7 +54,7 @@ export const InfiniteScroll = ({
   }
 
   return (
-    <Box className="flex-1 p-4 pb-20 overflow-y-auto custom-scrollbar">
+    <Box className="custom-scrollbar flex-1 overflow-y-auto p-4 pb-20">
       {children}
 
       {data.length === 0 && (
@@ -84,7 +84,7 @@ export const InfiniteScroll = ({
       )}
 
       {!isLoading && !hasNextPage && data.length > 0 && (
-        <Box className="my-2 text-lg text-right">
+        <Box className="my-2 text-right text-lg">
           <Typography variant="body2" color="text.secondary">
             🎉 You have reached the end.
           </Typography>

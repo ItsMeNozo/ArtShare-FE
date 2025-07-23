@@ -18,6 +18,21 @@ export const fetchCollectionsWithPosts = async (): Promise<Collection[]> => {
 };
 
 /**
+ * Fetches all PUBLIC collections for a specific user by their username.
+ * Calls the public endpoint: GET /api/collections/user/:username
+ * @param username The username of the user whose collections to fetch.
+ */
+export const fetchPublicCollectionsByUsername = async (
+  username: string,
+): Promise<Collection[]> => {
+  if (!username) {
+    return [];
+  }
+  const { data } = await api.get<Collection[]>(`/collections/user/${username}`);
+  return data;
+};
+
+/**
  * Updates specific fields of a collection.
  * Corresponds to: PATCH /collections/:id
  * Allows updating fields defined in UpdateCollectionData based on UpdateCollectionDto.
