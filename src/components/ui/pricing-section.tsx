@@ -13,9 +13,9 @@ export function PricingSection({ tiers, frequencies }: PricingSectionProps) {
   );
 
   return (
-    <section className="flex w-full flex-col items-center space-y-4">
+    <section className="flex flex-col items-center space-y-4 w-full">
       <div className="text-center">
-        <div className="mx-auto flex w-fit rounded-full bg-indigo-50 p-1">
+        <div className="flex bg-indigo-50 mx-auto p-1 border border-mountain-200 rounded-full w-fit">
           {frequencies.map((freq) => (
             <Tab
               key={freq}
@@ -27,7 +27,7 @@ export function PricingSection({ tiers, frequencies }: PricingSectionProps) {
           ))}
         </div>
       </div>
-      <div className="max-w-8xl grid w-full gap-8 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="gap-8 grid sm:grid-cols-2 xl:grid-cols-4 w-full max-w-8xl">
         {tiers.map((tier) => (
           <PricingCard
             key={tier.id}

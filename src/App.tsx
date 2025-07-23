@@ -12,6 +12,7 @@ import { RouterProvider } from 'react-router-dom';
 import { ComposeProviders } from './contexts/ComposeProviders';
 import { LoadingProvider } from './contexts/Loading/LoadingProvider';
 import { router } from './routes';
+import { TooltipProvider } from './components/ui/tooltip';
 
 const App: React.FC = () => {
   // The order here is the same as the nesting order (outermost first)
@@ -21,6 +22,7 @@ const App: React.FC = () => {
     NotificationsProvider,
     LanguageProvider,
     GlobalSearchProvider,
+    TooltipProvider
   ];
 
   return (
