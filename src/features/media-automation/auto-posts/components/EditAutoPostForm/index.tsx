@@ -3,12 +3,15 @@ import InlineErrorMessage from '@/components/InlineErrorMessage';
 import Loading from '@/components/loading/Loading';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
-import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
+import { PiStarFourFill } from 'react-icons/pi';
+import { TbGridDots } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { MAX_IMAGE_COUNT } from '../../constants';
 import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
@@ -17,11 +20,8 @@ import { useGetAutoPostDetails } from '../../hooks/useGetAutoPostDetails';
 import { AutoPostFormValues, ImageState } from '../../types';
 import PostContentEditor from './PostContentEditor';
 import PostImagesEditor from './PostImagesEditor';
-import PostScheduleEditor from './PostScheduleEditor';
 import { FacebookPostPreview } from './PostPreviewer';
-import { TbGridDots } from 'react-icons/tb';
-import { useNavigate } from 'react-router-dom';
-import { PiStarFourFill } from 'react-icons/pi';
+import PostScheduleEditor from './PostScheduleEditor';
 
 // import { Link, Element } from "react-scroll";
 
@@ -101,7 +101,7 @@ const EditAutoPostForm = () => {
 
   if (!postToEdit) {
     return (
-      <Box className="flex justify-center items-center h-full">
+      <Box className="flex h-full items-center justify-center">
         <Typography variant="h6" className="text-gray-600">
           Post not found or has been deleted
         </Typography>
@@ -122,31 +122,35 @@ const EditAutoPostForm = () => {
     >
       {({ values, setFieldValue, errors, touched, isSubmitting, dirty }) => {
         return (
-          <Form className="flex flex-col bg-[#F2F4F7] rounded-t-3xl w-full h-[calc(100vh-4rem)]">
-            <div className="flex items-center bg-white px-4 py-2 border-mountain-200 border-b-1 rounded-t-3xl w-full h-16 shrink-0">
-              <div className="flex justify-between items-center w-full">
-                <div className='flex space-x-4'>
-                  <div className='flex items-center space-x-4'>
-                    <div className='flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer'>
+          <Form className="flex h-[calc(100vh-4rem)] w-full flex-col rounded-t-3xl bg-[#F2F4F7]">
+            <div className="border-mountain-200 flex h-16 w-full shrink-0 items-center rounded-t-3xl border-b-1 bg-white px-4 py-2">
+              <div className="flex w-full items-center justify-between">
+                <div className="flex space-x-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-full border bg-indigo-100 p-2 px-4">
                       <span>Project Posts</span>
                       <TbGridDots />
                     </div>
-                    <button type='button' onClick={handleAddPost} className='flex items-center space-x-2 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                      <PiStarFourFill className='size-4 text-purple-600' />
+                    <button
+                      type="button"
+                      onClick={handleAddPost}
+                      className="hover:bg-mountain-50 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border p-2"
+                    >
+                      <PiStarFourFill className="size-4 text-purple-600" />
                       <span>Generate Post</span>
                     </button>
-                    <div className='flex items-center px-4 border-mountain-200 border-l-1'>
-                      <div className='flex items-center space-x-2'>
-                        <div className='flex items-center bg-white p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                          <ChevronLeft className='size-4' />
+                    <div className="border-mountain-200 flex items-center border-l-1 px-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="border-mountain-200 flex cursor-pointer items-center rounded-lg border bg-white p-2">
+                          <ChevronLeft className="size-4" />
                           <span>Prev</span>
                         </div>
-                        <div className='flex items-center bg-white p-2 border border-mountain-200 rounded-lg cursor-pointer'>
+                        <div className="border-mountain-200 flex cursor-pointer items-center rounded-lg border bg-white p-2">
                           <span>Post Number 1</span>
                         </div>
-                        <div className='flex items-center bg-white p-2 border border-mountain-200 rounded-lg cursor-pointer'>
+                        <div className="border-mountain-200 flex cursor-pointer items-center rounded-lg border bg-white p-2">
                           <span>Next</span>
-                          <ChevronRight className='size-4' />
+                          <ChevronRight className="size-4" />
                         </div>
                       </div>
                     </div>
@@ -163,7 +167,7 @@ const EditAutoPostForm = () => {
                   <Button
                     type="button"
                     onClick={() => openDialog(postId!)}
-                    className="flex items-center space-x-2 bg-mountain-100 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg"
+                    className="bg-mountain-100 hover:bg-mountain-50 border-mountain-200 flex items-center space-x-2 rounded-lg border p-2"
                   >
                     <LuTrash2 className="size-4" />
                     <div>Delete</div>
@@ -171,10 +175,10 @@ const EditAutoPostForm = () => {
                 </div>
               </div>
             </div>
-            <Box className='flex w-full h-screen min-h-0'>
-              <Box className="flex flex-col space-y-8 px-2 border-mountain-200 border-r-1 w-lg min-h-0 overflow-x-hidden overflow-y-auto custom-scrollbar">
+            <Box className="flex h-screen min-h-0 w-full">
+              <Box className="border-mountain-200 custom-scrollbar flex min-h-0 w-lg flex-col space-y-8 overflow-x-hidden overflow-y-auto border-r-1 px-2">
                 <Box className="flex flex-col space-y-4">
-                  <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
+                  <Typography className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
                     <span className="mr-2">🖊️</span>Post Content
                   </Typography>
                   <PostContentEditor
@@ -188,7 +192,7 @@ const EditAutoPostForm = () => {
                   </ErrorMessage>
                 </Box>
                 <Box className="flex flex-col space-y-4">
-                  <div className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
+                  <div className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
                     <p>🖼️</p>
                     <p>Post Images</p>
                   </div>
@@ -204,7 +208,7 @@ const EditAutoPostForm = () => {
                   </ErrorMessage>
                 </Box>
                 <Box className="flex flex-col space-y-4">
-                  <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b font-medium text-indigo-900">
+                  <Typography className="border-mountain-200 flex items-center space-x-2 border-b py-2 font-medium text-indigo-900">
                     <span className="mr-2">📅</span> Post Scheduling
                   </Typography>
                   <PostScheduleEditor
