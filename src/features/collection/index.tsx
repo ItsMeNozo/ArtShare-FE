@@ -1,6 +1,12 @@
 import {
   Box,
+  Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Stack,
   ToggleButton,
   Tooltip,
@@ -8,9 +14,7 @@ import {
 } from '@mui/material';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { SearchInput } from '@/components/SearchInput';
-import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { Collection, Post } from '@/types';
 import { FiGlobe as AllIcon, FiLock as LockIcon } from 'react-icons/fi';
 import { CollectionGallery } from './components/CollectionGallery';
@@ -38,14 +42,10 @@ const CollectionPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
   const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [collectionToDelete, setCollectionToDelete] =
+    useState<Collection | null>(null);
   const [showOnlyPrivate, setShowOnlyPrivate] = useState<boolean>(false);
-
-  const {
-    isDialogOpen: isDeleteDialogOpen,
-    itemToConfirm: collectionToDelete,
-    openDialog: openDeleteDialog,
-    closeDialog: closeDeleteDialog,
-  } = useConfirmationDialog<Collection>();
 
   const {
     collections,
@@ -247,6 +247,11 @@ const CollectionPage: React.FC = () => {
     setIsCreateDialogOpen(false);
   }, []);
 
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+    setCollectionToDelete(null);
+  };
+
   const handleCreateCollection = useCallback(
     async (newCollectionData: { name: string; isPrivate: boolean }) => {
       createCollectionMutation.mutate(newCollectionData, {
@@ -308,9 +313,11 @@ const CollectionPage: React.FC = () => {
         );
         return;
       }
-      openDeleteDialog(collection);
+
+      setCollectionToDelete(collection);
+      setIsDeleteDialogOpen(true);
     },
-    [collections, openDeleteDialog],
+    [collections],
   );
 
   const handleConfirmDeleteCollection = useCallback(() => {
@@ -320,15 +327,10 @@ const CollectionPage: React.FC = () => {
         if (selectedCollectionId === collectionToDelete.id) {
           setSelectedCollectionId('all');
         }
-        closeDeleteDialog();
+        handleCloseDeleteDialog();
       },
     });
-  }, [
-    collectionToDelete,
-    deleteCollectionMutation,
-    selectedCollectionId,
-    closeDeleteDialog,
-  ]);
+  }, [collectionToDelete, deleteCollectionMutation, selectedCollectionId]);
 
   const galleryTitle = useMemo(() => {
     if (selectedCollectionId === 'all') return 'All';
@@ -347,7 +349,7 @@ const CollectionPage: React.FC = () => {
   const displayError = collectionsError || anyMutationError;
 
   return (
-    <Container maxWidth="xl" className="h-screen overflow-y-auto py-3">
+    <Container maxWidth="xl" className="h-screen py-3">
       {/* Header */}
       <Stack
         direction={{ xs: 'column', md: 'row' }}
@@ -458,17 +460,38 @@ const CollectionPage: React.FC = () => {
       />
 
       {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
+      <Dialog
         open={isDeleteDialogOpen}
-        onClose={closeDeleteDialog}
-        onConfirm={handleConfirmDeleteCollection}
-        title="Confirm Delete Collection"
-        contentText={`Are you sure you want to delete the collection "${
-          collectionToDelete?.name || 'this collection'
-        }"?`}
-        confirmButtonText="Delete"
-        isConfirming={deleteCollectionMutation.isPending}
-      />
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-collection-dialog-title"
+        aria-describedby="delete-collection-dialog-description"
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <DialogTitle id="delete-collection-dialog-title">
+          Confirm Delete Collection
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-collection-dialog-description">
+            Are you sure you want to delete the collection
+            <strong>"{collectionToDelete?.name || 'this collection'}"</strong>?
+            <br />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={handleCloseDeleteDialog} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDeleteCollection}
+            variant="contained"
+            color="error"
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

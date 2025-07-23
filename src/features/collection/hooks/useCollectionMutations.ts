@@ -13,7 +13,7 @@ import {
 import { CreateCollectionFormData } from '../components/CreateCollectionDialog';
 import { Collection, UpdateCollectionData } from '../types/collection';
 
-const COLLECTIONS_QUERY_KEY = ['collections', 'me'];
+const COLLECTIONS_QUERY_KEY = ['collections'];
 
 /**
  * A hook for creating a new collection.

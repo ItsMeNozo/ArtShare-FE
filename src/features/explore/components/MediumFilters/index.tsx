@@ -5,10 +5,8 @@ import { memo, useState } from 'react';
 import { MediumSelector } from './MediumSelector';
 
 interface MediumFiltersProps {
-  selectedMediums: string[];
-  setSelectedMediums: (Mediums: string[]) => void;
-  isAi: boolean;
-  setIsAi: (isAi: boolean) => void;
+  selectedMedium: string | null;
+  setSelectedMedium: (medium: string | null) => void;
   children: (triggerProps: {
     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isLoading: boolean;
@@ -16,47 +14,42 @@ interface MediumFiltersProps {
 }
 
 const MediumFilters = ({
-  selectedMediums,
-  setSelectedMediums,
-  isAi,
-  setIsAi,
+  selectedMedium,
+  setSelectedMedium,
   children,
 }: MediumFiltersProps) => {
-  const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const { data: MediumCategories = [], isLoading } = useCategories({
+  const [openCP, setOpenCP] = useState(false);
+  const [anchorElCP, setAnchorElCP] = useState<null | HTMLElement>(null);
+  const { data: mediumCategories = [], isLoading } = useCategories({
     type: CategoryTypeValues.MEDIUM,
   });
-
   const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    setOpen((prevOpen) => !prevOpen);
+    setAnchorElCP(event.currentTarget);
+    setOpenCP((prevOpen) => !prevOpen);
   };
-
-  const handleClose = () => {
-    setOpen(false);
-    setAnchorEl(null);
+  const handleCloseMediumPopper = () => {
+    setOpenCP(false);
+    setAnchorElCP(null);
   };
-
   return (
-    <ClickAwayListener onClickAway={handleClose}>
+    <ClickAwayListener onClickAway={handleCloseMediumPopper}>
       <Box>
         {children({
           onClick: handleToggle,
           isLoading: isLoading,
         })}
         <MediumSelector
-          open={open}
-          onClose={() => setOpen(false)}
-          onSave={(Mediums) => setSelectedMediums(Mediums)}
-          anchorEl={anchorEl}
-          data={MediumCategories}
-          selectedData={selectedMediums}
-          placement="bottom-end"
-          showClearAllButton={true}
-          isAi={isAi}
-          setIsAi={setIsAi}
+          open={openCP}
+          anchorEl={anchorElCP}
+          onClose={() => setOpenCP(false)}
+          onClearData={() => {
+            setOpenCP(false);
+            setSelectedMedium(null);
+          }}
+          onSelectMedium={(medium) => setSelectedMedium(medium)}
+          selectedMedium={selectedMedium}
+          data={mediumCategories}
+          placement="bottom-start"
         />
       </Box>
     </ClickAwayListener>
