@@ -38,7 +38,19 @@ import axios, { AxiosError } from 'axios';
 import { useLocation } from 'react-router-dom';
 import { generateImages } from './api/generate-imges.api';
 import { buildTempPromptResult } from './helper/image-gen.helper';
-import { GuidePanel } from './components/GenGuidance';
+
+{
+  /*
+A stunning realistic scene featuring a woman astronaut curiously peeking out of 
+her dormitory window aboard a futuristic space station, overlooking the breathtaking 
+view of Earth below. The setting showcases a vibrant blue planet adorned with swirling 
+clouds and continents. Surrounding the space station are sleek construction drones actively 
+working, along with various spacecraft gliding gracefully through the cosmos. 
+The artwork is richly detailed and realistic, inspired by the visionary style of Syd Mead, 
+capturing the intricate design of the space station and the dynamic activity in orbit, 
+with stars twinkling in the background creating a sense of vastness in space.
+*/
+}
 
 const PAGE_SIZE = 5;
 
@@ -46,7 +58,6 @@ const ArtGenAI = () => {
   const { showSnackbar } = useSnackbar();
   const [expanded, setExpanded] = useState<boolean>(true);
   const [promptExpanded, setPromptExpanded] = useState<boolean>(false);
-  const [showGuidePanel, setShowGuidePanel] = useState(false);
   const [userPrompt, setUserPrompt] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [scrollTrigger, setScrollTrigger] = useState(0);
@@ -197,8 +208,7 @@ const ArtGenAI = () => {
       </div>
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-col items-end border-mountain-200 border-b-1">
-          <AIHeader onGuideClick={() => setShowGuidePanel((prev) => !prev)} />
-          <GuidePanel open={showGuidePanel} onOpenChange={setShowGuidePanel} docName='ai-gen' />
+          <AIHeader />
         </div>
         <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div
