@@ -1,4 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
+import { TestHelpers } from '../utils/test-helpers';
 
 interface RouteGroup {
   name: string;
@@ -106,11 +107,9 @@ class PerformanceNavigationTester {
         ),
       ).toBeVisible({ timeout: 8000 });
     } else if (route.includes('/posts/new')) {
-      await expect(
-        this.page.locator(
-          'form, [data-testid="upload-post-form"], .post-creation, input[type="file"]',
-        ),
-      ).toBeVisible({ timeout: 8000 });
+      await expect(this.page.getByTestId('upload-post-form')).toBeVisible({
+        timeout: 8000,
+      });
     } else if (route.includes('/image/tool')) {
       await expect(
         this.page.locator(
@@ -207,12 +206,11 @@ const PRODUCTION_ROUTES: RouteGroup[] = [
 
 test.describe('Production Performance Tests @safe @smoke', () => {
   let tester: PerformanceNavigationTester;
-  let _helpers: unknown;
+  let helpers: TestHelpers;
 
   test.beforeEach(async ({ page }) => {
     tester = new PerformanceNavigationTester(page);
-    // Import and initialize your TestHelpers
-    // helpers = new TestHelpers(page);
+    helpers = new TestHelpers(page);
 
     // Track console errors
     const consoleErrors: string[] = [];
@@ -240,8 +238,8 @@ test.describe('Production Performance Tests @safe @smoke', () => {
     });
 
     console.log('🔑 Authenticating user for production tests...');
-    // _helpers = new TestHelpers(page);
-    // await _helpers.loginWithTestUser();
+    helpers = new TestHelpers(page);
+    await helpers.loginWithTestUser();
 
     // Verify authentication worked
     const currentUrl = page.url();
