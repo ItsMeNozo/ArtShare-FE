@@ -1,18 +1,33 @@
 import { Collection } from '@/types';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCollectionsWithPosts } from '../api/collection.api';
+import {
+  fetchCollectionsWithPosts,
+  fetchPublicCollectionsByUsername,
+} from '../api/collection.api';
 
-export const COLLECTIONS_QUERY_KEY = ['collections'];
 const STALE_TIME = 1000 * 60 * 5;
 
-export function useCollectionsData(options: { enabled?: boolean } = {}) {
+export function useCollectionsData(
+  username?: string,
+  options: { enabled?: boolean } = {},
+) {
   const { enabled = true } = options;
 
+  const queryKey = username
+    ? ['collections', 'public', username]
+    : ['collections', 'me'];
+
+  const queryFn = () =>
+    username
+      ? fetchPublicCollectionsByUsername(username)
+      : fetchCollectionsWithPosts();
+
   const { data, error, isLoading, isError } = useQuery({
-    queryKey: COLLECTIONS_QUERY_KEY,
-    queryFn: fetchCollectionsWithPosts,
+    queryKey,
+    queryFn,
     staleTime: STALE_TIME,
-    enabled,
+
+    enabled: enabled && (username ? !!username.trim() : true),
   });
 
   const collections: Collection[] = data ?? [];
