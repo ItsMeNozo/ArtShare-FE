@@ -8,12 +8,10 @@ import GuestRoute from '@/components/routes/guest-route';
 import RootLayout from '@/layouts';
 import OnboardingRoute from './components/ProtectedItems/OnboardingRoute';
 import UserSubscription from './features/user-profile-private/UserSubscription';
-import AutoLayout from './layouts/subLayouts/AutoLayout';
 
 const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
 const Dashboard = lazy(() => import('./features/app-dashboard/Dashboard'));
-const Updates = lazy(() => import('./features/app-dashboard/Updates'));
 const EditUser = lazy(() => import('./features/edit-user/EditUserPage'));
 const OnboardingProfile = lazy(() => import('./pages/Onboarding'));
 const RequireOnboard = lazy(
@@ -60,11 +58,6 @@ const SocialLinksPage = lazy(
   () =>
     import('@/features/media-automation/social-links/routes/SocialLinksPage'),
 );
-const AutoSchedulingPage = lazy(
-  () =>
-    import('@/features/media-automation/scheduling/routes/AutoScheduling'),
-);
-
 const ProjectsPage = lazy(
   () => import('@/features/media-automation/projects/routes/ProjectsPage'),
 );
@@ -76,12 +69,12 @@ const ProjectEditorPage = lazy(
   () => import('@/features/media-automation/projects/routes/ProjectEditorPage'),
 );
 
-// const AutoPostsManagerPage = lazy(
-//   () =>
-//     import(
-//       '@/features/media-automation/auto-posts/routes/AutoPostsManagerPage'
-//     ),
-// );
+const AutoPostsManagerPage = lazy(
+  () =>
+    import(
+      '@/features/media-automation/auto-posts/routes/AutoPostsManagerPage'
+    ),
+);
 
 const GenerateAutoPostForm = lazy(
   () =>
@@ -181,7 +174,6 @@ const routeConfig: RouteObject[] = [
         ),
         children: [
           { path: '/dashboard', element: <Dashboard /> },
-          { path: '/dashboard/updates', element: <Updates /> },
           { path: '/explore', element: <Explore /> },
           { path: '/posts/:postId', element: <Post /> },
           { path: '/blogs', element: <BrowseBlogs /> },
@@ -207,23 +199,8 @@ const routeConfig: RouteObject[] = [
           { path: '/collections', element: <Collection /> },
           { path: '/docs', element: <DocumentDashboard /> },
           { path: '/app-subscription', element: <UserSubscription /> },
-          { path: '/:username', element: <UserProfile /> },
-        ],
-      },
-      // Auto Private
-      {
-        element: (
-          <RequireOnboard>
-            <ProtectedInAppRoute>
-              <AutoLayout>
-                <Outlet />
-              </AutoLayout>
-            </ProtectedInAppRoute>
-          </RequireOnboard>
-        ),
-        children: [
+
           { path: '/auto/social-links', element: <SocialLinksPage /> },
-          { path: '/auto/scheduling', element: <AutoSchedulingPage /> },
           {
             path: '/auto/projects',
             element: <Outlet />,
@@ -238,7 +215,7 @@ const routeConfig: RouteObject[] = [
                   { path: 'edit', element: <ProjectEditorPage /> },
                   {
                     path: 'posts',
-                    // element: <AutoPostsManagerPage />,
+                    element: <AutoPostsManagerPage />,
                     children: [
                       {
                         path: 'new',
@@ -254,22 +231,9 @@ const routeConfig: RouteObject[] = [
               },
             ],
           },
-        ],
-      },
-      // No layout routes
-      {
-        element: (
-          <RequireOnboard>
-            <ProtectedInAppRoute>
-              <Outlet />
-            </ProtectedInAppRoute>
-          </RequireOnboard>
-        ),
-        children: [
-          { path: '/docs/:blogId', element: <MyWriting /> },
-          { path: '/image/tool/editor', element: <ImageEditor /> },
-          { path: '/image/tool/editor/new', element: <BrowseImage /> },
-          { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
+
+          // Username route MUST be last as it's a catch-all
+          { path: '/:username', element: <UserProfile /> },
         ],
       },
       // Catch-all -> redirect

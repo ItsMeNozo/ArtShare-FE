@@ -33,12 +33,12 @@ const Dashboard = () => {
           </div>
           <div className="flex space-x-4">
             <div className="flex justify-center items-center space-x-2 bg-mountain-950 hover:brightness-105 p-4 rounded-xl w-40 text-white hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
-              <p className="font-bold select-none">Version 1.52</p>
+              <p className="font-bold select-none">Version 1.01</p>
             </div>
-            <Link to="updates" className="flex justify-center items-center space-x-2 bg-gradient-to-r from-indigo-100 to-purple-50 hover:brightness-105 p-4 border border-mountain-200 rounded-xl w-40 text-mountain-950 hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
+            <div className="flex justify-center items-center space-x-2 bg-gradient-to-r from-indigo-100 to-purple-50 hover:brightness-105 p-4 border border-mountain-200 rounded-xl w-40 text-mountain-950 hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
               <IoNewspaperOutline />
               <p className="font-thin select-none">What's news</p>
-            </Link>
+            </div>
           </div>
         </div>
         {/* Image section */}
@@ -59,7 +59,7 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="gap-x-4 grid grid-cols-4">
-          {featuresShowcase.slice(0, 3).map((feature, index) => (
+          {featuresShowcase.slice(0, 4).map((feature, index) => (
             <div
               key={index}
               className="group relative flex flex-col bg-white shadow-md border border-mountain-200 rounded-xl w-72 h-86"
@@ -99,13 +99,13 @@ const Dashboard = () => {
           </p>
           <p className="text-mountain-600">
             Planning content generation and automate publishing across platforms{' '}
-            <Link to="/dashboard/updates" className="underline">
-              version 1.52
+            <Link to="#" className="underline">
+              version 1.01
             </Link>
           </p>
         </div>
         <div className="gap-x-4 grid grid-cols-4">
-          {featuresShowcase.slice(3, 7).map((feature, index) => (
+          {featuresShowcase.slice(4, 7).map((feature, index) => (
             <div
               key={index}
               className="group relative flex flex-col bg-white shadow-md border border-mountain-200 rounded-xl w-72 h-86"

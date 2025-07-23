@@ -1,98 +1,138 @@
-import { BiComment, BiDesktop, BiLike, BiMobile, BiShare } from 'react-icons/bi';
+// FacebookPostDialog.tsx
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { BiLike } from 'react-icons/bi';
 import { IoEarthSharp } from 'react-icons/io5';
 import { MdMoreHoriz } from 'react-icons/md';
 import { ExpandablePostContent } from './ExpandTextArea';
-import { useState } from 'react';
 
-interface FacebookPostPreviewProps {
+interface FacebookPostDialogProps {
+  open: boolean;
+  onClose: () => void;
   content: string;
   images: string[];
 }
 
-export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
+export const FacebookPostDialog: React.FC<FacebookPostDialogProps> = ({
+  open,
+  onClose,
   content,
   images,
 }) => {
-  const [desktopMode, setDesktopMode] = useState(true);
   return (
-    <div className="flex flex-1 justify-center p-4 overflow-y-auto custom-scrollbar">
-      <div className='flex flex-col space-y-4'>
-        <div className='flex items-center space-x-2'>
-          <div className='flex items-center space-x-2 bg-white shadow-sm p-2 py-2.5 rounded-md w-56 text-sm'>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent
+        hideCloseButton
+        className="border-mountain-200 custom-scrollbar h-full overflow-y-auto rounded-none bg-[#F2F4F7] p-0 sm:w-[1024px]"
+      >
+        <DialogHeader className="border-mountain-200 sticky top-0 z-50 flex h-16 w-full flex-row items-center justify-between rounded-t-lg border-b-1 bg-white p-4">
+          <DialogTitle className="flex items-center space-x-2 font-medium">
             <img
               src={'/public/fb_icon.svg'}
               alt="Facebook Logo"
-              className="w-auto h-8"
+              className="h-8 w-auto"
             />
-            <p className='font-medium'>Facebook Feed Preview</p>
-          </div>
-          <div className='flex bg-mountain-100 shadow p-0.5 rounded-lg w-24 h-full'>
-            <button type='button' onClick={() => setDesktopMode(!desktopMode)} className='flex justify-center items-center bg-white rounded-lg w-1/2 h-full'>
-              <BiDesktop className='size-5' />
-            </button>
-            <button type='button' onClick={() => setDesktopMode(!desktopMode)} className='flex justify-center items-center rounded-lg w-1/2 h-full'>
-              <BiMobile className='size-5' />
-            </button>
-          </div>
-        </div>
-        <div
-          className="flex flex-col space-y-2 bg-white shadow-md rounded-lg w-[680px] h-fit"
-        >
-          <div className="flex justify-between items-center p-4 pb-0">
-            <div className="flex items-center space-x-2">
-              <img
-                src={'/public/fb_icon.svg'}
-                alt="Avatar"
-                className="rounded-full w-10 h-10"
-              />
-              <div className="flex flex-col">
-                <p className="font-medium">Sample Page</p>
-                <div className="flex space-x-2 text-mountain-400 text-xs">
-                  <p>July 1 at 23:15</p>
-                  <span>•</span>
-                  <IoEarthSharp className="text-mountain-600" />
+            <p>Facebook</p>
+          </DialogTitle>
+          <p className="text-lg font-medium">Preview Post</p>
+          <Button
+            variant={'outline'}
+            className="border-mountain-200 cursor-pointer"
+            onClick={onClose}
+          >
+            Close Preview
+          </Button>
+          <DialogDescription hidden></DialogDescription>
+        </DialogHeader>
+        <div className="flex w-full scale-90 justify-center">
+          <div className="flex h-fit w-[680px] flex-col space-y-2 rounded-lg bg-white shadow-md">
+            <div className="flex items-center justify-between p-4 pb-0">
+              <div className="flex items-center space-x-2">
+                <img
+                  src={'/public/blank_avatar.png'}
+                  alt="Facebook Logo"
+                  className="h-10 w-10 rounded-full"
+                />
+                <div className="flex flex-col">
+                  <p className="font-medium">Sample Page</p>
+                  <div className="text-mountain-400 flex items-center space-x-2 text-xs">
+                    <p>July 1 at 23:15</p>
+                    <span>•</span>
+                    <IoEarthSharp className="text-mountain-600" />
+                  </div>
                 </div>
               </div>
+              <MdMoreHoriz className="text-mountain-600 size-6" />
             </div>
-            <MdMoreHoriz className="size-6 text-mountain-600" />
-          </div>
-          <ExpandablePostContent content={content} />
-          <div
-            className={`border-mountain-200 grid max-h-[680px] w-full gap-1 overflow-hidden border-b ${images.length === 0 ? 'hidden' : images.length === 1
-              ? 'grid-cols-1'
-              : images.length === 2
-                ? 'grid-rows-2'
-                : images.length === 3
-                  ? 'grid-cols-2 grid-rows-[340px_1fr]'
-                  : 'grid-cols-2 grid-rows-2'
+            <ExpandablePostContent content={content} />
+            <div
+              className={`border-mountain-200 grid max-h-[680px] w-full gap-1 overflow-hidden border-b ${
+                images.length === 1
+                  ? 'grid-cols-1'
+                  : images.length === 2
+                    ? 'grid-rows-2'
+                    : images.length === 3
+                      ? 'grid-cols-2 grid-rows-[340px_1fr]'
+                      : 'grid-cols-2 grid-rows-2'
               }`}
-          >
-            {images.slice(0, 4).map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Post Image ${index + 1}`}
-                className={`h-full w-full object-cover ${images.length === 3 && index === 0 ? 'col-span-2' : ''
-                  }`}
-              />
-            ))}
-          </div>
-          <div className="flex justify-center items-center p-4 border-mountain-200 border-t w-full">
-            <div className="flex justify-center items-center space-x-2 w-1/3">
-              <BiLike className="size-5 text-mountain-600" />
-              <p className="text-mountain-600 text-sm">Like</p>
+            >
+              {images.slice(0, 4).map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Post Image ${index + 1}`}
+                  className={`h-full w-full object-cover ${
+                    images.length === 3 && index === 0 ? 'col-span-2' : ''
+                  } `}
+                />
+              ))}
             </div>
-            <div className="flex justify-center items-center space-x-2 w-1/3">
-              <BiComment className="size-5 text-mountain-600" />
-              <p className="text-mountain-600 text-sm">Comment</p>
+            <div className="flex items-center justify-between px-4 py-2">
+              <div className="flex items-center space-x-2">
+                <img
+                  src="/like_icon.png"
+                  className="h-8 w-8 rounded-full border border-white"
+                />
+                <img
+                  src="/love_icon.png"
+                  className="-ml-4 h-8 w-8 rounded-full border border-white"
+                />
+                <p className="text-mountain-600 text-sm">999</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <p className="text-mountain-600 flex space-x-1 text-sm">
+                  <span>100</span>
+                  <span>Comments</span>
+                </p>
+                <p className="text-mountain-600 flex space-x-1 text-sm">
+                  <span>100</span>
+                  <span>Shares</span>
+                </p>
+              </div>
             </div>
-            <div className="flex justify-center items-center space-x-2 w-1/3">
-              <BiShare className="size-5 text-mountain-600" />
-              <p className="text-mountain-600 text-sm">Share</p>
+            <div className="border-mountain-200 flex w-full items-center justify-center border-t p-4">
+              <div className="flex w-1/3 items-center justify-center space-x-2">
+                <BiLike className="text-mountain-600 size-5" />
+                <p className="text-mountain-600 text-sm">Like</p>
+              </div>
+              <div className="flex w-1/3 items-center justify-center space-x-2">
+                <BiLike className="text-mountain-600 size-5" />
+                <p className="text-mountain-600 text-sm">Comment</p>
+              </div>
+              <div className="flex w-1/3 items-center justify-center space-x-2">
+                <BiLike className="text-mountain-600 size-5" />
+                <p className="text-mountain-600 text-sm">Share</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div >
+      </DialogContent>
+    </Dialog>
   );
 };

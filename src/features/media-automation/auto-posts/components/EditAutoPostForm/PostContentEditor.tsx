@@ -48,12 +48,12 @@ const PostContentEditor = ({ value, onChange }: PostContentEditorProps) => {
   return (
     <Box
       className={
-        'border-mountain-200 relative flex h-[520px] w-full flex-col border bg-white shadow-md'
+        'border-mountain-200 relative flex h-[520px] w-xl flex-col border bg-white shadow-md'
       }
     >
-      <div className="flex items-center gap-2 bg-white px-2 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
+      <div className="border-mountain-200 flex h-12 shrink-0 items-center gap-2 rounded-t-md border-b bg-white px-2">
         {editor && (
-          <div className="flex justify-between items-center w-full">
+          <div className="flex w-full items-center justify-between">
             <div className="flex items-center space-x-2">
               <button
                 type="button" // Add type="button" to prevent form submission
@@ -78,7 +78,7 @@ const PostContentEditor = ({ value, onChange }: PostContentEditorProps) => {
               </button>
               <button
                 type="button"
-                className="hover:bg-mountain-50/60 shadow px-2 py-1 border border-mountain-200 rounded-sm text-sm cursor-pointer"
+                className="hover:bg-mountain-50/60 border-mountain-200 cursor-pointer rounded-sm border px-2 py-1 text-sm shadow"
               >
                 <p>
                   😀<span>Emoji</span>
@@ -95,7 +95,7 @@ const PostContentEditor = ({ value, onChange }: PostContentEditorProps) => {
         )}
       </div>
       {editor ? (
-        <div className="p-4 w-full h-full overflow-auto text-left custom-scrollbar">
+        <div className="custom-scrollbar h-full w-xl overflow-auto p-4 text-left">
           <EditorContent editor={editor} />
         </div>
       ) : (

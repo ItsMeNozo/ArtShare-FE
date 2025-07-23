@@ -159,6 +159,11 @@ const BrowseBlogs: React.FC = () => {
                   viewCount={b.viewCount}
                 />
               ))}
+              {!hasNextPage && allBlogs.length > 0 && (
+                <div className="mt-8 text-center text-gray-500 dark:text-gray-400">
+                  🎉 You've reached the end. No more blogs to show.
+                </div>
+              )}
             </div>
           </InfiniteScroll>
         </div>
