@@ -25,7 +25,6 @@ interface CollectionSliderProps {
   onSelect: (id: SelectedCollectionId) => void;
   onAdd: () => void;
   onRemove: (id: number) => void;
-  isReadOnly?: boolean;
 }
 
 const getSliderItemId = (item: SliderItem): string => {
@@ -48,7 +47,6 @@ const renderSliderItem = (
   onSelect: (id: SelectedCollectionId) => void,
   onAdd: () => void,
   onRemove: (id: number) => void,
-  isReadOnly: boolean,
 ) => {
   const baseCardSx = {
     width: CARD_MIN_WIDTH,
@@ -86,7 +84,7 @@ const renderSliderItem = (
           }}
         >
           {/* --- Remove Button --- */}
-          {!isReadOnly && isCollection && (
+          {isCollection && (
             <Tooltip title="Remove collection">
               <IconButton
                 aria-label="Remove collection"
@@ -197,7 +195,6 @@ const renderSliderItem = (
       );
     }
     case 'add': {
-      if (isReadOnly) return null;
       return (
         <Paper
           key={getSliderItemId(item)}
@@ -242,7 +239,6 @@ export const CollectionSlider: React.FC<CollectionSliderProps> = ({
   onSelect,
   onAdd,
   onRemove,
-  isReadOnly = false,
 }) => {
   if (loading && items.length === 0) {
     return (
@@ -276,15 +272,7 @@ export const CollectionSlider: React.FC<CollectionSliderProps> = ({
     <HorizontalSlider
       data={items}
       renderItem={(item) =>
-        renderSliderItem(
-          item,
-          selectedId,
-          loading,
-          onSelect,
-          onAdd,
-          onRemove,
-          isReadOnly,
-        )
+        renderSliderItem(item, selectedId, loading, onSelect, onAdd, onRemove)
       }
       getItemId={getSliderItemId}
       wrapperClassName="collection-slider"

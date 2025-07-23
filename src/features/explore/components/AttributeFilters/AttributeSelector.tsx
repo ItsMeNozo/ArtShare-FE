@@ -1,4 +1,3 @@
-import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 import { cn } from '@/lib/utils';
 import { Category } from '@/types';
 import {
@@ -9,7 +8,7 @@ import {
   Popper,
   PopperPlacementType,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'react-horizontal-scrolling-menu/dist/styles.css';
 import { FiSearch } from 'react-icons/fi';
 import { TiDeleteOutline } from 'react-icons/ti';
@@ -19,31 +18,56 @@ interface AttributeSelectorProps {
   open: boolean;
   anchorEl: HTMLElement | null;
   onClose: () => void;
-  onClearData: () => void;
-  onSelectAttribute: (Attribute: string | null) => void;
-  selectedAttribute: string | null;
+  onSave: (selectedData: string[]) => void;
+  selectedData: string[];
   data: Category[];
   placement?: PopperPlacementType;
   className?: string;
+  showClearAllButton?: boolean;
+  isAi: boolean;
+  setIsAi: (isAi: boolean) => void;
 }
 
 export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
   open,
   anchorEl,
   onClose,
-  onClearData,
-  onSelectAttribute,
-  selectedAttribute,
+  onSave,
+  selectedData: selectedDataProp,
   data,
   placement,
   className,
+  showClearAllButton = false,
+  isAi,
+  setIsAi,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [internalSelectedData, setInternalSelectedData] =
+    useState<string[]>(selectedDataProp);
+  const [internalIsAi, setInternalIsAi] = useState(isAi);
+
+  useEffect(() => {
+    if (open) {
+      setInternalSelectedData(selectedDataProp);
+    }
+  }, [selectedDataProp, open]);
 
   const handleDataClick = (name: string) => {
-    onClose();
-    onSelectAttribute(name);
+    setInternalSelectedData((prev) => {
+      const currentArray = Array.isArray(prev) ? prev : [];
+      return currentArray.includes(name)
+        ? currentArray.filter((item) => item !== name)
+        : [...currentArray, name];
+    });
   };
+
+  const handleClearAll = () => {
+    setInternalSelectedData([]);
+    setInternalIsAi(false);
+  };
+
+  const canClearAll =
+    showClearAllButton && (internalSelectedData.length > 0 || internalIsAi);
 
   return (
     <Popper
@@ -67,7 +91,7 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
                 <FiSearch className="absolute left-2 h-5 w-5" />
                 <Input
                   className="border-mountain-200 dark:border-mountain-700 text-mountain-800 dark:text-mountain-200 h-full w-full rounded-2xl border-1 bg-transparent pr-8 pl-8 text-sm shadow-inner"
-                  placeholder="Search Attributes..."
+                  placeholder="Search attributes..."
                   disableUnderline
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -82,17 +106,29 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
             </div>
 
             <div className="px-4">
+              {renderPropItemForPopper(
+                {
+                  id: 99,
+                  name: 'Created by Artnova',
+                },
+                internalIsAi,
+                () => setInternalIsAi(!internalIsAi),
+              )}
+
+              {/* a separator line */}
+              <div className="dark:bg-mountain-700 h-px bg-gray-300" />
+
               {data
                 .filter((item) =>
                   item.name.toLowerCase().includes(searchQuery.toLowerCase()),
                 )
                 .map((item) => {
-                  const renderer = renderCategoryItemForPopper;
-
-                  const isItemSelected = selectedAttribute === item.name;
+                  const isItemSelected =
+                    Array.isArray(internalSelectedData) &&
+                    internalSelectedData.includes(item.name);
 
                   return React.cloneElement(
-                    renderer(item, isItemSelected, () =>
+                    renderPropItemForPopper(item, isItemSelected, () =>
                       handleDataClick(item.name),
                     ),
                     { key: item.id },
@@ -101,16 +137,46 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
             </div>
 
             <div className="dark:bg-mountain-950 dark:border-mountain-800 sticky bottom-0 flex items-center justify-between gap-2 bg-white p-4 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
-              <Button
-                variant="text"
-                color="error"
-                onClick={() => onClearData()}
-                size="small"
-                className="normal-case"
-                hidden={!selectedAttribute}
-              >
-                Clear
-              </Button>
+              {/* Clear All Button - Conditionally Rendered on the left */}
+              <div>
+                {/* Wrapper to push Clear All to the left */}
+                {canClearAll && (
+                  <Button
+                    variant="text"
+                    color="error"
+                    onClick={handleClearAll}
+                    size="small"
+                    className="normal-case"
+                  >
+                    Clear All
+                  </Button>
+                )}
+              </div>
+
+              {/* Action Buttons - Grouped on the right */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    onClose();
+                  }}
+                  className="normal-case"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  disableElevation
+                  onClick={() => {
+                    onSave(internalSelectedData);
+                    setIsAi(internalIsAi);
+                    onClose();
+                  }}
+                  className="normal-case"
+                >
+                  Apply
+                </Button>
+              </div>
             </div>
           </Paper>
         </Fade>
@@ -119,33 +185,27 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
   );
 };
 
-const renderCategoryItemForPopper = (
-  item: Category,
+const renderPropItemForPopper = (
+  item: { id: number; name: string },
   isSelected: boolean,
   onClick: () => void,
-) => {
-  const imageUrl =
-    item.exampleImages && item.exampleImages.length > 0
-      ? item.exampleImages[0]
-      : undefined;
-
-  return (
-    <div
-      className={`flex cursor-pointer items-center ${
-        isSelected
-          ? 'bg-mountain-200 dark:bg-mountain-800'
-          : 'hover:bg-mountain-100 dark:hover:bg-mountain-900'
-      } my-2 gap-2 rounded-lg p-2`}
-      onClick={onClick}
+) => (
+  <div
+    className="hover:bg-mountain-100 dark:hover:bg-mountain-900 flex cursor-pointer items-center gap-2 rounded-lg p-2"
+    onClick={onClick}
+  >
+    <input
+      type="checkbox"
+      id={`prop-${item.id}-${item.name}`}
+      checked={isSelected}
+      className="pointer-events-none"
+      readOnly
+    />
+    <label
+      htmlFor={`prop-${item.id}-${item.name}`}
+      className="dark:text-mountain-200 pointer-events-none w-full text-sm text-gray-800"
     >
-      <ImageWithFallback
-        src={imageUrl}
-        alt={item.name}
-        className="aspect-[1/1] h-12 w-12 rounded-lg object-cover object-center"
-      />
-      <span className="dark:text-mountain-200 text-sm text-wrap text-gray-800">
-        {item.name}
-      </span>
-    </div>
-  );
-};
+      {item.name}
+    </label>
+  </div>
+);
