@@ -22,8 +22,13 @@ import UserButton from "../../../components/header/user-button";
 //Context
 import { useUser } from '@/contexts/user/useUser';
 import UserInAppConfigs from "@/components/popovers/UserInAppConfigs";
+import { Book } from "lucide-react";
 
-const AIHeader: React.FC = () => {
+type AIHeaderProps = {
+  onGuideClick: () => void;
+};
+
+const AIHeader = ({ onGuideClick }: AIHeaderProps) => {
   const { user, loading } = useUser();
   const [open, setOpen] = useState(false);
 
@@ -65,6 +70,12 @@ const AIHeader: React.FC = () => {
               <TrendingPrompt onClose={handleOpenModal} />
             </DialogContent>
           </Dialog>
+          <Button
+            onClick={onGuideClick}
+            className="flex justify-center items-center bg-white hover:bg-mountain-50 border border-mountain-200 rounded-lg w-24 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
+            <Book className="size-6" />
+            Guide
+          </Button>
         </div>
       </div>
       <div className={`flex h-full items-center space-x-2`}>

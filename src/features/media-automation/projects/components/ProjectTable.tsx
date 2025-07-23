@@ -284,16 +284,16 @@ export default function ProjectTable({
   };
 
   return (
-    <div className="border-mountain-200 flex h-[calc(100vh-14rem)] w-full rounded-3xl border bg-white">
-      <div className="flex w-full flex-col justify-between">
-        <div className="flex flex-grow flex-col overflow-hidden">
+    <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-[calc(100vh-14rem)]">
+      <div className="flex flex-col justify-between w-full">
+        <div className="flex flex-col flex-grow overflow-hidden">
           <EnhancedTableToolbar
             numSelected={selected.length}
             dense={dense}
             handleChangeDense={handleChangeDense}
             onDelete={() => onDelete(selected)}
           />
-          <TableContainer className="sidebar flex-grow">
+          <TableContainer className="flex-grow custom-scrollbar">
             {isLoading && (
               <Box
                 sx={{
@@ -375,7 +375,7 @@ export default function ProjectTable({
                         <TableCell align="right">
                           <div className="flex flex-wrap justify-end gap-2">
                             {
-                              <div className="bg-mountain-100 rounded px-2 py-1">
+                              <div className="bg-mountain-100 px-2 py-1 rounded">
                                 {/* CHANGE: Using the helper function here */}
                                 {formatToTitleCase(row.platform.name)}
                               </div>
@@ -384,7 +384,7 @@ export default function ProjectTable({
                         </TableCell>
                         <TableCell align="right">{row.postCount}</TableCell>
                         <TableCell align="right">
-                          <span className="flex items-center justify-end gap-2 text-sm">
+                          <span className="flex justify-end items-center gap-2 text-sm">
                             <span
                               className={`h-2 w-2 rounded-full ${getStatusColor(
                                 row.status,
@@ -406,7 +406,7 @@ export default function ProjectTable({
                         >
                           <Tooltip title="Edit">
                             <Button
-                              className="border-mountain-200 border-1 bg-indigo-50 font-normal"
+                              className="bg-indigo-50 border-1 border-mountain-200 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/auto/projects/${row.id}/edit`);
@@ -418,7 +418,7 @@ export default function ProjectTable({
                           <Tooltip title="Delete">
                             <Button
                               color="error"
-                              className="border-mountain-200 border-1 bg-red-50 font-normal"
+                              className="bg-red-50 border-1 border-mountain-200 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onDelete([row.id]);
@@ -444,7 +444,7 @@ export default function ProjectTable({
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          className="border-mountain-100 flex-shrink-0 overflow-hidden border-t-2"
+          className="flex-shrink-0 border-mountain-100 border-t-2 overflow-hidden"
         />
       </div>
     </div>

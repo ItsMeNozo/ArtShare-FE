@@ -13,7 +13,7 @@ type ConfirmDialogProps = {
   title: string;
   description: string;
   confirmMessage: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   open: boolean;
   isLoading?: boolean;
   onCancel: Dispatch<SetStateAction<boolean>>;
@@ -32,12 +32,12 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
-      <DialogContent className="border-mountain-200 flex w-108 flex-col">
+      <DialogContent className="flex flex-col border-mountain-200 w-108">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div className="bg-mountain-50 flex items-center justify-center py-6">
+        <div className="flex justify-center items-center bg-mountain-50 py-6">
           {icon}
         </div>
         <DialogFooter>
@@ -48,7 +48,7 @@ export default function ConfirmDialog({
             Cancel
           </Button>
           <Button
-            className="text-mountain-50 bg-red-700 hover:bg-red-700/80"
+            className="bg-red-700 hover:bg-red-700/80 text-mountain-50"
             onClick={onConfirm}
             disabled={isLoading}
           >

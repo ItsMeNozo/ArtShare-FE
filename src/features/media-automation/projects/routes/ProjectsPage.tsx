@@ -41,6 +41,7 @@ const ProjectsPage = () => {
     () => fetchedProjectsResponse?.data ?? [],
     [fetchedProjectsResponse?.data],
   );
+
   const totalProjects = useMemo(
     () => fetchedProjectsResponse?.total ?? 0,
     [fetchedProjectsResponse?.total],
@@ -97,38 +98,38 @@ const ProjectsPage = () => {
   const combinedError = fetchError || deleteError;
 
   return (
-    <div className="flex h-screen w-full flex-col space-y-4 p-4">
-      <div className="flex w-full gap-x-12">
+    <div className="flex flex-col space-y-4 p-4 w-full h-screen">
+      <div className="flex gap-x-12 w-full">
         <div
           onClick={navigateToCreateProject}
-          className="hover:bg-mountain-50/80 flex h-28 w-1/3 cursor-pointer items-center justify-center space-x-2 rounded-3xl bg-white p-4 shadow-md"
+          className="flex justify-center items-center space-x-2 bg-white hover:bg-mountain-50/80 shadow-md p-4 rounded-3xl w-1/3 h-28 cursor-pointer"
         >
           <MdOutlineAddBox className="size-8" />
-          <p className="text-lg font-medium">Create New Project</p>
+          <p className="font-medium text-lg">Create New Project</p>
         </div>
-        <div className="flex h-28 w-2/3 items-center justify-center space-x-2">
-          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-teal-100 p-4">
+        <div className="flex justify-center items-center space-x-2 w-2/3 h-28">
+          <div className="flex justify-between items-center bg-teal-100 shadow-md p-4 rounded-3xl w-1/3 h-full">
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Active Projects</p>
-              <p className="text-2xl font-medium capitalize">
+              <p className="font-medium text-2xl capitalize">
                 {summaryStats.active} projects
               </p>
             </div>
             <FaCalendarCheck className="size-10 text-teal-600" />
           </div>
-          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-amber-100 p-4">
+          <div className="flex justify-between items-center bg-amber-100 shadow-md p-4 rounded-3xl w-1/3 h-full">
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Completed</p>
-              <p className="text-2xl font-medium capitalize">
+              <p className="font-medium text-2xl capitalize">
                 {summaryStats.completed} projects
               </p>
             </div>
             <FaCalendarDays className="size-10 text-amber-600" />
           </div>
-          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-rose-100 p-4">
+          <div className="flex justify-between items-center bg-rose-100 shadow-md p-4 rounded-3xl w-1/3 h-full">
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Cancelled / Failed</p>
-              <p className="text-2xl font-medium capitalize">
+              <p className="font-medium text-2xl capitalize">
                 {summaryStats.cancelledOrFailed} project
               </p>
             </div>
@@ -138,7 +139,7 @@ const ProjectsPage = () => {
       </div>
 
       {combinedError && (
-        <div className="rounded-md bg-red-100 p-3 text-red-500">
+        <div className="bg-red-100 p-3 rounded-md text-red-500">
           {combinedError.message || 'An unexpected error occurred.'}
         </div>
       )}
@@ -165,11 +166,10 @@ const ProjectsPage = () => {
         onClose={closeDeleteDialog}
         onConfirm={handleConfirmDelete}
         title="Delete Project(s)"
-        contentText={`Are you sure you want to delete ${
-          projectsToDelete?.length === 1
+        contentText={`Are you sure you want to delete ${projectsToDelete?.length === 1
             ? 'this project'
             : `${projectsToDelete?.length || 0} projects`
-        }? This action cannot be undone.`}
+          }? This action cannot be undone.`}
         isConfirming={isDeleting}
         confirmButtonText="Delete"
       />
