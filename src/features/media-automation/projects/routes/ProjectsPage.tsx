@@ -41,6 +41,7 @@ const ProjectsPage = () => {
     () => fetchedProjectsResponse?.data ?? [],
     [fetchedProjectsResponse?.data],
   );
+
   const totalProjects = useMemo(
     () => fetchedProjectsResponse?.total ?? 0,
     [fetchedProjectsResponse?.total],
@@ -97,7 +98,10 @@ const ProjectsPage = () => {
   const combinedError = fetchError || deleteError;
 
   return (
-    <div className="flex h-screen w-full flex-col space-y-4 p-4">
+    <div
+      className="flex h-screen w-full flex-col space-y-4 p-4"
+      data-testid="auto-projects"
+    >
       <div className="flex w-full gap-x-12">
         <div
           onClick={navigateToCreateProject}
@@ -107,7 +111,7 @@ const ProjectsPage = () => {
           <p className="text-lg font-medium">Create New Project</p>
         </div>
         <div className="flex h-28 w-2/3 items-center justify-center space-x-2">
-          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-teal-100 p-4">
+          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-teal-100 p-4 shadow-md">
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Active Projects</p>
               <p className="text-2xl font-medium capitalize">
@@ -116,7 +120,7 @@ const ProjectsPage = () => {
             </div>
             <FaCalendarCheck className="size-10 text-teal-600" />
           </div>
-          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-amber-100 p-4">
+          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-amber-100 p-4 shadow-md">
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Completed</p>
               <p className="text-2xl font-medium capitalize">
@@ -125,7 +129,7 @@ const ProjectsPage = () => {
             </div>
             <FaCalendarDays className="size-10 text-amber-600" />
           </div>
-          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-rose-100 p-4">
+          <div className="flex h-full w-1/3 items-center justify-between rounded-3xl bg-rose-100 p-4 shadow-md">
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Cancelled / Failed</p>
               <p className="text-2xl font-medium capitalize">

@@ -159,6 +159,7 @@ const PostForm: React.FC<PostFormProps> = ({
               <Box
                 className="flex h-[calc(100vh-4rem)] w-full gap-3 p-4"
                 style={{ overflow: 'hidden' }}
+                data-testid="upload-post-form"
               >
                 {/* LEFT COLUMN */}
                 <MediaSelection

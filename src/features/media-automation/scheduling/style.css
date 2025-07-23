@@ -1,0 +1,33 @@
+.rbc-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rbc-today {
+  background-color: white !important;
+  position: relative;
+}
+
+.rbc-month-view .rbc-day-bg {
+  background-color: #f6f6f6 !important;
+}
+
+.rbc-toolbar .rbc-btn-group {
+  font-size: small;
+}
+
+.rbc-toolbar .rbc-btn-group .rbc-active {
+  background-color: #2b2b2b !important;
+  color: hsl(0, 0%, 100%) !important;
+}
+
+.rbc-month-view .rbc-row {
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+.rbc-month-view .rbc-day-bg {
+  z-index: 0 !important;
+  position: relative !important;
+}

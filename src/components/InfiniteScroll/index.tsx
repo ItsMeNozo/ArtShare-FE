@@ -54,7 +54,10 @@ export const InfiniteScroll = ({
   }
 
   return (
-    <Box className="custom-scrollbar flex-1 overflow-y-auto p-4 pb-20">
+    <Box
+      className="custom-scrollbar flex-1 overflow-y-auto p-4 pb-20"
+      data-testid="explore-content"
+    >
       {children}
 
       {data.length === 0 && (

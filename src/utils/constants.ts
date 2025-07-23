@@ -13,12 +13,12 @@ export const featuresShowcase = [
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/nxyormqdp4kggz0ncymu?blur=300&q=1',
     destination: '/image/tool/text-to-image',
   },
-  {
-    label: 'Image Enhancement',
-    description: 'Enhance image quality with smart AI tools.',
-    url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/qrccndqcgnrmxpyfdhu3?blur=300&q=1',
-    destination: '/image/tool/text-to-image',
-  },
+  // {
+  //   label: 'Image Enhancement',
+  //   description: 'Enhance image quality with smart AI tools.',
+  //   url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/qrccndqcgnrmxpyfdhu3?blur=300&q=1',
+  //   destination: '/image/tool/text-to-image',
+  // },
   {
     label: 'Image Editor',
     description: 'A powerful editor for perfect visuals.',
@@ -70,6 +70,11 @@ export const routesForHeaders: HeaderRoute[] = [
     path: '/dashboard',
     label: 'Home Page',
     description: 'Discovering what we supply for your artistic journey',
+  },
+  {
+    path: '/dashboard/updates',
+    label: 'App Updates',
+    description: '',
   },
   {
     path: '/explore',
@@ -139,6 +144,11 @@ export const routesForHeaders: HeaderRoute[] = [
     path: '/auto/social-links',
     label: 'Link Socials',
     description: 'Connect social accounts to enable automated posting',
+  },
+  {
+    path: '/auto/scheduling',
+    label: 'Project Scheduling',
+    description: '',
   },
   {
     path: '/auto/projects',
