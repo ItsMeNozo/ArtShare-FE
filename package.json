@@ -14,6 +14,7 @@
     "test:ui": "cross-env TEST_ENV=local playwright test --ui --trace on",
     "test:production": "cross-env TEST_ENV=production playwright test --project=production-safe --trace on",
     "test:preview": "cross-env TEST_ENV=preview playwright test --project=unsafe --trace on --headed",
+    "test:speed-insights": "cross-env TEST_ENV=production playwright test --project=speed-insights --trace on --headed",
     "test:ai": "cross-env TEST_ENV=local playwright test --project=ai --trace on --headed",
     "test:cleanup": "cross-env TEST_ENV=preview playwright test --project=cleanup --trace on",
     "test:production:ci": "cross-env TEST_ENV=production playwright test --project=production-safe --reporter=line,html",
