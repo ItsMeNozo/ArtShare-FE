@@ -1,23 +1,22 @@
 import { searchPosts } from '@/features/explore/api/get-post';
-import { postsToPhotos } from '@/features/explore/utils';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 interface UseSearchPostsParams {
   finalQuery: string | null;
-  medium?: string | null;
-  attributes?: string[];
+  attribute?: string | null;
+  mediums?: string[];
   isAi?: boolean;
   enabled?: boolean;
 }
 
 export const useSearchPosts = (params: UseSearchPostsParams) => {
-  const { finalQuery, medium, attributes = [], isAi, enabled = true } = params;
+  const { finalQuery, attribute, mediums = [], isAi, enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ['postSearch', finalQuery, medium, attributes, isAi],
+    queryKey: ['postSearch', finalQuery, attribute, mediums, isAi],
 
     queryFn: async ({ pageParam = 1 }) => {
-      const filter = attributes.concat(medium ? [medium] : []);
+      const filter = mediums.concat(attribute ? [attribute] : []);
 
       const apiResponse = await searchPosts({
         page: pageParam,
@@ -26,7 +25,7 @@ export const useSearchPosts = (params: UseSearchPostsParams) => {
         isAi,
       });
 
-      return postsToPhotos(apiResponse);
+      return apiResponse;
     },
 
     getNextPageParam: (lastPage) => {

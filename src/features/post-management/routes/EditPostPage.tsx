@@ -8,7 +8,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PostForm from '../components/PostForm';
 import { useUpdatePost } from '../hooks/useUpdatePost';
-import { PostFormValues } from '../types/post-form-values.type';
+import {
+  defaultPostFormValues,
+  PostFormValues,
+} from '../types/post-form-values.type';
 import { PostMedia } from '../types/post-media';
 
 const EditPostPage: React.FC = () => {
@@ -31,9 +34,10 @@ const EditPostPage: React.FC = () => {
   const [hasArtNovaImages, setHasArtNovaImages] = useState(false);
 
   // Initialize form values only when fetchedPost is available
-  const initialFormValues = useMemo((): PostFormValues | null => {
-    if (!fetchedPost) return null;
-
+  const initialFormValues = useMemo((): PostFormValues => {
+    if (!fetchedPost) {
+      return defaultPostFormValues;
+    }
     return {
       title: fetchedPost.title,
       description: fetchedPost.description || '',
@@ -73,7 +77,6 @@ const EditPostPage: React.FC = () => {
     setPostMedias(initialMedias);
   }, [fetchedPost]);
 
-  // Update post mutation
   const { mutateAsync: updatePost } = useUpdatePost({
     onSuccess: (updatedPost) => {
       showSnackbar('Post updated successfully!', 'success');

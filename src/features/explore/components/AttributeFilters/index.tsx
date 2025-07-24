@@ -5,10 +5,8 @@ import { memo, useState } from 'react';
 import { AttributeSelector } from './AttributeSelector';
 
 interface AttributeFiltersProps {
-  selectedAttributes: string[];
-  setSelectedAttributes: (attributes: string[]) => void;
-  isAi: boolean;
-  setIsAi: (isAi: boolean) => void;
+  selectedAttribute: string | null;
+  setSelectedAttribute: (Attribute: string | null) => void;
   children: (triggerProps: {
     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isLoading: boolean;
@@ -16,47 +14,42 @@ interface AttributeFiltersProps {
 }
 
 const AttributeFilters = ({
-  selectedAttributes,
-  setSelectedAttributes,
-  isAi,
-  setIsAi,
+  selectedAttribute,
+  setSelectedAttribute,
   children,
 }: AttributeFiltersProps) => {
-  const [open, setOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const { data: attributeCategories = [], isLoading } = useCategories({
+  const [openCP, setOpenCP] = useState(false);
+  const [anchorElCP, setAnchorElCP] = useState<null | HTMLElement>(null);
+  const { data: AttributeCategories = [], isLoading } = useCategories({
     type: CategoryTypeValues.ATTRIBUTE,
   });
-
   const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-    setOpen((prevOpen) => !prevOpen);
+    setAnchorElCP(event.currentTarget);
+    setOpenCP((prevOpen) => !prevOpen);
   };
-
-  const handleClose = () => {
-    setOpen(false);
-    setAnchorEl(null);
+  const handleCloseAttributePopper = () => {
+    setOpenCP(false);
+    setAnchorElCP(null);
   };
-
   return (
-    <ClickAwayListener onClickAway={handleClose}>
+    <ClickAwayListener onClickAway={handleCloseAttributePopper}>
       <Box>
         {children({
           onClick: handleToggle,
           isLoading: isLoading,
         })}
         <AttributeSelector
-          open={open}
-          onClose={() => setOpen(false)}
-          onSave={(attributes) => setSelectedAttributes(attributes)}
-          anchorEl={anchorEl}
-          data={attributeCategories}
-          selectedData={selectedAttributes}
-          placement="bottom-end"
-          showClearAllButton={true}
-          isAi={isAi}
-          setIsAi={setIsAi}
+          open={openCP}
+          anchorEl={anchorElCP}
+          onClose={() => setOpenCP(false)}
+          onClearData={() => {
+            setOpenCP(false);
+            setSelectedAttribute(null);
+          }}
+          onSelectAttribute={(Attribute) => setSelectedAttribute(Attribute)}
+          selectedAttribute={selectedAttribute}
+          data={AttributeCategories}
+          placement="bottom-start"
         />
       </Box>
     </ClickAwayListener>
