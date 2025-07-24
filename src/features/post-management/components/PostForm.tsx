@@ -58,7 +58,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
   const handleGenerateContent = async (
     setFieldValue: FormikHelpers<PostFormValues>['setFieldValue'],
-    formikProps: FormikProps<PostFormValues>,
+    formikProps: FormikProps<PostFormValues>
   ) => {
     if (
       postMedias.filter((media) => media.type === MEDIA_TYPE.IMAGE).length === 0
@@ -149,7 +149,7 @@ const PostForm: React.FC<PostFormProps> = ({
         } = formikProps;
 
         const isAllDirty = mediasTouched || thumbnailTouched || dirty;
-
+        
         const isValidToSubmit = isAllDirty && !isSubmitting && isValid;
 
         return (
@@ -237,7 +237,7 @@ const PostForm: React.FC<PostFormProps> = ({
                       //   },
                       // }}
                     >
-                      {isEditMode ? 'Save Changes' : 'Submit'}
+                      { isEditMode ? 'Save Changes' : 'Submit' }
                     </Button>
                   </Box>
                 </Box>
