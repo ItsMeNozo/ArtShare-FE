@@ -155,7 +155,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
   return (
     <>
       <div className="dark:bg-mountain-950 overflow-none rounded-2xl bg-white">
-        <CardContent className="flex flex-col gap-2 p-0 px-4">
+        <CardContent className="flex flex-col gap-2 p-0">
           {/* Title, description, date */}
           <div className="flex flex-col gap-2">
             <div className="text-xl font-bold">{postData.title}</div>
@@ -172,7 +172,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               {postData.createdAt &&
               !isNaN(new Date(postData.createdAt).getTime()) ? (
                 <ReactTimeAgo
-                  className="capitalize"
+                  className='capitalize'
                   date={new Date(postData.createdAt)}
                   locale="en-US"
                   timeStyle="round-minute"

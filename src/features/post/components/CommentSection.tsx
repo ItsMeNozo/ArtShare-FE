@@ -1636,13 +1636,13 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       : '';
 
     const wrapperClass =
-      `${baseWrapperClasses} ${responsiveGrowClass} ${conditionalAppearanceClasses}`
+      `${baseWrapperClasses} ${responsiveGrowClass} ${conditionalAppearanceClasses} overflow-y-auto`
         .trim()
         .replace(/\s+/g, ' ');
 
     return (
       <div className={wrapperClass}>
-        <span className="text-md px-4 font-bold dark:text-white">
+        <span className="text-md px-4 pt-4 font-bold dark:text-white">
           Comments
         </span>
         {inputPosition === 'top' && InputBar}
