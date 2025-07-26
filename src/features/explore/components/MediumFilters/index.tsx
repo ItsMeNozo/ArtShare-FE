@@ -1,6 +1,6 @@
 import { CategoryTypeValues } from '@/constants';
 import { useCategories } from '@/hooks/useCategories';
-import { Box, ClickAwayListener } from '@mui/material';
+import { Badge, Box, ClickAwayListener } from '@mui/material';
 import { memo, useState } from 'react';
 import { MediumSelector } from './MediumSelector';
 
@@ -39,13 +39,26 @@ const MediumFilters = ({
     setAnchorEl(null);
   };
 
+  const selectedCount = selectedMediums.length;
+
   return (
     <ClickAwayListener onClickAway={handleClose}>
       <Box>
-        {children({
-          onClick: handleToggle,
-          isLoading: isLoading,
-        })}
+        <Badge
+          badgeContent={selectedCount}
+          color="primary"
+          overlap="circular"
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          invisible={selectedCount === 0}
+        >
+          {children({
+            onClick: handleToggle,
+            isLoading: isLoading,
+          })}
+        </Badge>
         <MediumSelector
           open={open}
           onClose={() => setOpen(false)}
