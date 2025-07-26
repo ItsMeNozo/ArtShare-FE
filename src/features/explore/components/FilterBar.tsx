@@ -51,7 +51,7 @@ const FilterBar = ({
   const isAllChannelsSelected = selectedAttribute === null;
 
   return (
-    <div className="categories-bar flex w-full items-center gap-6 overflow-x-hidden">
+    <div className="categories-bar flex w-full items-center gap-6">
       <AttributeFilters
         selectedAttribute={selectedAttribute}
         setSelectedAttribute={setSelectedAttribute}
