@@ -130,9 +130,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
           className={customInputClassName}
         />
         {errors.fullName && (
-          <Typography color="error" variant="caption">
-            {errors.fullName.message}
-          </Typography>
+          <p className="text-xs text-rose-500">{errors.fullName.message}</p>
         )}
       </Box>
 
@@ -155,9 +153,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
           className={customInputClassName}
         />
         {errors.username && (
-          <Typography color="error" variant="caption">
-            {errors.username.message}
-          </Typography>
+          <p className="text-xs text-rose-500">{errors.username.message}</p>
         )}
       </Box>
 
@@ -176,9 +172,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
           className={customInputClassName}
         />
         {errors.birthday && (
-          <Typography color="error" variant="caption">
-            {errors.birthday.message}
-          </Typography>
+          <p className="text-xs text-rose-500">{errors.birthday.message}</p>
         )}
       </Box>
 

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { TextareaAutosize } from '@mui/material';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 // SHADCN Dialog helpers
@@ -22,6 +22,9 @@ import {
 import { useUser } from '@/contexts/user';
 import { User } from '@/types';
 import axios, { AxiosError } from 'axios';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // Constants
 const SUCCESS_MESSAGE_TIMEOUT_MS = 1500;
@@ -36,6 +39,7 @@ interface ProfileForm {
 const OnboardingProfile: React.FC = () => {
   const navigate = useNavigate();
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -234,29 +238,44 @@ const OnboardingProfile: React.FC = () => {
 
           {/* Birthday */}
           <div className="space-y-1">
-            <label
-              className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-              htmlFor="birthday"
-            >
-              Birthday <span className="text-rose-500">*</span>
-            </label>
-            <Input
-              id="birthday"
-              type="date"
-              {...register('birthday', {
-                required: 'Birthday is required',
-                validate: (value) =>
-                  typeof value === 'string' && isAbove13(value)
-                    ? true
-                    : 'You must be at least 13 years old.',
-              })}
-              className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-            />
-
-            {errors.birthday && (
-              <p className="text-xs text-rose-500">{errors.birthday.message}</p>
-            )}
-          </div>
+              <label
+                className="text-sm font-medium text-neutral-700 dark:text-neutral-300 block mb-1 full-width"
+                htmlFor="birthday"
+              >
+                Birthday <span className="text-rose-500">*</span>
+              </label>
+              <Controller
+                name="birthday"
+                control={control}
+                rules={{
+                  required: 'Birthday is required',
+                  validate: (value) =>
+                    value && isAbove13(value)
+                      ? true
+                      : 'You must be at least 13 years old.',
+                }}
+                render={({ field }) => (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    {...field}
+                    label="Select your birthday"
+                    value={field.value ? dayjs(field.value) : null}
+                    onChange={(newValue) => {
+                      field.onChange(newValue ? newValue.format('YYYY-MM-DD') : null);
+                    }}
+                    slotProps={{
+                        textField: {
+                          fullWidth: true,
+                        },
+                    }}
+                  />
+                </LocalizationProvider>
+                )}
+              />
+              {errors.birthday && (
+                  <p className="text-xs text-rose-500">{errors.birthday.message}</p>
+              )}
+            </div>
 
           {/* Bio */}
           <div className="space-y-1">
