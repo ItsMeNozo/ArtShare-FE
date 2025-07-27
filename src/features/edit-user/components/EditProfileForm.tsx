@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { updateUserProfile } from '../api/user-profile.api';
+import { UnsavedChangesProtector } from '@/components/UnsavedChangesProtector';
 
 export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
   initialData,
@@ -32,6 +33,24 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
       birthday: initialData.birthday ? initialData.birthday.slice(0, 10) : '',
     },
   });
+
+  const currentValues = watch(); // Watch all form fields
+  const isDirty = React.useMemo(() => {
+    // A robust way to compare form state with initial data, accounting for date format differences
+    const initialFormatted = {
+        ...initialData,
+        birthday: initialData.birthday ? initialData.birthday.slice(0, 10) : '',
+    };
+    const currentFormatted = {
+        ...currentValues,
+        birthday: currentValues.birthday ? currentValues.birthday.slice(0, 10) : '',
+    };
+
+    delete initialFormatted.email;
+    delete currentFormatted.email;
+
+    return JSON.stringify(initialFormatted) !== JSON.stringify(currentFormatted);
+  }, [currentValues, initialData]);
 
   const isAbove13 = (birthday: string) => {
     const birth = new Date(birthday);
@@ -116,6 +135,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
       onSubmit={handleSubmit(onSubmit)}
       className="dark:bg-mountain-900 mt-5 max-w-screen rounded-none p-6 dark:rounded-md"
     >
+      <UnsavedChangesProtector isDirty={isDirty} />
       <Box className="mb-4">
         <Typography className="text-foreground mb-1 font-medium">
           Full Name <span className="text-rose-500">*</span>
