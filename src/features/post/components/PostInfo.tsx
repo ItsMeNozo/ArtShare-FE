@@ -183,12 +183,27 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               )}
             </div>
           </div>
+
           {/* Categories */}
           <div className="flex flex-wrap gap-2">
+            {postData.aiCreated && (
+              <div className="inline-flex items-center rounded-md bg-gradient-to-r from-[#a855f7] via-[#6366f1] to-[#06b6d4] p-1 pr-3 text-xs font-semibold text-white">
+                {postData.aiCreated && (
+                  <div className="flex items-center">
+                    <img
+                      src="/logo_app_v_101.png"
+                      alt="AI Generated"
+                      className="h-5 w-5 rounded-full"
+                    />
+                    <span className="ml-2">Created by ArtNova</span>
+                  </div>
+                )}
+              </div>
+            )}
             {postData.categories?.map((cat) => (
               <div
                 key={cat.id}
-                className="bg-mountain-50 dark:bg-mountain-800 rounded px-2 py-1 text-xs"
+                className="bg-mountain-50 dark:bg-mountain-800 flex items-center rounded px-2 py-1 text-xs"
               >
                 {cat.name}
               </div>
