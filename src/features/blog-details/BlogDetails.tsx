@@ -4,7 +4,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 //Components
 import type { Blog } from '@/types/blog';
 import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
-import Avatar from 'boring-avatars';
 //Icons
 import { LikesDialog } from '@/components/like/LikesDialog';
 import { useUser } from '@/contexts/user';
@@ -17,7 +16,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
 import { FiTrash2 } from 'react-icons/fi';
-import { IoPersonAddOutline } from 'react-icons/io5';
 import { LuLink, LuPencil } from 'react-icons/lu';
 import { MdOutlineFlag } from 'react-icons/md'; // Report Icon
 import { fetchBlogComments } from '../post/api/comment.api';
@@ -40,6 +38,7 @@ import { BlogDeleteConfirmDialog } from '../user-writing/components/BlogDeleteCo
 import { useDeleteBlog } from '../user-writing/hooks/useDeleteBlog';
 
 import './BlogDetails.css';
+import UserInfoCard from './components/UserInfoCard';
 interface BlogError {
   message: string;
   error?: string;
@@ -623,47 +622,20 @@ const BlogDetails = () => {
           )}
 
           {/* Author Info Box */}
-          <div className="dark:border-mountain-700 flex items-center justify-between rounded-lg border border-transparent bg-gradient-to-r from-indigo-100 to-purple-100 p-4 shadow-sm dark:from-indigo-900/30 dark:to-purple-900/30">
-            <div className="flex items-center space-x-4">
-              {blog.user.profilePictureUrl ? (
-                <img
-                  src={blog.user.profilePictureUrl}
-                  alt={blog.user.username}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-              ) : (
-                <Avatar
-                  name={blog.user.username}
-                  size={48}
-                  variant="beam"
-                  colors={['#84bfc3', '#ff9b62', '#d96153']}
-                />
-              )}
-              <div className="flex flex-col">
-                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                  {blog.user.fullName}
-                </p>
-                <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
-                  <span>@{blog.user.username}</span>
-                  <span className="text-gray-400 dark:text-gray-500">•</span>
-                  <span>
-                    {blog.user.followersCount.toLocaleString()}{' '}
-                    {blog.user.followersCount <= 1 ? 'follower' : 'followers'}
-                  </span>
-                </div>
-              </div>
-            </div>
-            {!isOwnBlog && (
-              <Button
-                onClick={toggleFollow}
-                disabled={followBtnLoading}
-                className="dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 border-mountain-200 dark:border-mountain-600 flex h-10 w-32 items-center border bg-white text-sm font-medium text-black shadow dark:text-white"
-              >
-                <IoPersonAddOutline className="mr-2 text-blue-500 dark:text-blue-400" />
-                {isFollowing ? 'Unfollow' : 'Follow'}
-              </Button>
-            )}
-          </div>
+          <UserInfoCard
+            user={{
+              ...blog.user,
+              id:
+                typeof blog.user.id === 'string'
+                  ? Number(blog.user.id)
+                  : blog.user.id,
+              fullName: blog.user.fullName ?? '',
+              profilePictureUrl: blog.user.profilePictureUrl ?? undefined, // fix here
+            }}
+            isOwnProfile={isOwnBlog}
+            isFollowLoading={followBtnLoading}
+            onToggleFollow={toggleFollow}
+          />
 
           {/* Blog Content */}
           <div
