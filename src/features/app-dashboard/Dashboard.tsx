@@ -43,7 +43,7 @@ const Dashboard = () => {
               className="border-mountain-200 text-mountain-950 flex w-40 items-center justify-center space-x-2 rounded-xl border bg-gradient-to-r from-indigo-100 to-purple-50 p-4 transition duration-300 ease-in-out hover:scale-105 hover:cursor-pointer hover:brightness-105"
             >
               <IoNewspaperOutline />
-              <p className="font-thin select-none">What's news</p>
+              <p className="font-thin select-none">What's new</p>
             </Link>
           </div>
         </div>

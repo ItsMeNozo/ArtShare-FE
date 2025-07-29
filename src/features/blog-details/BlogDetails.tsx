@@ -309,7 +309,11 @@ const BlogDetails = () => {
               Access Restricted
             </h2>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-              {errorData?.message || 'This blog is not accessible.'}
+              {typeof errorData?.message === 'string'
+                ? errorData.message
+                : typeof errorData === 'object' && errorData
+                  ? JSON.stringify(errorData)
+                  : 'This blog is not accessible.'}
             </p>
             <div className="space-y-3">
               <Button
@@ -356,8 +360,11 @@ const BlogDetails = () => {
               Blog Not Found
             </h2>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-              {errorData?.message ||
-                "The blog you're looking for doesn't exist."}
+              {typeof errorData?.message === 'string'
+                ? errorData.message
+                : typeof errorData === 'object' && errorData
+                  ? JSON.stringify(errorData)
+                  : "The blog you're looking for doesn't exist."}
             </p>
             <Button
               onClick={() => navigate('/blogs')}
@@ -392,7 +399,13 @@ const BlogDetails = () => {
             Something went wrong
           </h2>
           <p className="mb-6 text-gray-600 dark:text-gray-400">
-            {errorData?.message || error.message || 'Failed to load the blog.'}
+            {typeof errorData?.message === 'string'
+              ? errorData.message
+              : typeof errorData === 'object' && errorData
+                ? JSON.stringify(errorData)
+                : typeof error?.message === 'string'
+                  ? error.message
+                  : 'Failed to load the blog.'}
           </p>
           <div className="space-y-3">
             <Button
