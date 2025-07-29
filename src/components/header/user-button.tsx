@@ -780,7 +780,7 @@ const UserButton: React.FC<{
             </div>
           </div>
           {/* Notifications List */}
-          <div className="custom-scrollbar max-h-80 overflow-y-auto">
+          <div className="custom-scrollbar max-h-80 overflow-y-auto z-1000">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-4 py-8">
                 <div className="bg-mountain-100 mb-3 flex h-12 w-12 items-center justify-center rounded-full dark:bg-slate-600">
