@@ -13,19 +13,17 @@ export const ImageRenderer = (
 ) => {
   const { photo, height, width, index } = context;
 
-  const imageClassName = `w-full h-full object-cover rounded-lg ${
-    photo.isMature ? 'filter blur-md' : ''
-  }`;
-
+  const imageClassName = `w-full h-full object-cover rounded-lg ${photo.isMature ? 'filter blur-md' : ''
+    }`;
   return (
     <div
-      className="group relative cursor-pointer overflow-hidden rounded-lg"
+      className="group relative rounded-lg overflow-hidden cursor-pointer"
       style={{
         height: height,
         width: width,
       }}
     >
-      <Link to={`/posts/${photo.postId}`} className="block h-full w-full">
+      <Link to={`/posts/${photo.postId}`} className="block w-full h-full">
         <img
           src={photo.src}
           srcSet={
@@ -37,18 +35,18 @@ export const ImageRenderer = (
 
         {/* Mature Content Warning Overlay */}
         {photo.isMature && (
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/60 p-4 text-white">
-            <p className="text-center text-sm font-light uppercase">
+          <div className="absolute inset-0 flex flex-col justify-center items-center bg-black/60 p-4 rounded-lg text-white pointer-events-none">
+            <p className="font-light text-sm text-center uppercase">
               Mature Content
             </p>
           </div>
         )}
 
         {/* Info Overlay (visible on hover) */}
-        <div className="absolute inset-0 z-10 flex flex-col items-start justify-end rounded-lg bg-gradient-to-b from-transparent via-transparent to-black/70 p-4 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <div className="absolute top-2 left-2 flex items-center justify-center gap-2">
+        <div className="z-10 absolute inset-0 flex flex-col justify-end items-start bg-gradient-to-b from-transparent via-transparent to-black/70 opacity-0 group-hover:opacity-100 p-4 rounded-lg text-white transition-opacity duration-300">
+          <div className="top-2 left-2 absolute flex justify-center items-center gap-2">
             {photo.postLength > 1 ? (
-              <div className="rounded-full bg-black/40 p-1.5">
+              <div className="bg-black/40 p-1.5 rounded-full">
                 <Images size={14} />
               </div>
             ) : (
@@ -59,33 +57,33 @@ export const ImageRenderer = (
               <img
                 src="/logo_app_v_101.png"
                 alt="AI Generated"
-                className="border-mountain-700 h-6 w-6 rounded-full border"
+                className="border border-mountain-700 rounded-full w-6 h-6"
               />
             )}
           </div>
 
-          <div className="flex w-full items-end justify-between gap-2">
-            <div title={`${photo.title}\n${photo.author}`}>
-              <span className="line-clamp-1 text-sm font-semibold">
+          <div className="flex justify-between items-end gap-2 w-full">
+            <div title={`${photo.title}\n${photo.author}`} className='flex flex-col text-left'>
+              <span className="font-semibold text-sm line-clamp-1">
                 {photo.title}
               </span>
-              <span className="line-clamp-1 text-xs">{photo.author}</span>
+              <span className="text-xs line-clamp-1">{photo.author}</span>
             </div>
             <div className="flex flex-col items-end space-y-0.5">
               <div className="flex items-center space-x-1">
-                <p className="text-xs font-medium">
+                <p className="font-medium text-xs">
                   {formatCount(photo.likeCount)}
                 </p>
                 <AiOutlineLike className="size-3.5" />
               </div>
               <div className="flex items-center space-x-1">
-                <p className="text-xs font-medium">
+                <p className="font-medium text-xs">
                   {formatCount(photo.commentCount)}
                 </p>
                 <BiCommentDetail className="size-3.5 text-white" />
               </div>
               <div className="flex items-center space-x-1">
-                <p className="text-xs font-medium">
+                <p className="font-medium text-xs">
                   {formatCount(photo.viewCount)}
                 </p>
                 <HiOutlineEye className="size-3.5" />

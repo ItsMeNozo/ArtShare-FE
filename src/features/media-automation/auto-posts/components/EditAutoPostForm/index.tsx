@@ -3,11 +3,11 @@ import InlineErrorMessage from '@/components/InlineErrorMessage';
 import Loading from '@/components/loading/Loading';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
-import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
 import * as Yup from 'yup';
 import { MAX_IMAGE_COUNT } from '../../constants';
@@ -22,6 +22,8 @@ import { FacebookPostPreview } from './PostPreviewer';
 import { TbGridDots } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import { PiStarFourFill } from 'react-icons/pi';
+import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
+import { Platform } from '@/features/media-automation/projects/types/platform';
 
 // import { Link, Element } from "react-scroll";
 
@@ -37,6 +39,17 @@ const EditAutoPostForm = () => {
   const queryClient = useQueryClient();
 
   const { data: postToEdit, isLoading } = useGetAutoPostDetails(postId);
+  const { data: platforms } = useFetchPlatforms('FACEBOOK');
+  const [matchedPlatform, setMatchedPlatform] = useState<Platform | null>(null);
+  useEffect(() => {
+    if (!postToEdit?.platformPostId || !platforms) return;
+    const [platformExternalId] = postToEdit.platformPostId.split('_');
+    const matched = platforms.find(
+      (p) => String(p.externalPageId) === platformExternalId
+    );
+    setMatchedPlatform(matched ?? null);
+  }, [postToEdit, platforms]);
+
   const initialValues = useMemo((): AutoPostFormValues => {
     if (postToEdit) {
       const initialImages: ImageState[] = postToEdit.imageUrls.map((url) => ({
@@ -99,18 +112,18 @@ const EditAutoPostForm = () => {
     deletePost(postIdToDelete);
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   if (!postToEdit) {
     return (
       <Box className="flex justify-center items-center h-full">
         <Typography variant="h6" className="text-gray-600">
-          Post not found or has been deleted
+          Post not found or deleted
         </Typography>
       </Box>
     );
-  }
-
-  if (isLoading) {
-    return <Loading />;
   }
 
   return (
@@ -219,6 +232,8 @@ const EditAutoPostForm = () => {
               <FacebookPostPreview
                 content={values.content}
                 images={values.images.map((img) => img.url)}
+                scheduledAt={values.scheduledAt}
+                platform={matchedPlatform!}
               />
             </Box>
             <ConfirmationDialog

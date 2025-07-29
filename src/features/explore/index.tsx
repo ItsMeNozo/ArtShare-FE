@@ -48,7 +48,7 @@ const Explore: React.FC = () => {
   const galleryPhotos = useMemo(() => {
     return postsData?.pages.flatMap((page) => page.photos) ?? [];
   }, [postsData]);
-
+  console.log('galleryPhotos:', galleryPhotos);
   return (
     <div ref={ref} className="relative flex flex-col h-screen min-h-0">
       <div className="z-10 sticky flex flex-col gap-4 bg-gradient-to-t dark:bg-gradient-to-t from-white dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 px-4 py-1 pt-3 rounded-t-3xl">

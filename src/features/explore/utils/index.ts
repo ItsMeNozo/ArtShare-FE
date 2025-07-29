@@ -41,6 +41,7 @@ const transformPostToPhoto = (post: Post): Promise<GalleryPhoto | null> => {
 
         title: post.title || '',
         author: post.user?.username || 'Unknown Author',
+        profilePictureUrl: post.user?.profilePictureUrl || null,
         postLength: post.medias?.length ?? 0,
         postId: post.id,
         isMature: post.isMature,

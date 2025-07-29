@@ -29,7 +29,6 @@ export function useGetPosts({
         filter: filterParams,
         isAi,
       });
-
       return postsToPhotos(apiResponse);
     },
     getNextPageParam: (lastPage) => {

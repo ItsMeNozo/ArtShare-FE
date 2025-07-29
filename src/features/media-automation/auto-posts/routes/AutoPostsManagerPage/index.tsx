@@ -58,8 +58,8 @@ const AutoPostsManagerPage = () => {
                 key={post.id}
                 onClick={() => handlePostItemClick(post.id)}
                 className={`flex h-14 w-full shrink-0 cursor-pointer items-center justify-between rounded-md border-1 px-2 shadow-md select-none ${selectedPostIndex === post.id
-                    ? 'border-indigo-600 bg-white'
-                    : 'border-mountain-200 bg-white hover:bg-gray-100'
+                  ? 'border-indigo-600 bg-white'
+                  : 'border-mountain-200 bg-white hover:bg-gray-100'
                   }`}
               >
                 <p className="w-[70%] text-mountain-600 text-sm line-clamp-1">

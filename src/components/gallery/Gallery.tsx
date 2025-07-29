@@ -9,6 +9,7 @@ export interface GalleryPhoto extends Photo {
   key: string;
   title: string;
   author: string;
+  profilePictureUrl?: string | null;
   postLength: number;
   postId: number;
   isMature: boolean;
@@ -42,7 +43,7 @@ const IGallery: React.FC<IGalleryProps> = ({
   const [ref, { width }] = useMeasure();
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center space-x-4">
+      <div className="flex justify-center items-center space-x-4 h-64">
         <CircularProgress size={36} />
         <p>Loading...</p>
       </div>
@@ -53,7 +54,7 @@ const IGallery: React.FC<IGalleryProps> = ({
     console.error('Error loading initial posts:', error);
 
     return (
-      <div className="text-mountain-500 p-4 text-center">
+      <div className="p-4 text-mountain-500 text-center">
         Oops! Something went wrong while loading the gallery. Please try again
         later.
       </div>
@@ -62,7 +63,7 @@ const IGallery: React.FC<IGalleryProps> = ({
 
   if (!isLoading && photos.length === 0 && !isFetchingNextPage) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-gray-500 text-center">
         No posts found matching your criteria.
       </div>
     );
@@ -83,7 +84,7 @@ const IGallery: React.FC<IGalleryProps> = ({
         />
       )}
       {isFetchingNextPage && (
-        <div className="my-4 flex items-center justify-center space-x-2">
+        <div className="flex justify-center items-center space-x-2 my-4">
           <CircularProgress size={24} />
           <p>Loading more...</p>
         </div>
@@ -91,7 +92,7 @@ const IGallery: React.FC<IGalleryProps> = ({
       {isError && !isLoading && photos.length > 0 && (
         <>
           {console.error('Error fetching more posts:', error)}
-          <div className="text-mountain-500 py-4 text-center">
+          <div className="py-4 text-mountain-500 text-center">
             Could not load more posts at this time. Please try again later.
           </div>
         </>

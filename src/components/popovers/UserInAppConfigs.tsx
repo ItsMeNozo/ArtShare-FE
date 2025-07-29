@@ -160,7 +160,7 @@ const UserInAppConfigs = () => {
             </div>
             <hr className="my-2 border-mountain-100 dark:border-mountain-800" />
             <Link
-              to={`/${user.username}`}
+              to={`/u/${user.username}`}
               className="flex items-center space-x-2 hover:bg-mountain-50 dark:hover:bg-mountain-800 p-3"
             >
               <FaRegCircleUser className="text-mountain-600" />

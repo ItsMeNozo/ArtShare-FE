@@ -13,7 +13,7 @@ const UserProfile = () => {
   };
 
   return (
-    <Box className="dark:bg-mountain-1000 from-mountain-50 sidebar h-[calc(100vh-4rem)] rounded-t-3xl bg-gradient-to-b to-white">
+    <Box className="dark:bg-mountain-1000 bg-gradient-to-b from-mountain-50 to-white rounded-t-3xl h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
       {/* Container for Posts + Profile Sidebar */}
       <Box
         sx={{
@@ -22,12 +22,12 @@ const UserProfile = () => {
           gap: 4,
           height: '100%',
         }}
-        className="rounded-t-3xl p-2 pl-6"
+        className="p-2 rounded-t-3xl"
       >
         {/* TOP SECTION: Profile card */}
-        <div className="dark:bg-mountain-950 border-mountain-200 relative flex h-72 w-full shrink-0 flex-col justify-end rounded-3xl border bg-white">
-          <div className="dark:from-mountain-950 dark:to-mountain-1000 absolute top-0 left-0 h-32 w-full rounded-t-3xl bg-gradient-to-b from-indigo-200 to-purple-100" />
-          <div className="z-50 flex h-full w-full items-center justify-start px-4">
+        <div className="relative flex flex-col justify-end bg-white dark:bg-mountain-950 border border-mountain-200 rounded-3xl w-full h-72 shrink-0">
+          <div className="top-0 left-0 absolute bg-gradient-to-b from-indigo-200 dark:from-mountain-950 to-purple-100 dark:to-mountain-1000 rounded-t-3xl w-full h-28" />
+          <div className="z-50 flex justify-start items-center px-4 w-full h-full">
             <UserProfileCard />
           </div>
           <Tabs
@@ -39,7 +39,7 @@ const UserProfile = () => {
               minHeight: 0,
               '.MuiTabs-flexContainer': { gap: 2 },
             }}
-            className="border-mountain-200 z-50 flex h-12 w-full shrink-0 rounded-b-3xl border-t-1 px-6"
+            className="z-50 flex px-6 border-mountain-200 border-t-1 rounded-b-3xl w-full h-12 shrink-0"
           >
             <Tab
               label="All posts"
@@ -52,7 +52,7 @@ const UserProfile = () => {
           </Tabs>
         </div>
         {/* BOTTOM SECTION: Posts */}
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', height: '100%' }} className="flex-1 pb-20">
           {selectedTab === 0 && <UserPosts />}
           {selectedTab === 1 && <UserBlogs />}
         </Box>
