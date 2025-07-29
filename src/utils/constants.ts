@@ -66,6 +66,11 @@ export const routesForHeaders: HeaderRoute[] = [
     label: 'App Updates',
   },
   {
+    path: '/dashboard/updates',
+    label: 'App Updates',
+    description: '',
+  },
+  {
     path: '/explore',
     label: 'Explore Arts',
   },
@@ -122,6 +127,11 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/auto/scheduling',
     label: 'Project Scheduling',
+  },
+  {
+    path: '/auto/scheduling',
+    label: 'Project Scheduling',
+    description: '',
   },
   {
     path: '/auto/projects',

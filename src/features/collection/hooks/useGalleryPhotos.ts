@@ -30,10 +30,10 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
         const photosPromises = posts
           .filter(
             (post) =>
-              post.thumbnailUrl || (post.medias && post.medias.length > 0),
+              post?.thumbnailUrl || (post?.medias && post.medias.length > 0),
           )
           .map(async (post): Promise<GalleryPhoto | null> => {
-            const imageUrl = post.thumbnailUrl || post.medias?.[0]?.url;
+            const imageUrl = post?.thumbnailUrl || post?.medias?.[0]?.url;
             if (!imageUrl) return null;
 
             try {

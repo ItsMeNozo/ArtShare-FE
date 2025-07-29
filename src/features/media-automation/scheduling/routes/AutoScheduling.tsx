@@ -29,18 +29,18 @@ const mockProjects = [
 
 const mockPosts = [
   {
-    "id": 13,
-    "autoProjectId": 12,
-    "content": "In your free time, do you prefer to enjoy some solitude or to hang out with friends? Both options have their own charm...",
-    "scheduledAt": "2025-07-21T10:00:00.000Z", // Example future date
-    "status": "PENDING"
+    id: 13,
+    autoProjectId: 12,
+    content: "In your free time, do you prefer to enjoy some solitude or to hang out with friends? Both options have their own charm...",
+    scheduledAt: "2025-07-21T10:00:00.000Z", // Example future date
+    status: "PENDING" as "PENDING"
   },
   {
-    "id": 12,
-    "autoProjectId": 12,
-    "content": "There's something truly comforting about sleep—it's where we continue to exist beyond the chaos of the day...",
-    "scheduledAt": "2025-07-19T13:00:00.000Z",
-    "status": "POSTED"
+    id: 12,
+    autoProjectId: 12,
+    content: "There's something truly comforting about sleep—it's where we continue to exist beyond the chaos of the day...",
+    scheduledAt: "2025-07-19T13:00:00.000Z",
+    status: "POSTED" as "POSTED"
   }
 ];
 

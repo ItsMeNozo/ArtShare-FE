@@ -322,7 +322,7 @@ const CommentRow = ({
       className={`comment-item w-full ${isHighlighted ? 'comment-highlighted' : ''}`}
     >
       <Box className="w-full">
-        <div className="flex w-full gap-3 py-3">
+        <div className="flex w-full gap-3 py-3 items-start">
           {comment.user.profilePictureUrl ? (
             <img
               src={comment.user.profilePictureUrl}
@@ -335,7 +335,7 @@ const CommentRow = ({
             />
           ) : (
             <div
-              className="cursor-pointer rounded-full ring-2 ring-transparent transition-all duration-200 hover:ring-blue-500/30"
+              className="cursor-pointer rounded-full ring-2 ring-transparent transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/${comment.user.username}`);
@@ -1642,7 +1642,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
     return (
       <div className={wrapperClass}>
-        <span className="text-md px-4 pt-4 font-bold dark:text-white">
+        <span className="text-md px-4 font-bold dark:text-white">
           Comments
         </span>
         {inputPosition === 'top' && InputBar}

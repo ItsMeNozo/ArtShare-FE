@@ -1,4 +1,5 @@
 import { formatCount } from '@/utils/common';
+import { Tooltip } from '@mui/material';
 import { Images } from 'lucide-react';
 import { AiOutlineLike } from 'react-icons/ai';
 import { BiCommentDetail } from 'react-icons/bi';
@@ -54,11 +55,13 @@ export const ImageRenderer = (
             )}
 
             {photo.aiCreated && (
-              <img
-                src="/logo_app_v_101.png"
-                alt="AI Generated"
-                className="border border-mountain-700 rounded-full w-6 h-6"
-              />
+              <Tooltip title="Created by ArtNova" arrow>
+                <img
+                  src="/logo_app_v_101.png"
+                  alt="Created by ArtNova"
+                  className="border border-mountain-700 rounded-full w-6 h-6"
+                />
+              </Tooltip>
             )}
           </div>
 

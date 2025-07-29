@@ -292,7 +292,7 @@ const Post: React.FC = () => {
 
   if (!postId || isNaN(numericPostId)) {
     return (
-      <div className="flex justify-center items-center m-4">
+      <div className="m-4 flex items-center justify-center">
         Invalid Post ID.
       </div>
     );
@@ -300,7 +300,7 @@ const Post: React.FC = () => {
 
   if (isPostLoading || isCommentsLoading) {
     return (
-      <div className="flex justify-center items-center m-4 h-screen text-center">
+      <div className="m-4 flex h-screen items-center justify-center text-center">
         <CircularProgress size={36} />
         <p className="ml-2">Loading...</p>
       </div>
@@ -309,7 +309,7 @@ const Post: React.FC = () => {
 
   if (postError) {
     return (
-      <div className="flex justify-center items-center m-4">
+      <div className="m-4 flex items-center justify-center">
         Error loading post:{' '}
         {(postError as Error).message || 'Failed to fetch post.'}
       </div>
@@ -318,7 +318,7 @@ const Post: React.FC = () => {
 
   if (commentsError && postData) {
     return (
-      <div className="flex justify-center items-center m-4">
+      <div className="m-4 flex items-center justify-center">
         Error loading comments:{' '}
         {(commentsError as Error).message || 'Failed to fetch comments.'}
       </div>
@@ -327,7 +327,7 @@ const Post: React.FC = () => {
 
   if (!postData) {
     return (
-      <div className="flex justify-center items-center m-4">
+      <div className="m-4 flex items-center justify-center">
         Post not found or data is unavailable.
       </div>
     );
@@ -335,7 +335,7 @@ const Post: React.FC = () => {
 
   if (!comments) {
     return (
-      <div className="flex justify-center items-center m-4">
+      <div className="m-4 flex items-center justify-center">
         Comments not found or data is unavailable.
       </div>
     );
@@ -344,9 +344,9 @@ const Post: React.FC = () => {
   const displayAssets = !postData.isMature || showMatureContent;
 
   return (
-    <div className="relative flex-grow bg-mountain-50 dark:bg-mountain-950 dark:bg-gradient-to-b dark:from-mountain-1000 dark:to-mountain-950 rounded-t-3xl h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar">
-      <div className="md:hidden relative flex flex-col bg-white shadow p-4 rounded-2xl h-full">
-        <div className="rounded-2xl h-full overflow-y-auto">
+    <div className="bg-mountain-50 dark:bg-mountain-950 dark:from-mountain-1000 dark:to-mountain-950 no-scrollbar relative h-[calc(100vh-4rem)] flex-grow overflow-y-auto rounded-t-3xl dark:bg-gradient-to-b">
+      <div className="relative flex h-full flex-col rounded-2xl bg-white shadow lg:hidden">
+        <div className="custom-scrollbar h-full overflow-y-auto rounded-2xl">
           <PostArtist artist={postData!.user} postData={postData!} />
           {displayAssets ? (
             <PostAssets medias={postData.medias} />
@@ -365,20 +365,21 @@ const Post: React.FC = () => {
             targetType={TargetType.POST}
             onCommentAdded={handleCommentAdded}
             onCommentDeleted={handleCommentDeleted}
+            hideWrapper={true}
           />
         </div>
       </div>
       {/* Desktop Layout */}
-      <div className="hidden md:flex flex-row gap-4 h-full">
-        <div className="flex flex-grow justify-center items-center h-full overflow-hidden">
+      <div className="hidden h-full flex-row gap-4 lg:flex">
+        <div className="flex h-full flex-grow items-center justify-center">
           {displayAssets ? (
             <PostAssets medias={postData.medias} />
           ) : (
             <MatureContentWarning onShow={handleShowMatureContent} />
           )}
         </div>
-        <div className="relative flex-shrink-0 bg-white shadow py-0 pl-4 rounded-lr-3xl sm:w-[256px] md:w-[384px] lg:w-[448px] overflow-hidden">
-          <div className="flex flex-col gap-4 h-full">
+        <div className="rounded-lr-3xl dark:bg-mountain-950 custom-scrollbar relative flex-shrink-0 overflow-y-auto bg-white py-0 shadow sm:w-[256px] md:w-[384px] lg:w-[448px]">
+          <div className="flex h-full flex-col gap-4">
             <PostArtist artist={postData!.user} postData={postData!} />
             <PostInfo
               postData={postData}
@@ -392,6 +393,7 @@ const Post: React.FC = () => {
               targetType={TargetType.POST}
               onCommentAdded={handleCommentAdded}
               onCommentDeleted={handleCommentDeleted}
+              hideWrapper={true}
             />
           </div>
         </div>

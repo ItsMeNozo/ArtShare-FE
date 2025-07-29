@@ -259,7 +259,7 @@ const SignUp = () => {
           type="submit"
           className="bg-mountain-800 hover:bg-mountain-700 dark:bg-gradient-to-r dark:from-blue-800 dark:via-purple-700 dark:to-pink-900 hover:brightness-110 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full h-10 font-bold text-white dark:text-mountain-50 hover:cursor-pointer"
         >
-          Sign Up with Email
+          Sign Up With Email
         </Button>
       </form>
       {/* Display error and success messages */}

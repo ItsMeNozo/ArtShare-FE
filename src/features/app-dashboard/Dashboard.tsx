@@ -11,7 +11,10 @@ import RecentBlog from './components/RecentBlog';
 
 const Dashboard = () => {
   return (
-    <div className="flex flex-col space-y-4 p-4 h-screen overflow-x-hidden sidebar">
+    <div
+      className="flex flex-col space-y-4 p-4 h-screen overflow-x-hidden sidebar"
+      data-testid="dashboard-content"
+    >
       {/* Hero section */}
       <div className="relative flex items-center p-4 rounded-xl w-full h-96">
         {/* Gradient background */}

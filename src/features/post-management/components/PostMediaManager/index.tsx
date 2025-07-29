@@ -9,12 +9,11 @@ import {
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { MEDIA_TYPE } from '@/utils/constants';
 import { Avatar, Box, Button, IconButton, Tooltip } from '@mui/material';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { IoSparkles } from 'react-icons/io5';
 import { MdClose } from 'react-icons/md';
 import { RiImageCircleAiLine } from 'react-icons/ri';
 import { TbDeviceDesktop } from 'react-icons/tb';
-import { useLocation } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import TabValue from '../../enum/media-tab-value';
 import {
@@ -62,8 +61,6 @@ export default function PostMediaManager({
   const [matureDialogOpen, setMatureDialogOpen] = useState(false);
   const [selectedPreviewMedia, setSelectedPreviewMedia] =
     useState<PostMedia | null>(null);
-  const location = useLocation();
-  const hasProcessedImageRef = useRef(false);
 
   const handleTabChange = (newTab: TabValue) => {
     if (tabValue === newTab) return;
@@ -104,31 +101,6 @@ export default function PostMediaManager({
       handleIsMatureAutoDetected(false);
     }
   }, [postMedias, isMatureAutoDetected, handleIsMatureAutoDetected]);
-
-  useEffect(() => {
-    if (hasProcessedImageRef.current) return;
-    const state = location.state as {
-      fromEditorImage?: { fileUrl: string; fileName: string };
-    };
-    if (!state?.fromEditorImage) return;
-    hasProcessedImageRef.current = true;
-    const { fileUrl, fileName } = state.fromEditorImage;
-    fetch(fileUrl)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const file = new File([blob], fileName, { type: blob.type });
-        const newMedia = {
-          file,
-          type: MEDIA_TYPE.IMAGE,
-          url: URL.createObjectURL(file),
-        };
-        setPostMedias((prev) => [...prev, newMedia]);
-        onThumbnailAddedOrRemoved?.(file);
-        setHasArtNovaImages?.(false);
-        onMediasChanged?.();
-      })
-      .catch((err) => console.error('Failed to load image from editor:', err));
-  }, []);
 
   const { mutateAsync: checkMaturityForNewItems } = useCheckMaturity();
 

@@ -7,6 +7,8 @@ import { Edit2 } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { updateUserProfile } from '../api/user-profile.api';
+import { useUser } from '@/contexts/user';
+import { User } from '@/types';
 interface AvatarSectionProps {
   profilePictureUrl?: string | null;
   onUploadSuccess: (newUrl: string) => void;
@@ -22,6 +24,7 @@ export function AvatarSection({
     profilePictureUrl || null,
   );
   const { showSnackbar } = useSnackbar();
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     setPreview(profilePictureUrl ?? null);
@@ -45,6 +48,7 @@ export function AvatarSection({
       setPreview(fileUrl);
       onUploadSuccess(fileUrl);
       showSnackbar('Avatar updated', 'success');
+      setUser({...user, profilePictureUrl: fileUrl } as User);
     },
     onError: (err) => {
       showSnackbar(err.message || 'Failed to upload avatar', 'error');

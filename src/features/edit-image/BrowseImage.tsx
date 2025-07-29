@@ -1,25 +1,30 @@
-import { useNavigate } from 'react-router-dom';
-import EditHeader from './components/EditHeader'
-import { useEffect, useRef, useState } from 'react';
-import { Typography } from '@mui/material';
-import { BsCardImage } from 'react-icons/bs';
-import { Plus, RectangleHorizontal, RectangleVertical, Square } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Typography } from '@mui/material';
 import { Sketch } from '@uiw/react-color';
-import { Label } from '@/components/ui/label';
-import { RiImageCircleAiLine } from 'react-icons/ri';
+import {
+  Plus,
+  RectangleHorizontal,
+  RectangleVertical,
+  Square,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { BsCardImage } from 'react-icons/bs';
 import { MdAspectRatio, MdOutlinePhotoSizeSelectActual } from 'react-icons/md';
+import { RiImageCircleAiLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import EditHeader from './components/EditHeader';
 
 const BrowseImage = () => {
   const navigate = useNavigate();
@@ -29,63 +34,66 @@ const BrowseImage = () => {
 
   const canvasSizeOptions = [
     {
-      label: "1:1",
+      label: '1:1',
       icon: Square,
-      value: "1:1",
+      value: '1:1',
       sizes: [
-        { label: "Small (512 x 512)", width: 512, height: 512 },
-        { label: "Medium (1080 x 1080)", width: 1080, height: 1080 },
-        { label: "Large (2048 x 2048)", width: 2048, height: 2048 },
+        { label: 'Small (512 x 512)', width: 512, height: 512 },
+        { label: 'Medium (1080 x 1080)', width: 1080, height: 1080 },
+        { label: 'Large (2048 x 2048)', width: 2048, height: 2048 },
       ],
     },
     {
-      label: "16:9",
-      value: "16:9",
+      label: '16:9',
+      value: '16:9',
       icon: RectangleHorizontal,
       sizes: [
-        { label: "Small (640 x 360)", width: 640, height: 360 },
-        { label: "Medium (1280 x 720)", width: 1280, height: 720 },
-        { label: "Large (1920 x 1080)", width: 1920, height: 1080 },
+        { label: 'Small (640 x 360)', width: 640, height: 360 },
+        { label: 'Medium (1280 x 720)', width: 1280, height: 720 },
+        { label: 'Large (1920 x 1080)', width: 1920, height: 1080 },
       ],
     },
     {
-      label: "4:3",
-      value: "4:3",
+      label: '4:3',
+      value: '4:3',
       icon: RectangleVertical,
       sizes: [
-        { label: "Small (800 x 600)", width: 800, height: 600 },
-        { label: "Medium (1024 x 768)", width: 1024, height: 768 },
-        { label: "Large (1600 x 1200)", width: 1600, height: 1200 },
+        { label: 'Small (800 x 600)', width: 800, height: 600 },
+        { label: 'Medium (1024 x 768)', width: 1024, height: 768 },
+        { label: 'Large (1600 x 1200)', width: 1600, height: 1200 },
       ],
     },
     {
-      label: "3:4",
-      value: "3:4",
+      label: '3:4',
+      value: '3:4',
       icon: RectangleHorizontal,
       sizes: [
-        { label: "Small (600 x 800)", width: 600, height: 800 },
-        { label: "Medium (768 x 1024)", width: 768, height: 1024 },
-        { label: "Large (1200 x 1600)", width: 1200, height: 1600 },
+        { label: 'Small (600 x 800)', width: 600, height: 800 },
+        { label: 'Medium (768 x 1024)', width: 768, height: 1024 },
+        { label: 'Large (1200 x 1600)', width: 1200, height: 1600 },
       ],
     },
   ];
 
   const smallCanvasByRatio = {
-    "1:1": { width: 560, height: 560 },
-    "16:9": { width: 996, height: 560 },
-    "4:3": { width: 747, height: 560 },
-    "3:4": { width: 420, height: 560 },
+    '1:1': { width: 560, height: 560 },
+    '16:9': { width: 996, height: 560 },
+    '4:3': { width: 747, height: 560 },
+    '3:4': { width: 420, height: 560 },
   };
 
   const [selectedRatio, setSelectedRatio] = useState(canvasSizeOptions[0]);
-  const [selectedCanvasSize, setSelectedCanvasSize] = useState(canvasSizeOptions[0].sizes[1]);
-  const editCanvas = smallCanvasByRatio[selectedRatio.value as keyof typeof smallCanvasByRatio];
+  const [selectedCanvasSize, setSelectedCanvasSize] = useState(
+    canvasSizeOptions[0].sizes[1],
+  );
+  const editCanvas =
+    smallCanvasByRatio[selectedRatio.value as keyof typeof smallCanvasByRatio];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
       const url = URL.createObjectURL(selected);
-      navigate("/image/tool/editor", {
+      navigate('/image/tool/editor', {
         state: {
           imageUrl: url,
           name: selected.name,
@@ -95,7 +103,7 @@ const BrowseImage = () => {
             height: selectedCanvasSize.height,
           },
           editCanvas: editCanvas,
-          color: color
+          color: color,
         },
       });
     }
@@ -103,7 +111,10 @@ const BrowseImage = () => {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(event.target as Node)
+      ) {
         setOpenColorSettings(false);
       }
     }
@@ -116,15 +127,20 @@ const BrowseImage = () => {
   }, [openColorSettings]);
 
   return (
-    <div className="group relative flex flex-col w-full h-full">
+    <div className="group relative flex h-full w-full flex-col">
       <EditHeader />
-      <div className={`flex p-4 h-[calc(100vh-4rem)] items-center justify-center w-full overflow-hidden`}>
-        <div className={`flex items-center space-x-8 justify-center bg-mountain-100 border border-mountain-200 rounded-lg w-full h-full overflow-y-hidden`}>
-          <div className='relative flex justify-center items-center bg-gradient-to-b from-white via-indigo-100 to-purple-100 shadow-md w-96 h-96 cursor-pointer'>
-            <BsCardImage className='w-20 h-20 font-bold text-mountain-600' />
+      <div
+        className={`flex h-[calc(100vh-4rem)] w-full items-center justify-center overflow-hidden p-4`}
+        data-testid="image-editor"
+      >
+        <div
+          className={`bg-mountain-100 border-mountain-200 flex h-full w-full items-center justify-center space-x-8 overflow-y-hidden rounded-lg border`}
+        >
+          <div className="relative flex h-96 w-96 cursor-pointer items-center justify-center bg-gradient-to-b from-white via-indigo-100 to-purple-100 shadow-md">
+            <BsCardImage className="text-mountain-600 h-20 w-20 font-bold" />
           </div>
-          <div className='flex flex-col justify-between gap-4 w-96 h-96'>
-            <Label className="flex justify-center items-center bg-mountain-950 hover:bg-mountain-900 shadow-md p-4 border-1 border-mountain-200 rounded-full w-full h-16 cursor-pointer">
+          <div className="flex h-96 w-96 flex-col justify-between gap-4">
+            <Label className="bg-mountain-950 hover:bg-mountain-900 border-mountain-200 flex h-16 w-full cursor-pointer items-center justify-center rounded-full border-1 p-4 shadow-md">
               <input
                 type="file"
                 multiple
@@ -133,24 +149,29 @@ const BrowseImage = () => {
                 onChange={handleFileChange}
               />
               <Plus className="size-6 text-white" />
-              <Typography variant="body1" className="text-white text-sm">Open Image</Typography>
+              <Typography variant="body1" className="text-sm text-white">
+                Open Image
+              </Typography>
             </Label>
-            <Label className="flex justify-center items-center bg-white shadow-md p-4 border-1 border-mountain-200 rounded-full w-full h-16 cursor-pointer">
-              <RiImageCircleAiLine className="size-6 text-mountain-950" />
-              <Typography variant="body1" className="text-mountain-950 text-sm">Browse In-App Images</Typography>
+            <Label className="border-mountain-200 flex h-16 w-full cursor-pointer items-center justify-center rounded-full border-1 bg-white p-4 shadow-md">
+              <RiImageCircleAiLine className="text-mountain-950 size-6" />
+              <Typography variant="body1" className="text-mountain-950 text-sm">
+                Browse In-App Images
+              </Typography>
             </Label>
-            <div className='flex flex-col flex-1 justify-center gap-4 bg-white shadow p-4 border border-gray-300 rounded-lg w-full h-full font-normal text-gray-700'>
+            <div className="flex h-full w-full flex-1 flex-col justify-center gap-4 rounded-lg border border-gray-300 bg-white p-4 font-normal text-gray-700 shadow">
               {/* Select Aspect Ratio */}
-              <div className='flex justify-between items-center w-full'>
-                <p className='flex items-center space-x-2'>
+              <div className="flex w-full items-center justify-between">
+                <p className="flex items-center space-x-2">
                   <MdAspectRatio />
-                  <span>
-                    Aspect Ratio
-                  </span>
+                  <span>Aspect Ratio</span>
                 </p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12">
+                    <Button
+                      variant="outline"
+                      className="bg-mountain-50 border-mountain-200 h-12 w-48 justify-start rounded-full"
+                    >
                       {selectedRatio.label}
                     </Button>
                   </DropdownMenuTrigger>
@@ -166,7 +187,9 @@ const BrowseImage = () => {
                           }}
                           className="flex items-center space-x-2"
                         >
-                          {Icon && <Icon className="size-4 text-muted-foreground" />}
+                          {Icon && (
+                            <Icon className="text-muted-foreground size-4" />
+                          )}
                           <span>{ratio.label}</span>
                         </DropdownMenuItem>
                       );
@@ -175,16 +198,17 @@ const BrowseImage = () => {
                 </DropdownMenu>
               </div>
               {/* Select Canvas Size */}
-              <div className='flex justify-between items-center w-full'>
-                <p className='flex items-center space-x-2'>
+              <div className="flex w-full items-center justify-between">
+                <p className="flex items-center space-x-2">
                   <MdOutlinePhotoSizeSelectActual />
-                  <span>
-                    Canvas Size
-                  </span>
+                  <span>Canvas Size</span>
                 </p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12">
+                    <Button
+                      variant="outline"
+                      className="bg-mountain-50 border-mountain-200 h-12 w-48 justify-start rounded-full"
+                    >
                       {selectedCanvasSize.label}
                     </Button>
                   </DropdownMenuTrigger>
@@ -200,24 +224,30 @@ const BrowseImage = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className='flex justify-between items-center w-full'>
+              <div className="flex w-full items-center justify-between">
                 <p>Background Color</p>
-                <Popover open={openColorSettings} onOpenChange={setOpenColorSettings}>
+                <Popover
+                  open={openColorSettings}
+                  onOpenChange={setOpenColorSettings}
+                >
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
+                      className="bg-mountain-50 border-mountain-200 h-12 w-48 justify-start rounded-full"
                     >
                       <div
-                        className="shadow-md border border-mountain-200 rounded w-6 h-6"
+                        className="border-mountain-200 h-6 w-6 rounded border shadow-md"
                         style={{ backgroundColor: color }}
                       />
                       <span className="ml-2">{color.replace('#', '')}</span>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="ml-4 p-2 border-mountain-200 w-auto" side='right'>
+                  <PopoverContent
+                    className="border-mountain-200 ml-4 w-auto p-2"
+                    side="right"
+                  >
                     <div className="flex flex-col">
-                      <div className="mb-2 font-medium text-mountain-950 text-sm">
+                      <div className="text-mountain-950 mb-2 text-sm font-medium">
                         🎨 Pick a color
                       </div>
                       <Sketch
@@ -234,8 +264,8 @@ const BrowseImage = () => {
           </div>
         </div>
       </div>
-    </div >
-  )
-}
+    </div>
+  );
+};
 
-export default BrowseImage
+export default BrowseImage;

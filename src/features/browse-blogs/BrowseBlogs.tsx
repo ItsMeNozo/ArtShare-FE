@@ -1,23 +1,46 @@
 import { Paper, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { AiFillFire } from 'react-icons/ai';
 import { FiSearch } from 'react-icons/fi';
 import { IoHeartCircleOutline } from 'react-icons/io5';
 import { TiDeleteOutline } from 'react-icons/ti';
 
+import { InfiniteScroll } from '@/components/InfiniteScroll';
 import BlogItem from '@/components/lists/BlogItem';
 import { Input } from '@/components/ui/input';
 
-import { InfiniteScroll } from '@/components/InfiniteScroll';
 import './BrowseBlogs.css';
 import { useFetchBlogs } from './hooks/useFetchBlogs';
 import { BlogTab } from './types';
 
+const TOGGLE_BUTTON_STYLES = {
+  gap: 1,
+  '.MuiToggleButton-root': {
+    border: 'none',
+    borderRadius: '9999px',
+    px: 2,
+    textTransform: 'none',
+    fontWeight: 500,
+    backgroundColor: 'white',
+  },
+  '.MuiToggleButton-root.Mui-selected': {
+    backgroundColor: 'primary.main',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: 'primary.dark',
+    },
+  },
+};
+
+const calculateReadingTime = (content: string): string => {
+  const wordCount = content?.split(/\s+/).length ?? 0;
+  return `${Math.ceil(wordCount / 200)}m reading`;
+};
+
 const BrowseBlogs: React.FC = () => {
   const [tab, setTab] = useState<BlogTab | null>('trending');
-
   const [searchInput, setSearchInput] = useState('');
-  const [searcQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const {
     data,
@@ -29,22 +52,44 @@ const BrowseBlogs: React.FC = () => {
     fetchNextPage,
   } = useFetchBlogs({
     tab,
-    searchQuery: tab ? null : searcQuery,
+    searchQuery: tab ? null : searchQuery,
   });
 
-  const allBlogs = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data) ?? [];
+  const publishedBlogs = useMemo(() => {
+    const allBlogs = data?.pages.flatMap((page) => page.data) ?? [];
+    // Filter out unpublished blogs
+    return allBlogs.filter((blog) => blog.isPublished === true);
   }, [data]);
 
-  console.log('allBlogs', allBlogs, data);
+  const handleTabChange = useCallback(
+    (_: React.MouseEvent<HTMLElement>, val: string | null) => {
+      if (!val) return;
+      setTab(val as BlogTab);
+    },
+    [],
+  );
 
-  const handleTabChange = (
-    _: React.MouseEvent<HTMLElement>,
-    val: string | null,
-  ) => {
-    if (!val) return;
-    setTab(val as BlogTab);
-  };
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key !== 'Enter' || !searchInput) return;
+      setSearchQuery(searchInput);
+      setTab(null);
+    },
+    [searchInput],
+  );
+
+  const handleClearSearch = useCallback(() => {
+    setSearchInput('');
+    setSearchQuery('');
+    setTab('trending');
+  }, []);
+
+  const handleSearchInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchInput(e.target.value);
+    },
+    [],
+  );
 
   return (
     <div className="flex dark:bg-mountain-950 rounded-t-3xl h-screen overflow-hidden">
@@ -67,24 +112,7 @@ const BrowseBlogs: React.FC = () => {
                 exclusive
                 value={tab}
                 onChange={handleTabChange}
-                sx={{
-                  gap: 1,
-                  '.MuiToggleButton-root': {
-                    border: 'none',
-                    borderRadius: '9999px',
-                    px: 2,
-                    textTransform: 'none',
-                    fontWeight: 500,
-                    backgroundColor: 'white',
-                  },
-                  '.MuiToggleButton-root.Mui-selected': {
-                    backgroundColor: 'primary.main',
-                    color: 'white',
-                    '&:hover': {
-                      backgroundColor: 'primary.dark',
-                    },
-                  },
-                }}
+                sx={TOGGLE_BUTTON_STYLES}
               >
                 <ToggleButton
                   value="trending"
@@ -102,34 +130,28 @@ const BrowseBlogs: React.FC = () => {
                 </ToggleButton>
               </ToggleButtonGroup>
             </Paper>
+
             <div className="relative flex flex-1 items-center">
               <FiSearch className="left-2 absolute w-5 h-5 text-gray-500 dark:text-gray-400" />
               <Input
                 value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key !== 'Enter' || !searchInput) return;
-                  setSearchQuery(searchInput);
-                  setTab(null);
-                }}
+                onChange={handleSearchInputChange}
+                onKeyDown={handleSearchKeyDown}
                 placeholder="Search"
                 className="bg-mountain-50 dark:bg-mountain-800 shadow-inner pr-8 pl-8 border-gray-200 dark:border-mountain-700 rounded-2xl w-full text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
-              <TiDeleteOutline
-                className={`text-mountain-600 dark:text-mountain-400 hover:text-mountain-700 dark:hover:text-mountain-300 absolute right-2 h-5 w-5 cursor-pointer ${searchInput ? 'block' : 'hidden'
-                  }`}
-                onClick={() => {
-                  setSearchInput('');
-                  setSearchQuery('');
-                  setTab('trending');
-                }}
-              />
+              {searchInput && (
+                <TiDeleteOutline
+                  className="right-2 absolute w-5 h-5 text-mountain-600 hover:text-mountain-700 dark:hover:text-mountain-300 dark:text-mountain-400 cursor-pointer"
+                  onClick={handleClearSearch}
+                />
+              )}
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-4 space-y-8 dark:bg-mountain-950 py-0 pb-24 min-h-screen overflow-auto custom-scrollbar">
           <InfiniteScroll
-            data={allBlogs}
+            data={publishedBlogs}
             isLoading={isLoading}
             isFetchingNextPage={isFetchingNextPage}
             isError={isError}
@@ -137,25 +159,26 @@ const BrowseBlogs: React.FC = () => {
             hasNextPage={!!hasNextPage}
             fetchNextPage={fetchNextPage}
           >
-            <div className="flex flex-col gap-4 overflow-hidden">
-              {allBlogs.map((b) => (
+            <div className="flex flex-col gap-4 py-4 pr-4 overflow-hidden">
+              {publishedBlogs.map((blog) => (
                 <BlogItem
-                  key={b.id}
-                  blogId={String(b.id)}
-                  title={b.title}
-                  // ... rest of your BlogItem props
-                  content={b.content}
-                  thumbnail={b.pictures?.[0] ?? 'https://placehold.co/600x400'}
+                  key={blog.id}
+                  blogId={String(blog.id)}
+                  title={blog.title}
+                  content={blog.content}
+                  thumbnail={
+                    blog.pictures?.[0] ?? 'https://placehold.co/600x400'
+                  }
                   author={{
-                    username: b.user.username,
-                    avatar: b.user.profilePictureUrl ?? '',
+                    username: blog.user.username,
+                    avatar: blog.user.profilePictureUrl ?? '',
                   }}
-                  category={b.categories?.[0]?.name ?? ''}
-                  timeReading={`${Math.ceil((b.content?.split(/\s+/).length ?? 0) / 200)}m reading`}
-                  createdAt={b.createdAt}
-                  likeCount={b.likeCount}
-                  commentCount={b.commentCount}
-                  viewCount={b.viewCount}
+                  category={blog.categories?.[0]?.name ?? ''}
+                  timeReading={calculateReadingTime(blog.content)}
+                  createdAt={blog.createdAt}
+                  likeCount={blog.likeCount}
+                  commentCount={blog.commentCount}
+                  viewCount={blog.viewCount}
                 />
               ))}
             </div>

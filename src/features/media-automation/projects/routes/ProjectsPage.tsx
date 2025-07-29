@@ -98,7 +98,10 @@ const ProjectsPage = () => {
   const combinedError = fetchError || deleteError;
 
   return (
-    <div className="flex flex-col space-y-4 p-4 w-full h-screen">
+    <div
+      className="flex flex-col space-y-4 p-4 w-full h-screen"
+      data-testid="auto-projects"
+    >
       <div className="flex gap-x-12 w-full">
         <div
           onClick={navigateToCreateProject}
@@ -167,8 +170,8 @@ const ProjectsPage = () => {
         onConfirm={handleConfirmDelete}
         title="Delete Project(s)"
         contentText={`Are you sure you want to delete ${projectsToDelete?.length === 1
-            ? 'this project'
-            : `${projectsToDelete?.length || 0} projects`
+          ? 'this project'
+          : `${projectsToDelete?.length || 0} projects`
           }? This action cannot be undone.`}
         isConfirming={isDeleting}
         confirmButtonText="Delete"

@@ -61,6 +61,7 @@ const AutoPostsTable = () => {
   });
 
   const posts = fetchedPostsResponse?.data ?? [];
+  console.log("posts", posts);
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
