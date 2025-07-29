@@ -1,30 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 //Logo src
-import watermark from '/public/app_watermark.png'
+import watermark from '/public/app_watermark.png';
 
 //Components
+import Moveable from 'react-moveable';
+import EditHeader from './components/EditHeader';
+import LayerItem from './components/LayerItem';
 import Panels from './components/panels/Panels';
-import LayerItem from "./components/LayerItem";
-import LayerToolsBar from "./components/tools/LayerToolsBar";
-import EditHeader from "./components/EditHeader";
-import Moveable from "react-moveable";
+import LayerToolsBar from './components/tools/LayerToolsBar';
 
 //Icons
-import { IoCrop } from "react-icons/io5";
-import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
-import { RiText } from "react-icons/ri";
+import { HiOutlineAdjustmentsHorizontal } from 'react-icons/hi2';
+import { IoCrop } from 'react-icons/io5';
+import { RiText } from 'react-icons/ri';
 // import { IoShapesOutline } from "react-icons/io5";
 // import { PiDiamondsFourLight } from "react-icons/pi";
 // import { HiDotsHorizontal } from "react-icons/hi";
-import { MdFlipToFront } from "react-icons/md";
-import { IoIosColorFilter } from "react-icons/io";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from 'lucide-react';
+import { IoIosColorFilter } from 'react-icons/io';
+import { MdFlipToFront } from 'react-icons/md';
 
 //Hooks
-import { useImageStyleHandlers } from "./hooks/useImageStyleHandlers";
-import { useLayerTransformHandlers } from "./hooks/useLayerTransformHandlers";
+import { useImageStyleHandlers } from './hooks/useImageStyleHandlers';
+import { useLayerTransformHandlers } from './hooks/useLayerTransformHandlers';
 import { useTextStyleHandlers } from './hooks/useTextStyleHandlers';
 
 const EditImage: React.FC = () => {
@@ -63,7 +63,7 @@ const EditImage: React.FC = () => {
   const hasAppendedInitialImage = useRef(false);
   const [finalCanvasSize, setFinalCanvasSize] = useState<Canvas>(canvas);
   const [canvasSize, setCanvasSize] = useState<Canvas>(
-    editCanvas || { width: 560, height: 560 }
+    editCanvas || { width: 560, height: 560 },
   );
 
   //Texts
@@ -94,8 +94,8 @@ const EditImage: React.FC = () => {
       height: canvasSize.height,
       width: canvasSize.width,
       zIndex: 0,
-      isLocked: false
-    }
+      isLocked: false,
+    },
   ]);
 
   useEffect(() => {
@@ -105,10 +105,11 @@ const EditImage: React.FC = () => {
     } else setHasChanges(false);
     const base = layers[0];
     const isBase =
-      base.type === "image" &&
-      base.src === "" &&
-      base.zIndex === 0 &&
-      base.backgroundColor === color || '#ffffff';
+      (base.type === 'image' &&
+        base.src === '' &&
+        base.zIndex === 0 &&
+        base.backgroundColor === color) ||
+      '#ffffff';
     setHasChanges(!isBase);
   }, [layers]);
 
@@ -141,7 +142,7 @@ const EditImage: React.FC = () => {
       height: canvasSize.height,
       width: canvasSize.width,
       zIndex: 0,
-      isLocked: false
+      isLocked: false,
     };
     setLayers([baseLayer]);
     setNewDesign(null);
@@ -175,7 +176,7 @@ const EditImage: React.FC = () => {
       height: newEdit.canvas.height,
       width: newEdit.canvas.width,
       zIndex: 0,
-      isLocked: false
+      isLocked: false,
     };
     setLayers([baseLayer]);
     setNewDesign(null);
@@ -185,6 +186,8 @@ const EditImage: React.FC = () => {
     if (!imageUrl || hasAppendedInitialImage.current) return;
     hasAppendedInitialImage.current = true;
     const img = new Image();
+    img.src = `${imageUrl}?t=${new Date().getTime()}`;
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
       const maxWidth = canvasSize.width;
       const maxHeight = canvasSize.height;
@@ -197,12 +200,12 @@ const EditImage: React.FC = () => {
       const scaledHeight = height * scale;
       // Prevent duplicate image layer
       const isAlreadyAdded = layers.some(
-        (layer) => layer.type === "image" && layer.src === imageUrl
+        (layer) => layer.type === 'image' && layer.src === imageUrl,
       );
       if (isAlreadyAdded) return;
       const newImageLayer: ImageLayer = {
         id: crypto.randomUUID(),
-        type: "image",
+        type: 'image',
         name: name,
         src: imageUrl,
         zoom: 1,
@@ -220,11 +223,10 @@ const EditImage: React.FC = () => {
         hue: 0,
         sepia: 0,
         zIndex: 1,
-        isLocked: false
+        isLocked: false,
       };
       setLayers((prev) => [...prev, newImageLayer]);
     };
-    img.src = imageUrl;
   }, [imageUrl, layers, newDesign]);
 
   useEffect(() => {
@@ -286,7 +288,7 @@ const EditImage: React.FC = () => {
     setContrast,
     setSaturation,
     setHue,
-    setSepia
+    setSepia,
   });
 
   const {
@@ -317,7 +319,7 @@ const EditImage: React.FC = () => {
     toggleFlipVertical,
     handleLayerXPosition,
     handleLayerYPosition,
-    handleLockLayer
+    handleLockLayer,
   } = useLayerTransformHandlers({
     layers,
     selectedLayerId,
@@ -330,7 +332,7 @@ const EditImage: React.FC = () => {
     setFlipHorizontal,
     setFlipVertical,
     setXPos,
-    setYPos
+    setYPos,
   });
 
   useEffect(() => {
@@ -358,20 +360,20 @@ const EditImage: React.FC = () => {
     };
   }, [selectedLayerId]);
 
-  const renderToCanvas = (includeWatermark: boolean) => {
-    if (!canvasRef.current) return;
+  const renderToCanvas = (includeWatermark: boolean): Promise<void> => {
+    if (!canvasRef.current) return Promise.resolve();
     const canvas = canvasRef.current;
     canvas.width = canvasSize.width;
     canvas.height = canvasSize.height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return Promise.resolve();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Fill background
     const backgroundLayer = layers.find(
-      (layer): layer is ImageLayer => layer.type === "image"
+      (layer): layer is ImageLayer => layer.type === 'image',
     );
     ctx.save();
-    ctx.fillStyle = backgroundLayer?.backgroundColor || "#ffffff";
+    ctx.fillStyle = backgroundLayer?.backgroundColor || '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
     [...layers]
@@ -419,7 +421,7 @@ const EditImage: React.FC = () => {
               -drawWidth / 2,
               -drawHeight / 2,
               drawWidth,
-              drawHeight
+              drawHeight,
             );
             ctx.restore();
           };
@@ -427,21 +429,20 @@ const EditImage: React.FC = () => {
           ctx.save();
           ctx.translate(layer.x + layer.width / 2, layer.y);
           ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
-          ctx.font = `${layer.fontSize}px ${layer.fontFamily || "sans-serif"}`;
+          ctx.font = `${layer.fontSize}px ${layer.fontFamily || 'sans-serif'}`;
           ctx.fillStyle = layer.color;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
           ctx.globalAlpha = layer.opacity ?? 1;
           ctx.fillText(layer.text, 0, 0);
           ctx.restore();
         }
       });
-    const watermarkLayer: ImageLayer =
-    {
+    const watermarkLayer: ImageLayer = {
       id: crypto.randomUUID(),
-      type: "image",
+      type: 'image',
       src: watermark,
-      name: "Watermark",
+      name: 'Watermark',
       opacity: 0.4,
       zoom: 1,
       flipH: false,
@@ -457,8 +458,8 @@ const EditImage: React.FC = () => {
       x: canvasSize.width - 96,
       y: canvasSize.height - 32,
       zIndex: 9999,
-      isLocked: false
-    }
+      isLocked: false,
+    };
     if (includeWatermark) {
       const img = new Image();
       img.src = watermarkLayer.src;
@@ -470,29 +471,34 @@ const EditImage: React.FC = () => {
           watermarkLayer.x,
           watermarkLayer.y,
           watermarkLayer.width,
-          watermarkLayer.height
+          watermarkLayer.height,
         );
         ctx.restore();
       };
     }
+    return Promise.resolve();
   };
 
-  const handleDownload = (format: "png" | "jpg", fileName: string, includeWaterMark: boolean) => {
+  const handleDownload = (
+    format: 'png' | 'jpg',
+    fileName: string,
+    includeWaterMark: boolean,
+  ) => {
     renderToCanvas(includeWaterMark);
     setTimeout(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const trimmedName = fileName.trim();
-      const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
-      const link = document.createElement("a");
+      const mimeType = format === 'jpg' ? 'image/jpeg' : 'image/png';
+      const link = document.createElement('a');
       link.download = trimmedName;
       link.href = canvas.toDataURL(mimeType);
       link.click();
     }, 300);
   };
 
-  const handleShare = () => {
-    renderToCanvas(true);
+  const handleShare = async () => {
+    await renderToCanvas(true);
     setTimeout(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -501,26 +507,25 @@ const EditImage: React.FC = () => {
         const file = new File([blob], 'canvas-output.png', {
           type: 'image/png',
         });
-        const fileUrl = URL.createObjectURL(file);
-        navigate("/posts/new", {
+        navigate('/posts/new', {
           state: {
-            fromEditorImage: { fileUrl, fileName: file.name },
+            fromEditorImage: file,
           },
         });
       }, 'image/png');
-    }, 300);
+    }, 2000);
   };
 
   return (
-    <div className="group relative flex flex-col w-full h-full">
+    <div className="group relative flex h-full w-full flex-col">
       {/* Floating Button */}
       <button
         aria-label="Collapse Color Picker"
         onClick={() => setFullScreen(!fullScreen)}
-        className={`top-0 left-1/2 z-50 absolute flex justify-center items-center w-10 h-10 transition-all -translate-x-1/2 ${fullScreen ? '' : 'hidden'}`}
+        className={`absolute top-0 left-1/2 z-50 flex h-10 w-10 -translate-x-1/2 items-center justify-center transition-all ${fullScreen ? '' : 'hidden'}`}
       >
-        <div className="-top-4 hover:top-0 relative bg-white opacity-50 hover:opacity-100 p-2 rounded-full transition-all duration-300 ease-in-out cursor-pointer">
-          <ChevronDown className="size-5 text-mountain-950 transition-opacity duration-200" />
+        <div className="relative -top-4 cursor-pointer rounded-full bg-white p-2 opacity-50 transition-all duration-300 ease-in-out hover:top-0 hover:opacity-100">
+          <ChevronDown className="text-mountain-950 size-5 transition-opacity duration-200" />
         </div>
       </button>
       <EditHeader
@@ -533,8 +538,12 @@ const EditImage: React.FC = () => {
         handleShare={handleShare}
         handleDownload={handleDownload}
       />
-      <div className={`flex ${fullScreen ? 'p-0 h-screen' : 'p-4 h-[calc(100vh-4rem)]'}  w-full overflow-hidden`}>
-        <div className={`flex space-y-4 bg-mountain-100 border border-mountain-200 ${fullScreen ? 'rounded-none' : 'rounded-lg'} w-full h-full overflow-y-hidden`}>
+      <div
+        className={`flex ${fullScreen ? 'h-screen p-0' : 'h-[calc(100vh-4rem)] p-4'} w-full overflow-hidden`}
+      >
+        <div
+          className={`bg-mountain-100 border-mountain-200 flex space-y-4 border ${fullScreen ? 'rounded-none' : 'rounded-lg'} h-full w-full overflow-y-hidden`}
+        >
           <LayerToolsBar
             layers={layers}
             zoomLevel={zoomLevel}
@@ -545,8 +554,10 @@ const EditImage: React.FC = () => {
             handleZoomOut={handleZoomOut}
             currentZIndex={globalZIndex}
           />
-          <div onMouseDown={() => setSelectedLayerId(null)}
-            className="relative flex justify-center items-center bg-mountain-200 w-full h-full">
+          <div
+            onMouseDown={() => setSelectedLayerId(null)}
+            className="bg-mountain-200 relative flex h-full w-full items-center justify-center"
+          >
             <div
               ref={imageContainerRef}
               className="relative mx-auto overflow-hidden"
@@ -555,9 +566,9 @@ const EditImage: React.FC = () => {
                 backgroundColor:
                   layers[0].type === 'image'
                     ? layers[0].backgroundColor
-                    : "#ffffff",
+                    : '#ffffff',
                 width: canvasSize.width,
-                height: canvasSize.height
+                height: canvasSize.height,
               }}
             >
               <div
@@ -593,8 +604,10 @@ const EditImage: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="bottom-2 left-2 absolute flex justify-center items-center bg-white opacity-50 rounded-lg w-24 h-8 text-mountain-600 text-sm">
-              <span>{finalCanvasSize.width} x {finalCanvasSize.height}</span>
+            <div className="text-mountain-600 absolute bottom-2 left-2 flex h-8 w-24 items-center justify-center rounded-lg bg-white text-sm opacity-50">
+              <span>
+                {finalCanvasSize.width} x {finalCanvasSize.height}
+              </span>
             </div>
           </div>
           {/* Settings Panel */}
@@ -627,52 +640,54 @@ const EditImage: React.FC = () => {
             handleChangeTextColor={handleChangeTextColor}
           />
           {/* Tools Bar */}
-          <div className={`z-50 relative flex flex-col flex-none space-y-2 bg-white border border-mountain-200 w-20 h-full `}>
+          <div
+            className={`border-mountain-200 relative z-50 flex h-full w-20 flex-none flex-col space-y-2 border bg-white`}
+          >
             <div
               onClick={() =>
                 setActivePanel((prev) =>
                   prev === 'arrange' ? null : 'arrange',
                 )
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <MdFlipToFront className="size-6 text-mountain-600" />
+              <MdFlipToFront className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Arrange</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <IoCrop className="size-6 text-mountain-600" />
+              <IoCrop className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Crop</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <HiOutlineAdjustmentsHorizontal className="size-6 text-mountain-600" />
+              <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Adjust</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <IoIosColorFilter className="size-6 text-mountain-600" />
+              <IoIosColorFilter className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Filter</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'text' ? null : 'text'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <RiText className="size-6 text-mountain-600" />
+              <RiText className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Text</p>
             </div>
             {/* <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">

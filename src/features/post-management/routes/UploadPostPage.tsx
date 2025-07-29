@@ -18,6 +18,7 @@ const UploadPostPage: React.FC = () => {
   const { showSnackbar } = useSnackbar();
   const location = useLocation();
   const selectedPrompt: PromptResult | undefined = location.state?.prompt;
+  const fromEditorImage: File | undefined = location.state?.fromEditorImage;
 
   const [promptId, setPromptId] = useState<number | null>(null);
   const [hasArtNovaImages, setHasArtNovaImages] = useState(false);
@@ -77,6 +78,26 @@ const UploadPostPage: React.FC = () => {
       },
     );
   };
+
+  useEffect(() => {
+    if (!fromEditorImage) return;
+
+    const editedImage = {
+      type: MEDIA_TYPE.IMAGE,
+      url: URL.createObjectURL(fromEditorImage),
+      file: fromEditorImage,
+    };
+    setPostMedias([editedImage]);
+
+    setThumbnail(editedImage);
+    setOriginalThumbnail(editedImage);
+
+    // clear prompt out of history
+    navigate(location.pathname, {
+      replace: true, // swap current entry instead of pushing
+      state: {}, // or `state: null`
+    });
+  }, [location.pathname, navigate, fromEditorImage]);
 
   useEffect(() => {
     if (!selectedPrompt) return;
