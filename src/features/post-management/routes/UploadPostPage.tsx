@@ -92,7 +92,7 @@ const UploadPostPage: React.FC = () => {
     setThumbnail(editedImage);
     setOriginalThumbnail(editedImage);
 
-    // clear prompt out of history
+    // clear all navigation state out of history
     navigate(location.pathname, {
       replace: true, // swap current entry instead of pushing
       state: {}, // or `state: null`
