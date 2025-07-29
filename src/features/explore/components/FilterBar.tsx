@@ -1,7 +1,7 @@
 import { CategoryTypeValues } from '@/constants';
 import { useCategories } from '@/hooks/useCategories';
 import { Category } from '@/types';
-import { Button } from '@mui/material';
+import { Badge, Button } from '@mui/material';
 import { UseQueryResult } from '@tanstack/react-query';
 import { Ellipsis, LoaderPinwheel } from 'lucide-react';
 import { useMemo } from 'react';
@@ -49,6 +49,7 @@ const FilterBar = ({
   };
 
   const isAllChannelsSelected = selectedAttribute === null;
+  const selectedCount = selectedMediums.length;
 
   return (
     <div className="categories-bar flex w-full items-center gap-6">
@@ -111,15 +112,26 @@ const FilterBar = ({
         setIsAi={setIsAi}
       >
         {({ onClick, isLoading }) => (
-          <Button
-            className="dark:bg-mountain-900 dark:text-mountain-50 spread-btn aspect-[1/1] min-w-auto flex-shrink-0 rounded-lg p-2"
-            variant="contained"
-            disableElevation
-            onClick={onClick}
-            disabled={isLoading}
+          <Badge
+            badgeContent={selectedCount}
+            color="primary"
+            overlap="circular"
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            invisible={selectedCount === 0}
           >
-            <BsFilter size={24} />
-          </Button>
+            <Button
+              className="dark:bg-mountain-900 dark:text-mountain-50 spread-btn aspect-[1/1] min-w-auto flex-shrink-0 rounded-lg p-2"
+              variant="contained"
+              disableElevation
+              onClick={onClick}
+              disabled={isLoading}
+            >
+              <BsFilter size={24} />
+            </Button>
+          </Badge>
         )}
       </MediumFilters>
     </div>

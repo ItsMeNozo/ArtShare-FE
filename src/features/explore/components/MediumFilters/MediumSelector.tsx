@@ -76,7 +76,7 @@ export const MediumSelector: React.FC<MediumSelectorProps> = ({
       anchorEl={anchorEl}
       placement={placement}
       transition
-      className="mt-4 mr-4"
+      className="mt-4"
     >
       {({ TransitionProps }) => (
         <Fade {...TransitionProps} timeout={350}>
