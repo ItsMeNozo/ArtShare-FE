@@ -513,7 +513,7 @@ const EditImage: React.FC = () => {
           },
         });
       }, 'image/png');
-    }, 2000);
+    }, 300);
   };
 
   return (
