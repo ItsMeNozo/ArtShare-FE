@@ -1,13 +1,10 @@
 import { BiComment, BiDesktop, BiLike, BiMobile, BiShare } from 'react-icons/bi';
-import { BiComment, BiDesktop, BiLike, BiMobile, BiShare } from 'react-icons/bi';
 import { IoEarthSharp } from 'react-icons/io5';
 import { MdMoreHoriz } from 'react-icons/md';
 import { ExpandablePostContent } from './ExpandTextArea';
 import { useState } from 'react';
 import { Platform } from '@/features/media-automation/projects/types/platform';
 import { format } from 'date-fns';
-
-interface FacebookPostPreviewProps {
 interface FacebookPostPreviewProps {
   content: string;
   images: string[];

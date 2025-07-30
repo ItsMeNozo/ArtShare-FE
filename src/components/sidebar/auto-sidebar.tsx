@@ -163,7 +163,7 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               {
                 icon: IoDocumentTextOutline,
                 label: 'Documentation',
-                href: 'https://artshare-docs.netlify.app/',
+                href: 'https://artshare-docs.vercel.app/',
               },
               {
                 icon: PiVideo,

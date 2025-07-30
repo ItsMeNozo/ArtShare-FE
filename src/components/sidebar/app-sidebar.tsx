@@ -272,7 +272,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand, userRole, onShowUp
               {
                 icon: IoDocumentTextOutline,
                 label: 'Documentation',
-                href: 'https://artshare-docs.netlify.app/',
+                href: 'https://artshare-docs.vercel.app/',
               },
               {
                 icon: PiVideo,
