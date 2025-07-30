@@ -38,7 +38,8 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
   };
 
   const isLastPage = relatedBlogs.length < take;
-  const isFirstPage = skip === 1;
+  const isFirstPage = skip === 1 && relatedBlogs.length > 0;
+  const hasNoPages = relatedBlogs.length === 0;
 
   if (isLoading) {
     return (
@@ -60,7 +61,7 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
     );
   }
 
-  if (relatedBlogs.length === 0 && skip === 0) {
+  if (hasNoPages) {
     return (
       <div className="flex min-h-[300px] w-full flex-col items-center justify-center space-y-8 pt-8">
         <div className="flex w-full items-center justify-center space-x-2 font-medium text-gray-900 dark:text-gray-100">
@@ -81,15 +82,13 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
         <p>Related Blogs</p>
       </div>
       <div className="relative flex w-full max-w-7xl items-center justify-center gap-6 px-4">
-        {!(skip === 0 && isLastPage) && (
-          <button
-            onClick={handlePrevious}
-            disabled={skip === 0 || isFirstPage}
-            className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ArrowLeft className="size-5 text-white" />
-          </button>
-        )}
+        <button
+          onClick={handlePrevious}
+          disabled={isFirstPage || isFetching}
+          className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ArrowLeft className="size-5 text-white" />
+        </button>
 
         <div className="w-full flex-grow">
           <div
@@ -130,22 +129,20 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
             ))}
           </div>
 
-          {isLastPage && skip > 0 && (
+          {isLastPage && (
             <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
               End of results
             </p>
           )}
         </div>
 
-        {!(skip === 0 && isLastPage) && (
-          <button
-            onClick={handleNext}
-            disabled={isLastPage || isFetching}
-            className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ArrowRight className="size-5 text-white" />
-          </button>
-        )}
+        <button
+          onClick={handleNext}
+          disabled={isLastPage || isFetching}
+          className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <ArrowRight className="size-5 text-white" />
+        </button>
       </div>
     </div>
   );
