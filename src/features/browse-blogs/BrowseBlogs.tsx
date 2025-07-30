@@ -13,25 +13,6 @@ import './BrowseBlogs.css';
 import { useFetchBlogs } from './hooks/useFetchBlogs';
 import { BlogTab } from './types';
 
-const TOGGLE_BUTTON_STYLES = {
-  gap: 1,
-  '.MuiToggleButton-root': {
-    border: 'none',
-    borderRadius: '9999px',
-    px: 2,
-    textTransform: 'none',
-    fontWeight: 500,
-    backgroundColor: 'white',
-  },
-  '.MuiToggleButton-root.Mui-selected': {
-    backgroundColor: 'primary.main',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: 'primary.dark',
-    },
-  },
-};
-
 const calculateReadingTime = (content: string): string => {
   const wordCount = content?.split(/\s+/).length ?? 0;
   return `${Math.ceil(wordCount / 200)}m reading`;
@@ -41,6 +22,7 @@ const BrowseBlogs: React.FC = () => {
   const [tab, setTab] = useState<BlogTab | null>('trending');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const token = localStorage.getItem('accessToken');
 
   const {
     data,
@@ -105,7 +87,7 @@ const BrowseBlogs: React.FC = () => {
                 borderRadius: '9999px',
                 gap: 2,
               }}
-              className="bg-mountain-50 dark:bg-mountain-800 w-64"
+              className="bg-mountain-50 dark:bg-mountain-800 max-w-64"
             >
               <ToggleButtonGroup
                 size="small"
@@ -121,13 +103,15 @@ const BrowseBlogs: React.FC = () => {
                   <AiFillFire className="mr-1 size-4 dark:text-mountain-300" />
                   Trending
                 </ToggleButton>
-                <ToggleButton
-                  value="following"
-                  className="border border-mountain-200 w-32 dark:text-gray-300"
-                >
-                  <IoHeartCircleOutline className="mr-1 size-4 dark:text-mountain-300" />
-                  Following
-                </ToggleButton>
+                {token && (
+                  <ToggleButton
+                    value="following"
+                    className="border border-mountain-200 w-32 dark:text-gray-300"
+                  >
+                    <IoHeartCircleOutline className="mr-1 size-4 dark:text-mountain-300" />
+                    Following
+                  </ToggleButton>
+                )}
               </ToggleButtonGroup>
             </Paper>
 
@@ -190,3 +174,22 @@ const BrowseBlogs: React.FC = () => {
 };
 
 export default memo(BrowseBlogs);
+
+const TOGGLE_BUTTON_STYLES = {
+  gap: 1,
+  '.MuiToggleButton-root': {
+    border: 'none',
+    borderRadius: '9999px',
+    px: 2,
+    textTransform: 'none',
+    fontWeight: 500,
+    backgroundColor: 'white',
+  },
+  '.MuiToggleButton-root.Mui-selected': {
+    backgroundColor: 'primary.main',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: 'primary.dark',
+    },
+  },
+};

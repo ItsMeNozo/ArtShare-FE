@@ -1,7 +1,7 @@
 import { CategoryTypeValues } from '@/constants';
 import { useCategories } from '@/hooks/useCategories';
-import { Badge, Box, ClickAwayListener } from '@mui/material';
-import { memo, useState } from 'react';
+import { Box, ClickAwayListener } from '@mui/material';
+import { memo, useEffect, useState } from 'react';
 import { MediumSelector } from './MediumSelector';
 
 interface MediumFiltersProps {
@@ -13,6 +13,7 @@ interface MediumFiltersProps {
     onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     isLoading: boolean;
   }) => React.ReactElement;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 const MediumFilters = ({
@@ -21,6 +22,7 @@ const MediumFilters = ({
   isAi,
   setIsAi,
   children,
+  onOpenChange,
 }: MediumFiltersProps) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -28,6 +30,10 @@ const MediumFilters = ({
   const { data: MediumCategories = [], isLoading } = useCategories({
     type: CategoryTypeValues.MEDIUM,
   });
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
 
   const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -39,26 +45,13 @@ const MediumFilters = ({
     setAnchorEl(null);
   };
 
-  const selectedCount = selectedMediums.length;
-
   return (
     <ClickAwayListener onClickAway={handleClose}>
       <Box>
-        <Badge
-          badgeContent={selectedCount}
-          color="primary"
-          overlap="circular"
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          invisible={selectedCount === 0}
-        >
-          {children({
-            onClick: handleToggle,
-            isLoading: isLoading,
-          })}
-        </Badge>
+        {children({
+          onClick: handleToggle,
+          isLoading: isLoading,
+        })}
         <MediumSelector
           open={open}
           onClose={() => setOpen(false)}

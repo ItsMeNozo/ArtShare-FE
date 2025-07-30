@@ -40,7 +40,7 @@ const Dashboard = () => {
             </div>
             <Link to="updates" className="flex justify-center items-center space-x-2 bg-gradient-to-r from-indigo-100 to-purple-50 hover:brightness-105 p-4 border border-mountain-200 rounded-xl w-40 text-mountain-950 hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
               <IoNewspaperOutline />
-              <p className="font-thin select-none">What's news</p>
+              <p className="font-thin select-none">What's new</p>
             </Link>
           </div>
         </div>
