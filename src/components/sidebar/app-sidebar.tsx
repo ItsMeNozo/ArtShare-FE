@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 //Assets
 import app_logo from '/logo_app_v_101.png';
@@ -25,12 +25,19 @@ import { PiVideo } from 'react-icons/pi';
 type SidebarProps = {
   expand: boolean;
   setExpand: Dispatch<SetStateAction<boolean>>;
+  userRole: string | null;
+  onShowUpgradeModal: () => void;
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  expand,
+  setExpand,
+  userRole,
+  onShowUpgradeModal,
+}) => {
   const location = useLocation();
   const pathname = location.pathname;
-
+  const navigate = useNavigate();
   return (
     <aside
       className={`${expand ? 'w-60' : 'w-16'} xs:flex dark:bg-mountain-950 dark:border-r-mountain-700 sticky top-0 z-20 h-screen flex-none flex-shrink-0 flex-col justify-between overflow-hidden transition-all duration-500 ease-in-out`}
@@ -238,11 +245,15 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                   arrow
                   disableHoverListener={expand}
                 >
-                  <Link
-                    to={item.href}
-                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center justify-between rounded-md px-3.5 text-[15px] ${
-                      isActive ? 'text-white' : 'text-mountain-900'
-                    } `}
+                  <div
+                    onClick={() => {
+                      if (userRole === 'free' && userRole !== null) {
+                        onShowUpgradeModal();
+                      } else {
+                        navigate(item.href);
+                      }
+                    }}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center justify-between rounded-md px-3.5 text-[15px] ${isActive ? 'text-white' : 'text-mountain-900'} `}
                     style={
                       isActive
                         ? {
@@ -269,7 +280,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                     >
                       Pro
                     </p>
-                  </Link>
+                  </div>
                 </Tooltip>
               );
             })}
@@ -284,7 +295,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               {
                 icon: IoDocumentTextOutline,
                 label: 'Documentation',
-                href: 'https://artshare-docs.netlify.app/',
+                href: 'https://artshare-docs.vercel.app/',
               },
               {
                 icon: PiVideo,

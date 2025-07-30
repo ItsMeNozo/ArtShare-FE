@@ -7,7 +7,6 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { loading, isAuthenticated } = useUser();
-
   if (loading) return <Loading />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 

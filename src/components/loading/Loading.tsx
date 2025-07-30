@@ -12,11 +12,11 @@ const Loading = () => {
   }, []);
 
   return (
-    <div className="flex h-screen w-full items-center justify-center">
+    <div className="flex justify-center items-center w-full h-screen">
       <Lottie
         animationData={loading_anim}
         loop={true}
-        className="h-80 w-80"
+        className="w-48 h-48"
         lottieRef={lottieRef}
       />
     </div>

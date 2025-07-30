@@ -27,6 +27,7 @@ const SocialLinksPage = () => {
     useFetchPlatforms(selectedPlatform);
   const { data: fbAccountInfo, isLoading: isLoadingFbAccountInfo } =
     useFacebookAccountInfo();
+
   const { mutate: disconnect } = useDisconnectPlatform();
   const { initiateFacebookConnection, isLoading: isConnecting } =
     useFacebookAuth({
@@ -67,9 +68,9 @@ const SocialLinksPage = () => {
           fbAccountInfo[0].pictureUrl || 'https://i.pravatar.cc/150',
       }
       : null;
-
+  console.log('platforms', platforms);
   const facebookPages = platforms?.filter((p) => p.name === 'FACEBOOK') ?? [];
-
+  console.log('facebookPages', facebookPages);
   const getPlatformIcon = (platformName: string) => {
     switch (platformName.toLowerCase()) {
       case 'facebook':

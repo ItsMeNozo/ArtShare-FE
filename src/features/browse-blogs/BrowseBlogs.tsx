@@ -74,9 +74,9 @@ const BrowseBlogs: React.FC = () => {
   );
 
   return (
-    <div className="dark:bg-mountain-950 flex h-screen overflow-hidden rounded-t-3xl">
-      <div className="flex min-h-screen flex-1 flex-col">
-        <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 sticky top-0 z-30 border-b-1 bg-white p-4 shadow-sm">
+    <div className="flex dark:bg-mountain-950 rounded-t-3xl h-screen overflow-hidden">
+      <div className="flex flex-col flex-1 min-h-screen">
+        <div className="top-0 z-30 sticky bg-white dark:bg-mountain-900 shadow-sm p-4 border-mountain-200 dark:border-mountain-700 border-b-1">
           <div className="flex items-center space-x-4">
             <Paper
               elevation={0}
@@ -98,17 +98,17 @@ const BrowseBlogs: React.FC = () => {
               >
                 <ToggleButton
                   value="trending"
-                  className="border-mountain-200 w-32 border dark:text-gray-300"
+                  className="border border-mountain-200 w-32 dark:text-gray-300"
                 >
-                  <AiFillFire className="dark:text-mountain-300 mr-1 size-4" />
+                  <AiFillFire className="mr-1 size-4 dark:text-mountain-300" />
                   Trending
                 </ToggleButton>
                 {token && (
                   <ToggleButton
                     value="following"
-                    className="border-mountain-200 w-32 border dark:text-gray-300"
+                    className="border border-mountain-200 w-32 dark:text-gray-300"
                   >
-                    <IoHeartCircleOutline className="dark:text-mountain-300 mr-1 size-4" />
+                    <IoHeartCircleOutline className="mr-1 size-4 dark:text-mountain-300" />
                     Following
                   </ToggleButton>
                 )}
@@ -116,25 +116,24 @@ const BrowseBlogs: React.FC = () => {
             </Paper>
 
             <div className="relative flex flex-1 items-center">
-              <FiSearch className="absolute left-2 h-5 w-5 text-gray-500 dark:text-gray-400" />
+              <FiSearch className="left-2 absolute w-5 h-5 text-gray-500 dark:text-gray-400" />
               <Input
                 value={searchInput}
                 onChange={handleSearchInputChange}
                 onKeyDown={handleSearchKeyDown}
                 placeholder="Search"
-                className="bg-mountain-50 dark:bg-mountain-800 dark:border-mountain-700 w-full rounded-2xl border-gray-200 pr-8 pl-8 text-gray-900 placeholder-gray-500 shadow-inner dark:text-gray-100 dark:placeholder-gray-400"
+                className="bg-mountain-50 dark:bg-mountain-800 shadow-inner pr-8 pl-8 border-gray-200 dark:border-mountain-700 rounded-2xl w-full text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               {searchInput && (
                 <TiDeleteOutline
-                  className="text-mountain-600 dark:text-mountain-400 hover:text-mountain-700 dark:hover:text-mountain-300 absolute right-2 h-5 w-5 cursor-pointer"
+                  className="right-2 absolute w-5 h-5 text-mountain-600 hover:text-mountain-700 dark:hover:text-mountain-300 dark:text-mountain-400 cursor-pointer"
                   onClick={handleClearSearch}
                 />
               )}
             </div>
           </div>
         </div>
-
-        <div className="dark:bg-mountain-950 sidebar flex min-h-screen flex-col gap-4 space-y-8 overflow-auto py-0 pb-24 pl-4">
+        <div className="flex flex-col gap-4 space-y-8 dark:bg-mountain-950 py-0 pb-24 min-h-screen overflow-auto custom-scrollbar">
           <InfiniteScroll
             data={publishedBlogs}
             isLoading={isLoading}
@@ -144,7 +143,7 @@ const BrowseBlogs: React.FC = () => {
             hasNextPage={!!hasNextPage}
             fetchNextPage={fetchNextPage}
           >
-            <div className="flex flex-col gap-4 overflow-hidden py-4 pr-4">
+            <div className="flex flex-col gap-4 py-4 pr-4 overflow-hidden">
               {publishedBlogs.map((blog) => (
                 <BlogItem
                   key={blog.id}

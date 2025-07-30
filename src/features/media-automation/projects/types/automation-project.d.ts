@@ -53,6 +53,7 @@ type PostStatus = 'draft' | 'scheduled' | 'posted' | 'canceled';
 
 type AutoPost = {
   id: number;
+  platformPostId?: string;
   content: string;
   imageUrl?: string[];
   status: PostStatus;

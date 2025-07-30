@@ -253,20 +253,20 @@ export default function PostMediaManager({
     postMedias.filter((media) => media.type === MEDIA_TYPE.VIDEO).length > 0;
 
   return (
-    <Box className="dark:bg-mountain-900 flex h-full w-[60%] flex-col items-start rounded-md text-gray-900 dark:text-white">
+    <Box className="flex flex-col items-start dark:bg-mountain-900 rounded-md w-[60%] h-full text-gray-900 dark:text-white">
       {/* Tabs */}
-      <div className="border-mountain-200 z-20 mb-3 flex w-full gap-x-1 rounded-full border bg-white p-1.25">
+      <div className="z-20 flex gap-x-1 bg-white mb-3 p-1.25 border border-mountain-200 rounded-full w-full">
         <MediaUploadTab
           isActive={tabValue === TabValue.UPLOAD_MEDIA}
           onClick={() => handleTabChange(TabValue.UPLOAD_MEDIA)}
-          icon={<TbDeviceDesktop className="mr-0.5 h-5 w-5" />}
+          icon={<TbDeviceDesktop className="mr-0.5 w-5 h-5" />}
           label="Upload from Device"
           examples="(images, video)"
         />
         <MediaUploadTab
           isActive={tabValue === TabValue.BROWSE_GENAI}
           onClick={() => handleTabChange(TabValue.BROWSE_GENAI)}
-          icon={<RiImageCircleAiLine className="mr-2 h-5 w-5 text-sm" />}
+          icon={<RiImageCircleAiLine className="mr-2 w-5 h-5 text-sm" />}
           label="Post My AI Images"
           examples=""
         />
@@ -289,7 +289,7 @@ export default function PostMediaManager({
               }}
             >
               <Box
-                className="absolute top-2 z-50 mb-2 flex w-full items-center justify-between space-x-2 rounded-lg p-1 px-2"
+                className="top-2 z-50 absolute flex justify-between items-center space-x-2 mb-2 p-1 px-2 rounded-lg w-full"
                 sx={{ flexShrink: 0 }}
               >
                 <InfoMediaRemaining
@@ -318,7 +318,7 @@ export default function PostMediaManager({
                   justifyContent: 'center',
                   overflow: 'hidden',
                 }}
-                className="bg-mountain-100/80 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
+                className="flex flex-col justify-center items-center bg-mountain-100/80 border border-gray-500 border-dashed rounded-lg w-full h-full"
               >
                 {selectedPreviewMedia ? (
                   <MediaPreviewer media={selectedPreviewMedia} />
@@ -333,7 +333,7 @@ export default function PostMediaManager({
               </Box>
               {/* Carousel */}
               <Box
-                className="custom-scrollbar flex h-fit space-x-2 pt-3"
+                className="flex space-x-2 pt-3 h-fit custom-scrollbar"
                 sx={{
                   flexShrink: 0,
                 }}
@@ -341,7 +341,7 @@ export default function PostMediaManager({
                 {postMedias.map((media, i) => (
                   <Box
                     key={i}
-                    className="bounce-item relative cursor-pointer rounded-md border-1"
+                    className="relative border-1 rounded-md cursor-pointer bounce-item"
                     sx={{
                       borderColor:
                         selectedPreviewMedia?.file === media.file
@@ -365,10 +365,10 @@ export default function PostMediaManager({
                         handleRemoveMediaPreview(media);
                       }}
                       size="small"
-                      className="group absolute -top-2 -right-2 bg-gray-600 opacity-60 hover:bg-gray-400"
+                      className="group -top-2 -right-2 absolute bg-gray-600 hover:bg-gray-400 opacity-60"
                     >
                       <MdClose
-                        className="text-sm text-white group-hover:text-black"
+                        className="text-white group-hover:text-black text-sm"
                         size={16}
                       />
                     </IconButton>
@@ -389,7 +389,7 @@ export default function PostMediaManager({
         }}
       </AutoSizer>
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="flex w-108 flex-col">
+        <DialogContent className="flex flex-col w-108">
           <DialogHeader>
             <DialogTitle>Change Tab Confirmation</DialogTitle>
             <DialogDescription>
@@ -404,7 +404,7 @@ export default function PostMediaManager({
               Cancel
             </Button>
             <Button
-              className="text-mountain-50 bg-red-700 hover:bg-red-700/80"
+              className="bg-red-700 hover:bg-red-700/80 text-mountain-50"
               onClick={() => {
                 setPostMedias([]);
                 setTabValue(pendingTab!);
@@ -420,7 +420,7 @@ export default function PostMediaManager({
         </DialogContent>
       </Dialog>
       <Dialog open={matureDialogOpen} onOpenChange={setMatureDialogOpen}>
-        <DialogContent className="flex w-108 flex-col">
+        <DialogContent className="flex flex-col w-108">
           <DialogHeader>
             <DialogTitle>Mature content detected</DialogTitle>
             <DialogDescription>

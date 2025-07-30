@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { RiSettingsLine } from "react-icons/ri"
 import changelog from './changelog.json'
 import { PiStarFourFill } from "react-icons/pi";
@@ -10,10 +11,29 @@ function formatDate(dateStr: string) {
   });
 }
 
+const CloudinaryImageWithSkeleton = ({ src, alt }: { src: string; alt?: string }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="relative w-144 h-auto">
+      {!loaded && (
+        <div className="top-0 left-0 absolute bg-gray-200 rounded-xl w-full h-full animate-pulse" />
+      )}
+      <img
+        src={src}
+        alt={alt || ''}
+        onLoad={() => setLoaded(true)}
+        className={`rounded-xl shadow-md w-full h-fit object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'
+          }`}
+      />
+    </div>
+  );
+};
+
+
 const Updates = () => {
   return (
-    <div className="flex flex-col items-center space-y-8 py-16 h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
-      <div className="flex flex-col justify-center items-center space-y-2 bg-gradient-to-r from-indigo-100 via-white to-purple-100 shadow-md p-2 px-12 rounded-full shrink-0">
+    <div className="flex flex-col items-center space-y-8 rounded-t-3xl h-[calc(100vh-4rem)] overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col justify-center items-center space-y-1.5 bg-gradient-to-r from-indigo-50 via-white to-purple-50 shadow-md px-12 w-full h-24 shrink-0">
         <p className="font-medium text-2xl">Latest Updates</p>
         <span className="text-mountain-600 text-sm">Discover the latest platform enhancements and announcements</span>
       </div>
@@ -46,12 +66,7 @@ const Updates = () => {
             <div key={entry.id} className="flex flex-col space-y-4 min-h-180 last:min-h-0">
               {entry.media?.map((media) =>
                 media.type === 'image' ? (
-                  <img
-                    key={media.url}
-                    src={media.url}
-                    alt=""
-                    className="shadow-md rounded-xl w-144 h-fit object-cover"
-                  />
+                  <CloudinaryImageWithSkeleton key={media.url} src={media.url} />
                 ) : null
               )}
               <div className="flex flex-col justify-center items-start bg-white shadow-md p-4 rounded-lg w-144">
