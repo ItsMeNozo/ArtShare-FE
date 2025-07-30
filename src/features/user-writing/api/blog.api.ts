@@ -4,6 +4,7 @@
 
 import api from '@/api/baseApi';
 import { Blog } from '@/types/blog'; // Assuming BlogUser and BlogCategory are part of your main Blog type or defined in @/types/blog
+import { RequestOptions } from 'https';
 
 // --- Functions that were NOT duplicates and might still be needed ---
 
@@ -54,15 +55,25 @@ export interface UpdateBlogPayload {
 export const updateExistingBlog = async (
   blogId: string | number,
   blogData: UpdateBlogPayload,
+  options?: RequestOptions,
 ): Promise<Blog> => {
   // Assuming backend returns something mappable to Blog or directly Blog
   try {
     // Similar to createNewBlog, if backend returns a specific DTO, map it.
-    const response = await api.patch<Blog>(`/blogs/${blogId}`, blogData); // Or BackendBlogDetailsDto then map
+    const response = await api.patch<Blog>(`/blogs/${blogId}`, blogData, {
+      signal: options?.signal,
+    }); // Or BackendBlogDetailsDto then map
     // If mapping is needed: return mapBackendDetailsToFrontendBlog(response.data);
     return response.data;
-  } catch (error) {
-    console.error(`Error updating blog with ID ${blogId}:`, error);
+  } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'name' in error &&
+      (error as { name?: string }).name !== 'CanceledError'
+    ) {
+      console.error('Error updating blog with ID', blogId, ':', error);
+    }
     throw error;
   }
 };

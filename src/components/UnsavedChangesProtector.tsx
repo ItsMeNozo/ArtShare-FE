@@ -5,6 +5,10 @@ import { UnsavedChangesModal } from './UnsavedChangesModal';
 interface UnsavedChangesProtectorProps {
   /** A boolean indicating if there are unsaved changes that should block navigation. */
   isDirty: boolean;
+  /** Optional callback to notify parent when dialog state changes */
+  onDialogStateChange?: (isOpen: boolean) => void;
+  /** Called when user presses Stay (closes modal) */
+  onStay?: () => void;
 }
 
 /**
@@ -14,6 +18,8 @@ interface UnsavedChangesProtectorProps {
  */
 export const UnsavedChangesProtector = ({
   isDirty,
+  onDialogStateChange,
+  onStay,
 }: UnsavedChangesProtectorProps) => {
   const [showModal, setShowModal] = useState(false);
 
@@ -39,23 +45,40 @@ export const UnsavedChangesProtector = ({
     }
   }, [blocker.state]);
 
+  // Notify parent when modal state changes
+  useEffect(() => {
+    onDialogStateChange?.(showModal);
+  }, [showModal, onDialogStateChange]);
+
   // Handler for Browser-Native Navigation (unload/refresh/close)
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (isDirty) {
+        onDialogStateChange?.(true);
         event.preventDefault();
       }
     };
+
+    const handleUnload = () => {
+      onDialogStateChange?.(false);
+    };
+
     window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('unload', handleUnload);
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('unload', handleUnload);
     };
-  }, [isDirty]);
+  }, [isDirty, onDialogStateChange]);
 
   const handleCloseModal = () => {
     setShowModal(false);
     if (blocker.state === 'blocked') {
       blocker.reset();
+    }
+    if (typeof onStay === 'function') {
+      onStay();
     }
   };
 

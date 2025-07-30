@@ -33,7 +33,7 @@ import {
 } from '@tiptap/pm/model';
 import { EditorView } from '@tiptap/pm/view';
 import { EditorContent, useEditor } from '@tiptap/react';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import ImageResize from 'tiptap-extension-resize-image';
 import { FontSizeExtension } from '../extensions/font-size';
 import { LineHeightExtension } from '../extensions/line-height';
@@ -42,6 +42,7 @@ import './Editor.css';
 
 interface EditorProps {
   onChange?: () => void;
+  setHasUnsavedChanges?: (value: boolean) => void;
 }
 
 export type EditorHandle = {
@@ -56,15 +57,9 @@ const CustomImage = Image.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      src: {
-        default: null,
-      },
-      alt: {
-        default: null,
-      },
-      title: {
-        default: null,
-      },
+      src: { default: null },
+      alt: { default: null },
+      title: { default: null },
       width: {
         default: null,
         parseHTML: (element) => element.getAttribute('width'),
@@ -125,11 +120,8 @@ const CustomImage = Image.extend({
   },
 });
 
-// ...existing helper functions remain the same...
 const getMarkRange = ($pos?: ResolvedPos, type?: MarkType) => {
-  if (!$pos || !type) {
-    return false;
-  }
+  if (!$pos || !type) return false;
 
   const nodeBefore = $pos.nodeBefore;
   const nodeAfter = $pos.nodeAfter;
@@ -139,8 +131,6 @@ const getMarkRange = ($pos?: ResolvedPos, type?: MarkType) => {
   if ($pos.parent.isTextblock && $pos.depth > 0) {
     if ($pos.textOffset > 0) {
       targetNode = $pos.parent.child($pos.index());
-      targetNodePos =
-        $pos.start() + $pos.parent.child($pos.index()).attrs.offset;
       targetNodePos = $pos.pos - $pos.textOffset;
     } else if ($pos.index() > 0 && $pos.parent.child($pos.index() - 1).isText) {
       targetNode = $pos.parent.child($pos.index() - 1);
@@ -197,9 +187,7 @@ const getMarkRange = ($pos?: ResolvedPos, type?: MarkType) => {
   }
 
   const mark = targetNode.marks.find((m) => m.type === type);
-  if (!mark) {
-    return false;
-  }
+  if (!mark) return false;
 
   const currentPos = targetNodePos;
   let from = currentPos;
@@ -240,11 +228,7 @@ const getMarkRange = ($pos?: ResolvedPos, type?: MarkType) => {
     }
   }
 
-  return {
-    from,
-    to,
-    mark,
-  };
+  return { from, to, mark };
 };
 
 const findLinkRange = (doc: ProseMirrorNode, pos: number, linkMark: Mark) => {
@@ -297,7 +281,6 @@ interface LinkModalProps {
   position: { x: number; y: number };
 }
 
-// Link Edit Modal Component with dark mode
 const LinkEditModal = ({
   isOpen,
   onClose,
@@ -357,292 +340,337 @@ const LinkEditModal = ({
   );
 };
 
-const Editor = forwardRef<EditorHandle, EditorProps>(({ onChange }, ref) => {
-  const { setEditor } = useEditorStore();
-  const [linkModal, setLinkModal] = useState<{
-    isOpen: boolean;
-    url: string;
-    position: { x: number; y: number };
-    linkRange: LinkRange | null;
-    view: EditorView | null;
-  }>({
-    isOpen: false,
-    url: '',
-    position: { x: 0, y: 0 },
-    linkRange: null,
-    view: null,
-  });
+const Editor = forwardRef<EditorHandle, EditorProps>(
+  ({ onChange, setHasUnsavedChanges }, ref) => {
+    const { setEditor } = useEditorStore();
+    const isSettingContentRef = useRef(false);
+    const lastSetContentRef = useRef<string>('');
+    const initializationCompleteRef = useRef(false);
+    const [linkModal, setLinkModal] = useState<{
+      isOpen: boolean;
+      url: string;
+      position: { x: number; y: number };
+      linkRange: LinkRange | null;
+      view: EditorView | null;
+    }>({
+      isOpen: false,
+      url: '',
+      position: { x: 0, y: 0 },
+      linkRange: null,
+      view: null,
+    });
 
-  const editor = useEditor(
-    {
-      immediatelyRender: true,
-      editable: true,
-      content: '',
-      extensions: [
-        Bold,
-        BulletList,
-        Color,
-        Document,
-        FontFamily,
-        FontSizeExtension,
-        Gapcursor,
-        Heading.configure({ levels: [1, 2, 3] }),
-        Highlight.configure({ multicolor: true }),
-        History,
-        ListItem,
-        LineHeightExtension.configure({
-          types: ['heading', 'paragraph'],
-          defaultLineHeight: 'normal',
-        }),
-        Paragraph,
-        Italic,
-        // Use custom image instead of regular Image
-        CustomImage,
-        // Configure ImageResize with better attribute handling
-        ImageResize.configure({
-          inline: false,
-          allowBase64: true,
-        }),
-        Table.configure({ resizable: true }),
-        TableRow,
-        TableHeader,
-        TableCell,
-        TaskList,
-        TaskItem.configure({ nested: true }),
-        Text,
-        // Include 'image' in TextAlign types to support image alignment
-        TextAlign.configure({
-          types: ['heading', 'paragraph', 'image'],
-          alignments: ['left', 'center', 'right', 'justify'],
-          defaultAlignment: 'left',
-        }),
-        TextStyle,
-        Underline,
-        OrderedList,
-        Placeholder.configure({ placeholder: 'Write something …' }),
-        Youtube.configure({
-          inline: true,
-          controls: true,
-          allowFullscreen: true,
-        }),
-        Link.configure({
-          openOnClick: false,
-          autolink: true,
-          HTMLAttributes: {
-            target: '_blank',
-            rel: 'noopener noreferrer',
+    const editor = useEditor(
+      {
+        immediatelyRender: true,
+        editable: true,
+        content: '',
+        extensions: [
+          Bold,
+          BulletList,
+          Color,
+          Document,
+          FontFamily,
+          FontSizeExtension,
+          Gapcursor,
+          Heading.configure({ levels: [1, 2, 3] }),
+          Highlight.configure({ multicolor: true }),
+          History,
+          ListItem,
+          LineHeightExtension.configure({
+            types: ['heading', 'paragraph'],
+            defaultLineHeight: 'normal',
+          }),
+          Paragraph,
+          Italic,
+          CustomImage,
+          ImageResize.configure({
+            inline: false,
+            allowBase64: true,
+          }),
+          Table.configure({ resizable: true }),
+          TableRow,
+          TableHeader,
+          TableCell,
+          TaskList,
+          TaskItem.configure({ nested: true }),
+          Text,
+          TextAlign.configure({
+            types: ['heading', 'paragraph', 'image'],
+            alignments: ['left', 'center', 'right', 'justify'],
+            defaultAlignment: 'left',
+          }),
+          TextStyle,
+          Underline,
+          OrderedList,
+          Placeholder.configure({ placeholder: 'Write something …' }),
+          Youtube.configure({
+            inline: true,
+            controls: true,
+            allowFullscreen: true,
+          }),
+          Link.configure({
+            openOnClick: false,
+            autolink: true,
+            HTMLAttributes: {
+              target: '_blank',
+              rel: 'noopener noreferrer',
+            },
+          }),
+        ],
+        editorProps: {
+          attributes: {
+            class: `focus:outline-none print:border-0 bg-white dark:bg-mountain-800 border border-[#C7C7C7] dark:border-mountain-600 flex flex-col min-h-full w-[816px] cursor-text reset-tailwind p-10 text-gray-900 dark:text-gray-100`,
+            style: 'all:revert;',
           },
-        }),
-      ],
-      editorProps: {
-        attributes: {
-          class: `focus:outline-none print:border-0 bg-white dark:bg-mountain-800 border border-[#C7C7C7] dark:border-mountain-600 flex flex-col min-h-full w-[816px] cursor-text reset-tailwind p-10 text-gray-900 dark:text-gray-100`,
-          style: 'all:revert;',
-        },
-        handleClick: (view, pos, event) => {
-          const { schema, doc } = view.state;
-          const range = doc.resolve(pos);
-          const link = range
-            .marks()
-            .find((mark) => mark.type === schema.marks.link);
-
-          if (link && (event.ctrlKey || event.metaKey)) {
-            event.preventDefault();
-            window.open(link.attrs.href, '_blank', 'noopener,noreferrer');
-            return true;
-          }
-          return false;
-        },
-        handleDOMEvents: {
-          contextmenu: (view, event) => {
+          handleClick: (view, pos, event) => {
             const { schema, doc } = view.state;
-            const pos = view.posAtCoords({
-              left: event.clientX,
-              top: event.clientY,
-            });
-            if (!pos) return false;
-
-            const range = doc.resolve(pos.pos);
+            const range = doc.resolve(pos);
             const link = range
               .marks()
               .find((mark) => mark.type === schema.marks.link);
 
-            if (link) {
+            if (link && (event.ctrlKey || event.metaKey)) {
               event.preventDefault();
-
-              const contextMenu = document.createElement('div');
-              // Check if dark mode is active
-              const isDarkMode =
-                document.documentElement.classList.contains('dark');
-              contextMenu.className = isDarkMode
-                ? 'fixed bg-mountain-800 border border-mountain-600 rounded-md shadow-lg p-1 z-50'
-                : 'fixed bg-white border border-gray-200 rounded-md shadow-lg p-1 z-50';
-              contextMenu.style.left = `${event.clientX}px`;
-              contextMenu.style.top = `${event.clientY}px`;
-
-              // Open Link option
-              const openButton = document.createElement('button');
-              openButton.className = isDarkMode
-                ? 'block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-mountain-700 rounded'
-                : 'block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded';
-              openButton.innerHTML = '🔗 Open Link';
-              openButton.onclick = () => {
-                window.open(link.attrs.href, '_blank', 'noopener,noreferrer');
-                document.body.removeChild(contextMenu);
-              };
-
-              // Edit Link option
-              const editButton = document.createElement('button');
-              editButton.className = isDarkMode
-                ? 'block w-full text-left px-3 py-2 text-sm hover:bg-blue-800/30 text-blue-400 rounded'
-                : 'block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue-600 rounded';
-              editButton.innerHTML = '✏️ Edit Link';
-              editButton.onclick = () => {
-                const linkRange = findLinkRange(doc, pos.pos, link);
-                setLinkModal({
-                  isOpen: true,
-                  url: link.attrs.href,
-                  position: { x: event.clientX, y: event.clientY },
-                  linkRange,
-                  view,
-                });
-                document.body.removeChild(contextMenu);
-              };
-
-              // Remove Link option
-              const unlinkButton = document.createElement('button');
-              unlinkButton.className = isDarkMode
-                ? 'block w-full text-left px-3 py-2 text-sm hover:bg-red-800/30 text-red-400 rounded'
-                : 'block w-full text-left px-3 py-2 text-sm hover:bg-red-50 text-red-600 rounded';
-              unlinkButton.innerHTML = '🔓 Remove Link';
-              unlinkButton.onclick = () => {
-                const $pos = view.state.doc.resolve(pos.pos);
-                const markRange = getMarkRange($pos, schema.marks.link);
-
-                if (markRange) {
-                  const tr = view.state.tr.removeMark(
-                    markRange.from,
-                    markRange.to,
-                    schema.marks.link,
-                  );
-                  view.dispatch(tr);
-                } else {
-                  view.dispatch(
-                    view.state.tr.removeMark(
-                      pos.pos,
-                      pos.pos + 1,
-                      schema.marks.link,
-                    ),
-                  );
-                }
-
-                document.body.removeChild(contextMenu);
-              };
-
-              contextMenu.appendChild(openButton);
-              contextMenu.appendChild(editButton);
-              contextMenu.appendChild(unlinkButton);
-              document.body.appendChild(contextMenu);
-
-              const removeMenu = () => {
-                if (document.body.contains(contextMenu)) {
-                  document.body.removeChild(contextMenu);
-                }
-                document.removeEventListener('click', removeMenu);
-              };
-              setTimeout(
-                () => document.addEventListener('click', removeMenu),
-                0,
-              );
-
+              window.open(link.attrs.href, '_blank', 'noopener,noreferrer');
               return true;
             }
             return false;
           },
+          handleDOMEvents: {
+            contextmenu: (view, event) => {
+              const { schema, doc } = view.state;
+              const pos = view.posAtCoords({
+                left: event.clientX,
+                top: event.clientY,
+              });
+              if (!pos) return false;
+
+              const range = doc.resolve(pos.pos);
+              const link = range
+                .marks()
+                .find((mark) => mark.type === schema.marks.link);
+
+              if (link) {
+                event.preventDefault();
+
+                const contextMenu = document.createElement('div');
+                const isDarkMode =
+                  document.documentElement.classList.contains('dark');
+                contextMenu.className = isDarkMode
+                  ? 'fixed bg-mountain-800 border border-mountain-600 rounded-md shadow-lg p-1 z-50'
+                  : 'fixed bg-white border border-gray-200 rounded-md shadow-lg p-1 z-50';
+                contextMenu.style.left = `${event.clientX}px`;
+                contextMenu.style.top = `${event.clientY}px`;
+
+                const openButton = document.createElement('button');
+                openButton.className = isDarkMode
+                  ? 'block w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-mountain-700 rounded'
+                  : 'block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded';
+                openButton.innerHTML = '🔗 Open Link';
+                openButton.onclick = () => {
+                  window.open(link.attrs.href, '_blank', 'noopener,noreferrer');
+                  document.body.removeChild(contextMenu);
+                };
+
+                const editButton = document.createElement('button');
+                editButton.className = isDarkMode
+                  ? 'block w-full text-left px-3 py-2 text-sm hover:bg-blue-800/30 text-blue-400 rounded'
+                  : 'block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 text-blue-600 rounded';
+                editButton.innerHTML = '✏️ Edit Link';
+                editButton.onclick = () => {
+                  const linkRange = findLinkRange(doc, pos.pos, link);
+                  setLinkModal({
+                    isOpen: true,
+                    url: link.attrs.href,
+                    position: { x: event.clientX, y: event.clientY },
+                    linkRange,
+                    view,
+                  });
+                  document.body.removeChild(contextMenu);
+                };
+
+                const unlinkButton = document.createElement('button');
+                unlinkButton.className = isDarkMode
+                  ? 'block w-full text-left px-3 py-2 text-sm hover:bg-red-800/30 text-red-400 rounded'
+                  : 'block w-full text-left px-3 py-2 text-sm hover:bg-red-50 text-red-600 rounded';
+                unlinkButton.innerHTML = '🔓 Remove Link';
+                unlinkButton.onclick = () => {
+                  const $pos = view.state.doc.resolve(pos.pos);
+                  const markRange = getMarkRange($pos, schema.marks.link);
+
+                  if (markRange) {
+                    const tr = view.state.tr.removeMark(
+                      markRange.from,
+                      markRange.to,
+                      schema.marks.link,
+                    );
+                    view.dispatch(tr);
+                  } else {
+                    view.dispatch(
+                      view.state.tr.removeMark(
+                        pos.pos,
+                        pos.pos + 1,
+                        schema.marks.link,
+                      ),
+                    );
+                  }
+
+                  document.body.removeChild(contextMenu);
+                };
+
+                contextMenu.appendChild(openButton);
+                contextMenu.appendChild(editButton);
+                contextMenu.appendChild(unlinkButton);
+                document.body.appendChild(contextMenu);
+
+                const removeMenu = () => {
+                  if (document.body.contains(contextMenu)) {
+                    document.body.removeChild(contextMenu);
+                  }
+                  document.removeEventListener('click', removeMenu);
+                };
+                setTimeout(
+                  () => document.addEventListener('click', removeMenu),
+                  0,
+                );
+
+                return true;
+              }
+              return false;
+            },
+          },
+        },
+        onCreate({ editor }) {
+          setEditor(editor);
+          // For new documents that start empty, mark initialization as complete immediately
+          setTimeout(() => {
+            initializationCompleteRef.current = true;
+          }, 100);
+        },
+        onUpdate() {
+          // Only trigger onChange for actual user input, not programmatic content setting
+          const shouldTriggerChange =
+            !isSettingContentRef.current && initializationCompleteRef.current;
+          if (shouldTriggerChange) {
+            if (onChange) onChange();
+            if (typeof setHasUnsavedChanges === 'function') {
+              setHasUnsavedChanges(true);
+            }
+          }
         },
       },
-      onCreate({ editor }) {
-        setEditor(editor);
-      },
-      onUpdate() {
-        if (onChange) {
-          onChange();
+      [],
+    );
+
+    const handleLinkSave = (newUrl: string) => {
+      if (linkModal.view && linkModal.linkRange) {
+        const { view, linkRange } = linkModal;
+        const { schema } = view.state;
+
+        const tr = view.state.tr
+          .removeMark(linkRange.start, linkRange.end, schema.marks.link)
+          .addMark(
+            linkRange.start,
+            linkRange.end,
+            schema.marks.link.create({ href: newUrl }),
+          );
+
+        view.dispatch(tr);
+      }
+    };
+
+    useImperativeHandle(ref, () => ({
+      getContent: () => editor?.getHTML(),
+      setContent: (content: string) => {
+        if (!editor || editor.isDestroyed) return;
+
+        const currentContent = editor.getHTML();
+
+        // Don't set content if it's exactly the same
+        if (currentContent === content) return;
+
+        // Check if this is the same content we just set (prevent loops)
+        if (content === lastSetContentRef.current) return;
+
+        // For initialization, always set content
+        if (!initializationCompleteRef.current) {
+          isSettingContentRef.current = true;
+          lastSetContentRef.current = content;
+          editor.commands.setContent(content, false);
+          initializationCompleteRef.current = true;
+
+          // Reset the flag after a short delay to allow the update to process
+          setTimeout(() => {
+            isSettingContentRef.current = false;
+          }, 50);
+          return;
         }
-      },
-    },
-    [],
-  );
 
-  const handleLinkSave = (newUrl: string) => {
-    if (linkModal.view && linkModal.linkRange) {
-      const { view, linkRange } = linkModal;
-      const { schema } = view.state;
+        // For subsequent updates, be more careful
+        const currentText = currentContent.replace(/<[^>]*>/g, '').trim();
+        const newText = content.replace(/<[^>]*>/g, '').trim();
 
-      const tr = view.state.tr
-        .removeMark(linkRange.start, linkRange.end, schema.marks.link)
-        .addMark(
-          linkRange.start,
-          linkRange.end,
-          schema.marks.link.create({ href: newUrl }),
-        );
+        // Don't overwrite user content with empty content
+        if (currentText.length > 0 && newText.length === 0) {
+          return;
+        }
 
-      view.dispatch(tr);
-    }
-  };
+        // Set the content
+        isSettingContentRef.current = true;
+        lastSetContentRef.current = content;
+        editor.commands.setContent(content, false);
 
-  useImperativeHandle(ref, () => ({
-    getContent: () => editor?.getHTML(),
-    setContent: (content: string) => {
-      if (editor) {
-        editor.commands.setContent(content);
+        // Reset flag after processing
         setTimeout(() => {
+          isSettingContentRef.current = false;
           if (editor && !editor.isDestroyed) {
             editor.chain().focus().run();
           }
         }, 50);
-      }
-    },
-    getImages: () => {
-      const images: { src: string; alt?: string; title?: string }[] = [];
-      editor?.state.doc.descendants((node) => {
-        if (node.type.name === 'image') {
-          images.push({
-            src: node.attrs.src,
-            alt: node.attrs.alt,
-            title: node.attrs.title,
-          });
-        }
-      });
-      return images;
-    },
-    focus: () => {
-      if (editor && !editor.isDestroyed) {
-        editor.chain().focus().run();
-        setTimeout(() => {
-          const dom = document.querySelector('.tiptap');
-          if (dom) {
-            (dom as HTMLElement).focus();
+      },
+      getImages: () => {
+        const images: { src: string; alt?: string; title?: string }[] = [];
+        editor?.state.doc.descendants((node) => {
+          if (node.type.name === 'image') {
+            images.push({
+              src: node.attrs.src,
+              alt: node.attrs.alt,
+              title: node.attrs.title,
+            });
           }
-        }, 10);
-      }
-    },
-  }));
+        });
+        return images;
+      },
+      focus: () => {
+        if (editor && !editor.isDestroyed) {
+          editor.chain().focus().run();
+          setTimeout(() => {
+            const dom = document.querySelector('.tiptap');
+            if (dom) {
+              (dom as HTMLElement).focus();
+            }
+          }, 10);
+        }
+      },
+    }));
 
-  return (
-    <>
-      <EditorContent
-        editor={editor}
-        className="prose dark:prose-invert max-w-full"
-      />
-      <LinkEditModal
-        isOpen={linkModal.isOpen}
-        onClose={() => setLinkModal((prev) => ({ ...prev, isOpen: false }))}
-        currentUrl={linkModal.url}
-        onSave={handleLinkSave}
-        position={linkModal.position}
-      />
-    </>
-  );
-});
+    return (
+      <>
+        <EditorContent
+          editor={editor}
+          className="prose dark:prose-invert max-w-full"
+        />
+        <LinkEditModal
+          isOpen={linkModal.isOpen}
+          onClose={() => setLinkModal((prev) => ({ ...prev, isOpen: false }))}
+          currentUrl={linkModal.url}
+          onSave={handleLinkSave}
+          position={linkModal.position}
+        />
+      </>
+    );
+  },
+);
 
 export default Editor;
