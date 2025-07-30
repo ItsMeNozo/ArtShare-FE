@@ -3,7 +3,7 @@ import AttributeFilters from '@/features/explore/components/AttributeFilters';
 import MediumFilters from '@/features/explore/components/MediumFilters';
 import { useState } from 'react';
 import { BsFilter } from 'react-icons/bs';
-import { IoMdArrowDropdown } from 'react-icons/io';
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { TbCategory } from 'react-icons/tb';
 import 'react-photo-album/rows.css';
 import { PostSearchResultsGallery } from './PostSearchResultsGallery';
@@ -19,6 +19,8 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
   );
   const [selectedMediums, setSelectedMediums] = useState<string[]>([]);
   const [isAi, setIsAi] = useState(false);
+  const [isAttributeOpen, setIsAttributeOpen] = useState(false);
+  const [isMediumOpen, setIsMediumOpen] = useState(false);
 
   return (
     <div className="relative flex h-screen min-h-0 flex-col">
@@ -41,6 +43,7 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
               <AttributeFilters
                 selectedAttribute={selectedAttribute}
                 setSelectedAttribute={setSelectedAttribute}
+                onOpenChange={setIsAttributeOpen}
               >
                 {({ onClick }) => (
                   <Button
@@ -50,7 +53,11 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
                   >
                     <TbCategory size={16} className="mr-1" />
                     <p className="mr-1">Attributes</p>
-                    <IoMdArrowDropdown />
+                    {isAttributeOpen ? (
+                      <IoMdArrowDropup />
+                    ) : (
+                      <IoMdArrowDropdown />
+                    )}
                   </Button>
                 )}
               </AttributeFilters>
@@ -59,6 +66,7 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
                 setSelectedMediums={setSelectedMediums}
                 isAi={isAi}
                 setIsAi={setIsAi}
+                onOpenChange={setIsMediumOpen}
               >
                 {({ onClick }) => (
                   <Button
@@ -68,7 +76,7 @@ const PostSearchResults = ({ finalQuery }: PostSearchResultsProps) => {
                   >
                     <TbCategory size={16} className="mr-1" />
                     <p className="mr-1">Mediums</p>
-                    <IoMdArrowDropdown />
+                    {isMediumOpen ? <IoMdArrowDropup /> : <IoMdArrowDropdown />}
                   </Button>
                 )}
               </MediumFilters>
