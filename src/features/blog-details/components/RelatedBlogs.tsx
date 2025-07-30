@@ -38,6 +38,7 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
   };
 
   const isLastPage = relatedBlogs.length < take;
+  const isFirstPage = skip === 1;
 
   if (isLoading) {
     return (
@@ -83,7 +84,7 @@ const RelatedBlogs = ({ currentBlogId }: RelatedBlogsProps) => {
         {!(skip === 0 && isLastPage) && (
           <button
             onClick={handlePrevious}
-            disabled={skip === 0 || isFetching}
+            disabled={skip === 0 || isFirstPage}
             className="bg-mountain-200 dark:bg-mountain-700 hover:bg-mountain-300 dark:hover:bg-mountain-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg shadow-md transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowLeft className="size-5 text-white" />
