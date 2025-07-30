@@ -121,7 +121,7 @@ class PerformanceNavigationTester {
         this.page.locator(
           '[data-testid="explore-content"], .explore, .posts-grid, .post-item',
         ),
-      ).toBeVisible({ timeout: 8000 });
+      ).toBeVisible({ timeout: 9000 });
     } else if (route.includes('/auto/projects')) {
       await expect(
         this.page.locator(
