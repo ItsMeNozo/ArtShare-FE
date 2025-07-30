@@ -134,7 +134,7 @@ const GenerateAutoPostForm = () => {
                     name="contentPrompt"
                     as="textarea"
                     rows={8}
-                    className="px-4 py-2 border border-gray-300 rounded-md outline-0 w-full min-h-[200px] placeholder:text-mountain-400 resize-none"
+                    className="px-4 py-2 border border-gray-300 rounded-md outline-0 w-full min-h-64 placeholder:text-mountain-400 resize-none"
                     placeholder="Create the compaign marketing content..."
                   />
                   <div className="flex justify-end items-center space-x-4 w-full">

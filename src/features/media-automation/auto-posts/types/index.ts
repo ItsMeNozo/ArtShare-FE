@@ -2,6 +2,7 @@ export type AutoPostStatus = 'draft' | 'scheduled' | 'posted' | 'canceled';
 
 export type AutoPost = {
   id: number;
+  platformPostId?: string;
   content: string;
   imageUrls: string[];
   scheduledAt: Date;

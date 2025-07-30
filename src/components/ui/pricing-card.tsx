@@ -102,8 +102,8 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
         icon: FaCheckCircle,
         asChild: false,
         href: undefined,
-        variant: isHighlighted ? 'secondary' : 'outline', // Give current plan a distinct look
-        disabled: false,
+        variant: isHighlighted ? 'secondary' : 'outline',
+        disabled: true,
       };
     }
     switch (tier.actionType) {
@@ -138,13 +138,13 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
   return (
     <div
       className={cn(
-        'relative flex flex-1 flex-col gap-8 overflow-hidden rounded-lg border p-6',
+        'relative flex flex-col flex-1 gap-8 p-6 border rounded-lg overflow-hidden',
         isHighlighted
           ? 'border-purple-700 bg-gradient-to-b from-blue-800 to-purple-800 text-white dark:border-purple-600' // Gradient works for dark, ensure border is visible
-          : 'border-mountain-300 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50', // Default card styles
+          : 'border-mountain-300 bg-white text-mountain-900 dark:border-mountain-700 dark:bg-mountain-800 dark:text-mountain-50', // Default card styles
         isPopular &&
-          !isHighlighted &&
-          'border-2 border-indigo-600 dark:border-indigo-500', // Popular border only if not highlighted
+        !isHighlighted &&
+        'border-2 border-indigo-600 dark:border-indigo-500', // Popular border only if not highlighted
       )}
     >
       {isHighlighted && <HighlightedBackground isDarkMode />}
@@ -154,7 +154,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       <h2
         className={cn(
           'flex items-center gap-3 text-xl capitalize',
-          isHighlighted ? 'text-white' : 'text-slate-900 dark:text-slate-50',
+          isHighlighted ? 'text-white' : 'text-mountain-900 dark:text-mountain-50',
         )}
       >
         {tier.name}
@@ -177,7 +177,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
       <div
         className={cn(
           'relative h-12',
-          isHighlighted ? 'text-white' : 'text-slate-900 dark:text-slate-100',
+          isHighlighted ? 'text-white' : 'text-mountain-900 dark:text-mountain-100',
         )}
       >
         {typeof price === 'number' ? (
@@ -196,7 +196,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
                 '-mt-2 text-xs',
                 isHighlighted
                   ? 'text-purple-200'
-                  : 'text-muted-foreground dark:text-slate-400',
+                  : 'text-muted-foreground dark:text-mountain-400',
               )}
             >
               Per month/user
@@ -214,7 +214,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
             'text-xs',
             isHighlighted
               ? 'text-purple-100'
-              : 'text-slate-700 dark:text-slate-300',
+              : 'text-mountain-700 dark:text-mountain-300',
           )}
         >
           {tier.description}
@@ -227,12 +227,12 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
                 'flex items-center gap-2 text-xs',
                 isHighlighted
                   ? 'text-mountain-200 dark:text-purple-200'
-                  : 'text-muted-foreground dark:text-slate-400',
+                  : 'text-muted-foreground dark:text-mountain-400',
               )}
             >
               <BadgeCheck
                 className={cn(
-                  'h-4 w-4 flex-shrink-0',
+                  'flex-shrink-0 w-4 h-4',
                   isHighlighted
                     ? 'text-purple-300'
                     : 'text-indigo-500 dark:text-indigo-400', // Give check a distinct color
@@ -255,7 +255,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
             ctaProps.disabled && isHighlighted
               ? 'bg-white/30 text-white hover:bg-white/40'
               : ctaProps.disabled && !isHighlighted
-                ? 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                ? 'bg-mountain-200 text-mountain-900 dark:bg-mountain-700 dark:text-mountain-400'
                 : '',
           )}
           onClick={ctaProps.action}
@@ -267,14 +267,14 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
               href={ctaProps.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center"
+              className="flex justify-center items-center"
             >
-              {ctaProps.icon && <ctaProps.icon className="mr-2 h-4 w-4" />}
+              {ctaProps.icon && <ctaProps.icon className="mr-2 w-4 h-4" />}
               {ctaProps.text}
             </a>
           ) : (
             <>
-              {ctaProps.icon && <ctaProps.icon className="mr-2 h-4 w-4" />}
+              {ctaProps.icon && <ctaProps.icon className="mr-2 w-4 h-4" />}
               {ctaProps.text}
             </>
           )}
@@ -287,7 +287,7 @@ export function PricingCard({ tier, paymentFrequency }: PricingCardProps) {
 const HighlightedBackground = ({ isDarkMode }: { isDarkMode?: boolean }) => (
   <div
     className={cn(
-      'absolute inset-0 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-[size:45px_45px] opacity-50 dark:opacity-30',
+      'absolute inset-0 bg-[size:45px_45px] opacity-50 dark:opacity-30 [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]',
       isDarkMode
         ? 'bg-[linear-gradient(to_right,#ffffff12_1px,transparent_1px),linear-gradient(to_bottom,#ffffff12_1px,transparent_1px)]'
         : 'bg-[linear-gradient(to_right,#00000012_1px,transparent_1px),linear-gradient(to_bottom,#00000012_1px,transparent_1px)]',
@@ -305,7 +305,7 @@ const PopularBackground = ({ isDarkMode }: { isDarkMode?: boolean }) => (
       'absolute inset-0',
       'bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15)_0%,rgba(255,255,255,0)_100%)]',
       isDarkMode &&
-        'dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2)_0%,rgba(255,255,255,0)_100%)]', // Slightly more intense for dark
+      'dark:bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.2)_0%,rgba(255,255,255,0)_100%)]', // Slightly more intense for dark
     )}
   />
 );

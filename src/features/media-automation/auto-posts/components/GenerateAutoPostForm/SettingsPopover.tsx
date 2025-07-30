@@ -15,7 +15,7 @@ const SettingsPanel = () => {
   };
 
   return (
-    <Box className="space-y-6 bg-white shadow-sm p-4 border border-mountain-200 rounded-lg w-80 shrink-0">
+    <Box className="space-y-6 bg-white shadow-sm p-4 border border-mountain-200 rounded-lg w-80 h-full shrink-0">
       <Typography className="flex items-center gap-2 font-bold text-mountain-800 text-sm">
         <Settings2 className="size-4" />
         Prompt Settings

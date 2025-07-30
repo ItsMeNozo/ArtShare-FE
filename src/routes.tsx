@@ -6,35 +6,34 @@ import ProtectedAuthRoute from '@/components/ProtectedItems/ProtectedAuthRoute';
 import ProtectedInAppRoute from '@/components/ProtectedItems/ProtectedInAppRoute';
 import GuestRoute from '@/components/routes/guest-route';
 import RootLayout from '@/layouts';
-import OnboardingRoute from './components/ProtectedItems/OnboardingRoute';
-import UserSubscription from './features/user-profile-private/UserSubscription';
-import AutoLayout from './layouts/subLayouts/AutoLayout';
+import OnboardingRoute from '@/components/ProtectedItems/OnboardingRoute';
+import UserSubscription from '@/features/user-profile-private/UserSubscription';
+import AutoLayout from '@/layouts/subLayouts/AutoLayout';
+import ProFeatureRoute from './components/ProtectedItems/ProFeatureRoute';
 
 const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
-const Dashboard = lazy(() => import('./features/app-dashboard/Dashboard'));
-const Updates = lazy(() => import('./features/app-dashboard/Updates'));
-const EditUser = lazy(() => import('./features/edit-user/EditUserPage'));
-const OnboardingProfile = lazy(() => import('./pages/Onboarding'));
-const RequireOnboard = lazy(
-  () => import('./components/ProtectedItems/RequireOnboard'),
-);
+const Dashboard = lazy(() => import('@/features/app-dashboard/Dashboard'));
+const Updates = lazy(() => import('@/features/app-dashboard/Updates'));
+const EditUser = lazy(() => import('@/features/edit-user/EditUserPage'));
+const OnboardingProfile = lazy(() => import('@/features/onboarding'));
+const RequireOnboard = lazy(() => import('@/components/ProtectedItems/RequireOnboard'));
 
 // Lazy imports for pages/features
 const LandingPage = lazy(() => import('@/pages/Home'));
-const Login = lazy(() => import('@/pages/Authentication/Login'));
-const SignUp = lazy(() => import('@/pages/Authentication/SignUp'));
+const Login = lazy(() => import('@/features/authentication/Login'));
+const SignUp = lazy(() => import('@/features/authentication/SignUp'));
 const ForgotPassword = lazy(
-  () => import('@/pages/Authentication/ForgotPassword'),
+  () => import('@/features/authentication/ForgotPassword'),
 );
 const AccountActivation = lazy(
-  () => import('@/pages/Authentication/Activation'),
+  () => import('@/features/authentication/Activation'),
 );
-const AuthAction = lazy(() => import('@/pages/Authentication/HandleCallback'));
+const AuthAction = lazy(() => import('@/features/authentication/HandleCallback'));
 const Explore = lazy(() => import('@/features/explore'));
 const BrowseBlogs = lazy(() => import('@/features/browse-blogs/BrowseBlogs'));
 const BlogDetails = lazy(() => import('@/features/blog-details/BlogDetails'));
-const Search = lazy(() => import('@/pages/Search'));
+const Search = lazy(() => import('@/features/search'));
 const Post = lazy(() => import('@/features/post'));
 
 const UploadPostPage = lazy(
@@ -96,7 +95,7 @@ const EditAutoPostForm = lazy(
     ),
 );
 
-const NotFoundPage = lazy(() => import('@/components/NotFoundPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 
 const routeConfig: RouteObject[] = [
   {
@@ -207,7 +206,7 @@ const routeConfig: RouteObject[] = [
           { path: '/collections', element: <Collection /> },
           { path: '/docs', element: <DocumentDashboard /> },
           { path: '/app-subscription', element: <UserSubscription /> },
-          { path: '/:username', element: <UserProfile /> },
+          { path: '/u/:username', element: <UserProfile /> },
         ],
       },
       // Auto Private
@@ -215,9 +214,11 @@ const routeConfig: RouteObject[] = [
         element: (
           <RequireOnboard>
             <ProtectedInAppRoute>
-              <AutoLayout>
-                <Outlet />
-              </AutoLayout>
+              <ProFeatureRoute>
+                <AutoLayout>
+                  <Outlet />
+                </AutoLayout>
+              </ProFeatureRoute>
             </ProtectedInAppRoute>
           </RequireOnboard>
         ),

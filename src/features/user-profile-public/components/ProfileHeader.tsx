@@ -15,12 +15,12 @@ const ProfileHeader: FC<ProfileHeaderProps> = ({
 }) => {
   return (
     <div className="flex items-center">
-      <div className="flex h-36 w-36 items-center justify-center rounded-full bg-white/30 p-1 shadow-md backdrop-blur-md">
+      <div className="flex justify-center items-center bg-white/30 shadow-md backdrop-blur-md p-1 rounded-full w-36 h-36">
         {avatarUrl ? (
           <img
             src={avatarUrl}
             alt={`${name}'s profile picture`}
-            className="h-full w-full object-cover"
+            className="rounded-full w-full h-full object-cover"
           />
         ) : (
           <Avatar

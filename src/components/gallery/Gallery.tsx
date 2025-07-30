@@ -9,6 +9,7 @@ export interface GalleryPhoto extends Photo {
   key: string;
   title: string;
   author: string;
+  profilePictureUrl?: string | null;
   postLength: number;
   postId: number;
   isMature: boolean;
@@ -46,7 +47,7 @@ const IGallery: React.FC<IGalleryProps> = ({
   const effectiveRenderPhoto = renderPhoto || ImageRenderer;
 
   return (
-    <div ref={ref} className="custom-scrollbar relative overflow-auto pb-20">
+    <div ref={ref} className="relative pb-20 overflow-auto custom-scrollbar">
       <InfiniteScroll
         data={photos}
         isLoading={isLoading}
