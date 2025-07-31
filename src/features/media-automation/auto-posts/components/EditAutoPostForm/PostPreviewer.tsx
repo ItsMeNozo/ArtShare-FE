@@ -3,15 +3,41 @@ import { IoEarthSharp } from 'react-icons/io5';
 import { MdMoreHoriz } from 'react-icons/md';
 import { ExpandablePostContent } from './ExpandTextArea';
 import { useState } from 'react';
-
+import { Platform } from '@/features/media-automation/projects/types/platform';
+import { format } from 'date-fns';
 interface FacebookPostPreviewProps {
   content: string;
   images: string[];
+  scheduledAt?: Date | null;
+  platform?: Platform;
 }
+
+const facebookIcon = 'https://res.cloudinary.com/dqxtf297o/image/upload/v1753263979/artshare-asset/fb_icon_jiqelq.svg'
+
+const SkeletonIconImage = ({ src, alt }: { src: string; alt?: string }) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="relative flex items-center w-auto h-8">
+      {!loaded && (
+        <div className="absolute inset-0 bg-gray-200 rounded animate-pulse" />
+      )}
+      <img
+        src={src}
+        alt={alt || ''}
+        onLoad={() => setLoaded(true)}
+        className={`h-8 w-auto transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'
+          }`}
+      />
+    </div>
+  );
+};
+
 
 export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
   content,
   images,
+  scheduledAt,
+  platform
 }) => {
   const [desktopMode, setDesktopMode] = useState(true);
   return (
@@ -19,11 +45,7 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
       <div className='flex flex-col space-y-4'>
         <div className='flex items-center space-x-2'>
           <div className='flex items-center space-x-2 bg-white shadow-sm p-2 py-2.5 rounded-md w-56 text-sm'>
-            <img
-              src={'/public/fb_icon.svg'}
-              alt="Facebook Logo"
-              className="w-auto h-8"
-            />
+            <SkeletonIconImage src={facebookIcon} alt="Facebook Icon" />
             <p className='font-medium'>Facebook Feed Preview</p>
           </div>
           <div className='flex bg-mountain-100 shadow p-0.5 rounded-lg w-24 h-full'>
@@ -41,14 +63,18 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
           <div className="flex justify-between items-center p-4 pb-0">
             <div className="flex items-center space-x-2">
               <img
-                src={'/public/fb_icon.svg'}
+                src={platform?.pictureUrl || facebookIcon}
                 alt="Avatar"
                 className="rounded-full w-10 h-10"
               />
               <div className="flex flex-col">
-                <p className="font-medium">Sample Page</p>
+                <p className="font-medium">{platform?.config.pageName}</p>
                 <div className="flex space-x-2 text-mountain-400 text-xs">
-                  <p>July 1 at 23:15</p>
+                  <p>
+                    {scheduledAt
+                      ? format(new Date(scheduledAt), 'MMM dd, yyyy HH:mm')
+                      : 'Not scheduled'}
+                  </p>
                   <span>•</span>
                   <IoEarthSharp className="text-mountain-600" />
                 </div>

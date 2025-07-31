@@ -61,7 +61,6 @@ export enum TargetType {
 export interface HeaderRoute {
   path: string;
   label: string;
-  description: string;
   parent?: string;
 }
 
@@ -69,120 +68,104 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/dashboard',
     label: 'Home Page',
-    description: 'Discovering what we supply for your artistic journey',
   },
   {
     path: '/dashboard/updates',
     label: 'App Updates',
-    description: '',
+  },
+  {
+    path: '/dashboard/updates',
+    label: 'App Updates',
   },
   {
     path: '/explore',
     label: 'Explore Arts',
-    description: 'Discover stunning creations shared by artists worldwide',
   },
   {
     path: '/search',
     label: 'Search Page',
-    description: 'Finding beautiful creations that you want to view',
   },
   {
     path: '/blogs',
     label: 'Browse Blogs',
-    description: 'Get inspired by stories, tutorials, and creative journeys',
   },
   {
     path: '/blogs/:id',
     label: 'Read Blogs',
-    description: 'Dive into creative experiences shared by artists',
     parent: '/blogs',
   },
   {
     path: '/docs',
     label: 'My Writing',
-    description: 'Your space to write and manage your knowledge, sharings',
   },
   {
     path: '/docs/new',
     label: 'Write Blog',
-    description:
-      'Share your latest artwork or visual content with the community',
   },
   {
     path: '/posts/new',
     label: 'Create Post',
-    description:
-      'Share your latest artwork or visual content with the community',
   },
   {
     path: '/posts/:id',
     label: 'Post Details',
-    description: "View artwork in detail and engage with the artist's post",
     parent: '/explore',
   },
   {
     path: '/collections',
     label: 'My Collections',
-    description: '',
   },
   {
     path: '/edit-user',
     label: 'Edit Profile',
-    description: 'Update your user profile information if needed',
   },
   {
     path: '/app-subscription',
     label: 'App Subscription',
-    description: 'View and manage your current subscription plan',
   },
   {
-    path: '/:username',
+    path: '/u/:username',
     label: 'My Profile',
-    description: 'This place is yours to showcase your creations',
   },
   {
     path: '/auto/social-links',
     label: 'Link Socials',
-    description: 'Connect social accounts to enable automated posting',
   },
   {
     path: '/auto/scheduling',
     label: 'Project Scheduling',
-    description: '',
+  },
+  {
+    path: '/auto/scheduling',
+    label: 'Project Scheduling',
   },
   {
     path: '/auto/projects',
     label: 'Automation Projects',
-    description: 'Manage your automated content workflows',
   },
   {
     path: '/auto/projects/new',
     label: 'New Workflow',
-    description: 'Create new workflow for automatic upload',
     parent: '/auto/projects',
   },
   {
     path: '/auto/projects/:id/edit',
     label: 'Edit Workflow',
-    description: 'Create new workflow for automatic upload',
     parent: '/auto/projects',
   },
   {
     path: '/auto/projects/:id/details',
     label: 'Details',
-    description: 'Manage your automated content workflows',
     parent: '/auto/projects',
   },
   {
     path: '/auto/projects/:id/posts/:postId/edit',
     label: 'Edit Post',
-    description: '',
     parent: '/auto/projects/:id/details',
   },
   {
     path: '/auto/projects/:id/posts/new',
     label: 'Create Post',
-    description: '',
     parent: '/auto/projects/:id/details',
   },
 ];

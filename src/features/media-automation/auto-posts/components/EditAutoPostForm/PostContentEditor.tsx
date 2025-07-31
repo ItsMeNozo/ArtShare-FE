@@ -51,39 +51,11 @@ const PostContentEditor = ({ value, onChange }: PostContentEditorProps) => {
         'border-mountain-200 relative flex h-[520px] w-full flex-col border bg-white shadow-md'
       }
     >
-      <div className="flex items-center gap-2 bg-white px-2 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
+      <div className="flex items-center gap-2 bg-white px-4 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
         {editor && (
           <div className="flex justify-between items-center w-full">
             <div className="flex items-center space-x-2">
-              <button
-                type="button" // Add type="button" to prevent form submission
-                onClick={() => editor.chain().focus().toggleBold().run()}
-                className={`border-mountain-200 rounded border px-2 py-1 text-sm font-bold shadow ${editor.isActive('bold') ? 'bg-indigo-100' : ''}`}
-              >
-                B
-              </button>
-              <button
-                type="button"
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-                className={`border-mountain-200 rounded border px-2 py-1 text-sm italic shadow ${editor.isActive('italic') ? 'bg-indigo-100' : ''}`}
-              >
-                I
-              </button>
-              <button
-                type="button"
-                onClick={() => editor.chain().focus().toggleUnderline().run()}
-                className={`border-mountain-200 rounded border px-2 py-1 text-sm underline shadow ${editor.isActive('underline') ? 'bg-indigo-100' : ''}`}
-              >
-                U
-              </button>
-              <button
-                type="button"
-                className="hover:bg-mountain-50/60 shadow px-2 py-1 border border-mountain-200 rounded-sm text-sm cursor-pointer"
-              >
-                <p>
-                  😀<span>Emoji</span>
-                </p>
-              </button>
+              <span className='text-mountain-600 text-sm'>Tips: Click on text editor to start editing</span>
             </div>
             <div
               // FIX: Using MAX_WORDS for the warning check

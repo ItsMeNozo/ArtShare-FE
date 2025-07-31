@@ -1,7 +1,8 @@
 import { Box, Button, Container, Typography } from '@mui/material';
+import { IoIosLock } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 
-const NotFoundPage = () => {
+const NoPermission = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -32,30 +33,21 @@ const NotFoundPage = () => {
           component="h1"
           sx={{
             fontWeight: 700,
-            fontSize: { xs: '6rem', sm: '8rem' }, // Responsive font size
+            fontSize: '32px',
             color: 'primary.main',
           }}
+          className='flex flex-col items-center gap-2'
         >
-          404
+          <IoIosLock className='size-20 primary.main' />
+          <p>NO PERMISSION</p>
         </Typography>
-
         <Typography
-          variant="h4"
+          variant="h5"
           component="h2"
-          sx={{ mt: 2, mb: 1, fontWeight: 600 }}
+          sx={{ mt: 2, mb: 2, fontWeight: 600 }}
         >
-          Page Not Found
+          You do not have permission to access this page
         </Typography>
-
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ mb: 4, maxWidth: '480px' }}
-        >
-          Oops! We couldn't find the page you were looking for. It might have
-          been moved or deleted.
-        </Typography>
-
         <Button onClick={handleGoBack} variant="contained" size="large">
           Go Back
         </Button>
@@ -64,4 +56,4 @@ const NotFoundPage = () => {
   );
 };
 
-export default NotFoundPage;
+export default NoPermission;

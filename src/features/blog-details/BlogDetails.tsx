@@ -1,25 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-//Components
-import type { Blog } from '@/types/blog';
-import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
-import Avatar from 'boring-avatars';
-//Icons
 import { LikesDialog } from '@/components/like/LikesDialog';
 import { useUser } from '@/contexts/user';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import type { Blog } from '@/types/blog';
 import { TargetType } from '@/utils/constants';
+import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
 import { BiComment } from 'react-icons/bi';
 import { FiTrash2 } from 'react-icons/fi';
-import { IoPersonAddOutline } from 'react-icons/io5';
 import { LuLink, LuPencil } from 'react-icons/lu';
-import { MdOutlineFlag } from 'react-icons/md'; // Report Icon
+import { MdOutlineFlag } from 'react-icons/md';
 import { fetchBlogComments } from '../post/api/comment.api';
 import CommentSection, {
   CommentSectionRef,
@@ -32,7 +28,6 @@ import { fetchBlogDetails } from './api/blog';
 import { createLike, removeLike } from './api/like-blog';
 import RelatedBlogs from './components/RelatedBlogs';
 
-// Import your ReportDialog and the reporting hook
 import { ReportTargetType } from '../user-profile-public/api/report.api';
 import ReportDialog from '../user-profile-public/components/ReportDialog';
 import { useReport } from '../user-profile-public/hooks/useReport';
@@ -40,24 +35,162 @@ import { BlogDeleteConfirmDialog } from '../user-writing/components/BlogDeleteCo
 import { useDeleteBlog } from '../user-writing/hooks/useDeleteBlog';
 
 import './BlogDetails.css';
+import UserInfoCard from './components/UserInfoCard';
+
 interface BlogError {
   message: string;
   error?: string;
   statusCode?: number;
 }
 
+const useOptimisticMutation = <T = unknown, TVariables = unknown>(
+  mutationFn: (param: TVariables) => Promise<T>,
+  optimisticUpdater: (old: Blog | undefined) => Blog | undefined,
+  successMessage: string,
+  errorMessage: string,
+  blogId: string,
+  showSnackbar: (
+    msg: string,
+    type: 'success' | 'error' | 'warning' | 'info',
+  ) => void,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn,
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['blogDetails', blogId] });
+      const previousBlog = queryClient.getQueryData(['blogDetails', blogId]);
+      queryClient.setQueryData(['blogDetails', blogId], optimisticUpdater);
+      return { previousBlog };
+    },
+    onSuccess: () => {
+      showSnackbar(successMessage, 'success');
+      queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
+    },
+    onError: (error: unknown, _, context) => {
+      if (context?.previousBlog) {
+        queryClient.setQueryData(['blogDetails', blogId], context.previousBlog);
+      }
+      const msg =
+        error instanceof AxiosError && error.response?.data?.message
+          ? error.response.data.message
+          : errorMessage;
+      showSnackbar(msg, 'error');
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
+    },
+  });
+};
+
+const useFollowMutations = (
+  blogId: string,
+  showSnackbar: (
+    msg: string,
+    type: 'success' | 'error' | 'warning' | 'info',
+  ) => void,
+) => {
+  const followMutation = useOptimisticMutation(
+    followUser,
+    (old: Blog | undefined) => {
+      if (!old) return old;
+      return {
+        ...old,
+        user: {
+          ...old.user,
+          isFollowing: true,
+          followersCount: old.user.followersCount + 1,
+        },
+      };
+    },
+    "Successfully followed user! You'll receive notifications about their posts.",
+    'Failed to follow user.',
+    blogId,
+    showSnackbar,
+  );
+
+  const unfollowMutation = useOptimisticMutation(
+    unfollowUser,
+    (old: Blog | undefined) => {
+      if (!old) return old;
+      return {
+        ...old,
+        user: {
+          ...old.user,
+          isFollowing: false,
+          followersCount: Math.max(0, old.user.followersCount - 1),
+        },
+      };
+    },
+    'Successfully unfollowed user.',
+    'Failed to unfollow user.',
+    blogId,
+    showSnackbar,
+  );
+
+  return { followMutation, unfollowMutation };
+};
+
+const useLikeMutations = (
+  blogId: string,
+  showSnackbar: (
+    msg: string,
+    type: 'success' | 'error' | 'warning' | 'info',
+  ) => void,
+) => {
+  const likeMutation = useOptimisticMutation(
+    () => createLike({ targetId: Number(blogId), targetType: TargetType.BLOG }),
+    (old: Blog | undefined) => {
+      if (!old) return old;
+      return {
+        ...old,
+        isLikedByCurrentUser: true,
+        likeCount: old.likeCount + 1,
+      };
+    },
+    '',
+    'Failed to like blog.',
+    blogId,
+    showSnackbar,
+  );
+
+  const unlikeMutation = useOptimisticMutation(
+    () => removeLike({ targetId: Number(blogId), targetType: TargetType.BLOG }),
+    (old: Blog | undefined) => {
+      if (!old) return old;
+      return {
+        ...old,
+        isLikedByCurrentUser: false,
+        likeCount: Math.max(0, old.likeCount - 1),
+      };
+    },
+    '',
+    'Failed to unlike blog.',
+    blogId,
+    showSnackbar,
+  );
+
+  return { likeMutation, unlikeMutation };
+};
+
 const BlogDetails = () => {
   const { blogId } = useParams<{ blogId: string }>();
   const [showAuthorBadge, setShowAuthorBadge] = useState(false);
   const [likesDialogOpen, setLikesDialogOpen] = useState(false);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false); // Add delete confirmation state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   const { user } = useUser();
   const { showSnackbar } = useSnackbar();
-  const queryClient = useQueryClient();
-  const [copied, setCopied] = useState(false);
   const requireAuth = useRequireAuth();
+  const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const commentSectionRef = useRef<CommentSectionRef>(null);
+
+  const safeBlogId = blogId || '';
+
   const {
     data: blog,
     isLoading,
@@ -68,17 +201,22 @@ const BlogDetails = () => {
     queryFn: () => fetchBlogDetails(Number(blogId)),
     enabled: !!blogId,
     retry: (failureCount, error) => {
-      // Don't retry on 403 or 404 errors
       if (error?.response?.status === 403 || error?.response?.status === 404) {
         return false;
       }
       return failureCount < 3;
     },
   });
-  const navigate = useNavigate();
-  const commentSectionRef = useRef<CommentSectionRef>(null);
 
-  // Delete blog mutation
+  const { followMutation, unfollowMutation } = useFollowMutations(
+    safeBlogId,
+    showSnackbar,
+  );
+  const { likeMutation, unlikeMutation } = useLikeMutations(
+    safeBlogId,
+    showSnackbar,
+  );
+
   const { mutate: deleteBlogMutation, isPending: isDeletingBlog } =
     useDeleteBlog({
       onSuccess: () => {
@@ -90,7 +228,6 @@ const BlogDetails = () => {
       },
     });
 
-  // Reporting Hook
   const { mutate: reportBlogContent, isPending: isLoadingReport } = useReport();
 
   const {
@@ -104,87 +241,10 @@ const BlogDetails = () => {
     enabled: !!blogId,
   });
 
-  const followMutation = useMutation({
-    mutationFn: () => followUser(blog!.user.id),
-    onSuccess: () => refetch(),
-    onError: (error: unknown) => {
-      const msg =
-        error instanceof AxiosError && error.response?.data?.message
-          ? error.response.data.message
-          : 'Failed to follow user.';
-      showSnackbar(msg, 'error');
-    },
-  });
-
-  const unfollowMutation = useMutation({
-    mutationFn: () => unfollowUser(blog!.user.id),
-    onSuccess: () => refetch(),
-    onError: (error: unknown) => {
-      const msg =
-        error instanceof AxiosError && error.response?.data?.message
-          ? error.response.data.message
-          : 'Failed to unfollow user.';
-      showSnackbar(msg, 'error');
-    },
-  });
-
-  const likeMutation = useMutation({
-    mutationFn: () =>
-      createLike({
-        targetId: Number(blogId),
-        targetType: TargetType.BLOG,
-      }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] }),
-    onError: (error: unknown) => {
-      const msg =
-        error instanceof AxiosError && error.response?.data?.message
-          ? error.response.data.message
-          : 'Failed to like blog.';
-      showSnackbar(msg, 'error');
-    },
-  });
-
-  const unlikeMutation = useMutation({
-    mutationFn: () =>
-      removeLike({
-        targetId: Number(blogId),
-        targetType: TargetType.BLOG,
-      }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] }),
-    onError: (error: unknown) => {
-      const msg =
-        error instanceof AxiosError && error.response?.data?.message
-          ? error.response.data.message
-          : 'Failed to unlike blog.';
-      showSnackbar(msg, 'error');
-    },
-  });
-
-  const isOwnBlog = user?.id === blog?.user.id;
-  const isFollowing = blog?.user.isFollowing;
-  const isPublished = blog?.isPublished ?? true;
-
-  const toggleFollow = () =>
-    requireAuth('follow/unfollow users', () =>
-      isFollowing ? unfollowMutation.mutate() : followMutation.mutate(),
-    );
-
-  const followBtnLoading =
-    followMutation.isPending || unfollowMutation.isPending;
-  const isLiked = blog?.isLikedByCurrentUser || false;
-  const likeCount = blog?.likeCount || 0;
-
-  const handleToggleLike = () =>
-    requireAuth('like this blog', () => {
-      isLiked ? unlikeMutation.mutate() : likeMutation.mutate();
-    });
-
   useEffect(() => {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
-        const scrollY = scrollContainerRef.current.scrollTop; // scrollTop is correct for an element
+        const scrollY = scrollContainerRef.current.scrollTop;
         setShowAuthorBadge(scrollY > 150);
       }
     };
@@ -196,40 +256,61 @@ const BlogDetails = () => {
     }
   }, []);
 
-  const handleOpenLikesDialog = () =>
-    requireAuth('view likes', () => setLikesDialogOpen(true));
-  const handleCloseLikesDialog = () => setLikesDialogOpen(false);
+  if (!blogId) {
+    return (
+      <div className="dark:bg-mountain-950 flex h-screen items-center justify-center bg-white">
+        <p className="text-gray-600 dark:text-gray-400">Blog ID not found.</p>
+      </div>
+    );
+  }
 
-  // Report dialog handlers
-  const handleOpenReportDialog = () => {
-    if (!user) {
-      showSnackbar(
-        'Please login to report this blog',
-        'warning',
-        <Button
-          size="small"
-          color="inherit"
-          onClick={() => (window.location.href = '/login')}
-        >
-          Login
-        </Button>,
-      );
-      return;
-    }
-    if (isOwnBlog) {
-      showSnackbar('You cannot report your own blog.', 'info');
-      return;
-    }
-    setReportDialogOpen(true);
+  const handleCommentUpdate = () => {
+    refetchComments();
+    refetch();
   };
-  const handleCloseReportDialog = () => setReportDialogOpen(false);
 
-  // Delete blog handlers
-  const handleOpenDeleteDialog = () => {
-    setDeleteConfirmOpen(true);
+  const isOwnBlog = user?.id === blog?.user.id;
+  const isPublished = blog?.isPublished ?? true;
+  const followBtnLoading =
+    followMutation.isPending || unfollowMutation.isPending;
+  const isLiked = blog?.isLikedByCurrentUser || false;
+  const likeCount = blog?.likeCount || 0;
+
+  const toggleFollow = () =>
+    requireAuth('follow/unfollow users', () => {
+      if (!blog?.user.id) {
+        showSnackbar(
+          'Cannot follow/unfollow: User information not available.',
+          'error',
+        );
+        return;
+      }
+
+      const userId = blog.user.id;
+      const currentlyFollowing = blog.user.isFollowing;
+
+      if (currentlyFollowing) {
+        unfollowMutation.mutate(userId);
+      } else {
+        followMutation.mutate(userId);
+      }
+    });
+
+  const handleToggleLike = () =>
+    requireAuth('like this blog', () => {
+      isLiked
+        ? unlikeMutation.mutate(undefined)
+        : likeMutation.mutate(undefined);
+    });
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    showSnackbar('Link copied to clipboard!', 'success');
+    setTimeout(() => setCopied(false), 2000);
   };
-  const handleCloseDeleteDialog = () => setDeleteConfirmOpen(false);
-  const handleConfirmDelete = () => {
+
+  const handleDeleteConfirm = () => {
     if (blog) {
       deleteBlogMutation(blog.id);
       setDeleteConfirmOpen(false);
@@ -264,29 +345,19 @@ const BlogDetails = () => {
     );
   };
 
-  const handleCommentAdded = () => {
-    refetchComments();
-    queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
-  };
-  const handleCommentDeleted = () => {
-    refetchComments();
-    queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
-  };
-
-  // Handle loading state
-  if (isLoading || commentsLoading)
+  if (isLoading || commentsLoading) {
     return (
       <div className="dark:bg-mountain-950 flex h-screen items-center justify-center space-x-4 bg-white text-black dark:text-white">
-        <CircularProgress size={36} /> <p>Loading…</p>
+        <CircularProgress size={36} />
+        <p>Loading…</p>
       </div>
     );
+  }
 
-  // Handle error states with specific messages
   if (error) {
     const errorData = error.response?.data;
     const statusCode = error.response?.status;
 
-    // Handle specific error cases
     if (statusCode === 403) {
       return (
         <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
@@ -310,7 +381,9 @@ const BlogDetails = () => {
               Access Restricted
             </h2>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-              {errorData?.message || 'This blog is not accessible.'}
+              {typeof errorData?.message === 'string'
+                ? errorData.message
+                : 'This blog is not accessible.'}
             </p>
             <div className="space-y-3">
               <Button
@@ -357,8 +430,9 @@ const BlogDetails = () => {
               Blog Not Found
             </h2>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-              {errorData?.message ||
-                "The blog you're looking for doesn't exist."}
+              {typeof errorData?.message === 'string'
+                ? errorData.message
+                : "The blog you're looking for doesn't exist."}
             </p>
             <Button
               onClick={() => navigate('/blogs')}
@@ -393,7 +467,9 @@ const BlogDetails = () => {
             Something went wrong
           </h2>
           <p className="mb-6 text-gray-600 dark:text-gray-400">
-            {errorData?.message || error.message || 'Failed to load the blog.'}
+            {typeof errorData?.message === 'string'
+              ? errorData.message
+              : 'Failed to load the blog.'}
           </p>
           <div className="space-y-3">
             <Button
@@ -414,13 +490,11 @@ const BlogDetails = () => {
       </div>
     );
   }
-  // Handle comments error
+
   if (commentsError) {
     console.error('Failed to load comments:', commentsError);
-    // Continue showing the blog even if comments fail to load
   }
 
-  // If no blog data after loading
   if (!blog) {
     return (
       <div className="dark:bg-mountain-950 flex h-screen items-center justify-center bg-white">
@@ -433,7 +507,6 @@ const BlogDetails = () => {
 
   const readingTime = Math.ceil(blog.content.split(/\s+/).length / 200);
 
-  // Centralized Action Buttons Component with improved visibility
   const ActionButtons = () => (
     <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 flex h-full w-full items-center space-x-3 rounded-full border bg-white p-2 shadow-sm transition duration-300 ease-in-out">
       <Tooltip title={isLiked ? 'Unlike' : 'Like'} placement="bottom" arrow>
@@ -451,7 +524,7 @@ const BlogDetails = () => {
             className="ml-1 font-medium text-blue-700 hover:underline dark:text-blue-300"
             onClick={(e) => {
               e.stopPropagation();
-              handleOpenLikesDialog();
+              requireAuth('view likes', () => setLikesDialogOpen(true));
             }}
           >
             {likeCount}
@@ -472,21 +545,32 @@ const BlogDetails = () => {
       <div className="ml-auto flex items-center space-x-3">
         <Tooltip title={copied ? 'Link copied!' : 'Copy link'} arrow>
           <IconButton
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }}
+            onClick={handleCopyLink}
             className="text-mountain-700 dark:text-mountain-200 hover:text-mountain-900 bg-mountain-100 dark:bg-mountain-700 hover:bg-mountain-200 dark:hover:bg-mountain-600 flex h-12 w-12 items-center justify-center rounded-full p-2 font-medium shadow-md transition-all duration-200 hover:cursor-pointer dark:hover:text-white"
           >
             <LuLink className="size-4" />
           </IconButton>
         </Tooltip>
-        {/* Report Button - Conditionally rendered */}
         {!isOwnBlog && (
           <Tooltip title="Report this blog" arrow>
             <IconButton
-              onClick={handleOpenReportDialog}
+              onClick={() => {
+                if (!user) {
+                  showSnackbar(
+                    'Please login to report this blog',
+                    'warning',
+                    <Button
+                      size="small"
+                      color="inherit"
+                      onClick={() => (window.location.href = '/login')}
+                    >
+                      Login
+                    </Button>,
+                  );
+                  return;
+                }
+                setReportDialogOpen(true);
+              }}
               className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 p-2 font-medium text-red-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-800/40 dark:hover:text-red-300"
             >
               <MdOutlineFlag className="size-4" />
@@ -505,7 +589,7 @@ const BlogDetails = () => {
             </Tooltip>
             <Tooltip title="Delete" arrow>
               <IconButton
-                onClick={handleOpenDeleteDialog}
+                onClick={() => setDeleteConfirmOpen(true)}
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 p-2 font-medium text-red-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-800/40 dark:hover:text-red-300"
               >
                 <FiTrash2 className="size-4" />
@@ -541,7 +625,6 @@ const BlogDetails = () => {
             <h1 className="text-4xl font-medium text-black dark:text-white">
               {blog.title}
             </h1>
-            {/* Show draft badge if not published and user is the owner */}
             {!isPublished && isOwnBlog && (
               <span className="inline-flex items-center rounded-full border border-yellow-200 bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                 Draft
@@ -579,7 +662,6 @@ const BlogDetails = () => {
             )}
           </div>
 
-          {/* Show a banner for unpublished content if owner */}
           {!isPublished && isOwnBlog && (
             <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
               <div className="flex items-start">
@@ -613,7 +695,6 @@ const BlogDetails = () => {
             </div>
           )}
 
-          {/* For unpublished blogs, hide or disable certain actions */}
           {isPublished && (
             <div
               className={`flex h-20 w-full items-center justify-center transition-all duration-300 ease-in-out ${showAuthorBadge ? 'sticky bottom-4 z-10' : 'opacity-100'}`}
@@ -622,56 +703,20 @@ const BlogDetails = () => {
             </div>
           )}
 
-          {/* Author Info Box */}
-          <div className="dark:border-mountain-700 flex items-center justify-between rounded-lg border border-transparent bg-gradient-to-r from-indigo-100 to-purple-100 p-4 shadow-sm dark:from-indigo-900/30 dark:to-purple-900/30">
-            <div className="flex items-center space-x-4">
-              {blog.user.profilePictureUrl ? (
-                <img
-                  src={blog.user.profilePictureUrl}
-                  alt={blog.user.username}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-              ) : (
-                <Avatar
-                  name={blog.user.username}
-                  size={48}
-                  variant="beam"
-                  colors={['#84bfc3', '#ff9b62', '#d96153']}
-                />
-              )}
-              <div className="flex flex-col">
-                <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                  {blog.user.fullName}
-                </p>
-                <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
-                  <span>@{blog.user.username}</span>
-                  <span className="text-gray-400 dark:text-gray-500">•</span>
-                  <span>
-                    {blog.user.followersCount.toLocaleString()}{' '}
-                    {blog.user.followersCount <= 1 ? 'follower' : 'followers'}
-                  </span>
-                </div>
-              </div>
-            </div>
-            {!isOwnBlog && (
-              <Button
-                onClick={toggleFollow}
-                disabled={followBtnLoading}
-                className="dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 border-mountain-200 dark:border-mountain-600 flex h-10 w-32 items-center border bg-white text-sm font-medium text-black shadow dark:text-white"
-              >
-                {followBtnLoading ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <>
-                    <IoPersonAddOutline className="mr-2 text-blue-500 dark:text-blue-400" />
-                    {isFollowing ? 'Unfollow' : 'Follow'}
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
+          <UserInfoCard
+            user={{
+              ...blog.user,
+              id: blog.user.id,
+              fullName: blog.user.fullName ?? '',
+              profilePictureUrl: blog.user.profilePictureUrl ?? null,
+              isFollowing: blog.user.isFollowing,
+              followersCount: blog.user.followersCount || 0,
+            }}
+            isOwnProfile={isOwnBlog}
+            isFollowLoading={followBtnLoading}
+            onToggleFollow={toggleFollow}
+          />
 
-          {/* Blog Content */}
           <div
             className="prose lg:prose-xl dark:prose-invert reset-tailwind dark:bg-mountain-950 max-w-none rounded-md bg-white p-2 text-black dark:text-white"
             dangerouslySetInnerHTML={{ __html: blog.content }}
@@ -679,7 +724,6 @@ const BlogDetails = () => {
 
           <hr className="border-mountain-200 dark:border-mountain-700 flex w-full border-t-1" />
 
-          {/* Only show action bar and interactions for published blogs */}
           {isPublished ? (
             <>
               <div
@@ -697,8 +741,8 @@ const BlogDetails = () => {
                 comments={comments}
                 targetId={Number(blogId)}
                 targetType={TargetType.BLOG}
-                onCommentAdded={handleCommentAdded}
-                onCommentDeleted={handleCommentDeleted}
+                onCommentAdded={handleCommentUpdate}
+                onCommentDeleted={handleCommentUpdate}
                 hideWrapper
               />
             </>
@@ -730,21 +774,19 @@ const BlogDetails = () => {
         </div>
       </main>
 
-      {/* Only show likes dialog for published blogs */}
       {isPublished && (
         <LikesDialog
           contentId={Number(blogId)}
           open={likesDialogOpen}
-          onClose={handleCloseLikesDialog}
+          onClose={() => setLikesDialogOpen(false)}
           variant={TargetType.BLOG}
         />
       )}
 
-      {/* Report Dialog - only for published blogs */}
       {blog && isPublished && (
         <ReportDialog
           open={reportDialogOpen}
-          onClose={handleCloseReportDialog}
+          onClose={() => setReportDialogOpen(false)}
           onSubmit={handleReportSubmit}
           submitting={isLoadingReport}
           itemName={blog.title}
@@ -752,12 +794,11 @@ const BlogDetails = () => {
         />
       )}
 
-      {/* Delete Confirmation Dialog - only for blog owners */}
       {blog && isOwnBlog && (
         <BlogDeleteConfirmDialog
           open={deleteConfirmOpen}
-          onClose={handleCloseDeleteDialog}
-          onConfirm={handleConfirmDelete}
+          onClose={() => setDeleteConfirmOpen(false)}
+          onConfirm={handleDeleteConfirm}
           submitting={isDeletingBlog}
           blogTitle={blog.title}
         />

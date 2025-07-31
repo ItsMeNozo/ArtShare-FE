@@ -198,7 +198,7 @@ const ArtGenAI = () => {
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-col items-end border-mountain-200 border-b-1">
           <AIHeader onGuideClick={() => setShowGuidePanel((prev) => !prev)} />
-          <GuidePanel open={showGuidePanel} onOpenChange={setShowGuidePanel} docName='ai-gen' />
+          <GuidePanel open={showGuidePanel} onOpenChange={setShowGuidePanel} docName='generate-images-ai' />
         </div>
         <div className="relative flex justify-end bg-gradient-to-b from-mountain-50 to-white w-full h-full">
           <div

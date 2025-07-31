@@ -16,7 +16,6 @@ const UserSubscription = () => {
     isLoading: loadingSubscriptionInfo,
     isError: isSubscriptionError,
   } = useSubscriptionInfo();
-  console.log('Subscription Info:', subscriptionInfo);
 
   useEffect(() => {
     if (searchParams.get('stripe_portal_return')) {
