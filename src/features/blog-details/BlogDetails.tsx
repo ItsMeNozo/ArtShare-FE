@@ -659,8 +659,14 @@ const BlogDetails = () => {
                 disabled={followBtnLoading}
                 className="dark:bg-mountain-800 hover:bg-mountain-50 dark:hover:bg-mountain-700 border-mountain-200 dark:border-mountain-600 flex h-10 w-32 items-center border bg-white text-sm font-medium text-black shadow dark:text-white"
               >
-                <IoPersonAddOutline className="mr-2 text-blue-500 dark:text-blue-400" />
-                {isFollowing ? 'Unfollow' : 'Follow'}
+                {followBtnLoading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  <>
+                    <IoPersonAddOutline className="mr-2 text-blue-500 dark:text-blue-400" />
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </>
+                )}
               </Button>
             )}
           </div>
