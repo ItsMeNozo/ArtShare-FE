@@ -31,14 +31,6 @@ const WriteBlog = () => {
   const initialSaveStatus = location.state?.saveStatus;
   const initialLastSaved = location.state?.lastSaved;
 
-  console.log('🏗️ WriteBlog component rendered with:', {
-    blogId,
-    pathname: location.pathname,
-    locationState: location.state,
-    justCreated,
-    initialSaveStatus,
-  });
-
   const blogState = useBlogState(preloadedTitle || (isNewDocument ? '' : ''));
   const {
     blogTitle,
@@ -64,15 +56,8 @@ const WriteBlog = () => {
     setTooltipOpen,
   } = blogState;
 
-  // ✅ DEBUG: Now that variables are declared, we can use them
   useEffect(() => {
-    console.log('📊 State update:', {
-      createdDocId,
-      isCreating,
-      hasUnsavedChanges,
-      wasJustCreated,
-      blogId,
-    });
+    // State update effect for debugging can be re-added if needed
   }, [createdDocId, isCreating, hasUnsavedChanges, wasJustCreated, blogId]);
 
   const blogOperations = useBlogOperations({
@@ -100,27 +85,14 @@ const WriteBlog = () => {
     return content.replace(/<[^>]*>/g, '').trim().length > 0;
   }, []);
 
-  // ✅ FIXED: Handle justCreated state immediately when component mounts
   useEffect(() => {
-    console.log('🔄 justCreated useEffect triggered with:', {
-      blogId,
-      justCreated,
-      initialSaveStatus,
-      locationState: location.state,
-      pathname: location.pathname,
-    });
-
     if (justCreated) {
-      console.log('🎯 Document was just created - setting clean state');
       setHasUnsavedChanges(false);
       setWasJustCreated(true);
       setHasContentForCreation(true);
       if (initialSaveStatus) {
         updateSaveStatus(initialSaveStatus, initialLastSaved);
       }
-      console.log('✅ Clean state set for just-created document');
-    } else {
-      console.log('⚠️ justCreated is false/undefined, not setting clean state');
     }
   }, [
     blogId,
@@ -134,50 +106,26 @@ const WriteBlog = () => {
   ]);
 
   const handleEditorChange = useCallback(() => {
-    console.log('📝 Editor changed:', {
-      wasJustCreated,
-      isNewDocument,
-      blogId,
-      isCreating,
-      createdDocId,
-      hasUnsavedChanges,
-    });
-
     autoSave.triggerContentCapture();
 
     const hasContent = hasContentToSave();
     setHasContentForCreation(hasContent);
 
     if (wasJustCreated && isInitializedRef.current) {
-      console.log(
-        '🔄 User made changes after creation - clearing wasJustCreated flag',
-      );
       setWasJustCreated(false);
     }
 
     autoSave.markChangesWhileSaving();
 
     if (isNewDocument && !createdDocId && !isCreating && hasContent) {
-      console.log('🆕 Creating new document with debounce...', {
-        blogTitle,
-        hasContent,
-        createdDocId,
-        isCreating,
-        debounceDelay: autoSave.delays.create,
-      });
-
       autoSave.createDebounce(() => {
-        console.log('⚡ Debounced createDocument triggered');
         return blogOperations.createDocument(blogTitle, editorRef);
       }, autoSave.delays.create);
       return;
     }
 
     if (!isNewDocument && blogId !== 'new' && blogId && !wasJustCreated) {
-      console.log('💾 Marking existing document as unsaved');
       setHasUnsavedChanges(true);
-    } else if (!isNewDocument && blogId !== 'new' && blogId && wasJustCreated) {
-      console.log('⏸️ Skipping unsaved marking - document was just created');
     }
   }, [
     autoSave,
@@ -192,7 +140,6 @@ const WriteBlog = () => {
     blogOperations,
     blogId,
     setHasUnsavedChanges,
-    hasUnsavedChanges,
   ]);
 
   const handleTitleChange = useCallback(
@@ -240,49 +187,16 @@ const WriteBlog = () => {
   );
 
   const isDirty = useMemo(() => {
-    const state = {
-      wasJustCreated,
-      isNewDocument,
-      hasContentForCreation,
-      hasUnsavedChanges,
-      blogId,
-      justCreated,
-      pathname: location.pathname,
-    };
-
-    console.log('🔍 isDirty calculation with full state:', state);
-
     if (wasJustCreated) {
-      console.log(
-        '✅ Document was just created - not dirty (wasJustCreated=true)',
-      );
       return false;
     }
 
     if (!isNewDocument) {
-      const dirty = hasUnsavedChanges;
-      console.log('📝 Existing document dirty check:', {
-        dirty,
-        hasUnsavedChanges,
-      });
-      return dirty;
+      return hasUnsavedChanges;
     }
 
-    const dirty = hasContentForCreation;
-    console.log('🆕 New document dirty check:', {
-      dirty,
-      hasContentForCreation,
-    });
-    return dirty;
-  }, [
-    isNewDocument,
-    hasContentForCreation,
-    hasUnsavedChanges,
-    wasJustCreated,
-    blogId,
-    justCreated,
-    location.pathname,
-  ]);
+    return hasContentForCreation;
+  }, [isNewDocument, hasContentForCreation, hasUnsavedChanges, wasJustCreated]);
 
   const isPublishDisabled = useMemo(() => {
     return !blogTitle?.trim() || !hasContentForCreation;
