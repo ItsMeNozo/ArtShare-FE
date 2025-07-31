@@ -18,6 +18,7 @@ const WriteBlog = () => {
   const editorRef = useRef<EditorHandle>(null);
   const isInitializedRef = useRef(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [wasJustCreated, setWasJustCreated] = useState(false);
 
   const { blogId } = useParams<{ blogId: string }>();
   const location = useLocation();
@@ -26,6 +27,17 @@ const WriteBlog = () => {
   const isNewDocument = blogId === 'new';
   const preloadedTitle = location.state?.title;
   const preserveContent = location.state?.preserveContent;
+  const justCreated = location.state?.justCreated;
+  const initialSaveStatus = location.state?.saveStatus;
+  const initialLastSaved = location.state?.lastSaved;
+
+  console.log('🏗️ WriteBlog component rendered with:', {
+    blogId,
+    pathname: location.pathname,
+    locationState: location.state,
+    justCreated,
+    initialSaveStatus,
+  });
 
   const blogState = useBlogState(preloadedTitle || (isNewDocument ? '' : ''));
   const {
@@ -52,6 +64,17 @@ const WriteBlog = () => {
     setTooltipOpen,
   } = blogState;
 
+  // ✅ DEBUG: Now that variables are declared, we can use them
+  useEffect(() => {
+    console.log('📊 State update:', {
+      createdDocId,
+      isCreating,
+      hasUnsavedChanges,
+      wasJustCreated,
+      blogId,
+    });
+  }, [createdDocId, isCreating, hasUnsavedChanges, wasJustCreated, blogId]);
+
   const blogOperations = useBlogOperations({
     updateSaveStatus,
     setHasUnsavedChanges,
@@ -77,35 +100,91 @@ const WriteBlog = () => {
     return content.replace(/<[^>]*>/g, '').trim().length > 0;
   }, []);
 
-  // ✅ FIXED: Simplified handleEditorChange - removed duplicate auto-save logic
+  // ✅ FIXED: Handle justCreated state immediately when component mounts
+  useEffect(() => {
+    console.log('🔄 justCreated useEffect triggered with:', {
+      blogId,
+      justCreated,
+      initialSaveStatus,
+      locationState: location.state,
+      pathname: location.pathname,
+    });
+
+    if (justCreated) {
+      console.log('🎯 Document was just created - setting clean state');
+      setHasUnsavedChanges(false);
+      setWasJustCreated(true);
+      setHasContentForCreation(true);
+      if (initialSaveStatus) {
+        updateSaveStatus(initialSaveStatus, initialLastSaved);
+      }
+      console.log('✅ Clean state set for just-created document');
+    } else {
+      console.log('⚠️ justCreated is false/undefined, not setting clean state');
+    }
+  }, [
+    blogId,
+    justCreated,
+    initialSaveStatus,
+    initialLastSaved,
+    setHasUnsavedChanges,
+    updateSaveStatus,
+    location.state,
+    location.pathname,
+  ]);
+
   const handleEditorChange = useCallback(() => {
-    // Capture content immediately before any other processing
+    console.log('📝 Editor changed:', {
+      wasJustCreated,
+      isNewDocument,
+      blogId,
+      isCreating,
+      createdDocId,
+      hasUnsavedChanges,
+    });
+
     autoSave.triggerContentCapture();
 
     const hasContent = hasContentToSave();
     setHasContentForCreation(hasContent);
 
-    // Mark changes while saving but don't let it block input capture
+    if (wasJustCreated && isInitializedRef.current) {
+      console.log(
+        '🔄 User made changes after creation - clearing wasJustCreated flag',
+      );
+      setWasJustCreated(false);
+    }
+
     autoSave.markChangesWhileSaving();
 
-    // Handle new document creation
     if (isNewDocument && !createdDocId && !isCreating && hasContent) {
-      autoSave.createDebounce(
-        () => blogOperations.createDocument(blogTitle, editorRef),
-        autoSave.delays.create,
-      );
+      console.log('🆕 Creating new document with debounce...', {
+        blogTitle,
+        hasContent,
+        createdDocId,
+        isCreating,
+        debounceDelay: autoSave.delays.create,
+      });
+
+      autoSave.createDebounce(() => {
+        console.log('⚡ Debounced createDocument triggered');
+        return blogOperations.createDocument(blogTitle, editorRef);
+      }, autoSave.delays.create);
       return;
     }
 
-    // ✅ FIXED: Let useAutoSave handle all existing document updates with proper abort support
-    if (!isNewDocument && blogId !== 'new' && blogId) {
+    if (!isNewDocument && blogId !== 'new' && blogId && !wasJustCreated) {
+      console.log('💾 Marking existing document as unsaved');
       setHasUnsavedChanges(true);
-      // The useAutoSave hook will handle the actual saving with abort controller
+    } else if (!isNewDocument && blogId !== 'new' && blogId && wasJustCreated) {
+      console.log('⏸️ Skipping unsaved marking - document was just created');
     }
   }, [
     autoSave,
     hasContentToSave,
     setHasContentForCreation,
+    wasJustCreated,
+    setWasJustCreated,
     isNewDocument,
     createdDocId,
     isCreating,
@@ -113,6 +192,7 @@ const WriteBlog = () => {
     blogOperations,
     blogId,
     setHasUnsavedChanges,
+    hasUnsavedChanges,
   ]);
 
   const handleTitleChange = useCallback(
@@ -125,7 +205,6 @@ const WriteBlog = () => {
 
         setHasUnsavedChanges(true);
 
-        // Use the enhanced abortable title save from useAutoSave
         const abortableTitleSave = autoSave.createAbortableTitleSave(
           numericBlogId,
           newTitle,
@@ -161,11 +240,49 @@ const WriteBlog = () => {
   );
 
   const isDirty = useMemo(() => {
-    return (
-      (isNewDocument && hasContentForCreation) ||
-      (!isNewDocument && hasUnsavedChanges)
-    );
-  }, [isNewDocument, hasContentForCreation, hasUnsavedChanges]);
+    const state = {
+      wasJustCreated,
+      isNewDocument,
+      hasContentForCreation,
+      hasUnsavedChanges,
+      blogId,
+      justCreated,
+      pathname: location.pathname,
+    };
+
+    console.log('🔍 isDirty calculation with full state:', state);
+
+    if (wasJustCreated) {
+      console.log(
+        '✅ Document was just created - not dirty (wasJustCreated=true)',
+      );
+      return false;
+    }
+
+    if (!isNewDocument) {
+      const dirty = hasUnsavedChanges;
+      console.log('📝 Existing document dirty check:', {
+        dirty,
+        hasUnsavedChanges,
+      });
+      return dirty;
+    }
+
+    const dirty = hasContentForCreation;
+    console.log('🆕 New document dirty check:', {
+      dirty,
+      hasContentForCreation,
+    });
+    return dirty;
+  }, [
+    isNewDocument,
+    hasContentForCreation,
+    hasUnsavedChanges,
+    wasJustCreated,
+    blogId,
+    justCreated,
+    location.pathname,
+  ]);
 
   const isPublishDisabled = useMemo(() => {
     return !blogTitle?.trim() || !hasContentForCreation;
@@ -286,9 +403,7 @@ const WriteBlog = () => {
         isDirty={isDirty}
         onDialogStateChange={setIsDialogOpen}
         onStay={async () => {
-          // ✅ FIXED: Use autoSave.performAutoSave with proper abort controller support
           if (!isNewDocument && blogId && blogTitle && hasUnsavedChanges) {
-            // Resume auto-save after user chooses to stay
             await autoSave.performAutoSave();
           }
         }}
