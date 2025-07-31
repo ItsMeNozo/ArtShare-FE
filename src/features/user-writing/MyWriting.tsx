@@ -2,11 +2,10 @@ import { UnsavedChangesProtector } from '@/components/UnsavedChangesProtector';
 import { TUTORIAL_TEMPLATE_HTML } from '@/constants/template';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useBlogOperations } from '@/hooks/useBlogOperations';
-import { useBlogState, type SaveStatus } from '@/hooks/useBlogState';
+import { useBlogState } from '@/hooks/useBlogState';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { fetchBlogDetails } from '../blog-details/api/blog';
-import { updateExistingBlog } from './api/blog.api';
 import Editor, { EditorHandle } from './components/Editor';
 import {
   EnhancedAutoSaveStatus,
@@ -53,18 +52,8 @@ const WriteBlog = () => {
     setTooltipOpen,
   } = blogState;
 
-  // Freeze status updates when dialog is open
-  const updateSaveStatusSafe = useCallback(
-    (status: SaveStatus, saved?: Date) => {
-      if (!isDialogOpen) {
-        updateSaveStatus(status, saved);
-      }
-    },
-    [isDialogOpen, updateSaveStatus],
-  );
-
   const blogOperations = useBlogOperations({
-    updateSaveStatus, // Use original, not wrapped version
+    updateSaveStatus,
     setHasUnsavedChanges,
     setCreatedDocId,
     setIsCreating,
@@ -77,7 +66,7 @@ const WriteBlog = () => {
     hasUnsavedChanges,
     isCreating,
     isNewDocument,
-    updateSaveStatus, // Use original, not wrapped version
+    updateSaveStatus,
     setHasUnsavedChanges,
     editorRef,
     isDialogOpen,
@@ -88,11 +77,18 @@ const WriteBlog = () => {
     return content.replace(/<[^>]*>/g, '').trim().length > 0;
   }, []);
 
+  // ✅ FIXED: Simplified handleEditorChange - removed duplicate auto-save logic
   const handleEditorChange = useCallback(() => {
+    // Capture content immediately before any other processing
+    autoSave.triggerContentCapture();
+
     const hasContent = hasContentToSave();
     setHasContentForCreation(hasContent);
+
+    // Mark changes while saving but don't let it block input capture
     autoSave.markChangesWhileSaving();
 
+    // Handle new document creation
     if (isNewDocument && !createdDocId && !isCreating && hasContent) {
       autoSave.createDebounce(
         () => blogOperations.createDocument(blogTitle, editorRef),
@@ -101,22 +97,22 @@ const WriteBlog = () => {
       return;
     }
 
-    if (!isNewDocument && blogId !== 'new') {
+    // ✅ FIXED: Let useAutoSave handle all existing document updates with proper abort support
+    if (!isNewDocument && blogId !== 'new' && blogId) {
       setHasUnsavedChanges(true);
-      updateSaveStatusSafe('unsaved');
+      // The useAutoSave hook will handle the actual saving with abort controller
     }
   }, [
+    autoSave,
+    hasContentToSave,
+    setHasContentForCreation,
     isNewDocument,
     createdDocId,
     isCreating,
-    blogId,
-    hasContentToSave,
     blogTitle,
     blogOperations,
-    autoSave,
-    setHasContentForCreation,
+    blogId,
     setHasUnsavedChanges,
-    updateSaveStatusSafe,
   ]);
 
   const handleTitleChange = useCallback(
@@ -128,9 +124,8 @@ const WriteBlog = () => {
         if (isNaN(numericBlogId)) return;
 
         setHasUnsavedChanges(true);
-        updateSaveStatusSafe('unsaved');
 
-        // Use the abortable title save function
+        // Use the enhanced abortable title save from useAutoSave
         const abortableTitleSave = autoSave.createAbortableTitleSave(
           numericBlogId,
           newTitle,
@@ -141,14 +136,7 @@ const WriteBlog = () => {
         );
       }
     },
-    [
-      isNewDocument,
-      blogId,
-      setBlogTitle,
-      setHasUnsavedChanges,
-      updateSaveStatusSafe,
-      autoSave,
-    ],
+    [isNewDocument, blogId, setBlogTitle, setHasUnsavedChanges, autoSave],
   );
 
   const handleExportDocument = useCallback(async () => {
@@ -166,9 +154,10 @@ const WriteBlog = () => {
 
   const handleSaveBlog = useCallback(
     (currentTitle: string) => {
+      autoSave.triggerContentCapture();
       blogOperations.saveBlog(blogId!, currentTitle, editorRef);
     },
-    [blogId, blogOperations],
+    [blogId, blogOperations, autoSave],
   );
 
   const isDirty = useMemo(() => {
@@ -297,27 +286,10 @@ const WriteBlog = () => {
         isDirty={isDirty}
         onDialogStateChange={setIsDialogOpen}
         onStay={async () => {
-          // Resume auto-save after user chooses to stay
+          // ✅ FIXED: Use autoSave.performAutoSave with proper abort controller support
           if (!isNewDocument && blogId && blogTitle && hasUnsavedChanges) {
-            const content = editorRef.current?.getContent();
-            if (content) {
-              // If we were saving when dialog opened, maintain the "Saving..." status
-              // Otherwise, show it now since we're starting a new save
-              updateSaveStatus('saving');
-
-              try {
-                await updateExistingBlog(parseInt(blogId, 10), {
-                  content,
-                  title: blogTitle.trim() || 'Untitled Document',
-                  isPublished: false,
-                });
-                updateSaveStatus('saved', new Date());
-                setHasUnsavedChanges(false);
-              } catch (error) {
-                console.error('Save after stay failed:', error);
-                updateSaveStatus('error');
-              }
-            }
+            // Resume auto-save after user chooses to stay
+            await autoSave.performAutoSave();
           }
         }}
       />
