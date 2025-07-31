@@ -45,7 +45,10 @@ export const useAutoSave = ({
 
   const isSavingRef = useRef(false);
   const changesWhileSavingRef = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const contentAbortControllerRef = useRef<AbortController | null>(null);
+  const titleAbortControllerRef = useRef<AbortController | null>(null);
+
   const wasDialogOpenRef = useRef(false);
 
   const latestContentRef = useRef<string>('');
@@ -66,10 +69,17 @@ export const useAutoSave = ({
     pendingTitleSaveRef.current = true;
   }, []);
 
-  const abortCurrentRequest = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+  const abortContentRequest = useCallback(() => {
+    if (contentAbortControllerRef.current) {
+      contentAbortControllerRef.current.abort();
+      contentAbortControllerRef.current = null;
+    }
+  }, []);
+
+  const abortTitleRequest = useCallback(() => {
+    if (titleAbortControllerRef.current) {
+      titleAbortControllerRef.current.abort();
+      titleAbortControllerRef.current = null;
     }
   }, []);
 
@@ -78,7 +88,8 @@ export const useAutoSave = ({
       cancelAutoSave();
       cancelTitleSave();
       cancelCreate();
-      abortCurrentRequest();
+      abortContentRequest();
+      abortTitleRequest();
       wasDialogOpenRef.current = true;
     } else if (!isDialogOpen && wasDialogOpenRef.current) {
       wasDialogOpenRef.current = false;
@@ -88,32 +99,24 @@ export const useAutoSave = ({
     cancelAutoSave,
     cancelTitleSave,
     cancelCreate,
-    abortCurrentRequest,
+    abortContentRequest,
+    abortTitleRequest,
   ]);
 
   const performAutoSave = useCallback(async () => {
-    console.log('💾 performAutoSave called:', {
-      blogId,
-      hasUnsavedChanges,
-      isDialogOpen,
-    });
-
     if (!blogId || blogId === 'new' || !hasUnsavedChanges || isDialogOpen) {
-      console.log('⏸️ Skipping performAutoSave due to conditions');
       return;
     }
 
     const content = latestContentRef.current || editorRef.current?.getContent();
     if (!content) {
-      console.log('⏸️ No content to save');
       return;
     }
 
-    console.log('🚀 Starting auto-save process');
-    abortCurrentRequest();
+    abortContentRequest();
 
     const currentAbortController = new AbortController();
-    abortControllerRef.current = currentAbortController;
+    contentAbortControllerRef.current = currentAbortController;
 
     isSavingRef.current = true;
     changesWhileSavingRef.current = false;
@@ -132,10 +135,8 @@ export const useAutoSave = ({
 
       if (!currentAbortController.signal.aborted) {
         if (changesWhileSavingRef.current) {
-          console.log('📝 Changes detected during save - staying unsaved');
           updateSaveStatus('unsaved');
           setHasUnsavedChanges(true);
-
           setTimeout(() => {
             if (!isDialogOpen && changesWhileSavingRef.current) {
               changesWhileSavingRef.current = false;
@@ -143,7 +144,6 @@ export const useAutoSave = ({
             }
           }, 100);
         } else {
-          console.log('✅ Auto-save completed successfully');
           setHasUnsavedChanges(false);
           updateSaveStatus('saved', new Date());
           pendingContentSaveRef.current = false;
@@ -153,7 +153,6 @@ export const useAutoSave = ({
       const saveError = error as SaveError;
       if (
         saveError.name !== 'AbortError' &&
-        saveError.name !== 'CanceledError' &&
         !currentAbortController.signal.aborted
       ) {
         console.error('❌ Auto-save failed:', saveError);
@@ -161,8 +160,8 @@ export const useAutoSave = ({
       }
     } finally {
       isSavingRef.current = false;
-      if (abortControllerRef.current === currentAbortController) {
-        abortControllerRef.current = null;
+      if (contentAbortControllerRef.current === currentAbortController) {
+        contentAbortControllerRef.current = null;
       }
     }
   }, [
@@ -173,27 +172,16 @@ export const useAutoSave = ({
     updateSaveStatus,
     setHasUnsavedChanges,
     editorRef,
-    abortCurrentRequest,
+    abortContentRequest,
     autoSaveDebounce,
   ]);
 
   useEffect(() => {
-    console.log('🔄 useAutoSave effect triggered:', {
-      hasUnsavedChanges,
-      isCreating,
-      isDialogOpen,
-      blogId,
-    });
-
     if (!hasUnsavedChanges || isCreating || isDialogOpen) {
-      console.log('⏸️ Skipping auto-save due to conditions');
       return;
     }
-
-    console.log('⚡ Triggering auto-save debounce');
     updateSaveStatus('unsaved');
     autoSaveDebounce(performAutoSave, DELAYS.autoSave);
-
     return cancelAutoSave;
   }, [
     hasUnsavedChanges,
@@ -221,10 +209,10 @@ export const useAutoSave = ({
 
         const titleToSave = latestTitleRef.current || newTitle;
 
-        abortCurrentRequest();
-
+        abortTitleRequest();
         const currentAbortController = new AbortController();
-        abortControllerRef.current = currentAbortController;
+        titleAbortControllerRef.current = currentAbortController;
+
         updateSaveStatus('saving');
 
         try {
@@ -246,7 +234,6 @@ export const useAutoSave = ({
           const saveError = error as SaveError;
           if (
             saveError.name !== 'AbortError' &&
-            saveError.name !== 'CanceledError' &&
             !currentAbortController.signal.aborted
           ) {
             console.error('Title save failed:', saveError);
@@ -254,8 +241,8 @@ export const useAutoSave = ({
             setHasUnsavedChanges(true);
           }
         } finally {
-          if (abortControllerRef.current === currentAbortController) {
-            abortControllerRef.current = null;
+          if (titleAbortControllerRef.current === currentAbortController) {
+            titleAbortControllerRef.current = null;
           }
         }
       };
@@ -265,10 +252,11 @@ export const useAutoSave = ({
       updateSaveStatus,
       setHasUnsavedChanges,
       captureCurrentTitle,
-      abortCurrentRequest,
+      abortTitleRequest,
     ],
   );
 
+  // This beacon part can remain the same
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (pendingContentSaveRef.current || pendingTitleSaveRef.current) {
@@ -277,6 +265,7 @@ export const useAutoSave = ({
         const finalTitle = latestTitleRef.current || blogTitle;
 
         if (finalContent && blogId && blogId !== 'new') {
+          // This API endpoint needs to exist on your server
           navigator.sendBeacon(
             '/api/blogs/autosave',
             JSON.stringify({
