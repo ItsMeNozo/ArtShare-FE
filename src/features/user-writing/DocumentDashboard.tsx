@@ -455,7 +455,7 @@ const DocumentDashboard = () => {
       </div>
 
       <div className="border-mountain-200 dark:border-mountain-700 flex w-full flex-col space-y-6 border-t">
-        <div className="dark:bg-mountain-800 sticky top-0 flex h-fit w-full items-center justify-between bg-white px-4 py-3 shadow-md">
+        <div className="dark:bg-mountain-800 sticky top-0 z-10 flex h-fit w-full items-center justify-between bg-white px-4 py-3 shadow-md">
           <div>
             <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
               Recent projects
