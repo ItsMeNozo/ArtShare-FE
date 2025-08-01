@@ -53,6 +53,8 @@ const useOptimisticMutation = <T = unknown, TVariables = unknown>(
     msg: string,
     type: 'success' | 'error' | 'warning' | 'info',
   ) => void,
+  // Add this new parameter with a default empty array
+  additionalInvalidationKeys: (string | undefined)[][] = [],
 ) => {
   const queryClient = useQueryClient();
 
@@ -65,8 +67,18 @@ const useOptimisticMutation = <T = unknown, TVariables = unknown>(
       return { previousBlog };
     },
     onSuccess: () => {
-      showSnackbar(successMessage, 'success');
+      // Don't show a snackbar if the message is empty (for likes)
+      if (successMessage) {
+        showSnackbar(successMessage, 'success');
+      }
       queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
+      // Invalidate the additional queries passed to the hook
+      additionalInvalidationKeys.forEach((key) => {
+        // Only invalidate if the dynamic key part (e.g., username) is present
+        if (key && key.length > 1 && key[1]) {
+          queryClient.invalidateQueries({ queryKey: key });
+        }
+      });
     },
     onError: (error: unknown, _, context) => {
       if (context?.previousBlog) {
@@ -80,17 +92,27 @@ const useOptimisticMutation = <T = unknown, TVariables = unknown>(
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['blogDetails', blogId] });
+      // Also settle the additional queries
+      additionalInvalidationKeys.forEach((key) => {
+        if (key && key.length > 1 && key[1]) {
+          queryClient.invalidateQueries({ queryKey: key });
+        }
+      });
     },
   });
 };
 
 const useFollowMutations = (
   blogId: string,
+  username: string | undefined, // Safely accept string | undefined
   showSnackbar: (
     msg: string,
     type: 'success' | 'error' | 'warning' | 'info',
   ) => void,
 ) => {
+  // Define the additional query key that needs to be invalidated
+  const additionalKeysToInvalidate = [['userProfile', username]];
+
   const followMutation = useOptimisticMutation(
     followUser,
     (old: Blog | undefined) => {
@@ -108,6 +130,7 @@ const useFollowMutations = (
     'Failed to follow user.',
     blogId,
     showSnackbar,
+    additionalKeysToInvalidate, // Pass the key here
   );
 
   const unfollowMutation = useOptimisticMutation(
@@ -127,6 +150,7 @@ const useFollowMutations = (
     'Failed to unfollow user.',
     blogId,
     showSnackbar,
+    additionalKeysToInvalidate, // And pass it here as well
   );
 
   return { followMutation, unfollowMutation };
@@ -210,6 +234,7 @@ const BlogDetails = () => {
 
   const { followMutation, unfollowMutation } = useFollowMutations(
     safeBlogId,
+    blog?.user.username,
     showSnackbar,
   );
   const { likeMutation, unlikeMutation } = useLikeMutations(
