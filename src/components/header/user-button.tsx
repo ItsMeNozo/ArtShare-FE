@@ -329,7 +329,7 @@ const handleNotificationClick = (
       const followMatch = message.match(followPattern);
       if (followMatch && followMatch[1]) {
         const username = followMatch[1].trim().replace(/^"|"$/g, '');
-        navigate(`/${username}`);
+        navigate(`/u/${username}`);
       } else {
         navigate('/profile');
       }

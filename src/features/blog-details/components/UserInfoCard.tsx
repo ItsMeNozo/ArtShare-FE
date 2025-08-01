@@ -24,7 +24,7 @@ const UserInfoCard = memo(
   }: UserInfoCardProps) => {
     const navigate = useNavigate();
 
-    const handleCardClick = () => navigate(`/${user.username}`);
+    const handleCardClick = () => navigate(`/u/${user.username}`);
 
     const handleFollowClick = (e: React.MouseEvent) => {
       e.stopPropagation();
