@@ -234,6 +234,13 @@ const BlogDetails = () => {
     },
   });
 
+  useEffect(() => {
+    // This code will only run after the data has been successfully fetched.
+    if (blog && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [blog]);
+
   const { followMutation, unfollowMutation } = useFollowMutations(
     safeBlogId,
     blog?.user.username,
