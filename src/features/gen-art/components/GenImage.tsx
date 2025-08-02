@@ -439,7 +439,13 @@ const GenImage: React.FC<GenImageProps> = ({
             </div>
             <div className="p-2">
               <div
-                onClick={() => handleNavigateToUpload(result)}
+                onClick={() => {
+                  const copyResult = {
+                    ...result,
+                    imageUrls: [result.imageUrls[currentIndex]],
+                  };
+                  handleNavigateToUpload(copyResult);
+                }}
                 className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
               >
                 <RiFolderUploadLine className="mr-2 size-5" />
