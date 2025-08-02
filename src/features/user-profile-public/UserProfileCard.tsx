@@ -18,6 +18,7 @@ import { BiEdit } from 'react-icons/bi';
 import { HiUserAdd } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { followUser, unfollowUser } from './api/follow.api';
+import { UserProfile } from './api/user-profile.api';
 import ProfileHeader from './components/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo';
 import ReportDialog from './components/ReportDialog';
@@ -48,8 +49,27 @@ export const UserProfileCard = () => {
       }
       return followUser(profileData.id);
     },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['userProfile', username] });
+
+      const previousProfileData = queryClient.getQueryData<UserProfile>([
+        'userProfile',
+        username,
+      ]);
+
+      // 3. Optimistically update to the new value
+      if (previousProfileData) {
+        queryClient.setQueryData<UserProfile>(['userProfile', username], {
+          ...previousProfileData,
+          isFollowing: true,
+          followersCount: previousProfileData.followersCount + 1,
+        });
+      }
+
+      return { previousProfileData };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
+      // queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
       showSnackbar('Followed successfully.', 'success');
     },
     onError: (error: unknown) => {
@@ -70,8 +90,23 @@ export const UserProfileCard = () => {
       }
       return unfollowUser(profileData.id);
     },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['userProfile', username] });
+      const previousProfileData = queryClient.getQueryData<UserProfile>([
+        'userProfile',
+        username,
+      ]);
+      if (previousProfileData) {
+        queryClient.setQueryData<UserProfile>(['userProfile', username], {
+          ...previousProfileData,
+          isFollowing: false,
+          followersCount: previousProfileData.followersCount - 1,
+        });
+      }
+      return { previousProfileData };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
+      // queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
       showSnackbar('Unfollowed successfully.', 'success');
     },
     onError: (error: unknown) => {
