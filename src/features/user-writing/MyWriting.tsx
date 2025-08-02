@@ -4,7 +4,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useBlogOperations } from '@/hooks/useBlogOperations';
 import { useBlogState } from '@/hooks/useBlogState';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchBlogDetails } from '../blog-details/api/blog';
 import Editor, { EditorHandle } from './components/Editor';
 import {
@@ -19,6 +19,7 @@ const WriteBlog = () => {
   const isInitializedRef = useRef(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [wasJustCreated, setWasJustCreated] = useState(false);
+  const navigate = useNavigate();
 
   const { blogId } = useParams<{ blogId: string }>();
   const location = useLocation();
@@ -103,6 +104,7 @@ const WriteBlog = () => {
     updateSaveStatus,
     location.state,
     location.pathname,
+    setHasContentForCreation,
   ]);
 
   const handleEditorChange = useCallback(() => {
@@ -178,12 +180,46 @@ const WriteBlog = () => {
     }
   }, [blogId, setTooltipOpen]);
 
-  const handleSaveBlog = useCallback(
-    (currentTitle: string) => {
-      autoSave.triggerContentCapture();
-      blogOperations.saveBlog(blogId!, currentTitle, editorRef);
+  const handlePublish = useCallback(
+    async (currentTitle: string) => {
+      if (!blogId || !currentTitle.trim() || !hasContentForCreation) return;
+
+      try {
+        // Capture current content
+        autoSave.triggerContentCapture();
+
+        // ✅ WAIT for publish to complete before navigating
+        await blogOperations.saveBlog(blogId, currentTitle, editorRef);
+
+        // ✅ Update local state immediately
+        setIsPublished(true);
+
+        // ✅ Navigate with published state to prevent flash
+        const targetBlogId = blogId === 'new' ? createdDocId : blogId;
+        if (targetBlogId) {
+          navigate(`/blogs/${targetBlogId}`, {
+            state: {
+              isPublished: true, // Tell destination page it's published
+              title: currentTitle, // Pass current title
+              justPublished: true, // Flag to indicate fresh publish
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Failed to publish:', error);
+        // Optionally show error message to user
+      }
     },
-    [blogId, blogOperations, autoSave],
+    [
+      blogId,
+      hasContentForCreation,
+      autoSave,
+      blogOperations,
+      editorRef,
+      createdDocId,
+      navigate,
+      setIsPublished,
+    ],
   );
 
   const isDirty = useMemo(() => {
@@ -199,8 +235,14 @@ const WriteBlog = () => {
   }, [isNewDocument, hasContentForCreation, hasUnsavedChanges, wasJustCreated]);
 
   const isPublishDisabled = useMemo(() => {
-    return !blogTitle?.trim() || !hasContentForCreation;
-  }, [blogTitle, hasContentForCreation]);
+    // Can't publish without title and content
+    if (!blogTitle?.trim() || !hasContentForCreation) return true;
+
+    // Already published
+    if (isPublished) return true;
+
+    return false;
+  }, [blogTitle, hasContentForCreation, isPublished]);
 
   const statusComponent = useMemo(
     () => (
@@ -239,6 +281,11 @@ const WriteBlog = () => {
           editorRef.current.setContent(content);
           isInitializedRef.current = true;
         }
+
+        // Set hasContentForCreation for template content
+        const hasContent = content.replace(/<[^>]*>/g, '').trim().length > 0;
+        setHasContentForCreation(hasContent);
+
         setIsApiLoading(false);
         setIsContentReady(true);
         return;
@@ -257,6 +304,11 @@ const WriteBlog = () => {
         if (editorRef.current) {
           editorRef.current.setContent(blog.content || '');
           isInitializedRef.current = true;
+
+          // ✅ FIX: Check if loaded content exists and set hasContentForCreation
+          const hasContent =
+            (blog.content || '').replace(/<[^>]*>/g, '').trim().length > 0;
+          setHasContentForCreation(hasContent);
         }
       } catch (error) {
         blogOperations.handleApiError(error, 'Failed to load blog content.');
@@ -276,6 +328,7 @@ const WriteBlog = () => {
     setIsPublished,
     setIsApiLoading,
     setIsContentReady,
+    setHasContentForCreation, // ✅ Already added this dependency
     blogOperations,
   ]);
 
@@ -327,7 +380,7 @@ const WriteBlog = () => {
         <div className="flex h-full w-[calc(100vw-16rem)] flex-1 flex-col">
           <TextEditorHeader
             handleExport={handleExportDocument}
-            handleSaveBlog={handleSaveBlog}
+            handlePublish={handlePublish}
             text={titleDisplay}
             setText={handleTitleChange}
             isPublished={isPublished}

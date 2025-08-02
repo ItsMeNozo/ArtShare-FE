@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { LikesDialog } from '@/components/like/LikesDialog';
 import { useUser } from '@/contexts/user';
@@ -205,6 +205,8 @@ const BlogDetails = () => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const location = useLocation();
+  const navigationState = location.state as { isPublished?: boolean } | null;
 
   const { user } = useUser();
   const { showSnackbar } = useSnackbar();
@@ -295,7 +297,7 @@ const BlogDetails = () => {
   };
 
   const isOwnBlog = user?.id === blog?.user.id;
-  const isPublished = blog?.isPublished ?? true;
+  const isPublished = navigationState?.isPublished ?? blog?.isPublished ?? true;
   const followBtnLoading =
     followMutation.isPending || unfollowMutation.isPending;
   const isLiked = blog?.isLikedByCurrentUser || false;
