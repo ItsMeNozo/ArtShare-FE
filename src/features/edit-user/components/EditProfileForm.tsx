@@ -1,30 +1,37 @@
+import { getPresignedUrl, uploadFile } from '@/api/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { UnsavedChangesProtector } from '@/components/UnsavedChangesProtector';
 import { useUser } from '@/contexts/user';
-import { getUserProfile } from '@/features/user-profile-private/api/get-user-profile';
 import { UserProfile } from '@/features/user-profile-public/api/user-profile.api';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { cn } from '@/lib/utils';
+import { User } from '@/types';
 import { Box, TextareaAutosize, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import React from 'react';
+import { nanoid } from 'nanoid';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { updateUserProfile } from '../api/user-profile.api';
-import { UnsavedChangesProtector } from '@/components/UnsavedChangesProtector';
 
-export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
-  initialData,
-}) => {
+export const EditProfileForm: React.FC<{
+  initialData: UserProfile;
+  newAvatarFile: File | null;
+  onSaveSuccess: () => void;
+}> = ({ initialData, newAvatarFile, onSaveSuccess }) => {
   const { showSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
+  const navigate = useNavigate();
+  const [navigateToUrl, setNavigateToUrl] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty: formIsDirty },
     reset,
     watch,
   } = useForm<UserProfile>({
@@ -34,23 +41,21 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     },
   });
 
-  const currentValues = watch(); // Watch all form fields
-  const isDirty = React.useMemo(() => {
-    // A robust way to compare form state with initial data, accounting for date format differences
-    const initialFormatted = {
-        ...initialData,
-        birthday: initialData.birthday ? initialData.birthday.slice(0, 10) : '',
+  useEffect(() => {
+    const formattedData = {
+      ...initialData,
+      birthday: initialData.birthday ? initialData.birthday.slice(0, 10) : '',
     };
-    const currentFormatted = {
-        ...currentValues,
-        birthday: currentValues.birthday ? currentValues.birthday.slice(0, 10) : '',
-    };
+    reset(formattedData, { keepDirty: true });
+  }, [initialData, reset]);
 
-    delete initialFormatted.email;
-    delete currentFormatted.email;
+  useEffect(() => {
+    if (navigateToUrl) {
+      navigate(navigateToUrl);
+    }
+  }, [navigateToUrl, navigate]);
 
-    return JSON.stringify(initialFormatted) !== JSON.stringify(currentFormatted);
-  }, [currentValues, initialData]);
+  const isPageDirty = formIsDirty || !!newAvatarFile;
 
   const isAbove13 = (birthday: string) => {
     const birth = new Date(birthday);
@@ -65,37 +70,55 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
     return age >= 13;
   };
 
-  const onSubmit = async (raw: UserProfile) => {
-    if (raw.birthday && !isAbove13(raw.birthday)) {
+  const onSubmit = async (formData: UserProfile) => {
+    if (formData.birthday && !isAbove13(formData.birthday)) {
       showSnackbar('You must be at least 13 years old.', 'error');
       return;
     }
 
-    const payload = {
-      username: raw.username,
-      email: raw.email,
-      fullName: raw.fullName,
-      profilePictureUrl: raw.profilePictureUrl,
-      bio: raw.bio,
-      birthday: new Date(raw.birthday ?? '').toISOString(),
-    };
+    let finalProfilePictureUrl = formData.profilePictureUrl;
 
     try {
-      await updateUserProfile(payload);
-
-      // Invalidate and refetch user profile query
-      await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-
-      // Update user context with fresh data
-      try {
-        const updatedProfile = await getUserProfile();
-        setUser?.(updatedProfile);
-      } catch (contextError) {
-        console.warn('Failed to update user context:', contextError);
+      if (newAvatarFile) {
+        const ext = newAvatarFile.type.split('/')[1];
+        const key = `avatars/${nanoid(8)}.${ext}`;
+        const { presignedUrl, fileUrl } = await getPresignedUrl(
+          key,
+          ext,
+          'image',
+          'users',
+        );
+        await uploadFile(newAvatarFile, presignedUrl);
+        finalProfilePictureUrl = fileUrl;
       }
 
-      reset(raw);
-      showSnackbar('Profile updated successfully!', 'success');
+      const payload = {
+        username: formData.username,
+        fullName: formData.fullName,
+        bio: formData.bio,
+        birthday: new Date(formData.birthday ?? '').toISOString(),
+        profilePictureUrl: finalProfilePictureUrl,
+      };
+
+      const { data: savedProfile } = await updateUserProfile(payload);
+
+      if (user) {
+        const updatedFullUser: User = {
+          ...user,
+          ...savedProfile,
+        };
+
+        await queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+
+        showSnackbar('Profile updated successfully!', 'success');
+        reset(savedProfile);
+        onSaveSuccess();
+        setUser?.(updatedFullUser);
+        setNavigateToUrl(`/u/${savedProfile.username}`);
+      } else {
+        showSnackbar('Session error. Please log in again.', 'error');
+        navigate('/login');
+      }
     } catch (err: unknown) {
       let msg = 'Failed to update profile';
       if (axios.isAxiosError(err)) {
@@ -135,7 +158,7 @@ export const EditProfileForm: React.FC<{ initialData: UserProfile }> = ({
       onSubmit={handleSubmit(onSubmit)}
       className="dark:bg-mountain-900 mt-5 max-w-screen rounded-none p-6 dark:rounded-md"
     >
-      <UnsavedChangesProtector isDirty={isDirty} />
+      <UnsavedChangesProtector isDirty={isPageDirty} />
       <Box className="mb-4">
         <Typography className="text-foreground mb-1 font-medium">
           Full Name <span className="text-rose-500">*</span>

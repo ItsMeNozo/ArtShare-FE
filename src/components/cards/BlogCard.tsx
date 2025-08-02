@@ -49,12 +49,11 @@ const BlogCard: React.FC<BlogCardProps> = ({
   const handleCardClick = () => {
     navigate(`/blogs/${blogId}`);
   };
-
   const handleCopyLink = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText(
-        `http://localhost:5173/blogs/${blogId}`,
+        `${window.location.origin}/blogs/${blogId}`,
       );
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -137,7 +136,13 @@ const BlogCard: React.FC<BlogCardProps> = ({
             <span className="text-gray-500 dark:text-gray-500">•</span>
             <span className="truncate text-xs text-gray-500 dark:text-gray-400">
               {dateCreated && !isNaN(new Date(dateCreated).getTime()) ? (
-                <ReactTimeAgo className='capitalize' date={new Date(dateCreated)} locale="en-US" timeStyle="round-minute" tick={false} />
+                <ReactTimeAgo
+                  className="capitalize"
+                  date={new Date(dateCreated)}
+                  locale="en-US"
+                  timeStyle="round-minute"
+                  tick={false}
+                />
               ) : (
                 'Unknown time'
               )}

@@ -18,12 +18,24 @@ export default function EditUser() {
   });
 
   const [formData, setFormData] = useState<UserProfile | null>(null);
+  const [newAvatarFile, setNewAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (profileData) {
       setFormData(profileData);
     }
   }, [profileData]);
+
+  const handleAvatarChange = (file: File, previewUrl: string) => {
+    setNewAvatarFile(file);
+    setFormData((prev) =>
+      prev ? { ...prev, profilePictureUrl: previewUrl } : prev,
+    );
+  };
+
+  const handleSaveSuccess = () => {
+    setNewAvatarFile(null);
+  };
 
   if (loadingProfile || !formData) {
     return (
@@ -39,15 +51,15 @@ export default function EditUser() {
         <AvatarSection
           profilePictureUrl={formData.profilePictureUrl}
           username={formData.username}
-          onUploadSuccess={(newUrl: string) =>
-            setFormData((prev) =>
-              prev ? { ...prev, profilePictureUrl: newUrl } : prev,
-            )
-          }
+          onAvatarChange={handleAvatarChange}
         />
       </Box>
 
-      {profileData && <EditProfileForm initialData={profileData} />}
+      <EditProfileForm
+        initialData={formData}
+        newAvatarFile={newAvatarFile}
+        onSaveSuccess={handleSaveSuccess}
+      />
     </Container>
   );
 }
