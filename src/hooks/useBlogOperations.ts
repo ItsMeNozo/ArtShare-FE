@@ -1,3 +1,4 @@
+// useBlogOperations.ts - Final version
 import {
   CreateBlogPayload,
   createNewBlog,
@@ -51,7 +52,16 @@ export const useBlogOperations = ({
 
   const createDocument = useCallback(
     async (blogTitle: string, editorRef: React.RefObject<EditorHandle>) => {
+      console.log('🚀 createDocument function called with:', {
+        blogTitle,
+        editorContent:
+          editorRef.current?.getContent()?.substring(0, 100) + '...',
+        editorExists: !!editorRef.current,
+      });
+
       setIsCreating(true);
+      updateSaveStatus('saving');
+
       try {
         const payload: CreateBlogPayload = {
           title: blogTitle?.trim() || 'Untitled Document',
@@ -59,20 +69,48 @@ export const useBlogOperations = ({
           content: editorRef.current?.getContent() || '',
         };
 
-        const newBlog = await createNewBlog(payload);
-        setCreatedDocId(newBlog.id);
-
-        navigate(`/docs/${newBlog.id}`, {
-          replace: true,
-          state: { preserveContent: true, title: blogTitle },
+        console.log('📡 About to call createNewBlog API with payload:', {
+          title: payload.title,
+          isPublished: payload.isPublished,
+          contentLength: payload.content.length,
         });
 
+        const newBlog = await createNewBlog(payload);
+        console.log('✅ createNewBlog API call successful, received:', newBlog);
+
+        const lastSavedTime = new Date();
+        setCreatedDocId(newBlog.id);
+
+        console.log('🧹 Setting clean state before navigation...');
         setHasUnsavedChanges(false);
-        updateSaveStatus('saved', new Date());
+        updateSaveStatus('saved', lastSavedTime);
+
+        console.log('🧭 About to navigate to:', `/docs/${newBlog.id}`);
+
+        // --- THE FIX IS APPLIED HERE ---
+        navigate(`/docs/${newBlog.id}`, {
+          replace: true, // Replaces /docs/new in the browser history
+          state: {
+            preserveContent: true,
+            title: blogTitle,
+            justCreated: true,
+            initialSaveStatus: 'saved',
+            initialLastSaved: lastSavedTime.toISOString(),
+
+            // This line tells the blocker to allow this specific navigation
+            skipUnsavedGuard: true,
+          },
+        });
+
+        console.log('✅ Navigation call completed');
       } catch (error) {
+        console.error('❌ Error in createDocument:', error);
         handleApiError(error, 'Failed to create document', false);
         updateSaveStatus('error');
       } finally {
+        console.log(
+          '🏁 createDocument finally block - setting isCreating to false',
+        );
         setIsCreating(false);
       }
     },
@@ -100,12 +138,13 @@ export const useBlogOperations = ({
 
       const payload: UpdateBlogPayload = {
         title: title?.trim() || 'Untitled Document',
-        isPublished: true,
+        isPublished: true, // Note: This might need to be dynamic if you have a separate publish button
         pictures: images.map((img) => img.src),
         content,
       };
 
       try {
+        updateSaveStatus('saving');
         await updateExistingBlog(numericBlogId, payload);
         updateSaveStatus('saved', new Date());
         setHasUnsavedChanges(false);

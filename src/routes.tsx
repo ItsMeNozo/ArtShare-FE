@@ -2,12 +2,12 @@ import { lazy } from 'react';
 import { createBrowserRouter, Outlet, RouteObject } from 'react-router-dom';
 
 // Layouts & Wrappers
+import OnboardingRoute from '@/components/ProtectedItems/OnboardingRoute';
 import ProtectedAuthRoute from '@/components/ProtectedItems/ProtectedAuthRoute';
 import ProtectedInAppRoute from '@/components/ProtectedItems/ProtectedInAppRoute';
 import GuestRoute from '@/components/routes/guest-route';
-import RootLayout from '@/layouts';
-import OnboardingRoute from '@/components/ProtectedItems/OnboardingRoute';
 import UserSubscription from '@/features/user-profile-private/UserSubscription';
+import RootLayout from '@/layouts';
 import AutoLayout from '@/layouts/subLayouts/AutoLayout';
 import ProFeatureRoute from './components/ProtectedItems/ProFeatureRoute';
 
@@ -17,7 +17,9 @@ const Dashboard = lazy(() => import('@/features/app-dashboard/Dashboard'));
 const Updates = lazy(() => import('@/features/app-dashboard/Updates'));
 const EditUser = lazy(() => import('@/features/edit-user/EditUserPage'));
 const OnboardingProfile = lazy(() => import('@/features/onboarding'));
-const RequireOnboard = lazy(() => import('@/components/ProtectedItems/RequireOnboard'));
+const RequireOnboard = lazy(
+  () => import('@/components/ProtectedItems/RequireOnboard'),
+);
 
 // Lazy imports for pages/features
 const LandingPage = lazy(() => import('@/pages/Home'));
@@ -29,7 +31,9 @@ const ForgotPassword = lazy(
 const AccountActivation = lazy(
   () => import('@/features/authentication/Activation'),
 );
-const AuthAction = lazy(() => import('@/features/authentication/HandleCallback'));
+const AuthAction = lazy(
+  () => import('@/features/authentication/HandleCallback'),
+);
 const Explore = lazy(() => import('@/features/explore'));
 const BrowseBlogs = lazy(() => import('@/features/browse-blogs/BrowseBlogs'));
 const BlogDetails = lazy(() => import('@/features/blog-details/BlogDetails'));
@@ -60,8 +64,7 @@ const SocialLinksPage = lazy(
     import('@/features/media-automation/social-links/routes/SocialLinksPage'),
 );
 const AutoSchedulingPage = lazy(
-  () =>
-    import('@/features/media-automation/scheduling/routes/AutoScheduling'),
+  () => import('@/features/media-automation/scheduling/routes/AutoScheduling'),
 );
 
 const ProjectsPage = lazy(
@@ -163,7 +166,7 @@ const routeConfig: RouteObject[] = [
           </RequireOnboard>
         ),
         children: [
-          { path: '/docs/:blogId', element: <MyWriting /> },
+          { path: '/docs/:blogId', element: <MyWriting /> }, // ✅ FIXED: Comes after
           { path: '/image/tool/editor', element: <ImageEditor /> },
           { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
           { path: '/image/tool/editor/new', element: <BrowseImage /> },
@@ -255,22 +258,6 @@ const routeConfig: RouteObject[] = [
               },
             ],
           },
-        ],
-      },
-      // No layout routes
-      {
-        element: (
-          <RequireOnboard>
-            <ProtectedInAppRoute>
-              <Outlet />
-            </ProtectedInAppRoute>
-          </RequireOnboard>
-        ),
-        children: [
-          { path: '/docs/:blogId', element: <MyWriting /> },
-          { path: '/image/tool/editor', element: <ImageEditor /> },
-          { path: '/image/tool/editor/new', element: <BrowseImage /> },
-          { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
         ],
       },
       // Catch-all -> redirect
