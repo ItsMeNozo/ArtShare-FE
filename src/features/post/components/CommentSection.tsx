@@ -322,7 +322,7 @@ const CommentRow = ({
       className={`comment-item w-full ${isHighlighted ? 'comment-highlighted' : ''}`}
     >
       <Box className="w-full">
-        <div className="flex w-full gap-3 py-3 items-start">
+        <div className="flex w-full items-start gap-3 py-3">
           {comment.user.profilePictureUrl ? (
             <img
               src={comment.user.profilePictureUrl}
@@ -355,7 +355,7 @@ const CommentRow = ({
                 className="cursor-pointer font-bold transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/${comment.user.username}`);
+                  navigate(`/u/${comment.user.username}`);
                 }}
               >
                 @{comment.user.username}
@@ -373,7 +373,7 @@ const CommentRow = ({
                 }
               >
                 <ReactTimeAgo
-                  className='capitalize'
+                  className="capitalize"
                   date={new Date(comment.updatedAt)}
                   timeStyle="round-minute"
                   tick={false}
@@ -1642,9 +1642,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
     return (
       <div className={wrapperClass}>
-        <span className="text-md px-4 font-bold dark:text-white">
-          Comments
-        </span>
+        <span className="text-md px-4 font-bold dark:text-white">Comments</span>
         {inputPosition === 'top' && InputBar}
         <FreshRepliesCtx.Provider
           value={{ map: newRepliesMap, clear: clearFresh }}
