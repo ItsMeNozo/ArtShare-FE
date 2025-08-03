@@ -3,8 +3,8 @@ import {
   createNewBlog,
   UpdateBlogPayload,
   updateExistingBlog,
-} from '@/features/user-writing/api/blog.api';
-import { EditorHandle } from '@/features/user-writing/components/Editor';
+} from '@/features/write-blog/api/blog.api';
+import { EditorHandle } from '@/features/write-blog/components/Editor';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { AxiosError } from 'axios';
 import { useCallback } from 'react';

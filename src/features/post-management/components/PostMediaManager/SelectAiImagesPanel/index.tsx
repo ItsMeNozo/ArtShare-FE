@@ -17,13 +17,13 @@ import BrowsePromptHistory from './BrowsePromptHistory';
 const SelectAiImagesPanel: React.FC = () => {
   return (
     <MediaPreviewContainer>
-      <Dialog modal={false}>
-        <DialogTrigger>
+      <Dialog>
+        <DialogTrigger asChild>
           <Button
             variant="text"
             component="label"
             size="small"
-            className="hover:bg-mountain-50 border-mountain-200 flex w-40 flex-col items-center justify-center border-1 bg-white p-4 shadow-md"
+            className="flex flex-col justify-center items-center bg-white hover:bg-mountain-50 shadow-md p-4 border-1 border-mountain-200 w-40"
             sx={{
               backgroundColor: 'transparent',
               color: 'white',
@@ -32,7 +32,7 @@ const SelectAiImagesPanel: React.FC = () => {
               '&:hover': { backgroundColor: 'transparent' },
             }}
           >
-            <RiImageCircleAiFill className="text-mountain-600 mb-2 size-10" />
+            <RiImageCircleAiFill className="mb-2 size-10 text-mountain-600" />
             <Typography variant="body1" className="text-sm">
               Browse My Stock
             </Typography>
@@ -40,23 +40,23 @@ const SelectAiImagesPanel: React.FC = () => {
         </DialogTrigger>
         <DialogContent
           hideCloseButton
-          className="z-50 flex h-[95%] min-w-[90%] flex-col gap-0 p-0"
+          className="z-50 flex flex-col gap-0 p-0 border-mountain-200 min-w-[90%] h-[95%]"
         >
           <DialogTitle hidden />
           <DialogDescription hidden />
 
-          <div className="flex h-24 w-full items-center justify-between p-4 shadow-md">
+          <div className="flex justify-between items-center shadow-md p-4 w-full h-24">
             <div className="flex flex-col">
-              <p className="flex text-lg font-medium">
+              <p className="flex font-medium text-lg">
                 Post With Your AI Images
               </p>
-              <p className="text-mountain-600 flex text-sm">
+              <p className="flex text-mountain-600 text-sm">
                 Browse your ai images and start sharing over the world
               </p>
             </div>
             <Link
               to="/image/tool/text-to-image"
-              className="flex transform items-center rounded-full bg-gradient-to-r from-blue-100 to-purple-100 px-4 py-2 shadow duration-300 ease-in-out hover:scale-105 hover:cursor-pointer hover:brightness-105"
+              className="flex items-center bg-gradient-to-r from-blue-100 to-purple-100 shadow hover:brightness-105 px-4 py-2 rounded-full hover:scale-105 duration-300 ease-in-out hover:cursor-pointer transform"
             >
               <IoSparkles className="mr-2 text-amber-300" />
               <p>Generated with ArtNova</p>

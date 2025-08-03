@@ -22,9 +22,9 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { BsCardImage } from 'react-icons/bs';
 import { MdAspectRatio, MdOutlinePhotoSizeSelectActual } from 'react-icons/md';
-import { RiImageCircleAiLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import EditHeader from './components/EditHeader';
+import SelectAiImagesPanel from './components/dialog';
 
 const BrowseImage = () => {
   const navigate = useNavigate();
@@ -127,7 +127,7 @@ const BrowseImage = () => {
   }, [openColorSettings]);
 
   return (
-    <div className="group relative flex h-full w-full flex-col">
+    <div className="group relative flex flex-col w-full h-full">
       <EditHeader />
       <div
         className={`flex h-[calc(100vh-4rem)] w-full items-center justify-center overflow-hidden p-4`}
@@ -136,11 +136,11 @@ const BrowseImage = () => {
         <div
           className={`bg-mountain-100 border-mountain-200 flex h-full w-full items-center justify-center space-x-8 overflow-y-hidden rounded-lg border`}
         >
-          <div className="relative flex h-96 w-96 cursor-pointer items-center justify-center bg-gradient-to-b from-white via-indigo-100 to-purple-100 shadow-md">
-            <BsCardImage className="text-mountain-600 h-20 w-20 font-bold" />
+          <div className="relative flex justify-center items-center bg-gradient-to-b from-white via-indigo-100 to-purple-100 shadow-md w-96 h-96 cursor-pointer">
+            <BsCardImage className="w-20 h-20 font-bold text-mountain-600" />
           </div>
-          <div className="flex h-96 w-96 flex-col justify-between gap-4">
-            <Label className="bg-mountain-950 hover:bg-mountain-900 border-mountain-200 flex h-16 w-full cursor-pointer items-center justify-center rounded-full border-1 p-4 shadow-md">
+          <div className="flex flex-col justify-between gap-4 w-96 h-96">
+            <Label className="flex justify-center items-center bg-mountain-950 hover:bg-mountain-900 shadow-md p-4 border-1 border-mountain-200 rounded-full w-full h-16 cursor-pointer">
               <input
                 type="file"
                 multiple
@@ -149,19 +149,14 @@ const BrowseImage = () => {
                 onChange={handleFileChange}
               />
               <Plus className="size-6 text-white" />
-              <Typography variant="body1" className="text-sm text-white">
+              <Typography variant="body1" className="text-white text-sm">
                 Open Image
               </Typography>
             </Label>
-            <Label className="border-mountain-200 flex h-16 w-full cursor-pointer items-center justify-center rounded-full border-1 bg-white p-4 shadow-md">
-              <RiImageCircleAiLine className="text-mountain-950 size-6" />
-              <Typography variant="body1" className="text-mountain-950 text-sm">
-                Browse In-App Images
-              </Typography>
-            </Label>
-            <div className="flex h-full w-full flex-1 flex-col justify-center gap-4 rounded-lg border border-gray-300 bg-white p-4 font-normal text-gray-700 shadow">
+            <SelectAiImagesPanel />
+            <div className="flex flex-col flex-1 justify-center gap-4 bg-white shadow p-4 border border-gray-300 rounded-lg w-full h-full font-normal text-gray-700">
               {/* Select Aspect Ratio */}
-              <div className="flex w-full items-center justify-between">
+              <div className="flex justify-between items-center w-full">
                 <p className="flex items-center space-x-2">
                   <MdAspectRatio />
                   <span>Aspect Ratio</span>
@@ -170,7 +165,7 @@ const BrowseImage = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="bg-mountain-50 border-mountain-200 h-12 w-48 justify-start rounded-full"
+                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
                     >
                       {selectedRatio.label}
                     </Button>
@@ -188,7 +183,7 @@ const BrowseImage = () => {
                           className="flex items-center space-x-2"
                         >
                           {Icon && (
-                            <Icon className="text-muted-foreground size-4" />
+                            <Icon className="size-4 text-muted-foreground" />
                           )}
                           <span>{ratio.label}</span>
                         </DropdownMenuItem>
@@ -198,7 +193,7 @@ const BrowseImage = () => {
                 </DropdownMenu>
               </div>
               {/* Select Canvas Size */}
-              <div className="flex w-full items-center justify-between">
+              <div className="flex justify-between items-center w-full">
                 <p className="flex items-center space-x-2">
                   <MdOutlinePhotoSizeSelectActual />
                   <span>Canvas Size</span>
@@ -207,7 +202,7 @@ const BrowseImage = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="bg-mountain-50 border-mountain-200 h-12 w-48 justify-start rounded-full"
+                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
                     >
                       {selectedCanvasSize.label}
                     </Button>
@@ -224,7 +219,7 @@ const BrowseImage = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-              <div className="flex w-full items-center justify-between">
+              <div className="flex justify-between items-center w-full">
                 <p>Background Color</p>
                 <Popover
                   open={openColorSettings}
@@ -233,21 +228,21 @@ const BrowseImage = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="bg-mountain-50 border-mountain-200 h-12 w-48 justify-start rounded-full"
+                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
                     >
                       <div
-                        className="border-mountain-200 h-6 w-6 rounded border shadow-md"
+                        className="shadow-md border border-mountain-200 rounded w-6 h-6"
                         style={{ backgroundColor: color }}
                       />
                       <span className="ml-2">{color.replace('#', '')}</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="border-mountain-200 ml-4 w-auto p-2"
+                    className="ml-4 p-2 border-mountain-200 w-auto"
                     side="right"
                   >
                     <div className="flex flex-col">
-                      <div className="text-mountain-950 mb-2 text-sm font-medium">
+                      <div className="mb-2 font-medium text-mountain-950 text-sm">
                         🎨 Pick a color
                       </div>
                       <Sketch

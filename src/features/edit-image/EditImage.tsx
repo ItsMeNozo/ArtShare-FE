@@ -186,8 +186,8 @@ const EditImage: React.FC = () => {
     if (!imageUrl || hasAppendedInitialImage.current) return;
     hasAppendedInitialImage.current = true;
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.src = `${imageUrl}?t=${new Date().getTime()}`;
-    img.crossOrigin = 'anonymous';
     img.onload = () => {
       const maxWidth = canvasSize.width;
       const maxHeight = canvasSize.height;
@@ -361,70 +361,84 @@ const EditImage: React.FC = () => {
   }, [selectedLayerId]);
 
   const renderToCanvas = (includeWatermark: boolean): Promise<void> => {
-    if (!canvasRef.current) return Promise.resolve();
-    const canvas = canvasRef.current;
-    canvas.width = canvasSize.width;
-    canvas.height = canvasSize.height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return Promise.resolve();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Fill background
-    const backgroundLayer = layers.find(
-      (layer): layer is ImageLayer => layer.type === 'image',
-    );
-    ctx.save();
-    ctx.fillStyle = backgroundLayer?.backgroundColor || '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-    [...layers]
-      .sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
-      .forEach((layer) => {
+    return new Promise((resolve) => {
+      if (!canvasRef.current) return resolve();
+      const canvas = canvasRef.current;
+      canvas.width = canvasSize.width;
+      canvas.height = canvasSize.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve();
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const allLayers = [...layers];
+
+      // Add watermark as a layer if needed
+      if (includeWatermark) {
+        const watermarkLayer: ImageLayer = {
+          id: 'watermark',
+          type: 'image',
+          src: watermark,
+          name: 'Watermark',
+          opacity: 0.4,
+          zoom: 1,
+          flipH: false,
+          flipV: false,
+          rotation: 0,
+          brightness: 100,
+          contrast: 100,
+          saturation: 100,
+          hue: 0,
+          sepia: 0,
+          width: 256 * 0.3,
+          height: 62 * 0.3,
+          x: canvasSize.width - 96,
+          y: canvasSize.height - 32,
+          zIndex: 9999,
+          isLocked: true,
+        };
+        allLayers.push(watermarkLayer);
+      }
+      // Sort by zIndex
+      const sortedLayers = allLayers.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+      const imagePromises: Promise<void>[] = [];
+      sortedLayers.forEach((layer) => {
         if (layer.type === 'image') {
-          const img = new Image();
-          img.src = layer.src;
-          img.onload = () => {
-            const {
-              x,
-              y,
-              zoom,
-              rotation,
-              flipH,
-              flipV,
-              opacity,
-              brightness,
-              contrast,
-              saturation,
-              hue,
-              sepia,
-              width,
-              height,
-            } = layer;
-            // Calculate layer size
-            const drawWidth = width ?? img.naturalWidth;
-            const drawHeight = height ?? img.naturalHeight;
-            ctx.save();
-            // Translate to (x + center), so rotation is around center
-            ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
-            ctx.rotate((rotation * Math.PI) / 180);
-            ctx.scale((flipH ? -1 : 1) * zoom, (flipV ? -1 : 1) * zoom);
-            ctx.globalAlpha = opacity;
-            ctx.filter = `
-          brightness(${brightness}%)
-          contrast(${contrast}%)
-          saturate(${saturation}%)
-          hue-rotate(${hue}deg)
-          sepia(${sepia}%)
-        `;
-            // Draw image centered
-            ctx.drawImage(
-              img,
-              -drawWidth / 2,
-              -drawHeight / 2,
-              drawWidth,
-              drawHeight,
-            );
-            ctx.restore();
-          };
+          const promise = new Promise<void>((resolveImg) => {
+            const img = new Image();
+            if (layer.src.startsWith("https://artsharing.s3.ap-southeast-1.amazonaws.com")) {
+              img.crossOrigin = "anonymous";
+            }
+            img.src = layer.src;
+            img.onload = () => {
+              const {
+                x, y, zoom, rotation, flipH, flipV, opacity,
+                brightness, contrast, saturation, hue, sepia,
+                width, height,
+              } = layer;
+              const drawWidth = width ?? img.naturalWidth;
+              const drawHeight = height ?? img.naturalHeight;
+              ctx.save();
+              ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
+              ctx.rotate((rotation * Math.PI) / 180);
+              ctx.scale((flipH ? -1 : 1) * zoom, (flipV ? -1 : 1) * zoom);
+              ctx.globalAlpha = opacity;
+              ctx.filter = `
+              brightness(${brightness}%)
+              contrast(${contrast}%)
+              saturate(${saturation}%)
+              hue-rotate(${hue}deg)
+              sepia(${sepia}%)
+            `;
+              ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+              ctx.restore();
+              resolveImg();
+            };
+            img.onerror = () => resolveImg();
+          });
+          imagePromises.push(promise);
         } else if (layer.type === 'text') {
           ctx.save();
           ctx.translate(layer.x + layer.width / 2, layer.y);
@@ -438,45 +452,8 @@ const EditImage: React.FC = () => {
           ctx.restore();
         }
       });
-    const watermarkLayer: ImageLayer = {
-      id: crypto.randomUUID(),
-      type: 'image',
-      src: watermark,
-      name: 'Watermark',
-      opacity: 0.4,
-      zoom: 1,
-      flipH: false,
-      flipV: false,
-      rotation: 0,
-      brightness: 100,
-      contrast: 100,
-      saturation: 100,
-      hue: 0,
-      sepia: 0,
-      width: 256 * 0.3,
-      height: 62 * 0.3,
-      x: canvasSize.width - 96,
-      y: canvasSize.height - 32,
-      zIndex: 9999,
-      isLocked: false,
-    };
-    if (includeWatermark) {
-      const img = new Image();
-      img.src = watermarkLayer.src;
-      img.onload = () => {
-        ctx.save();
-        ctx.globalAlpha = watermarkLayer.opacity;
-        ctx.drawImage(
-          img,
-          watermarkLayer.x,
-          watermarkLayer.y,
-          watermarkLayer.width,
-          watermarkLayer.height,
-        );
-        ctx.restore();
-      };
-    }
-    return Promise.resolve();
+      Promise.all(imagePromises).then(() => resolve());
+    });
   };
 
   const handleDownload = (
@@ -498,7 +475,7 @@ const EditImage: React.FC = () => {
   };
 
   const handleShare = async () => {
-    await renderToCanvas(true);
+    renderToCanvas(true);
     setTimeout(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -516,16 +493,18 @@ const EditImage: React.FC = () => {
     }, 300);
   };
 
+  console.log('Layers:', layers);
+
   return (
-    <div className="group relative flex h-full w-full flex-col">
+    <div className="group relative flex flex-col w-full h-full">
       {/* Floating Button */}
       <button
         aria-label="Collapse Color Picker"
         onClick={() => setFullScreen(!fullScreen)}
         className={`absolute top-0 left-1/2 z-50 flex h-10 w-10 -translate-x-1/2 items-center justify-center transition-all ${fullScreen ? '' : 'hidden'}`}
       >
-        <div className="relative -top-4 cursor-pointer rounded-full bg-white p-2 opacity-50 transition-all duration-300 ease-in-out hover:top-0 hover:opacity-100">
-          <ChevronDown className="text-mountain-950 size-5 transition-opacity duration-200" />
+        <div className="-top-4 hover:top-0 relative bg-white opacity-50 hover:opacity-100 p-2 rounded-full transition-all duration-300 ease-in-out cursor-pointer">
+          <ChevronDown className="size-5 text-mountain-950 transition-opacity duration-200" />
         </div>
       </button>
       <EditHeader
@@ -552,11 +531,12 @@ const EditImage: React.FC = () => {
             setSelectedLayerId={setSelectedLayerId}
             handleZoomIn={handleZoomIn}
             handleZoomOut={handleZoomOut}
-            currentZIndex={globalZIndex}
+            zIndex={zIndex}
+            setZIndex={setZIndex}
           />
           <div
             onMouseDown={() => setSelectedLayerId(null)}
-            className="bg-mountain-200 relative flex h-full w-full items-center justify-center"
+            className="relative flex justify-center items-center bg-mountain-200 w-full h-full"
           >
             <div
               ref={imageContainerRef}
@@ -604,7 +584,7 @@ const EditImage: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="text-mountain-600 absolute bottom-2 left-2 flex h-8 w-24 items-center justify-center rounded-lg bg-white text-sm opacity-50">
+            <div className="bottom-2 left-2 absolute flex justify-center items-center bg-white opacity-50 rounded-lg w-24 h-8 text-mountain-600 text-sm">
               <span>
                 {finalCanvasSize.width} x {finalCanvasSize.height}
               </span>
@@ -649,45 +629,45 @@ const EditImage: React.FC = () => {
                   prev === 'arrange' ? null : 'arrange',
                 )
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <MdFlipToFront className="text-mountain-600 size-6" />
+              <MdFlipToFront className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Arrange</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <IoCrop className="text-mountain-600 size-6" />
+              <IoCrop className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Crop</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
+              <HiOutlineAdjustmentsHorizontal className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Adjust</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <IoIosColorFilter className="text-mountain-600 size-6" />
+              <IoIosColorFilter className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Filter</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'text' ? null : 'text'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <RiText className="text-mountain-600 size-6" />
+              <RiText className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Text</p>
             </div>
             {/* <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">

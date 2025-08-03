@@ -6,7 +6,6 @@ import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
 import * as Yup from 'yup';
@@ -19,7 +18,6 @@ import PostContentEditor from './PostContentEditor';
 import PostImagesEditor from './PostImagesEditor';
 import PostScheduleEditor from './PostScheduleEditor';
 import { FacebookPostPreview } from './PostPreviewer';
-import { TbGridDots } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import { PiStarFourFill } from 'react-icons/pi';
 import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
@@ -111,7 +109,6 @@ const EditAutoPostForm = () => {
     if (!postIdToDelete) return;
     deletePost(postIdToDelete);
   };
-
   if (isLoading) {
     return <Loading />;
   }
@@ -140,29 +137,18 @@ const EditAutoPostForm = () => {
               <div className="flex justify-between items-center w-full">
                 <div className='flex space-x-4'>
                   <div className='flex items-center space-x-4'>
-                    <div className='flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer'>
-                      <span>Project Posts</span>
-                      <TbGridDots />
+                    <div className='flex items-center space-x-2 px-4 border-1 border-mountain-200 rounded-lg h-10'>
+                      <span>{postToEdit.content.trim() || values.content.trim() ? '✅' : '❌'} Content</span>
+                      <span>-</span>
+                      <span>{postToEdit.scheduledAt || values.scheduledAt ? '✅' : '❌'} Scheduled</span>
+                      <span>-</span>
+                      <span>🖼️ {postToEdit.imageUrls.length || values.images.length} Images</span>
                     </div>
+                    <div className='flex items-center border-mountain-200 border-l-1 w-0.5 h-10' />
                     <button type='button' onClick={handleAddPost} className='flex items-center space-x-2 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer'>
                       <PiStarFourFill className='size-4 text-purple-600' />
                       <span>Generate Post</span>
                     </button>
-                    <div className='flex items-center px-4 border-mountain-200 border-l-1'>
-                      <div className='flex items-center space-x-2'>
-                        <div className='flex items-center bg-white p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                          <ChevronLeft className='size-4' />
-                          <span>Prev</span>
-                        </div>
-                        <div className='flex items-center bg-white p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                          <span>Post Number 1</span>
-                        </div>
-                        <div className='flex items-center bg-white p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                          <span>Next</span>
-                          <ChevronRight className='size-4' />
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
                 <div className="flex space-x-2">

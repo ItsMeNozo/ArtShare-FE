@@ -48,9 +48,9 @@ const UserProfile = lazy(
   () => import('@/features/user-profile-private/UserProfile'),
 );
 const DocumentDashboard = lazy(
-  () => import('@/features/user-writing/DocumentDashboard'),
+  () => import('@/features/write-blog/DocumentDashboard'),
 );
-const MyWriting = lazy(() => import('@/features/user-writing/MyWriting'));
+const MyWriting = lazy(() => import('@/features/write-blog/MyWriting'));
 const ArtGeneration = lazy(() => import('@/features/gen-art/ArtGenAI'));
 const ImageEditor = lazy(() => import('@/features/edit-image/EditImage'));
 const BrowseImage = lazy(() => import('@/features/edit-image/BrowseImage'));
@@ -58,10 +58,6 @@ const BrowseImage = lazy(() => import('@/features/edit-image/BrowseImage'));
 const SocialLinksPage = lazy(
   () =>
     import('@/features/media-automation/social-links/routes/SocialLinksPage'),
-);
-const AutoSchedulingPage = lazy(
-  () =>
-    import('@/features/media-automation/scheduling/routes/AutoScheduling'),
 );
 
 const ProjectsPage = lazy(
@@ -224,7 +220,6 @@ const routeConfig: RouteObject[] = [
         ),
         children: [
           { path: '/auto/social-links', element: <SocialLinksPage /> },
-          { path: '/auto/scheduling', element: <AutoSchedulingPage /> },
           {
             path: '/auto/projects',
             element: <Outlet />,

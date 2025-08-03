@@ -6,17 +6,15 @@ import {
   FormikHelpers,
   FormikProps,
 } from 'formik';
-import { TbGridDots } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useGenAutoPosts } from '../../hooks/useGenAutoPosts';
 import { GenAutoPostFormValues } from '../../types';
 import SettingsPopover from './SettingsPopover';
-import { LuTrash2 } from 'react-icons/lu';
 import { PiStarFourFill } from 'react-icons/pi';
 import { useNumericParam } from '@/hooks/useNumericParam';
-import { HiArrowLeft } from 'react-icons/hi2';
-import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
+import { Book } from 'lucide-react';
+import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
 
 const GenerateAutoPostForm = () => {
   const navigate = useNavigate();
@@ -48,63 +46,22 @@ const GenerateAutoPostForm = () => {
     );
   };
 
-  const handlePostItemClick = (postId: number) => {
-    navigate(`/auto/projects/${projectId}/posts/${postId}/edit`);
-  };
-
-  const { data: fetchedPostsResponse } = useGetAutoPosts({
-    projectId: projectId,
-    orderBy: undefined,
-    order: undefined,
-    page: 1,
-    limit: 10,
-  });
-
-  const postList = fetchedPostsResponse?.data ?? [];
+  const { data: projectDetails } = useGetProjectDetails(projectId);
 
   return (
     <Box className="flex flex-col items-center bg-[#F2F4F7] border-mountain-200 rounded-t-3xl h-full">
       <div className="flex items-center bg-white px-4 py-2 border-mountain-200 border-b-1 rounded-t-3xl w-full h-16 shrink-0">
-        <div className="flex justify-between items-center w-full">
-          <div className='flex space-x-4'>
-            <div className='flex items-center space-x-4'>
-              <div className='flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer'>
-                <span>Project Posts</span>
-                <TbGridDots />
-              </div>
-              <button type='button' disabled className='flex items-center space-x-2 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                <PiStarFourFill className='size-4 text-purple-600' />
-                <span>Generate Post</span>
-              </button>
-              <div className='flex items-center px-4 border-mountain-200 border-l-1'>
-                <button
-                  disabled={!postList[0]?.id}
-                  onClick={() => handlePostItemClick(postList[0]?.id)}
-                  className='flex items-center space-x-2 bg-white hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                  <HiArrowLeft className='size-4' />
-                  <span>Return To Posts</span>
-                </button>
-              </div>
-            </div>
+        <div className="flex justify-between items-center space-x-4 w-full">
+          <div className='flex items-center space-x-2'>
+            <PiStarFourFill className='size-4 text-purple-600' />
+            <p>Generate Content for <span className='font-bold'>{projectDetails?.title}</span></p>
           </div>
-          <div className="flex space-x-2">
-            <Button
-              type="submit"
-              variant="contained"
-              className='opacity-50 pointer-events-none'
-            >
-              Save Changes
-            </Button>
-            <Button
-              type="button"
-              onClick={() => { }}
-              disabled
-              className="flex items-center space-x-2 bg-mountain-100 hover:bg-mountain-50 disabled:opacity-50 p-2 border border-mountain-200 rounded-lg font-normal"
-            >
-              <LuTrash2 className="size-4" />
-              <div>Delete</div>
-            </Button>
-          </div>
+          <Button
+            onClick={() => { }}
+            className="flex justify-center items-center bg-white hover:bg-mountain-50 border border-mountain-200 rounded-lg w-24 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
+            <Book className="mr-2 size-6" />
+            Guide
+          </Button>
         </div>
       </div>
       <div className='flex justify-center items-center w-full h-full'>
