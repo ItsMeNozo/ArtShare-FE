@@ -23,13 +23,13 @@ export const featuresShowcase = [
     label: 'Image Editor',
     description: 'A powerful editor for perfect visuals.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/rtbrxgmxcgkz9evmljks?blur=300&q=1',
-    destination: '/image/tool/text-to-image',
+    destination: '/image/tool/editor/new',
   },
   {
     label: 'Text Editor',
     description: 'Write, edit, and enhance with AI.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ztwlihdk1mqirwi1pzoc?blur=300&q=1',
-    destination: '/image/tool/text-to-image',
+    destination: '/docs',
   },
   {
     label: 'Content Approval Workflow',
@@ -49,7 +49,7 @@ export const featuresShowcase = [
     label: 'Scheduled Content Posting',
     description: 'Schedule when to publish the content automatically.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/leuamzwred3navfdhc6v?blur=300&q=1',
-    destination: '/image/tool/text-to-image',
+    destination: '/auto/projects',
   },
 ];
 

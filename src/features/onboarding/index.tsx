@@ -21,10 +21,10 @@ import {
 } from '@/components/ui/dialog';
 import { useUser } from '@/contexts/user';
 import { User } from '@/types';
-import axios, { AxiosError } from 'axios';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import axios, { AxiosError } from 'axios';
+import dayjs from 'dayjs';
 
 // Constants
 const SUCCESS_MESSAGE_TIMEOUT_MS = 1500;
@@ -163,7 +163,7 @@ const OnboardingProfile: React.FC = () => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} modal={true}>
       <DialogContent
         onInteractOutside={(e) => {
           e.preventDefault();
@@ -238,44 +238,52 @@ const OnboardingProfile: React.FC = () => {
 
           {/* Birthday */}
           <div className="space-y-1">
-              <label
-                className="text-sm font-medium text-neutral-700 dark:text-neutral-300 block mb-1 full-width"
-                htmlFor="birthday"
-              >
-                Birthday <span className="text-rose-500">*</span>
-              </label>
-              <Controller
-                name="birthday"
-                control={control}
-                rules={{
-                  required: 'Birthday is required',
-                  validate: (value) =>
-                    value && isAbove13(value)
-                      ? true
-                      : 'You must be at least 13 years old.',
-                }}
-                render={({ field }) => (
+            <label
+              className="full-width mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+              htmlFor="birthday"
+            >
+              Birthday <span className="text-rose-500">*</span>
+            </label>
+            <Controller
+              name="birthday"
+              control={control}
+              rules={{
+                required: 'Birthday is required',
+                validate: (value) =>
+                  value && isAbove13(value)
+                    ? true
+                    : 'You must be at least 13 years old.',
+              }}
+              render={({ field }) => (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    {...field}
                     label="Select your birthday"
                     value={field.value ? dayjs(field.value) : null}
                     onChange={(newValue) => {
-                      field.onChange(newValue ? newValue.format('YYYY-MM-DD') : null);
+                      field.onChange(
+                        newValue ? newValue.format('YYYY-MM-DD') : null,
+                      );
                     }}
                     slotProps={{
-                        textField: {
-                          fullWidth: true,
-                        },
+                      popper: {
+                        disablePortal: true,
+                      },
+                      textField: {
+                        fullWidth: true,
+                        onBlur: field.onBlur, // for validation
+                        name: field.name,
+                        inputRef: field.ref, // for focus management
+                        error: !!errors.birthday, // to show error state
+                      },
                     }}
                   />
                 </LocalizationProvider>
-                )}
-              />
-              {errors.birthday && (
-                  <p className="text-xs text-rose-500">{errors.birthday.message}</p>
               )}
-            </div>
+            />
+            {errors.birthday && (
+              <p className="text-xs text-rose-500">{errors.birthday.message}</p>
+            )}
+          </div>
 
           {/* Bio */}
           <div className="space-y-1">
