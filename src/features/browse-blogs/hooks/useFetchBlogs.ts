@@ -27,8 +27,8 @@ export function useFetchBlogs({ tab, searchQuery }: FetchBlogsParams) {
       return lastPage.hasNextPage ? lastPage.page + 1 : undefined;
     },
     initialPageParam: 1,
-    staleTime: 1000 * 60 * 3,
-    // staleTime: 0,
+    // staleTime: 1000 * 60 * 3,
+    staleTime: 0,
     enabled: !!tab || !!searchQuery,
   });
 }
