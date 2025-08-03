@@ -150,7 +150,13 @@ const BlogItem: React.FC<BlogItemProps> = ({
               <span className="text-gray-500 dark:text-gray-500">•</span>
               <span className="text-gray-500 dark:text-gray-400 text-sm">
                 {createdAt && !isNaN(new Date(createdAt).getTime()) ? (
-                  <ReactTimeAgo className='capitalize' date={new Date(createdAt)} locale="en-US" timeStyle="round-minute" tick={false} />
+                  <ReactTimeAgo
+                    className="capitalize"
+                    date={new Date(createdAt)}
+                    locale="en-US"
+                    timeStyle="round-minute"
+                    tick={false}
+                  />
                 ) : (
                   'Unknown time'
                 )}
@@ -158,13 +164,19 @@ const BlogItem: React.FC<BlogItemProps> = ({
             </div>
             <div className="flex items-center w-fit">
               <Tooltip title="Like">
-                <Button className="h-full font-normal text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500">
+                <Button
+                  className="h-full font-normal text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500"
+                  disabled
+                >
                   <AiOutlineLike className="mr-1 size-4" />
                   <p>{likeCount}</p>
                 </Button>
               </Tooltip>
               <Tooltip title="Comment">
-                <Button className="h-full font-normal text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500">
+                <Button
+                  className="h-full font-normal text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500"
+                  disabled
+                >
                   <BiComment className="mr-1 size-4" />
                   <p>{commentCount}</p>
                 </Button>

@@ -14,7 +14,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 
 interface TextEditorHeaderProps {
   handleExport: () => void;
-  handleSaveBlog: (blogName: string) => void;
+  handlePublish: (blogName: string) => void;
   text: string;
   setText: (text: string) => void;
   isPublished: boolean;
@@ -43,7 +43,7 @@ const COMMON_BUTTON_CLASSES = {
 const TextEditorHeader = memo<TextEditorHeaderProps>(
   ({
     handleExport,
-    handleSaveBlog,
+    handlePublish,
     text,
     setText,
     isPublished,
@@ -97,6 +97,7 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
     };
 
     const getPublishDisableReason = () => {
+      if (isPublished) return 'Document is already published';
       if (isTitleEmpty && !hasContent) {
         return 'Add a title and content to publish';
       }
@@ -169,14 +170,21 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
           <Tooltip title={getPublishDisableReason()}>
             <div>
               <Button
-                onClick={() => handleSaveBlog(text)}
+                onClick={() => handlePublish(text)}
                 disabled={isPublishDisabled}
                 className={`${COMMON_BUTTON_CLASSES.primaryButton} border border-emerald-700 bg-green-600 px-4 hover:bg-green-700 dark:border-emerald-800 dark:bg-green-700 dark:hover:bg-green-800`}
               >
-                <AiOutlineSave className="h-4 w-4" />
-                <span className="whitespace-nowrap">
-                  {isPublished ? 'Save and publish' : 'Publish'}
-                </span>
+                {isPublished ? (
+                  <>
+                    <MdCheckCircle className="h-4 w-4" />
+                    <span className="whitespace-nowrap">Published</span>
+                  </>
+                ) : (
+                  <>
+                    <AiOutlineSave className="h-4 w-4" />
+                    <span className="whitespace-nowrap">Publish</span>
+                  </>
+                )}
               </Button>
             </div>
           </Tooltip>

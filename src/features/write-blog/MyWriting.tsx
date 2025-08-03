@@ -2,11 +2,10 @@ import { UnsavedChangesProtector } from '@/components/UnsavedChangesProtector';
 import { TUTORIAL_TEMPLATE_HTML } from '@/constants/template';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useBlogOperations } from '@/hooks/useBlogOperations';
-import { useBlogState, type SaveStatus } from '@/hooks/useBlogState';
+import { useBlogState } from '@/hooks/useBlogState';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchBlogDetails } from '../blog-details/api/blog';
-import { updateExistingBlog } from './api/blog.api';
 import Editor, { EditorHandle } from './components/Editor';
 import {
   EnhancedAutoSaveStatus,
@@ -19,6 +18,8 @@ const WriteBlog = () => {
   const editorRef = useRef<EditorHandle>(null);
   const isInitializedRef = useRef(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [wasJustCreated, setWasJustCreated] = useState(false);
+  const navigate = useNavigate();
 
   const { blogId } = useParams<{ blogId: string }>();
   const location = useLocation();
@@ -27,6 +28,9 @@ const WriteBlog = () => {
   const isNewDocument = blogId === 'new';
   const preloadedTitle = location.state?.title;
   const preserveContent = location.state?.preserveContent;
+  const justCreated = location.state?.justCreated;
+  const initialSaveStatus = location.state?.saveStatus;
+  const initialLastSaved = location.state?.lastSaved;
 
   const blogState = useBlogState(preloadedTitle || (isNewDocument ? '' : ''));
   const {
@@ -53,18 +57,12 @@ const WriteBlog = () => {
     setTooltipOpen,
   } = blogState;
 
-  // Freeze status updates when dialog is open
-  const updateSaveStatusSafe = useCallback(
-    (status: SaveStatus, saved?: Date) => {
-      if (!isDialogOpen) {
-        updateSaveStatus(status, saved);
-      }
-    },
-    [isDialogOpen, updateSaveStatus],
-  );
+  useEffect(() => {
+    // State update effect for debugging can be re-added if needed
+  }, [createdDocId, isCreating, hasUnsavedChanges, wasJustCreated, blogId]);
 
   const blogOperations = useBlogOperations({
-    updateSaveStatus, // Use original, not wrapped version
+    updateSaveStatus,
     setHasUnsavedChanges,
     setCreatedDocId,
     setIsCreating,
@@ -77,7 +75,7 @@ const WriteBlog = () => {
     hasUnsavedChanges,
     isCreating,
     isNewDocument,
-    updateSaveStatus, // Use original, not wrapped version
+    updateSaveStatus,
     setHasUnsavedChanges,
     editorRef,
     isDialogOpen,
@@ -88,35 +86,62 @@ const WriteBlog = () => {
     return content.replace(/<[^>]*>/g, '').trim().length > 0;
   }, []);
 
+  useEffect(() => {
+    if (justCreated) {
+      setHasUnsavedChanges(false);
+      setWasJustCreated(true);
+      setHasContentForCreation(true);
+      if (initialSaveStatus) {
+        updateSaveStatus(initialSaveStatus, initialLastSaved);
+      }
+    }
+  }, [
+    blogId,
+    justCreated,
+    initialSaveStatus,
+    initialLastSaved,
+    setHasUnsavedChanges,
+    updateSaveStatus,
+    location.state,
+    location.pathname,
+    setHasContentForCreation,
+  ]);
+
   const handleEditorChange = useCallback(() => {
+    autoSave.triggerContentCapture();
+
     const hasContent = hasContentToSave();
     setHasContentForCreation(hasContent);
+
+    if (wasJustCreated && isInitializedRef.current) {
+      setWasJustCreated(false);
+    }
+
     autoSave.markChangesWhileSaving();
 
     if (isNewDocument && !createdDocId && !isCreating && hasContent) {
-      autoSave.createDebounce(
-        () => blogOperations.createDocument(blogTitle, editorRef),
-        autoSave.delays.create,
-      );
+      autoSave.createDebounce(() => {
+        return blogOperations.createDocument(blogTitle, editorRef);
+      }, autoSave.delays.create);
       return;
     }
 
-    if (!isNewDocument && blogId !== 'new') {
+    if (!isNewDocument && blogId !== 'new' && blogId && !wasJustCreated) {
       setHasUnsavedChanges(true);
-      updateSaveStatusSafe('unsaved');
     }
   }, [
+    autoSave,
+    hasContentToSave,
+    setHasContentForCreation,
+    wasJustCreated,
+    setWasJustCreated,
     isNewDocument,
     createdDocId,
     isCreating,
-    blogId,
-    hasContentToSave,
     blogTitle,
     blogOperations,
-    autoSave,
-    setHasContentForCreation,
+    blogId,
     setHasUnsavedChanges,
-    updateSaveStatusSafe,
   ]);
 
   const handleTitleChange = useCallback(
@@ -128,9 +153,7 @@ const WriteBlog = () => {
         if (isNaN(numericBlogId)) return;
 
         setHasUnsavedChanges(true);
-        updateSaveStatusSafe('unsaved');
 
-        // Use the abortable title save function
         const abortableTitleSave = autoSave.createAbortableTitleSave(
           numericBlogId,
           newTitle,
@@ -141,14 +164,7 @@ const WriteBlog = () => {
         );
       }
     },
-    [
-      isNewDocument,
-      blogId,
-      setBlogTitle,
-      setHasUnsavedChanges,
-      updateSaveStatusSafe,
-      autoSave,
-    ],
+    [isNewDocument, blogId, setBlogTitle, setHasUnsavedChanges, autoSave],
   );
 
   const handleExportDocument = useCallback(async () => {
@@ -164,23 +180,69 @@ const WriteBlog = () => {
     }
   }, [blogId, setTooltipOpen]);
 
-  const handleSaveBlog = useCallback(
-    (currentTitle: string) => {
-      blogOperations.saveBlog(blogId!, currentTitle, editorRef);
+  const handlePublish = useCallback(
+    async (currentTitle: string) => {
+      if (!blogId || !currentTitle.trim() || !hasContentForCreation) return;
+
+      try {
+        // Capture current content
+        autoSave.triggerContentCapture();
+
+        // ✅ WAIT for publish to complete before navigating
+        await blogOperations.saveBlog(blogId, currentTitle, editorRef);
+
+        // ✅ Update local state immediately
+        setIsPublished(true);
+
+        // ✅ Navigate with published state to prevent flash
+        const targetBlogId = blogId === 'new' ? createdDocId : blogId;
+        if (targetBlogId) {
+          navigate(`/blogs/${targetBlogId}`, {
+            state: {
+              isPublished: true, // Tell destination page it's published
+              title: currentTitle, // Pass current title
+              justPublished: true, // Flag to indicate fresh publish
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Failed to publish:', error);
+        // Optionally show error message to user
+      }
     },
-    [blogId, blogOperations],
+    [
+      blogId,
+      hasContentForCreation,
+      autoSave,
+      blogOperations,
+      editorRef,
+      createdDocId,
+      navigate,
+      setIsPublished,
+    ],
   );
 
   const isDirty = useMemo(() => {
-    return (
-      (isNewDocument && hasContentForCreation) ||
-      (!isNewDocument && hasUnsavedChanges)
-    );
-  }, [isNewDocument, hasContentForCreation, hasUnsavedChanges]);
+    if (wasJustCreated) {
+      return false;
+    }
+
+    if (!isNewDocument) {
+      return hasUnsavedChanges;
+    }
+
+    return hasContentForCreation;
+  }, [isNewDocument, hasContentForCreation, hasUnsavedChanges, wasJustCreated]);
 
   const isPublishDisabled = useMemo(() => {
-    return !blogTitle?.trim() || !hasContentForCreation;
-  }, [blogTitle, hasContentForCreation]);
+    // Can't publish without title and content
+    if (!blogTitle?.trim() || !hasContentForCreation) return true;
+
+    // Already published
+    if (isPublished) return true;
+
+    return false;
+  }, [blogTitle, hasContentForCreation, isPublished]);
 
   const statusComponent = useMemo(
     () => (
@@ -219,6 +281,11 @@ const WriteBlog = () => {
           editorRef.current.setContent(content);
           isInitializedRef.current = true;
         }
+
+        // Set hasContentForCreation for template content
+        const hasContent = content.replace(/<[^>]*>/g, '').trim().length > 0;
+        setHasContentForCreation(hasContent);
+
         setIsApiLoading(false);
         setIsContentReady(true);
         return;
@@ -237,6 +304,11 @@ const WriteBlog = () => {
         if (editorRef.current) {
           editorRef.current.setContent(blog.content || '');
           isInitializedRef.current = true;
+
+          // ✅ FIX: Check if loaded content exists and set hasContentForCreation
+          const hasContent =
+            (blog.content || '').replace(/<[^>]*>/g, '').trim().length > 0;
+          setHasContentForCreation(hasContent);
         }
       } catch (error) {
         blogOperations.handleApiError(error, 'Failed to load blog content.');
@@ -256,6 +328,7 @@ const WriteBlog = () => {
     setIsPublished,
     setIsApiLoading,
     setIsContentReady,
+    setHasContentForCreation, // ✅ Already added this dependency
     blogOperations,
   ]);
 
@@ -297,27 +370,8 @@ const WriteBlog = () => {
         isDirty={isDirty}
         onDialogStateChange={setIsDialogOpen}
         onStay={async () => {
-          // Resume auto-save after user chooses to stay
           if (!isNewDocument && blogId && blogTitle && hasUnsavedChanges) {
-            const content = editorRef.current?.getContent();
-            if (content) {
-              // If we were saving when dialog opened, maintain the "Saving..." status
-              // Otherwise, show it now since we're starting a new save
-              updateSaveStatus('saving');
-
-              try {
-                await updateExistingBlog(parseInt(blogId, 10), {
-                  content,
-                  title: blogTitle.trim() || 'Untitled Document',
-                  isPublished: false,
-                });
-                updateSaveStatus('saved', new Date());
-                setHasUnsavedChanges(false);
-              } catch (error) {
-                console.error('Save after stay failed:', error);
-                updateSaveStatus('error');
-              }
-            }
+            await autoSave.performAutoSave();
           }
         }}
       />
@@ -326,7 +380,7 @@ const WriteBlog = () => {
         <div className="flex h-full w-[calc(100vw-16rem)] flex-1 flex-col">
           <TextEditorHeader
             handleExport={handleExportDocument}
-            handleSaveBlog={handleSaveBlog}
+            handlePublish={handlePublish}
             text={titleDisplay}
             setText={handleTitleChange}
             isPublished={isPublished}

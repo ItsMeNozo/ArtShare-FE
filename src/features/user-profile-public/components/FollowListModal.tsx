@@ -42,7 +42,7 @@ const FollowListModal: FC<FollowListModalProps> = ({
   const navigate = useNavigate();
 
   const handleUserClick = (username: string) => {
-    navigate(`/${username}`);
+    navigate(`/u/${username}`);
     onClose(); // Close the modal after navigation
   };
 

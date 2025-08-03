@@ -135,12 +135,12 @@ export const LikesDialog: React.FC<LikesDialogProps> = ({
                 }}
                 role="button"
                 aria-label={`Navigate to ${u.username}'s profile`}
-                onClick={() => navigate(`/${u.username}`)}
+                onClick={() => navigate(`/u/${u.username}`)}
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    navigate(`/${u.username}`);
+                    navigate(`/u/${u.username}`);
                   }
                 }}
               >
