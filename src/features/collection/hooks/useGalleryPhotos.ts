@@ -1,7 +1,7 @@
 import { GalleryPhoto } from '@/components/gallery/Gallery';
 import { Post } from '@/types';
 import { getMediaDimensions } from '@/utils/helpers/gallery.helper';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface UseGalleryPhotosResult {
   galleryPhotos: GalleryPhoto[];
@@ -13,6 +13,14 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processingError, setProcessingError] = useState<string | null>(null);
+
+  // Create a stable dependency that only changes when posts actually change
+  const postsKey = useMemo(() => {
+    return posts
+      .map((p) => p.id)
+      .sort()
+      .join(',');
+  }, [posts]);
 
   useEffect(() => {
     const transformPosts = async () => {
@@ -77,7 +85,7 @@ export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
     };
 
     transformPosts();
-  }, [posts]);
+  }, [postsKey, posts]);
 
   return { galleryPhotos, isProcessing, processingError };
 }

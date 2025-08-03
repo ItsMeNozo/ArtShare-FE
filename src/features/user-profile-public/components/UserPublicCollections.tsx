@@ -64,7 +64,7 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
     return currentCollection?.posts || [];
   }, [
     selectedCollectionId,
-    currentCollection,
+    currentCollection?.posts,
     allPublicPosts,
     loadingCollections,
   ]);

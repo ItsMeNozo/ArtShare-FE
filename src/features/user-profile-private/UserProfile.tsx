@@ -1,10 +1,8 @@
-import { useUser } from '@/contexts/user';
 import UserPosts from '@/features/user-profile-private/components/UserPosts';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import UserPublicCollections from '../user-profile-public/components/UserPublicCollections';
-import { useUserProfile } from '../user-profile-public/hooks/useUserProfile';
 import { UserProfileCard } from '../user-profile-public/UserProfileCard';
 import UserBlogs from './components/UserBlogs';
 
@@ -14,11 +12,6 @@ const UserProfile = () => {
     setSelectedTab(newValue);
   };
   const { username } = useParams<{ username: string }>();
-  const { user } = useUser();
-
-  const { data: profileData } = useUserProfile(username);
-
-  const isOwnProfile = user?.id === profileData?.id;
 
   return (
     <Box className="dark:bg-mountain-1000 from-mountain-50 custom-scrollbar h-[calc(100vh-4rem)] overflow-y-auto rounded-t-3xl bg-gradient-to-b to-white">
@@ -57,12 +50,10 @@ const UserProfile = () => {
               label="Blogs"
               sx={{ textTransform: 'none', minHeight: 0, minWidth: 0 }}
             />
-            {!isOwnProfile && (
-              <Tab
-                label="Collections"
-                sx={{ textTransform: 'none', minHeight: 0, minWidth: 0 }}
-              />
-            )}
+            <Tab
+              label="Collections"
+              sx={{ textTransform: 'none', minHeight: 0, minWidth: 0 }}
+            />
           </Tabs>
         </div>
         {/* BOTTOM SECTION: Posts */}
