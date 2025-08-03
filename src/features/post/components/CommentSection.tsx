@@ -1660,33 +1660,39 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
             }`}
             style={{ scrollBehavior: 'smooth' }}
           >
-            {comments.map((c) => (
-              <CommentRow
-                targetId={targetId}
-                targetType={targetType}
-                isHighlighted={highlightedCommentId === c.id} // Compare number with number
-                highlightedCommentId={highlightedCommentId} // Pass number | null
-                key={c.id}
-                comment={c}
-                onLike={handleLike}
-                onSubmitReply={(parentId, content) =>
-                  requireAuth('reply to comments', () =>
-                    handleAdd(content, parentId),
-                  )
-                }
-                onReply={(id, username) => {
-                  setReplyParentId(id);
-                  setNewComment(`@${username} `);
-                  textareaRef.current?.focus();
-                }}
-                onDelete={handleDelete}
-                onRepliesFetched={attachReplies}
-                editingId={editingId}
-                onStartEdit={startEdit}
-                onAbortEdit={abortEdit}
-                onCommitEdit={commitEdit}
-              />
-            ))}
+            {comments.length > 0 ? (
+              comments.map((c) => (
+                <CommentRow
+                  targetId={targetId}
+                  targetType={targetType}
+                  isHighlighted={highlightedCommentId === c.id}
+                  highlightedCommentId={highlightedCommentId}
+                  key={c.id}
+                  comment={c}
+                  onLike={handleLike}
+                  onSubmitReply={(parentId, content) =>
+                    requireAuth('reply to comments', () =>
+                      handleAdd(content, parentId),
+                    )
+                  }
+                  onReply={(id, username) => {
+                    setReplyParentId(id);
+                    setNewComment(`@${username} `);
+                    textareaRef.current?.focus();
+                  }}
+                  onDelete={handleDelete}
+                  onRepliesFetched={attachReplies}
+                  editingId={editingId}
+                  onStartEdit={startEdit}
+                  onAbortEdit={abortEdit}
+                  onCommitEdit={commitEdit}
+                />
+              ))
+            ) : (
+              <div className="py-6 text-center text-gray-500 dark:text-gray-400">
+                No comments yet. Be the first to comment!
+              </div>
+            )}
           </div>
         </FreshRepliesCtx.Provider>
         {inputPosition === 'bottom' && InputBar}
