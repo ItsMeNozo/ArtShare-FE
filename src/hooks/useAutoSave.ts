@@ -22,6 +22,12 @@ interface UseAutoSaveProps {
   isDialogOpen?: boolean;
 }
 
+interface SaveError extends Error {
+  name: string;
+  code?: string;
+  status?: number;
+}
+
 export const useAutoSave = ({
   blogId,
   blogTitle,
@@ -39,40 +45,78 @@ export const useAutoSave = ({
 
   const isSavingRef = useRef(false);
   const changesWhileSavingRef = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const contentAbortControllerRef = useRef<AbortController | null>(null);
+  const titleAbortControllerRef = useRef<AbortController | null>(null);
+
   const wasDialogOpenRef = useRef(false);
 
-  // Cancel all operations when dialog opens
+  const latestContentRef = useRef<string>('');
+  const latestTitleRef = useRef<string>('');
+  const pendingContentSaveRef = useRef(false);
+  const pendingTitleSaveRef = useRef(false);
+
+  const captureCurrentContent = useCallback(() => {
+    const currentContent = editorRef.current?.getContent();
+    if (currentContent !== undefined) {
+      latestContentRef.current = currentContent;
+      pendingContentSaveRef.current = true;
+    }
+  }, [editorRef]);
+
+  const captureCurrentTitle = useCallback((title: string) => {
+    latestTitleRef.current = title;
+    pendingTitleSaveRef.current = true;
+  }, []);
+
+  const abortContentRequest = useCallback(() => {
+    if (contentAbortControllerRef.current) {
+      contentAbortControllerRef.current.abort();
+      contentAbortControllerRef.current = null;
+    }
+  }, []);
+
+  const abortTitleRequest = useCallback(() => {
+    if (titleAbortControllerRef.current) {
+      titleAbortControllerRef.current.abort();
+      titleAbortControllerRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     if (isDialogOpen && !wasDialogOpenRef.current) {
-      // Dialog just opened - cancel everything
       cancelAutoSave();
       cancelTitleSave();
       cancelCreate();
-
-      // Abort any in-flight request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
-      }
-
-      // Don't reset saving state - just freeze it
+      abortContentRequest();
+      abortTitleRequest();
       wasDialogOpenRef.current = true;
     } else if (!isDialogOpen && wasDialogOpenRef.current) {
-      // Dialog just closed - reset flag
       wasDialogOpenRef.current = false;
     }
-  }, [isDialogOpen, cancelAutoSave, cancelTitleSave, cancelCreate]);
+  }, [
+    isDialogOpen,
+    cancelAutoSave,
+    cancelTitleSave,
+    cancelCreate,
+    abortContentRequest,
+    abortTitleRequest,
+  ]);
 
   const performAutoSave = useCallback(async () => {
-    if (!blogId || blogId === 'new' || !hasUnsavedChanges || isDialogOpen)
+    if (!blogId || blogId === 'new' || !hasUnsavedChanges || isDialogOpen) {
       return;
+    }
 
-    const content = editorRef.current?.getContent();
-    if (!content) return;
+    const content = latestContentRef.current || editorRef.current?.getContent();
+    if (!content) {
+      return;
+    }
 
-    // Create new abort controller for this request
-    abortControllerRef.current = new AbortController();
+    abortContentRequest();
+
+    const currentAbortController = new AbortController();
+    contentAbortControllerRef.current = currentAbortController;
 
     isSavingRef.current = true;
     changesWhileSavingRef.current = false;
@@ -86,31 +130,39 @@ export const useAutoSave = ({
           title: blogTitle?.trim() || 'Untitled Document',
           isPublished: false,
         },
-        { signal: abortControllerRef.current.signal },
+        { signal: currentAbortController.signal },
       );
 
-      // Only update status if request wasn't aborted
-      if (!abortControllerRef.current.signal.aborted) {
+      if (!currentAbortController.signal.aborted) {
         if (changesWhileSavingRef.current) {
           updateSaveStatus('unsaved');
+          setHasUnsavedChanges(true);
+          setTimeout(() => {
+            if (!isDialogOpen && changesWhileSavingRef.current) {
+              changesWhileSavingRef.current = false;
+              autoSaveDebounce(performAutoSave, DELAYS.autoSave);
+            }
+          }, 100);
         } else {
           setHasUnsavedChanges(false);
           updateSaveStatus('saved', new Date());
+          pendingContentSaveRef.current = false;
         }
       }
-    } catch (error: any) {
-      // Don't show error for aborted requests (fetch uses 'AbortError', axios uses 'CanceledError')
+    } catch (error) {
+      const saveError = error as SaveError;
       if (
-        error.name !== 'AbortError' &&
-        error.name !== 'CanceledError' &&
-        !abortControllerRef.current?.signal.aborted
+        saveError.name !== 'AbortError' &&
+        !currentAbortController.signal.aborted
       ) {
-        console.error('Auto-save failed:', error);
+        console.error('❌ Auto-save failed:', saveError);
         updateSaveStatus('error');
       }
     } finally {
       isSavingRef.current = false;
-      abortControllerRef.current = null;
+      if (contentAbortControllerRef.current === currentAbortController) {
+        contentAbortControllerRef.current = null;
+      }
     }
   }, [
     blogId,
@@ -120,71 +172,119 @@ export const useAutoSave = ({
     updateSaveStatus,
     setHasUnsavedChanges,
     editorRef,
+    abortContentRequest,
+    autoSaveDebounce,
   ]);
 
   useEffect(() => {
-    if (!hasUnsavedChanges || isCreating || isDialogOpen) return;
-
+    if (!hasUnsavedChanges || isCreating || isDialogOpen) {
+      return;
+    }
     updateSaveStatus('unsaved');
     autoSaveDebounce(performAutoSave, DELAYS.autoSave);
-
     return cancelAutoSave;
   }, [
     hasUnsavedChanges,
     isCreating,
     isDialogOpen,
-    performAutoSave,
-    autoSaveDebounce,
     cancelAutoSave,
     updateSaveStatus,
+    autoSaveDebounce,
+    performAutoSave,
   ]);
 
   const markChangesWhileSaving = useCallback(() => {
     if (isSavingRef.current) {
       changesWhileSavingRef.current = true;
     }
-  }, []);
+    captureCurrentContent();
+  }, [captureCurrentContent]);
 
-  // Helper to create abortable title save
   const createAbortableTitleSave = useCallback(
     (numericBlogId: number, newTitle: string) => {
-      return async () => {
-        if (isDialogOpen) return; // Don't start if dialog is open
+      captureCurrentTitle(newTitle);
 
-        abortControllerRef.current = new AbortController();
+      return async () => {
+        if (isDialogOpen) return;
+
+        const titleToSave = latestTitleRef.current || newTitle;
+
+        abortTitleRequest();
+        const currentAbortController = new AbortController();
+        titleAbortControllerRef.current = currentAbortController;
+
         updateSaveStatus('saving');
 
         try {
           await updateExistingBlog(
             numericBlogId,
             {
-              title: newTitle.trim() || 'Untitled Document',
+              title: titleToSave.trim() || 'Untitled Document',
               isPublished: false,
             },
-            { signal: abortControllerRef.current.signal },
+            { signal: currentAbortController.signal },
           );
 
-          if (!abortControllerRef.current.signal.aborted) {
+          if (!currentAbortController.signal.aborted) {
             updateSaveStatus('saved', new Date());
             setHasUnsavedChanges(false);
+            pendingTitleSaveRef.current = false;
           }
-        } catch (error: any) {
+        } catch (error) {
+          const saveError = error as SaveError;
           if (
-            error.name !== 'AbortError' &&
-            error.name !== 'CanceledError' &&
-            !abortControllerRef.current?.signal.aborted
+            saveError.name !== 'AbortError' &&
+            !currentAbortController.signal.aborted
           ) {
-            console.error('Title save failed:', error);
+            console.error('Title save failed:', saveError);
             updateSaveStatus('error');
             setHasUnsavedChanges(true);
           }
         } finally {
-          abortControllerRef.current = null;
+          if (titleAbortControllerRef.current === currentAbortController) {
+            titleAbortControllerRef.current = null;
+          }
         }
       };
     },
-    [isDialogOpen, updateSaveStatus, setHasUnsavedChanges],
+    [
+      isDialogOpen,
+      updateSaveStatus,
+      setHasUnsavedChanges,
+      captureCurrentTitle,
+      abortTitleRequest,
+    ],
   );
+
+  // This beacon part can remain the same
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (pendingContentSaveRef.current || pendingTitleSaveRef.current) {
+        const finalContent =
+          latestContentRef.current || editorRef.current?.getContent();
+        const finalTitle = latestTitleRef.current || blogTitle;
+
+        if (finalContent && blogId && blogId !== 'new') {
+          // This API endpoint needs to exist on your server
+          navigator.sendBeacon(
+            '/api/blogs/autosave',
+            JSON.stringify({
+              blogId: parseInt(blogId, 10),
+              content: finalContent,
+              title: finalTitle?.trim() || 'Untitled Document',
+            }),
+          );
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [blogId, blogTitle, editorRef]);
+
+  const triggerContentCapture = useCallback(() => {
+    captureCurrentContent();
+  }, [captureCurrentContent]);
 
   return {
     autoSaveDebounce,
@@ -195,6 +295,8 @@ export const useAutoSave = ({
     cancelCreate,
     markChangesWhileSaving,
     createAbortableTitleSave,
+    triggerContentCapture,
+    performAutoSave,
     delays: DELAYS,
   };
 };

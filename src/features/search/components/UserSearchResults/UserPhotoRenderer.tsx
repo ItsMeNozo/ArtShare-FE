@@ -17,7 +17,7 @@ export const UserPhotoRenderer = (
         width: width,
       }}
     >
-      <Link to={`/${photo.username}`} className="block h-full w-full">
+      <Link to={`/u/${photo.username}`} className="block h-full w-full">
         <img
           {...photo}
           srcSet={

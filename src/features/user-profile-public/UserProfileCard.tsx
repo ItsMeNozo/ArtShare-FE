@@ -3,6 +3,7 @@ import { useSnackbar } from '@/hooks/useSnackbar';
 import {
   Box,
   Button,
+  CircularProgress,
   IconButton,
   Menu,
   MenuItem,
@@ -12,11 +13,12 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { MoreHorizontal } from 'lucide-react';
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { BiEdit } from 'react-icons/bi';
 import { HiUserAdd } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { followUser, unfollowUser } from './api/follow.api';
+import { UserProfile } from './api/user-profile.api';
 import ProfileHeader from './components/ProfileHeader';
 import ProfileInfo from './components/ProfileInfo';
 import ReportDialog from './components/ReportDialog';
@@ -29,24 +31,17 @@ export const UserProfileCard = () => {
   const queryClient = useQueryClient();
   const { showSnackbar } = useSnackbar();
   const [isHoveringFollowBtn, setIsHoveringFollowBtn] = useState(false);
-  const [unfollowInFlight, setUnfollowInFlight] = useState(false);
-
-  console.log('🎭 UserProfileCard rendered with username:', username);
 
   const {
     data: profileData,
     isLoading,
+    isRefetching,
     isError,
     error,
   } = useUserProfile(username);
 
-  useEffect(() => {
-    // Once the profile refetch shows isFollowing === false, drop the flag
-    if (!profileData?.isFollowing) {
-      setUnfollowInFlight(false);
-    }
-  }, [profileData?.isFollowing]);
-  /* ─────────────────── follow / unfollow ────────────── */
+  const isCardLoading = isLoading || isRefetching;
+
   const followMutation = useMutation({
     mutationFn: () => {
       if (!profileData?.id) {
@@ -54,19 +49,36 @@ export const UserProfileCard = () => {
       }
       return followUser(profileData.id);
     },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['userProfile', username] });
+
+      const previousProfileData = queryClient.getQueryData<UserProfile>([
+        'userProfile',
+        username,
+      ]);
+
+      // 3. Optimistically update to the new value
+      if (previousProfileData) {
+        queryClient.setQueryData<UserProfile>(['userProfile', username], {
+          ...previousProfileData,
+          isFollowing: true,
+          followersCount: previousProfileData.followersCount + 1,
+        });
+      }
+
+      return { previousProfileData };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
+      // queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
       showSnackbar('Followed successfully.', 'success');
     },
     onError: (error: unknown) => {
       let msg = 'Failed to follow user.';
-
       if (error instanceof AxiosError && error.response?.data?.message) {
         msg = error.response.data.message;
       } else if (error instanceof Error) {
         msg = error.message;
       }
-
       showSnackbar(msg, 'error');
     },
   });
@@ -78,24 +90,36 @@ export const UserProfileCard = () => {
       }
       return unfollowUser(profileData.id);
     },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['userProfile', username] });
+      const previousProfileData = queryClient.getQueryData<UserProfile>([
+        'userProfile',
+        username,
+      ]);
+      if (previousProfileData) {
+        queryClient.setQueryData<UserProfile>(['userProfile', username], {
+          ...previousProfileData,
+          isFollowing: false,
+          followersCount: previousProfileData.followersCount - 1,
+        });
+      }
+      return { previousProfileData };
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
-      showSnackbar('Unfollow successfully.', 'success');
+      // queryClient.invalidateQueries({ queryKey: ['userProfile', username] });
+      showSnackbar('Unfollowed successfully.', 'success');
     },
     onError: (error: unknown) => {
       let msg = 'Failed to unfollow user.';
-
       if (error instanceof AxiosError && error.response?.data?.message) {
         msg = error.response.data.message;
       } else if (error instanceof Error) {
         msg = error.message;
       }
-
       showSnackbar(msg, 'error');
     },
   });
 
-  // Dropdown menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
   const menuOpen = Boolean(anchorEl);
@@ -106,8 +130,11 @@ export const UserProfileCard = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  const handleEdit = () => {
+    handleMenuClose();
+    navigate('/edit-user');
+  };
 
-  // Report section
   const [dialogOpen, setDialogOpen] = useState(false);
   const { mutate: reportUser, isPending: isLoadingReportUser } =
     useReportUser();
@@ -135,33 +162,22 @@ export const UserProfileCard = () => {
     );
   };
 
-  const handleEdit = () => {
-    handleMenuClose();
-    navigate('/edit-user');
-  };
-
-  // Conditional rendering based on loading, error, or data state
-  if (isLoading || isLoadingReportUser) {
+  if (isCardLoading || isLoadingReportUser) {
     return (
-      <Typography variant="body1" color="textPrimary">
-        Loading profile...
-      </Typography>
+      <Box className="flex w-full items-center justify-center">
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (isError) {
-    // check if error indicates a 404 (Not Found)
-    // to give a more specific "User not found" message.
-    // For example, if (error instanceof AxiosError && error.response?.status === 404)
     return (
-      <Typography variant="body1" color="textPrimary">
+      <Typography variant="body1" color="error">
         Error loading profile: {error?.message || 'An unknown error occurred'}
       </Typography>
     );
   }
 
-  // If, after loading and no generic error, profileData is still null/undefined,
-  // it implies the user was not found by the API or the API returned no data.
   if (!profileData) {
     return (
       <Typography variant="body1" color="textPrimary">
@@ -170,110 +186,84 @@ export const UserProfileCard = () => {
     );
   }
 
-  // Now, profileData exists. Check for incompleteness.
   const isProfileIncomplete =
-    !profileData.birthday || // Checks if birthday is null, undefined, or an empty string
-    !profileData.username || // Checks if username is null, undefined, or an empty string
-    !profileData.fullName; // Checks if fullName is null, undefined, or an empty string
+    !profileData.birthday || !profileData.username || !profileData.fullName;
 
   if (isProfileIncomplete) {
     return (
-      <Typography variant="body1" color="textPrimary">
+      <Typography variant="body1" color="textSecondary">
         This user hasn't finished setting up their profile.
       </Typography>
     );
   }
 
+  const isProcessingMutation =
+    followMutation.isPending || unfollowMutation.isPending;
+  const isOwnProfile = user?.id === profileData.id;
+  const isFollowing = profileData.isFollowing;
+
   const toggleFollow = () => {
     if (isFollowing) {
-      setUnfollowInFlight(true);
       unfollowMutation.mutate();
     } else {
       followMutation.mutate();
     }
   };
 
-  const isProcessing = followMutation.isPending || unfollowMutation.isPending;
-
-  const isOwnProfile = user?.id === profileData?.id;
-  const isFollowing = profileData?.isFollowing;
-
   return (
-    <div className="flex items-end justify-between w-full h-full pb-4">
-      <div className="flex items-end w-full space-x-4">
-        {profileData.profilePictureUrl ? (
-          <ProfileHeader
-            name={profileData?.fullName ?? ''}
-            username={profileData.username || ''}
-            avatarUrl={profileData.profilePictureUrl}
-            isFollowing={false}
-          />
-        ) : (
-          <Box display="flex" alignItems="center">
-            <ProfileHeader
-              name={profileData?.fullName ?? ''}
-              username={profileData?.username ?? ''}
-              isFollowing={false}
-            />
-          </Box>
-        )}
-        <div className="flex items-center justify-between w-full">
+    <div className="flex h-full w-full items-end justify-between pb-4">
+      <div className="flex w-full items-end space-x-4">
+        {/* FIX: Provide fallbacks to satisfy strict string and string | undefined props */}
+        <ProfileHeader
+          name={profileData.fullName ?? ''}
+          username={profileData.username ?? ''}
+          avatarUrl={profileData.profilePictureUrl ?? undefined}
+          isFollowing={isFollowing}
+        />
+        <div className="flex w-full items-center justify-between">
+          {/* FIX: Provide fallbacks here as well */}
           <ProfileInfo
-            name={profileData?.fullName ?? ''}
+            name={profileData.fullName ?? ''}
             username={profileData.username ?? ''}
             bio={profileData.bio || ''}
             followingsCount={profileData.followingsCount}
             followersCount={profileData.followersCount}
             userId={profileData.id}
           />
-          <Box className="flex h-10">
+          <Box className="flex h-10 items-center space-x-2">
             {!isOwnProfile &&
               (isFollowing ? (
                 <Button
                   onClick={toggleFollow}
-                  disabled={isProcessing || unfollowInFlight}
-                  variant={
-                    isHoveringFollowBtn || unfollowInFlight
-                      ? 'contained'
-                      : 'outlined'
-                  }
-                  color={
-                    isHoveringFollowBtn || unfollowInFlight
-                      ? 'error'
-                      : 'primary'
-                  }
-                  sx={{ textTransform: 'none' }}
+                  disabled={isProcessingMutation}
+                  variant={isHoveringFollowBtn ? 'contained' : 'outlined'}
+                  color={isHoveringFollowBtn ? 'error' : 'primary'}
+                  sx={{ textTransform: 'none', width: '112px' }}
                   onMouseEnter={() => setIsHoveringFollowBtn(true)}
                   onMouseLeave={() => setIsHoveringFollowBtn(false)}
-                  className="flex"
                 >
-                  {unfollowInFlight || isHoveringFollowBtn
-                    ? 'Unfollow'
-                    : 'Following'}
+                  {isHoveringFollowBtn ? 'Unfollow' : 'Following'}
                 </Button>
               ) : (
                 <Button
                   onClick={toggleFollow}
-                  disabled={isProcessing}
+                  disabled={isProcessingMutation}
                   variant="contained"
                   color="primary"
-                  sx={{ textTransform: 'none' }}
-                  className="flex w-28"
+                  sx={{ textTransform: 'none', width: '112px' }}
                 >
                   <HiUserAdd className="mr-2 size-4" />
-                  <p>Follow</p>
+                  Follow
                 </Button>
               ))}
             {isOwnProfile && (
               <Button
                 onClick={handleEdit}
-                disabled={isProcessing}
                 variant="contained"
-                sx={{ textTransform: 'none' }}
-                className="flex w-36"
+                sx={{ textTransform: 'none', width: '144px' }}
               >
                 <BiEdit className="mr-2 size-4" />
-                <p>Edit Profile</p>
+                Edit Profile
               </Button>
             )}
             {!isOwnProfile && (
@@ -282,7 +272,6 @@ export const UserProfileCard = () => {
                   aria-label="More options"
                   color="primary"
                   size="medium"
-                  sx={{ borderRadius: '50%', bgcolor: 'transparent' }}
                   onClick={handleMenuOpen}
                 >
                   <MoreHorizontal />
@@ -295,9 +284,13 @@ export const UserProfileCard = () => {
               onClose={handleMenuClose}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-              className="m-2"
             >
-              <MenuItem onClick={() => setDialogOpen(true)}>
+              <MenuItem
+                onClick={() => {
+                  setDialogOpen(true);
+                  handleMenuClose();
+                }}
+              >
                 Report User
               </MenuItem>
             </Menu>
@@ -309,6 +302,8 @@ export const UserProfileCard = () => {
         onClose={() => setDialogOpen(false)}
         onSubmit={handleReport}
         submitting={isLoadingReportUser}
+        itemType="user"
+        itemName={profileData.username}
       />
     </div>
   );

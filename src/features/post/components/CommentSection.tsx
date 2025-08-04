@@ -322,7 +322,7 @@ const CommentRow = ({
       className={`comment-item w-full ${isHighlighted ? 'comment-highlighted' : ''}`}
     >
       <Box className="w-full">
-        <div className="flex w-full gap-3 py-3 items-start">
+        <div className="flex w-full items-start gap-3 py-3">
           {comment.user.profilePictureUrl ? (
             <img
               src={comment.user.profilePictureUrl}
@@ -355,7 +355,7 @@ const CommentRow = ({
                 className="cursor-pointer font-bold transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/${comment.user.username}`);
+                  navigate(`/u/${comment.user.username}`);
                 }}
               >
                 @{comment.user.username}
@@ -373,7 +373,7 @@ const CommentRow = ({
                 }
               >
                 <ReactTimeAgo
-                  className='capitalize'
+                  className="capitalize"
                   date={new Date(comment.updatedAt)}
                   timeStyle="round-minute"
                   tick={false}
@@ -1642,9 +1642,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
     return (
       <div className={wrapperClass}>
-        <span className="text-md px-4 font-bold dark:text-white">
-          Comments
-        </span>
+        <span className="text-md px-4 font-bold dark:text-white">Comments</span>
         {inputPosition === 'top' && InputBar}
         <FreshRepliesCtx.Provider
           value={{ map: newRepliesMap, clear: clearFresh }}
@@ -1662,33 +1660,39 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
             }`}
             style={{ scrollBehavior: 'smooth' }}
           >
-            {comments.map((c) => (
-              <CommentRow
-                targetId={targetId}
-                targetType={targetType}
-                isHighlighted={highlightedCommentId === c.id} // Compare number with number
-                highlightedCommentId={highlightedCommentId} // Pass number | null
-                key={c.id}
-                comment={c}
-                onLike={handleLike}
-                onSubmitReply={(parentId, content) =>
-                  requireAuth('reply to comments', () =>
-                    handleAdd(content, parentId),
-                  )
-                }
-                onReply={(id, username) => {
-                  setReplyParentId(id);
-                  setNewComment(`@${username} `);
-                  textareaRef.current?.focus();
-                }}
-                onDelete={handleDelete}
-                onRepliesFetched={attachReplies}
-                editingId={editingId}
-                onStartEdit={startEdit}
-                onAbortEdit={abortEdit}
-                onCommitEdit={commitEdit}
-              />
-            ))}
+            {comments.length > 0 ? (
+              comments.map((c) => (
+                <CommentRow
+                  targetId={targetId}
+                  targetType={targetType}
+                  isHighlighted={highlightedCommentId === c.id}
+                  highlightedCommentId={highlightedCommentId}
+                  key={c.id}
+                  comment={c}
+                  onLike={handleLike}
+                  onSubmitReply={(parentId, content) =>
+                    requireAuth('reply to comments', () =>
+                      handleAdd(content, parentId),
+                    )
+                  }
+                  onReply={(id, username) => {
+                    setReplyParentId(id);
+                    setNewComment(`@${username} `);
+                    textareaRef.current?.focus();
+                  }}
+                  onDelete={handleDelete}
+                  onRepliesFetched={attachReplies}
+                  editingId={editingId}
+                  onStartEdit={startEdit}
+                  onAbortEdit={abortEdit}
+                  onCommitEdit={commitEdit}
+                />
+              ))
+            ) : (
+              <div className="py-6 text-center text-gray-500 dark:text-gray-400">
+                No comments yet. Be the first to comment!
+              </div>
+            )}
           </div>
         </FreshRepliesCtx.Provider>
         {inputPosition === 'bottom' && InputBar}

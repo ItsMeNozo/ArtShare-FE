@@ -104,7 +104,7 @@ test.describe('Post Creation', () => {
 
   // Test cases using POM
 
-  test('@smoke SCRUM-356-1: Basic Post Creation with Image Upload', async ({
+  test('@unsafe SCRUM-356-1: Basic Post Creation with Image Upload', async ({
     page,
   }) => {
     console.log(`📍 Current URL: ${page.url()}`);

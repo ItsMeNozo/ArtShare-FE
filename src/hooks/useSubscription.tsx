@@ -8,14 +8,18 @@ import { useQuery } from '@tanstack/react-query';
 
 export const useSubscriptionInfo = () => {
   const { user } = useUser();
+  const accessToken =
+    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
   return useQuery<SubscriptionInfoDto, Error>({
-    queryKey: ['subscriptionInfo', user?.id],
+    queryKey: ['subscriptionInfo', user?.id, accessToken],
     queryFn: getSubscriptionInfo,
     staleTime: 1000 * 60 * 5, // 5 minutes
     select: (data) => ({
       ...data,
       expiresAt: new Date(data.expiresAt),
     }),
+    enabled: !!accessToken,
   });
 };
 
