@@ -6,52 +6,61 @@ import {
 } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
+import { useEffect, useState } from 'react';
 
 interface PostScheduleEditorProps {
   value: Date | null;
   onChange: (date: Date | null) => void;
   isInvalid?: boolean;
+  canEdit: boolean;
 }
 
 export default function PostScheduleEditor({
   value,
   onChange,
   isInvalid = false,
+  canEdit,
 }: PostScheduleEditorProps) {
-  const dayjsValue = value ? dayjs(value) : null;
+  const [internalDate, setInternalDate] = useState<Dayjs | null>(
+    value ? dayjs(value) : null,
+  );
+
+  useEffect(() => {
+    setInternalDate(value ? dayjs(value) : null);
+  }, [value]);
 
   const handleDateChange = (newDate: Dayjs | null) => {
-    if (!newDate) {
-      onChange(null);
-      return;
-    }
-    // Combine the new date with the existing time
-    const hour = dayjsValue ? dayjsValue.hour() : 12;
-    const minute = dayjsValue ? dayjsValue.minute() : 0;
+    setInternalDate(newDate);
 
-    const updatedDateTime = newDate.hour(hour).minute(minute).second(0);
-    onChange(updatedDateTime.toDate());
+    if (newDate && newDate.isValid()) {
+      onChange(newDate.toDate());
+    } else {
+      onChange(null);
+    }
   };
 
   const handleTimeChange = (newTime: Dayjs | null) => {
-    if (!newTime) {
-      onChange(null);
-      return;
-    }
-    const baseDate = dayjsValue || dayjs();
+    const baseDate = internalDate || dayjs();
+    const updatedDateTime = newTime
+      ? baseDate.hour(newTime.hour()).minute(newTime.minute())
+      : baseDate;
 
-    const updatedDateTime = baseDate
-      .hour(newTime.hour())
-      .minute(newTime.minute());
-    onChange(updatedDateTime.toDate());
+    setInternalDate(updatedDateTime);
+
+    if (updatedDateTime && updatedDateTime.isValid()) {
+      onChange(updatedDateTime.toDate());
+    } else {
+      onChange(null);
+    }
   };
 
   const handleClear = () => {
+    setInternalDate(null);
     onChange(null);
   };
 
   return (
-    <Box className="pb-20 w-full h-full">
+    <Box className="h-full w-full pb-20">
       <Box
         p={2}
         sx={{
@@ -60,6 +69,7 @@ export default function PostScheduleEditor({
           boxShadow: 2,
           maxWidth: '576px',
           border: isInvalid ? '1px solid #d32f2f' : '1px solid',
+          opacity: canEdit ? 1 : 0.7,
         }}
         className="border-mountain-200"
       >
@@ -67,7 +77,7 @@ export default function PostScheduleEditor({
           <Stack direction="row" spacing={2} alignItems="center">
             <DatePicker
               label="Date"
-              value={dayjsValue}
+              value={internalDate}
               onChange={handleDateChange}
               slotProps={{
                 textField: {
@@ -76,10 +86,11 @@ export default function PostScheduleEditor({
                   error: isInvalid,
                 },
               }}
+              disabled={!canEdit}
             />
             <TimePicker
               label="Time"
-              value={dayjsValue}
+              value={internalDate}
               onChange={handleTimeChange}
               slotProps={{
                 textField: {
@@ -88,6 +99,7 @@ export default function PostScheduleEditor({
                   error: isInvalid,
                 },
               }}
+              disabled={!canEdit}
             />
           </Stack>
         </LocalizationProvider>
@@ -108,20 +120,25 @@ export default function PostScheduleEditor({
           </Select>
         </FormControl> */}
 
-        {value && (
+        {internalDate && internalDate.isValid() && (
           <Box mt={2} p={2} sx={{ bgcolor: '#f0f4ff', borderRadius: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Scheduled for:
             </Typography>
             <Typography variant="subtitle2">
-              {dayjs(value).format('dddd, MMMM D, YYYY')} at{' '}
-              {dayjs(value).format('h:mm A')}
+              {internalDate.format('dddd, MMMM D, YYYY')} at{' '}
+              {internalDate.format('h:mm A')}
             </Typography>
           </Box>
         )}
 
         <Box mt={3} display="flex" justifyContent="flex-end">
-          <Button onClick={handleClear} color="secondary" size="small">
+          <Button
+            onClick={handleClear}
+            color="secondary"
+            size="small"
+            disabled={!canEdit}
+          >
             Clear Schedule
           </Button>
         </Box>

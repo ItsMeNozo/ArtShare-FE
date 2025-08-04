@@ -1,22 +1,22 @@
+import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button } from '@mui/material';
 import {
+  ErrorMessage,
   Field,
   Form,
   Formik,
   FormikHelpers,
   FormikProps,
 } from 'formik';
+import { HiArrowLeft } from 'react-icons/hi2';
+import { PiStarFourFill } from 'react-icons/pi';
 import { TbGridDots } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useGenAutoPosts } from '../../hooks/useGenAutoPosts';
+import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import { GenAutoPostFormValues } from '../../types';
 import SettingsPopover from './SettingsPopover';
-import { LuTrash2 } from 'react-icons/lu';
-import { PiStarFourFill } from 'react-icons/pi';
-import { useNumericParam } from '@/hooks/useNumericParam';
-import { HiArrowLeft } from 'react-icons/hi2';
-import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 
 const GenerateAutoPostForm = () => {
   const navigate = useNavigate();
@@ -24,7 +24,9 @@ const GenerateAutoPostForm = () => {
 
   const { mutate: generateAutoPosts } = useGenAutoPosts({
     onSuccess: (data) => {
-      navigate(`/auto/projects/${projectId}/posts/${data[0].id}/edit`);
+      if (data && data.length > 0) {
+        navigate(`/auto/projects/${projectId}/posts/${data[0].id}/edit`);
+      }
     },
     onError: (error) => {
       console.error('Error generating posts:', error);
@@ -48,66 +50,43 @@ const GenerateAutoPostForm = () => {
     );
   };
 
-  const handlePostItemClick = (postId: number) => {
-    navigate(`/auto/projects/${projectId}/posts/${postId}/edit`);
-  };
-
   const { data: fetchedPostsResponse } = useGetAutoPosts({
     projectId: projectId,
-    orderBy: undefined,
-    order: undefined,
-    page: 1,
-    limit: 10,
+    limit: 1,
   });
 
-  const postList = fetchedPostsResponse?.data ?? [];
+  const hasExistingPosts = (fetchedPostsResponse?.data?.length ?? 0) > 0;
+
+  const handleReturnToPosts = () => {
+    navigate(`/auto/projects/${projectId}/details`);
+  };
 
   return (
-    <Box className="flex flex-col items-center bg-[#F2F4F7] border-mountain-200 rounded-t-3xl h-full">
-      <div className="flex items-center bg-white px-4 py-2 border-mountain-200 border-b-1 rounded-t-3xl w-full h-16 shrink-0">
-        <div className="flex justify-between items-center w-full">
-          <div className='flex space-x-4'>
-            <div className='flex items-center space-x-4'>
-              <div className='flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer'>
+    <Box className="border-mountain-200 flex h-full flex-col items-center rounded-t-3xl bg-[#F2F4F7]">
+      <div className="border-mountain-200 flex h-16 w-full shrink-0 items-center rounded-t-3xl border-b-1 bg-white px-4 py-2">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex space-x-4">
+            <div className="flex items-center space-x-4">
+              <div className="border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-full border bg-indigo-100 p-2 px-4">
                 <span>Project Posts</span>
                 <TbGridDots />
               </div>
-              <button type='button' disabled className='flex items-center space-x-2 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                <PiStarFourFill className='size-4 text-purple-600' />
-                <span>Generate Post</span>
-              </button>
-              <div className='flex items-center px-4 border-mountain-200 border-l-1'>
-                <button
-                  disabled={!postList[0]?.id}
-                  onClick={() => handlePostItemClick(postList[0]?.id)}
-                  className='flex items-center space-x-2 bg-white hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer'>
-                  <HiArrowLeft className='size-4' />
-                  <span>Return To Posts</span>
-                </button>
-              </div>
+              {hasExistingPosts && (
+                <div className="border-mountain-200 flex items-center border-l-1 px-4">
+                  <button
+                    onClick={handleReturnToPosts}
+                    className="hover:bg-mountain-50 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border bg-white p-2"
+                  >
+                    <HiArrowLeft className="size-4" />
+                    <span>Return To Project</span>
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button
-              type="submit"
-              variant="contained"
-              className='opacity-50 pointer-events-none'
-            >
-              Save Changes
-            </Button>
-            <Button
-              type="button"
-              onClick={() => { }}
-              disabled
-              className="flex items-center space-x-2 bg-mountain-100 hover:bg-mountain-50 disabled:opacity-50 p-2 border border-mountain-200 rounded-lg font-normal"
-            >
-              <LuTrash2 className="size-4" />
-              <div>Delete</div>
-            </Button>
           </div>
         </div>
       </div>
-      <div className='flex justify-center items-center w-full h-full'>
+      <div className="flex h-full w-full items-center justify-center">
         <Formik
           initialValues={{
             contentPrompt: '',
@@ -121,38 +100,52 @@ const GenerateAutoPostForm = () => {
           validationSchema={validationSchema}
         >
           {(formikProps: FormikProps<GenAutoPostFormValues>) => {
-            const { isSubmitting } = formikProps;
+            const { isSubmitting, values, errors, touched } = formikProps;
             return (
-              <Form className="flex justify-between items-start gap-6 bg-white shadow-md p-4 rounded-lg w-3xl h-fit">
+              <Form className="flex h-fit w-3xl items-start justify-between gap-6 rounded-lg bg-white p-4 shadow-md">
                 <SettingsPopover />
-                <div className="flex flex-col flex-1 justify-between space-y-4 w-full h-full">
-                  <div className='flex items-center space-x-2'>
-                    <PiStarFourFill className='text-purple-600' />
-                    <p className='font-medium text-lg'>Generate Post Content</p>
+                <div className="flex h-full w-full flex-1 flex-col justify-between space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <PiStarFourFill className="text-purple-600" />
+                    <p className="text-lg font-medium">Generate Post Content</p>
                   </div>
                   <Field
                     name="contentPrompt"
                     as="textarea"
                     rows={8}
-                    className="px-4 py-2 border border-gray-300 rounded-md outline-0 w-full min-h-64 placeholder:text-mountain-400 resize-none"
-                    placeholder="Create the compaign marketing content..."
+                    className={`placeholder:text-mountain-400 min-h-64 w-full resize-none rounded-md border px-4 py-2 outline-0 ${
+                      errors.contentPrompt && touched.contentPrompt
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="e.g., Create a fun and engaging post about the benefits of a morning coffee."
                   />
-                  <div className="flex justify-end items-center space-x-4 w-full">
-                    <div className='flex flex-1 p-2 border border-mountain-200 rounded-lg'>
+                  <ErrorMessage name="contentPrompt">
+                    {(msg) => <div className="text-sm text-red-600">{msg}</div>}
+                  </ErrorMessage>
+                  <div className="flex w-full items-center justify-end space-x-4">
+                    <div className="border-mountain-200 flex flex-1 rounded-lg border p-2">
                       <span>Post Number: </span>
                       <Field
                         name="postCount"
                         type="number"
                         min={1}
                         max={7}
-                        className="bg-white rounded-md outline-0 w-fit text-center"
+                        className="w-fit rounded-md bg-white text-center outline-0"
                         placeholder="e.g. 3"
-                      />
+                      />{' '}
+                      <ErrorMessage name="postCount">
+                        {(msg) => (
+                          <div className="ml-2 text-sm text-red-600">{msg}</div>
+                        )}
+                      </ErrorMessage>
                     </div>
                     <Button
                       type="submit"
-                      disabled={isSubmitting || formikProps.values.contentPrompt === ''}
-                      className="bg-gradient-to-r from-indigo-600 hover:from-indigo-700 to-purple-600 hover:to-purple-700 disabled:opacity-50 shadow px-4 py-2 rounded-md w-1/2 font-medium text-white"
+                      disabled={
+                        isSubmitting || values.contentPrompt.trim() === ''
+                      }
+                      className="w-1/2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 font-medium text-white shadow hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50"
                     >
                       {isSubmitting ? 'Writing...' : 'Start Writing'}
                     </Button>

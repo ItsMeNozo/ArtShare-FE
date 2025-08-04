@@ -157,7 +157,7 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
         });
       }
       queryClient.invalidateQueries({
-        queryKey: ['collections', 'list-dialog'],
+        queryKey: ['collections', 'me'],
       });
       console.log(
         `API: ${optimisticAction === 'add' ? 'Added' : 'Removed'} post ${postId} successfully.`,
