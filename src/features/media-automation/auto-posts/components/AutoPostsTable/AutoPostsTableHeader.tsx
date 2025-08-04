@@ -1,34 +1,57 @@
-import Checkbox from '@mui/material/Checkbox';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
+import {
+  Box,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+} from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 import {
   HeadCellItemTable,
-  ItemTableProps,
+  Order,
+  SortableKeysItemTable,
 } from '../../../projects/types/automation-project';
 
-function AutoPostsTableHeader(props: ItemTableProps) {
-  const { onSelectAllClick, numSelected, rowCount } = props;
+interface AutoPostsTableHeaderProps {
+  onRequestSort: (
+    event: React.MouseEvent<unknown>,
+    property: SortableKeysItemTable,
+  ) => void;
+  order: Order;
+  orderBy: string;
+}
+
+function AutoPostsTableHeader(props: AutoPostsTableHeaderProps) {
+  const { order, orderBy, onRequestSort } = props;
+
+  const createSortHandler =
+    (property: SortableKeysItemTable) => (event: React.MouseEvent<unknown>) => {
+      onRequestSort(event, property);
+    };
 
   return (
     <TableHead>
       <TableRow className="border-mountain-100 border-b-2">
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
+            sortDirection={orderBy === headCell.id ? order : false}
             className="select-none"
           >
-            {headCell.label}
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <Box component="span" sx={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </Box>
+              ) : null}
+            </TableSortLabel>
           </TableCell>
         ))}
         <TableCell key={'actions'} align={'right'} className="select-none">
@@ -55,10 +78,10 @@ const headCells: readonly HeadCellItemTable[] = [
     label: 'Content',
   },
   {
-    id: 'imageUrl',
+    id: 'imageUrls',
     numeric: true,
     disablePadding: false,
-    label: 'Images Number',
+    label: 'Images',
   },
   {
     id: 'status',
@@ -67,10 +90,10 @@ const headCells: readonly HeadCellItemTable[] = [
     label: 'Status',
   },
   {
-    id: 'scheduledTime',
+    id: 'scheduledAt',
     numeric: true,
     disablePadding: false,
-    label: 'Scheduled Time',
+    label: 'Scheduled At',
   },
   {
     id: 'createdAt',
