@@ -49,12 +49,11 @@ const BlogCard: React.FC<BlogCardProps> = ({
   const handleCardClick = () => {
     navigate(`/blogs/${blogId}`);
   };
-
   const handleCopyLink = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText(
-        `http://localhost:5173/blogs/${blogId}`,
+        `${window.location.origin}/blogs/${blogId}`,
       );
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

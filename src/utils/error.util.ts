@@ -4,14 +4,23 @@ import axios, { AxiosError } from 'axios';
 
 export const extractApiErrorMessage = (
   error: unknown,
-  fallbackMessage: string,
+  defaultMessage: string,
 ): string => {
-  return axios.isAxiosError(error)
-    ? ((error as AxiosError<BackendErrorResponse>).response?.data?.message ??
-        fallbackMessage)
-    : error instanceof Error
-      ? error.message
-      : 'An unexpected error occurred. Please try again.';
+  if (axios.isAxiosError(error) && error.response?.data) {
+    const responseData = error.response.data;
+
+    const nestedMessage = responseData.message?.message;
+    if (typeof nestedMessage === 'string') {
+      return nestedMessage;
+    }
+
+    const primaryMessage = responseData.message;
+    if (typeof primaryMessage === 'string') {
+      return primaryMessage;
+    }
+  }
+
+  return defaultMessage;
 };
 
 export const extractReportErrorMessage = (
@@ -23,7 +32,6 @@ export const extractReportErrorMessage = (
     const { statusCode, message } = apiError.response?.data || {};
 
     if (statusCode === 409) {
-      // Convert enum to user-friendly string
       const itemTypeName = itemType.toLowerCase();
       return `You have already reported this ${itemTypeName}.`;
     }

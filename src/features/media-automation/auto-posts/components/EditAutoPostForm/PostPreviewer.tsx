@@ -1,10 +1,16 @@
-import { BiComment, BiDesktop, BiLike, BiMobile, BiShare } from 'react-icons/bi';
+import { Platform } from '@/features/media-automation/projects/types/platform';
+import { format } from 'date-fns';
+import {
+  BiComment,
+  BiDesktop,
+  BiLike,
+  BiMobile,
+  BiShare,
+} from 'react-icons/bi';
 import { IoEarthSharp } from 'react-icons/io5';
 import { MdMoreHoriz } from 'react-icons/md';
 import { ExpandablePostContent } from './ExpandTextArea';
 import { useState } from 'react';
-import { Platform } from '@/features/media-automation/projects/types/platform';
-import { format } from 'date-fns';
 import { MobileImageGrid } from '../mimics/MobileImageGrid';
 interface FacebookPostPreviewProps {
   content: string;
@@ -13,7 +19,8 @@ interface FacebookPostPreviewProps {
   platform?: Platform;
 }
 
-const facebookIcon = 'https://res.cloudinary.com/dqxtf297o/image/upload/v1753263979/artshare-asset/fb_icon_jiqelq.svg'
+const facebookIcon =
+  'https://res.cloudinary.com/dqxtf297o/image/upload/v1753263979/artshare-asset/fb_icon_jiqelq.svg';
 
 const SkeletonIconImage = ({ src, alt }: { src: string; alt?: string }) => {
   const [loaded, setLoaded] = useState(false);
@@ -33,12 +40,11 @@ const SkeletonIconImage = ({ src, alt }: { src: string; alt?: string }) => {
   );
 };
 
-
 export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
   content,
   images,
   scheduledAt,
-  platform
+  platform,
 }) => {
   const [desktopMode, setDesktopMode] = useState(true);
   return (
@@ -47,7 +53,7 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
         <div className='flex items-center space-x-2 w-full'>
           <div className='flex items-center space-x-2 bg-white shadow-sm p-2 py-2.5 rounded-md w-56 text-sm'>
             <SkeletonIconImage src={facebookIcon} alt="Facebook Icon" />
-            <p className='font-medium'>Facebook Feed Preview</p>
+            <p className="font-medium">Facebook Feed Preview</p>
           </div>
           <div className='flex bg-mountain-100 shadow p-0.5 rounded-lg w-24 h-full'>
             <button type='button' onClick={() => setDesktopMode(!desktopMode)} className={`${desktopMode === true ? 'bg-white' : 'group'} flex justify-center items-center cursor-pointer transform duration-300 ease-in-out rounded-lg w-1/2 h-full`}>
@@ -128,6 +134,6 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };

@@ -182,12 +182,18 @@ const EditImage: React.FC = () => {
     setNewDesign(null);
   }, [newEdit]);
 
+  const getSrcForImage = (url: string | undefined) => {
+    if (!url) return url;
+    if (url.startsWith('blob:')) return url;
+    return `${url}?t=${Date.now()}`;
+  };
+
   useEffect(() => {
     if (!imageUrl || hasAppendedInitialImage.current) return;
     hasAppendedInitialImage.current = true;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = `${imageUrl}?t=${new Date().getTime()}`;
+    img.src = getSrcForImage(imageUrl)!;
     img.onload = () => {
       const maxWidth = canvasSize.width;
       const maxHeight = canvasSize.height;

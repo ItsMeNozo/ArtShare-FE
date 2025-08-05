@@ -17,14 +17,16 @@ import { FormPlatform, ProjectFormValues } from '../types';
 import { Platform } from '../types/platform';
 import fb_icon from '/fb_icon.svg';
 import ins_icon from '/ins_icon.svg';
+import { Book } from 'lucide-react';
 
 const name = 'platform';
 
 type PlatformSelectionProps = {
   isEditMode?: boolean;
+  setShowGuide?: (show: boolean) => void;
 };
 
-const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
+const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelectionProps) => {
   const { setFieldValue, getFieldMeta } = useFormikContext<ProjectFormValues>();
 
   const initialPlatform = getFieldMeta(name).initialValue as FormPlatform;
@@ -192,52 +194,60 @@ const PlatformSelection = ({ isEditMode = false }: PlatformSelectionProps) => {
                       </div>
                     </div>
                     {selectedPlatform && (
-                      <div className="relative flex justify-between items-center bg-white px-2 rounded-full w-full h-12 text-sm">
-                        <div className="bg-gray-200 p-2 px-4 rounded-full select-none">
-                          <p>Target Page</p>
-                        </div>
-                        <Select
-                          value={selectedPlatform.id.toString()}
-                          onChange={(e) =>
-                            handlePlatformSelected(e.target.value)
-                          }
-                          disabled={isEditMode}
-                          className="top-1/2 left-1/2 absolute h-12 -translate-x-1/2 -translate-y-1/2"
-                          sx={{
-                            '.MuiOutlinedInput-notchedOutline': { border: 0 },
-                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                              border: 0,
-                            },
-                            minWidth: '250px',
-                          }}
-                        >
-                          {fetchedPlatforms.map((platform) => (
-                            <MenuItem
-                              key={platform.id}
-                              value={platform.id.toString()}
-                            >
-                              <div className="flex items-center space-x-2 w-full">
-                                <FaFacebookSquare className="size-4 text-blue-700 shrink-0" />
-                                <span className="flex-grow line-clamp-1">
-                                  {platform.config.pageName}
-                                </span>
-                                <div className="flex items-center space-x-1">
-                                  <div
-                                    className={`h-2 w-2 rounded-full ${isTokenExpired(platform.tokenExpiresAt)
-                                      ? 'bg-red-500'
-                                      : 'bg-green-500'
-                                      }`}
-                                  />
-                                  <span className="text-xs capitalize">
-                                    {isTokenExpired(platform.tokenExpiresAt)
-                                      ? 'Expired'
-                                      : platform.status.toLowerCase()}
+                      <div className="relative flex justify-between items-center gap-2 bg-white p-2 rounded-full w-full h-12 text-sm">
+                        <div className='flex'>
+                          <div className="flex items-center bg-gradient-to-r from-indigo-200 to-purple-200 px-4 border border-mountain-200 rounded-full rounded-r-none h-10 select-none">
+                            <p>Target Page</p>
+                          </div>
+                          <Select
+                            value={selectedPlatform.id.toString()}
+                            onChange={(e) =>
+                              handlePlatformSelected(e.target.value)
+                            }
+                            disabled={isEditMode}
+                            className="flex px-4 border border-mountain-200 rounded-full rounded-l-none h-10"
+                            sx={{
+                              '.MuiOutlinedInput-notchedOutline': { border: 0 },
+                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                border: 0,
+                              },
+                              minWidth: '300px',
+                            }}
+                          >
+                            {fetchedPlatforms.map((platform) => (
+                              <MenuItem
+                                key={platform.id}
+                                value={platform.id.toString()}
+                              >
+                                <div className="flex items-center space-x-2 w-full">
+                                  <FaFacebookSquare className="size-4 text-blue-700 shrink-0" />
+                                  <span className="flex-grow line-clamp-1">
+                                    {platform.config.pageName}
                                   </span>
+                                  <div className="flex items-center space-x-1">
+                                    <div
+                                      className={`h-2 w-2 rounded-full ${isTokenExpired(platform.tokenExpiresAt)
+                                        ? 'bg-red-500'
+                                        : 'bg-green-500'
+                                        }`}
+                                    />
+                                    <span className="capitalize">
+                                      {isTokenExpired(platform.tokenExpiresAt)
+                                        ? 'Expired'
+                                        : platform.status.toLowerCase()}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </MenuItem>
-                          ))}
-                        </Select>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </div>
+                        <div
+                          onClick={() => setShowGuide && setShowGuide(true)}
+                          className="flex flex-1 justify-center items-center bg-gray-100 px-4 border border-mountain-200 rounded-full h-10 cursor-pointer select-none">
+                          <Book className='mr-2 size-4' />
+                          <p>Guide</p>
+                        </div>
                       </div>
                     )}
                   </div>
