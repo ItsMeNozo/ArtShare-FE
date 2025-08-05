@@ -84,7 +84,9 @@ export function useUpdateCollection({
       queryClient.setQueryData<
         InfiniteData<PaginatedResponse<Collection>> | undefined
       >(COLLECTIONS_QUERY_KEY, (oldData) => {
-        if (!oldData) return undefined;
+        if (!oldData || !oldData.pages) {
+          return undefined;
+        }
 
         return {
           ...oldData,
@@ -145,7 +147,9 @@ export function useDeleteCollection({
       queryClient.setQueryData<
         InfiniteData<PaginatedResponse<Collection>> | undefined
       >(COLLECTIONS_QUERY_KEY, (oldData) => {
-        if (!oldData) return undefined;
+        if (!oldData || !oldData.pages) {
+          return undefined;
+        }
         return {
           ...oldData,
           pages: oldData.pages.map((page) => ({
