@@ -424,7 +424,7 @@ const CollectionPage: React.FC = () => {
       </Box>
 
       {/* Title Section */}
-      <Box mb={4}>
+      <Box>
         <CollectionTitle
           title={galleryTitle}
           itemCountText={galleryItemCountText}
