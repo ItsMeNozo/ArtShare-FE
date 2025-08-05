@@ -18,7 +18,8 @@ import {
 
 interface CollectionTitleProps {
   title: string;
-  itemCountText: string;
+
+  itemCount: number;
   isEditable: boolean;
   isPrivate: boolean;
   isLoading?: boolean;
@@ -33,7 +34,8 @@ interface CollectionTitleProps {
 
 export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   title,
-  itemCountText,
+
+  itemCount,
   isEditable,
   isPrivate,
   isLoading = false,
@@ -66,7 +68,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
 
   const handlePrivacyClick = async () => {
     handleMenuClose();
-    // Assuming onSetPrivacy will handle the API call and state update
     await onSetPrivacy(!isPrivate);
   };
 
@@ -75,7 +76,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
       setEditedTitle(title);
       setSaveError(null);
     }
-
     setEditedTitle(title);
   }, [title, isEditing]);
 
@@ -129,6 +129,8 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   }, [editedTitle, title, onSave, cancelEditMode, existingCollectionNames]);
 
   const displayError = error || saveError;
+
+  const itemCountText = `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
 
   return (
     <Box minHeight={48}>

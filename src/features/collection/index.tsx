@@ -336,8 +336,6 @@ const CollectionPage: React.FC = () => {
     return 'Loading...';
   }, [selectedCollectionId, currentCollection]);
 
-  const galleryItemCountText = `${galleryPhotos.length} items`;
-
   const isGalleryLoading = loadingCollections || isProcessingPhotos;
   const anyMutationError =
     createCollectionMutation.error ||
@@ -427,7 +425,7 @@ const CollectionPage: React.FC = () => {
       <Box>
         <CollectionTitle
           title={galleryTitle}
-          itemCountText={galleryItemCountText}
+          itemCount={galleryPhotos.length}
           isEditable={typeof selectedCollectionId === 'number'}
           isPrivate={!!currentCollection?.isPrivate}
           isLoading={updateCollectionMutation.isPending}

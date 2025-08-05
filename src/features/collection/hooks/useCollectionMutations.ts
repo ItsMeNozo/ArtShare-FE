@@ -11,7 +11,7 @@ import {
   updateCollection,
 } from '../api/collection.api';
 import { CreateCollectionFormData } from '../components/CreateCollectionDialog';
-import { Collection, UpdateCollectionData } from '../types/collection';
+import { Collection, Post, UpdateCollectionData } from '../types/collection';
 
 const COLLECTIONS_QUERY_KEY = ['collections', 'me'];
 
@@ -74,32 +74,38 @@ export function useRemovePostFromCollection() {
       await queryClient.cancelQueries({ queryKey: COLLECTIONS_QUERY_KEY });
 
       const previousData = queryClient.getQueryData<
-        PaginatedResponse<Collection>[]
+        InfiniteData<PaginatedResponse<Collection>>
       >(COLLECTIONS_QUERY_KEY);
 
-      queryClient.setQueryData(
-        COLLECTIONS_QUERY_KEY,
-        (oldData: InfiniteData<PaginatedResponse<Collection>>) => {
-          if (!oldData) return oldData;
+      queryClient.setQueryData<
+        InfiniteData<PaginatedResponse<Collection>> | undefined
+      >(COLLECTIONS_QUERY_KEY, (oldData) => {
+        if (!oldData || !oldData.pages) {
+          return undefined;
+        }
 
-          const newData = { ...oldData };
-          newData.pages = newData.pages.map((page) => ({
+        const newData = {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
             ...page,
-            data: page.data.map((collection: Collection) => {
+            data: page.data.map((collection) => {
               if (collection.id === collectionId) {
+                const updatedPosts = (collection.posts || []).filter(
+                  (p: Post) => p.id !== postId,
+                );
+
                 return {
                   ...collection,
-                  posts: (collection.posts || []).filter(
-                    (p) => p.id !== postId,
-                  ),
+                  posts: updatedPosts,
                 };
               }
               return collection;
             }),
-          }));
-          return newData;
-        },
-      );
+          })),
+        };
+
+        return newData;
+      });
 
       return { previousData };
     },
@@ -108,7 +114,6 @@ export function useRemovePostFromCollection() {
       if (context?.previousData) {
         queryClient.setQueryData(COLLECTIONS_QUERY_KEY, context.previousData);
       }
-
       console.error('Failed to remove post:', err);
     },
 
