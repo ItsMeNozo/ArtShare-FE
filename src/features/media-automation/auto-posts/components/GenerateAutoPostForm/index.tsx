@@ -15,11 +15,16 @@ import { PiStarFourFill } from 'react-icons/pi';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Book } from 'lucide-react';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
+import { GuidePanel } from '@/components/sheets/SheetGuidance';
+import { useState } from 'react';
 
 const GenerateAutoPostForm = () => {
   const navigate = useNavigate();
   const projectId = useNumericParam('projectId');
-
+  const [showGuidePanel, setShowGuidePanel] = useState(false);
+  const onGuideClick = () => {
+    setShowGuidePanel((prev) => !prev);
+  };
   const { mutate: generateAutoPosts } = useGenAutoPosts({
     onSuccess: (data) => {
       navigate(`/auto/projects/${projectId}/posts/${data[0].id}/edit`);
@@ -57,9 +62,9 @@ const GenerateAutoPostForm = () => {
             <p>Generate Content for <span className='font-bold'>{projectDetails?.title}</span></p>
           </div>
           <Button
-            onClick={() => { }}
+            onClick={onGuideClick}
             className="flex justify-center items-center bg-white hover:bg-mountain-50 border border-mountain-200 rounded-lg w-24 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
-            <Book className="mr-2 size-6" />
+            <Book className="size-6" />
             Guide
           </Button>
         </div>
@@ -120,6 +125,7 @@ const GenerateAutoPostForm = () => {
           }}
         </Formik>
       </div>
+      <GuidePanel open={showGuidePanel} onOpenChange={setShowGuidePanel} docName='generate-images-ai' />
     </Box>
   );
 };

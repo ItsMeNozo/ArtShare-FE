@@ -38,7 +38,7 @@ import axios, { AxiosError } from 'axios';
 import { useLocation } from 'react-router-dom';
 import { generateImages } from './api/generate-imges.api';
 import { buildTempPromptResult } from './helper/image-gen.helper';
-import { GuidePanel } from './components/GenGuidance';
+import { GuidePanel } from '@/components/sheets/SheetGuidance';
 
 const PAGE_SIZE = 5;
 
