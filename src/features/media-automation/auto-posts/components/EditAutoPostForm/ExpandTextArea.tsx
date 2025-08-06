@@ -22,7 +22,7 @@ export const ExpandablePostContent: React.FC<PostContentProps> = ({
     : parse(rawText.slice(0, limit) + '...');
 
   return (
-    <div className="p-4 pt-0 text-gray-800 text-base">
+    <div className="p-4 pt-0 text-base text-gray-800">
       <Typography
         variant="body2"
         component="div"
@@ -32,9 +32,9 @@ export const ExpandablePostContent: React.FC<PostContentProps> = ({
         {shouldTruncate && (
           <span
             onClick={() => setExpanded(!expanded)}
-            className="font-medium text-mountain-600 hover:underline cursor-pointer"
+            className="text-mountain-600 cursor-pointer font-medium hover:underline"
           >
-            {expanded ? 'See less' : 'See more'}
+            {expanded ? '  See less' : '  See more'}
           </span>
         )}
       </Typography>

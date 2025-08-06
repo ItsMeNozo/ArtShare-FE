@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { createBrowserRouter, Outlet, RouteObject } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet, RouteObject } from 'react-router-dom';
 
 // Layouts & Wrappers
 import OnboardingRoute from '@/components/ProtectedItems/OnboardingRoute';
@@ -22,7 +22,7 @@ const RequireOnboard = lazy(
 );
 
 // Lazy imports for pages/features
-const LandingPage = lazy(() => import('@/pages/Home'));
+// const LandingPage = lazy(() => import('@/pages/Home'));
 const Login = lazy(() => import('@/features/authentication/Login'));
 const SignUp = lazy(() => import('@/features/authentication/SignUp'));
 const ForgotPassword = lazy(
@@ -52,9 +52,9 @@ const UserProfile = lazy(
   () => import('@/features/user-profile-private/UserProfile'),
 );
 const DocumentDashboard = lazy(
-  () => import('@/features/user-writing/DocumentDashboard'),
+  () => import('@/features/write-blog/DocumentDashboard'),
 );
-const MyWriting = lazy(() => import('@/features/user-writing/MyWriting'));
+const MyWriting = lazy(() => import('@/features/write-blog/MyWriting'));
 const ArtGeneration = lazy(() => import('@/features/gen-art/ArtGenAI'));
 const ImageEditor = lazy(() => import('@/features/edit-image/EditImage'));
 const BrowseImage = lazy(() => import('@/features/edit-image/BrowseImage'));
@@ -62,9 +62,6 @@ const BrowseImage = lazy(() => import('@/features/edit-image/BrowseImage'));
 const SocialLinksPage = lazy(
   () =>
     import('@/features/media-automation/social-links/routes/SocialLinksPage'),
-);
-const AutoSchedulingPage = lazy(
-  () => import('@/features/media-automation/scheduling/routes/AutoScheduling'),
 );
 
 const ProjectsPage = lazy(
@@ -109,7 +106,7 @@ const routeConfig: RouteObject[] = [
     ),
     children: [
       // Landing
-      { index: true, element: <LandingPage /> },
+      // { index: true, element: <LandingPage /> },
       // Public Auth
       {
         element: (
@@ -227,7 +224,6 @@ const routeConfig: RouteObject[] = [
         ),
         children: [
           { path: '/auto/social-links', element: <SocialLinksPage /> },
-          { path: '/auto/scheduling', element: <AutoSchedulingPage /> },
           {
             path: '/auto/projects',
             element: <Outlet />,
@@ -260,6 +256,7 @@ const routeConfig: RouteObject[] = [
           },
         ],
       },
+      { index: true, element: <Navigate to="/explore" replace /> },
       // Catch-all -> redirect
       { path: '*', element: <NotFoundPage /> },
     ],

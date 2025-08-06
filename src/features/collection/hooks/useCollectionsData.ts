@@ -25,7 +25,7 @@ export function useCollectionsData(
   const { data, error, isLoading, isError } = useQuery({
     queryKey,
     queryFn,
-    staleTime: STALE_TIME,
+    staleTime: !username ? STALE_TIME : 0,
 
     enabled: enabled && (username ? !!username.trim() : true),
   });

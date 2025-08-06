@@ -1,6 +1,6 @@
 import Loading from '@/components/loading/Loading';
 import { Box, Typography } from '@mui/material';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetProjectDetails } from '../hooks/useGetProjectDetails';
 import { useSaveProject } from '../hooks/useSaveProject';
@@ -13,11 +13,13 @@ import { FaSave } from 'react-icons/fa';
 import { MdErrorOutline } from 'react-icons/md';
 import * as Yup from 'yup';
 import PlatformSelection from '../components/PlatformSelection';
+import { IoReturnDownBack } from 'react-icons/io5';
+import { GuidePanel } from '@/components/sheets/SheetGuidance';
 
 const ProjectEditorPage = () => {
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
-
+  const [showGuidePanel, setShowGuidePanel] = useState(false);
   const isEditMode = !!projectId;
 
   const { data: projectToEdit, isLoading: isLoadingProject } =
@@ -61,7 +63,7 @@ const ProjectEditorPage = () => {
   }
 
   return (
-    <Box className="relative flex h-full w-full items-center justify-center p-4">
+    <Box className="relative flex justify-center items-center bg-[#F2F4F7] p-4 rounded-t-3xl w-full h-full">
       {isLoadingProject && <Loading />}
       <Formik
         initialValues={initialValues}
@@ -72,22 +74,25 @@ const ProjectEditorPage = () => {
         {(formikProps: FormikProps<ProjectFormValues>) => {
           const { dirty, isSubmitting } = formikProps;
           return (
-            <Form className="flex h-full w-full flex-col items-center space-y-4">
-              <div className="flex h-64 w-full justify-center rounded-lg bg-gradient-to-br from-blue-100 to-indigo-50 p-2">
-                <PlatformSelection isEditMode={isEditMode} />
+            <Form className="flex flex-col items-center space-y-4 bg-white rounded-lg w-full h-full">
+              <div className="flex justify-center bg-gradient-to-br from-blue-100 to-indigo-50 p-2 rounded-t-lg w-full h-64">
+                <PlatformSelection
+                  isEditMode={isEditMode}
+                  setShowGuide={setShowGuidePanel}
+                />
               </div>
               {/* General Info Section */}
-              <div className="flex w-xl flex-col space-y-4">
-                <div className="flex w-xl flex-col items-center space-y-4">
+              <div className="flex flex-col space-y-4 w-xl">
+                <div className="flex flex-col items-center space-y-4 w-xl">
                   <Box className="w-full">
-                    <Typography className="mb-1 flex w-full gap-1 text-left font-medium">
+                    <Typography className="flex gap-1 mb-1 w-full font-medium text-left">
                       Project Name
                       <span className="text-red-600">*</span>
                     </Typography>
                     <Field
                       name="projectName" // Connects to Formik state
                       as={TextField}
-                      className="focus:ring-mountain-500 w-full rounded-md focus:ring-2 focus:outline-none"
+                      className="rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 w-full"
                       placeholder="Enter your project name"
                     />
                     <ErrorMessage name="projectName">
@@ -95,16 +100,16 @@ const ProjectEditorPage = () => {
                     </ErrorMessage>
                   </Box>
                   <Box className="w-full">
-                    <Typography className="mb-1 flex w-full items-center gap-1 text-left font-medium">
+                    <Typography className="flex items-center gap-1 mb-1 w-full font-medium text-left">
                       Description
-                      <span className="text-sm text-gray-400">(Optional)</span>
+                      <span className="text-gray-400 text-sm">(Optional)</span>
                     </Typography>
                     <Field
                       name="description"
                       as={TextField}
                       multiline
                       rows={4}
-                      className="focus:ring-mountain-500 esize-none w-full rounded-md focus:ring-2 focus:outline-none"
+                      className="rounded-md focus:outline-none focus:ring-2 focus:ring-mountain-500 w-full esize-none"
                       placeholder="Enter your project description"
                     />
                     <ErrorMessage name="description">
@@ -123,18 +128,35 @@ const ProjectEditorPage = () => {
                   </Box>
                 </div>
               </div>
-              <Button
-                type="submit"
-                startIcon={<FaSave />}
-                disabled={!dirty || isSubmitting}
-                className={`absolute bottom-4 h-10 w-48 bg-indigo-600 font-medium text-white hover:cursor-pointer hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-300`}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Project'}
-              </Button>
+              <div className='bottom-6 absolute flex space-x-2'>
+                <Button
+                  type="submit"
+                  startIcon={<IoReturnDownBack />}
+                  onClick={() => navigate('/auto/projects')}
+                  className={` h-10 w-48 bg-mountain-50 border text-mountain-950 border-mountain-200 font-medium hover:cursor-pointer hover:bg-mountain-100 disabled:cursor-not-allowed disabled:bg-gray-300`}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  startIcon={<FaSave />}
+                  disabled={!dirty || isSubmitting}
+                  className={` h-10 w-48 bg-indigo-600 font-medium text-white hover:cursor-pointer hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-300`}
+                >
+                  {isSubmitting ? 'Saving...' : 'Save Project'}
+                </Button>
+              </div>
             </Form>
           );
         }}
       </Formik>
+      {showGuidePanel && (
+        <GuidePanel
+          open={showGuidePanel}
+          onOpenChange={setShowGuidePanel}
+          docName="content-automation"
+        />
+      )}
     </Box>
   );
 };

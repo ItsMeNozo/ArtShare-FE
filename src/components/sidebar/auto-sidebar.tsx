@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import app_logo from '/logo_app_v_101.png';
 
 //Icons
-import { Calendar, ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home } from 'lucide-react';
 import { GoSidebarExpand } from 'react-icons/go';
 import { IoDocumentTextOutline, IoReorderThreeOutline } from 'react-icons/io5';
 import {
@@ -108,11 +108,6 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 label: 'Automation Project',
                 href: '/auto/projects',
               },
-              {
-                icon: Calendar,
-                label: 'Plan Scheduling',
-                href: '/auto/scheduling',
-              },
             ].map((item) => {
               const isActive = pathname === item.href
               return (
@@ -168,7 +163,7 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               {
                 icon: PiVideo,
                 label: 'App Tutorials',
-                href: 'https://www.youtube.com/channel/UCpg3O1quTzj7QpDHdhu6pNw',
+                href: 'https://www.youtube.com/@artshareofficial',
               }
             ].map((item, key) => {
               return (

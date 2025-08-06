@@ -1,5 +1,5 @@
-import { updateExistingBlog } from '@/features/user-writing/api/blog.api';
-import { EditorHandle } from '@/features/user-writing/components/Editor';
+import { updateExistingBlog } from '@/features/write-blog/api/blog.api';
+import { EditorHandle } from '@/features/write-blog/components/Editor';
 import { useCallback, useEffect, useRef } from 'react';
 import type { SaveStatus } from './useBlogState';
 import { useDebounce } from './useDebounce';
@@ -20,6 +20,7 @@ interface UseAutoSaveProps {
   setHasUnsavedChanges: (value: boolean) => void;
   editorRef: React.RefObject<EditorHandle>;
   isDialogOpen?: boolean;
+  isPublished?: boolean;
 }
 
 interface SaveError extends Error {
@@ -37,6 +38,7 @@ export const useAutoSave = ({
   setHasUnsavedChanges,
   editorRef,
   isDialogOpen = false,
+  isPublished = false,
 }: UseAutoSaveProps) => {
   const { debounce: autoSaveDebounce, cancel: cancelAutoSave } = useDebounce();
   const { debounce: titleSaveDebounce, cancel: cancelTitleSave } =
@@ -123,12 +125,15 @@ export const useAutoSave = ({
     updateSaveStatus('saving');
 
     try {
+      const images = editorRef.current?.getImages() || [];
+
       await updateExistingBlog(
         parseInt(blogId, 10),
         {
           content,
           title: blogTitle?.trim() || 'Untitled Document',
-          isPublished: false,
+          isPublished: isPublished,
+          pictures: images.map((img) => img.src),
         },
         { signal: currentAbortController.signal },
       );
@@ -174,6 +179,7 @@ export const useAutoSave = ({
     editorRef,
     abortContentRequest,
     autoSaveDebounce,
+    isPublished,
   ]);
 
   useEffect(() => {
@@ -216,11 +222,14 @@ export const useAutoSave = ({
         updateSaveStatus('saving');
 
         try {
+          const images = editorRef.current?.getImages() || [];
+
           await updateExistingBlog(
             numericBlogId,
             {
               title: titleToSave.trim() || 'Untitled Document',
-              isPublished: false,
+              isPublished: isPublished,
+              pictures: images.map((img) => img.src),
             },
             { signal: currentAbortController.signal },
           );
@@ -253,6 +262,8 @@ export const useAutoSave = ({
       setHasUnsavedChanges,
       captureCurrentTitle,
       abortTitleRequest,
+      isPublished,
+      editorRef,
     ],
   );
 

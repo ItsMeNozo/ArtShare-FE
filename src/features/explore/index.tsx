@@ -22,8 +22,8 @@ const Explore: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col h-[calc(100vh-4em)] min-h-0">
-      <div className="z-10 sticky flex flex-col gap-4 bg-gradient-to-t dark:bg-gradient-to-t from-white dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 px-4 py-1 pt-3 rounded-t-3xl">
+    <div className="relative flex h-[calc(100vh-4em)] min-h-0 flex-col">
+      <div className="dark:from-mountain-1000 to-mountain-50 dark:to-mountain-950 sticky z-10 flex flex-col gap-4 rounded-t-3xl bg-gradient-to-t from-white px-4 py-1 pt-3 dark:bg-gradient-to-t">
         <FilterBar
           selectedAttribute={selectedAttribute}
           setSelectedAttribute={setSelectedAttribute}
@@ -35,16 +35,15 @@ const Explore: React.FC = () => {
       </div>
 
       <ExploreGallery
-        key={tab}
         tab={tab}
         selectedAttribute={selectedAttribute}
         selectedMediums={selectedMediums}
         isAi={isAi}
       />
 
-      <Paper className="bottom-4 left-1/2 z-50 fixed bg-white dark:bg-mountain-800 shadow-lg rounded-full transform">
+      <Paper className="dark:bg-mountain-800 fixed bottom-4 left-1/2 z-50 transform rounded-full bg-white shadow-lg">
         <ToggleButtonGroup
-          className="flex gap-2 m-1.5"
+          className="m-1.5 flex gap-2"
           size="small"
           value={tab}
           exclusive
@@ -53,7 +52,7 @@ const Explore: React.FC = () => {
         >
           <ToggleButton
             color="primary"
-            className="data-[selected]:dark:bg-primary-700 -m-0.5 px-4 py-2 border-0 rounded-full data-[selected]:dark:text-white dark:text-mountain-100 normal-case"
+            className="data-[selected]:dark:bg-primary-700 dark:text-mountain-100 -m-0.5 rounded-full border-0 px-4 py-2 normal-case data-[selected]:dark:text-white"
             value={'Trending' as ExploreTab}
           >
             Trending
@@ -61,7 +60,7 @@ const Explore: React.FC = () => {
           {token && (
             <ToggleButton
               color="primary"
-              className="data-[selected]:dark:bg-primary-700 -m-0.5 px-4 py-2 border-0 rounded-full data-[selected]:dark:text-white dark:text-mountain-100 normal-case"
+              className="data-[selected]:dark:bg-primary-700 dark:text-mountain-100 -m-0.5 rounded-full border-0 px-4 py-2 normal-case data-[selected]:dark:text-white"
               value={'Following' as ExploreTab}
             >
               Following

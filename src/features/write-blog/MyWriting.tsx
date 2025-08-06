@@ -79,6 +79,7 @@ const WriteBlog = () => {
     setHasUnsavedChanges,
     editorRef,
     isDialogOpen,
+    isPublished,
   });
 
   const hasContentToSave = useCallback(() => {
@@ -298,7 +299,7 @@ const WriteBlog = () => {
         if (isNaN(numericBlogId)) throw new Error('Invalid blog ID');
 
         const blog = await fetchBlogDetails(numericBlogId);
-        setBlogTitle(blog.title || 'Untitled Document');
+        setBlogTitle(blog.title || '');
         setIsPublished(blog.isPublished || false);
 
         if (editorRef.current) {
@@ -361,7 +362,7 @@ const WriteBlog = () => {
     };
   }, [isDirty]);
 
-  const titleDisplay = blogTitle || 'Untitled Document';
+  const titleDisplay = blogTitle || '';
   const isTitleEmpty = !blogTitle?.trim();
 
   return (

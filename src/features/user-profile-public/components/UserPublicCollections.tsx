@@ -64,13 +64,22 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
     return currentCollection?.posts || [];
   }, [
     selectedCollectionId,
-    currentCollection,
+    currentCollection?.posts,
     allPublicPosts,
     loadingCollections,
   ]);
 
-  const { galleryPhotos, isProcessing: isProcessingPhotos } =
-    useGalleryPhotos(filteredPosts);
+  const pages = useMemo(() => {
+    return filteredPosts ? [{ data: filteredPosts }] : [];
+  }, [filteredPosts]);
+
+  const { photoPages, isProcessing: isProcessingPhotos } =
+    useGalleryPhotos(pages);
+
+  const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
+
+  const isGalleryLoading =
+    loadingCollections || (isProcessingPhotos && allPhotosFlat.length === 0);
 
   const collectionsForDisplay = useMemo<CollectionDisplayInfo[]>(() => {
     if (loadingCollections) return [];
@@ -144,17 +153,18 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
         />
       </Box>
 
-      <Box mb={4}>
+      <Box>
         <Typography variant="h6">{galleryTitle}</Typography>
         <Typography variant="body2" color="text.secondary">
-          {galleryPhotos.length} items
+          {allPhotosFlat.length} items
         </Typography>
       </Box>
 
       <Box sx={{ minHeight: '60vh' }}>
         <CollectionGallery
-          photos={galleryPhotos}
-          isLoading={isProcessingPhotos || loadingCollections}
+          photoPages={photoPages}
+          allPhotosFlat={allPhotosFlat}
+          isLoading={isGalleryLoading}
           isError={false}
           error={null}
           onRemovePost={() => {}}

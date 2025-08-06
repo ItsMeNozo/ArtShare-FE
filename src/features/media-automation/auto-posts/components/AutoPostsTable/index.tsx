@@ -6,7 +6,6 @@ import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import {
   Button,
-  Checkbox,
   Table,
   TableBody,
   TableCell,
@@ -23,11 +22,13 @@ import {
   Order,
   SortableKeysItemTable,
 } from '../../../projects/types/automation-project';
+import { MAX_POSTS_PER_PROJECT } from '../../constants';
 import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
 import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import PostsTableHeader from './AutoPostsTableHeader';
+import { BsQuestion } from 'react-icons/bs';
 
-const AutoPostsTable = () => {
+const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
   const {
     isDialogOpen: isDeleteDialogOpen,
     itemToConfirm: postToDelete,
@@ -36,10 +37,8 @@ const AutoPostsTable = () => {
   } = useConfirmationDialog<number>();
   const projectId = useNumericParam('projectId');
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<SortableKeysItemTable>('content');
-  const [selected, setSelected] = useState<readonly number[]>([]);
-  const [page] = useState(1);
-  const [rowsPerPage] = useState(7);
+  const [orderBy, setOrderBy] = useState<SortableKeysItemTable>('id');
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -48,8 +47,7 @@ const AutoPostsTable = () => {
     projectId: projectId,
     orderBy,
     order,
-    page,
-    limit: rowsPerPage,
+    limit: MAX_POSTS_PER_PROJECT,
   });
 
   const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
@@ -61,7 +59,7 @@ const AutoPostsTable = () => {
   });
 
   const posts = fetchedPostsResponse?.data ?? [];
-  console.log("posts", posts);
+  const totalPosts = fetchedPostsResponse?.total ?? posts.length;
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
@@ -71,37 +69,6 @@ const AutoPostsTable = () => {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelected = posts.map((n) => n.id);
-      setSelected(newSelected!);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (_event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly number[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-    setSelected(newSelected);
-  };
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - posts.length) : 0;
 
   const handleAddPostClick = () => {
     navigate(`/auto/projects/${projectDetails!.id}/posts/new`);
@@ -125,10 +92,17 @@ const AutoPostsTable = () => {
     return <Loading />;
   }
 
+  const emptyRows = Math.max(0, MAX_POSTS_PER_PROJECT - posts.length);
+
   return (
     <div className="flex flex-col space-y-2 w-full">
-      <div className="flex w-full">
-        <p>Number Of Posts: {posts.length}</p>
+      <div className="flex items-center w-full">
+        <p className='mr-2 font-medium'>Number Of Posts: {totalPosts} / 7</p>
+        <Tooltip title="The project allows a maximum of 7 posts." placement="top">
+          <div className="flex justify-center items-center bg-white border border-mountain-200 rounded-full w-6 h-6 text-mountain-950">
+            <BsQuestion className='size-5' />
+          </div>
+        </Tooltip>
       </div>
       <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-full overflow-hidden">
         <TableContainer className="flex-col justify-between h-[calc(100vh-14rem)] overflow-hidden">
@@ -138,42 +112,23 @@ const AutoPostsTable = () => {
             size={'medium'}
           >
             <PostsTableHeader
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={posts.length}
             />
             <TableBody>
-              {posts.map((row, index) => {
-                const isItemSelected = selected.includes(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
+              {posts.map((row) => {
                 return (
                   <TableRow
                     hover
                     role="checkbox"
-                    aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.id}
-                    selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
-                    onClick={() => handleRowClick(row.id)}
                     className="hover:bg-mountain-50 border-mountain-100 border-b-2 last:border-b-0 h-12"
+                    onClick={() => handleRowClick(row.id)}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        onClick={(event) => handleClick(event, row.id)}
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      align="right"
-                    >
+                    <TableCell component="th" scope="row" align="right">
                       {row.id}
                     </TableCell>
                     <TableCell align="left" padding="none">
@@ -199,35 +154,35 @@ const AutoPostsTable = () => {
                       {new Date(row.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell align="right" className="space-x-2">
-                      <Tooltip title="Edit">
-                        <Button className="bg-indigo-50 py-2 border-1 border-mountain-200 font-normal">
-                          <AiFillEdit className="size-5 text-indigo-600" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <Button
-                          className="bg-red-50 py-2 border-1 border-mountain-200 font-normal"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteClick(row.id);
-                          }}
-                        >
-                          <IoTrashBin className="size-5 text-red-600" />
-                        </Button>
-                      </Tooltip>
+                      {canEdit && (
+                        <>
+                          <Tooltip title="Edit">
+                            <Button className="bg-indigo-50 py-2 border-1 border-mountain-200 font-normal">
+                              <AiFillEdit className="size-5 text-indigo-600" />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <Button
+                              className="bg-red-50 py-2 border-1 border-mountain-200 font-normal"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(row.id);
+                              }}
+                            >
+                              <IoTrashBin className="size-5 text-red-600" />
+                            </Button>
+                          </Tooltip>
+                        </>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
               })}
-              {posts.length < 7 && (
-                <TableRow
-                  sx={{ cursor: 'pointer' }}
-                  className="hover:bg-mountain-50 border-mountain-100 border-b-2 last:border-b-0 w-full h-12"
-                  onClick={() => console.log('Add post clicked')}
-                >
-                  <TableCell colSpan={8} align="center">
+              {canEdit && posts.length < MAX_POSTS_PER_PROJECT && (
+                <TableRow sx={{ cursor: 'pointer' }} className="w-full h-12">
+                  <TableCell colSpan={7} align="center">
                     <Button
-                      onClick={() => handleAddPostClick()}
+                      onClick={handleAddPostClick}
                       variant="outlined"
                       color="primary"
                       className="bg-white border-mountain-200 w-48 text-mountain-950"
@@ -237,6 +192,7 @@ const AutoPostsTable = () => {
                   </TableCell>
                 </TableRow>
               )}
+
               {emptyRows > 0 && (
                 <TableRow
                   style={{
