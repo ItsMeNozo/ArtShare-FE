@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { useSnackbar } from '@/hooks/useSnackbar';
 import { truncateText } from '@/utils/text';
 import {
   Button,
@@ -31,7 +32,7 @@ import { useFormikContext } from 'formik';
 import JSZip from 'jszip';
 import { nanoid } from 'nanoid';
 import { RiShareBoxFill } from 'react-icons/ri';
-import { AutoPostFormValues } from '../../types';
+import { AutoPostFormValues, ImageState } from '../../types';
 import GenImage from './GenImage';
 
 interface promptResultProps {
@@ -44,8 +45,10 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
   useToShare,
 }) => {
   const [open, setOpen] = useState(false);
+  const { showSnackbar } = useSnackbar();
 
-  const { setFieldValue } = useFormikContext<AutoPostFormValues>();
+  const { setFieldValue, getFieldMeta } =
+    useFormikContext<AutoPostFormValues>();
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -77,6 +80,12 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
   const handleShareThese = (urls: string[]) => {
     // Implement share functionality here
     // create ImageState array from result.imageUrls
+
+    const currentImages = getFieldMeta('images').value as ImageState[];
+    if (currentImages.length + urls.length > 4) {
+      showSnackbar('You can only share up to 4 images', 'warning');
+      return;
+    }
     const newImages = urls.map((url) => ({
       id: nanoid(),
       status: 'existing',
