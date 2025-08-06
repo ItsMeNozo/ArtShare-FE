@@ -9,6 +9,7 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import ConfirmationDialog from '@/components/ConfirmationDialog';
+import Loading from '@/components/loading/Loading';
 import { SearchInput } from '@/components/SearchInput';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { Collection, Post } from '@/types';
@@ -58,12 +59,22 @@ const CollectionPage: React.FC = () => {
   const deleteCollectionMutation = useDeleteCollection();
   const removePostMutation = useRemovePostFromCollection();
 
+  const activeCollectionId = useMemo<SelectedCollectionId | null>(() => {
+    if (selectedCollectionId !== null) {
+      return selectedCollectionId;
+    }
+    if (!loadingCollections && collections.length >= 0) {
+      return 'all';
+    }
+    return null;
+  }, [collections, loadingCollections, selectedCollectionId]);
+
   const currentCollection = useMemo<Collection | undefined>(
     () =>
-      typeof selectedCollectionId === 'number'
-        ? collections.find((c) => c.id === selectedCollectionId)
+      typeof activeCollectionId === 'number'
+        ? collections.find((c) => c.id === activeCollectionId)
         : undefined,
-    [collections, selectedCollectionId],
+    [collections, activeCollectionId],
   );
 
   const existingCollectionNames = useMemo(() => {
@@ -129,9 +140,9 @@ const CollectionPage: React.FC = () => {
   }, [collections, loadingCollections]);
 
   const filteredPosts = useMemo<Post[]>(() => {
-    if (loadingCollections) return [];
+    if (loadingCollections || activeCollectionId === null) return [];
 
-    if (selectedCollectionId === 'all') {
+    if (activeCollectionId === 'all') {
       return showOnlyPrivate
         ? allPostsData.allPrivatePosts
         : allPostsData.allPostsCombined;
@@ -139,24 +150,23 @@ const CollectionPage: React.FC = () => {
       return currentCollection?.posts || [];
     }
   }, [
-    selectedCollectionId,
     currentCollection,
     showOnlyPrivate,
     allPostsData,
     loadingCollections,
+    activeCollectionId,
   ]);
 
   const pages = useMemo(() => {
     return filteredPosts ? [{ data: filteredPosts }] : [];
   }, [filteredPosts]);
-
-  const { photoPages, isProcessing: isProcessingPhotos } =
-    useGalleryPhotos(pages);
-
+  const { photoPages, isProcessing: isProcessingPhotos } = useGalleryPhotos(
+    pages,
+    activeCollectionId,
+  );
   const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
-  const isGalleryLoading =
-    loadingCollections || (isProcessingPhotos && allPhotosFlat.length === 0);
+  const isGalleryLoading = loadingCollections || isProcessingPhotos;
 
   const collectionsForDisplay = useMemo<CollectionDisplayInfo[]>(() => {
     if (loadingCollections) return [];
@@ -265,7 +275,7 @@ const CollectionPage: React.FC = () => {
         },
       });
     },
-    [createCollectionMutation],
+    [createCollectionMutation, handleCloseCreateDialog],
   );
 
   const handleEditRequest = useCallback(() => {
@@ -340,10 +350,10 @@ const CollectionPage: React.FC = () => {
   ]);
 
   const galleryTitle = useMemo(() => {
-    if (selectedCollectionId === 'all') return 'All';
+    if (activeCollectionId === 'all') return 'All';
     if (currentCollection) return currentCollection.name;
     return 'Loading...';
-  }, [selectedCollectionId, currentCollection]);
+  }, [activeCollectionId, currentCollection]);
 
   const anyMutationError =
     createCollectionMutation.error ||
@@ -351,6 +361,22 @@ const CollectionPage: React.FC = () => {
     deleteCollectionMutation.error ||
     removePostMutation.error;
   const displayError = collectionsError || anyMutationError;
+
+  if (loadingCollections) {
+    return (
+      <Container
+        maxWidth="xl"
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 'calc(100vh - 4em)',
+        }}
+      >
+        <Loading />
+      </Container>
+    );
+  }
 
   return (
     <Container
@@ -421,7 +447,7 @@ const CollectionPage: React.FC = () => {
       <Box mb={6}>
         <CollectionSlider
           items={combinedSliderData}
-          selectedId={selectedCollectionId}
+          selectedId={activeCollectionId}
           loading={loadingCollections}
           onSelect={handleCollectionSelect}
           onAdd={handleAddCollectionClick}
@@ -455,7 +481,7 @@ const CollectionPage: React.FC = () => {
         isError={!!displayError && !isGalleryLoading}
         error={displayError ? (displayError as Error).message : null}
         onRemovePost={handleRemovePost}
-        selectedCollectionId={selectedCollectionId}
+        selectedCollectionId={activeCollectionId}
       />
 
       <CreateCollectionDialog
