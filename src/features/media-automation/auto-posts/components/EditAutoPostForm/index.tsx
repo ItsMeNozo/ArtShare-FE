@@ -2,9 +2,6 @@ import ConfirmationDialog from '@/components/dialogs/Confirm';
 import InlineErrorMessage from '@/components/InlineErrorMessage';
 import Loading from '@/components/loading/Loading';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
-import { Platform } from '@/features/media-automation/projects/types/platform';
-import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
-import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,9 +9,6 @@ import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { ChevronLeft, ChevronRight, ShieldAlert } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
-import { PiStarFourFill } from 'react-icons/pi';
-import { TbGridDots } from 'react-icons/tb';
-import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { MAX_IMAGE_COUNT, MAX_POSTS_PER_PROJECT } from '../../constants';
 import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
@@ -24,8 +18,14 @@ import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import { AutoPostFormValues, ImageState } from '../../types';
 import PostContentEditor from './PostContentEditor';
 import PostImagesEditor from './PostImagesEditor';
-import { FacebookPostPreview } from './PostPreviewer';
 import PostScheduleEditor from './PostScheduleEditor';
+import { FacebookPostPreview } from './PostPreviewer';
+import { useNavigate } from 'react-router-dom';
+import { PiStarFourFill } from 'react-icons/pi';
+import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
+import { Platform } from '@/features/media-automation/projects/types/platform';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
+import { TbGridDots } from 'react-icons/tb';
 
 // import { Link, Element } from "react-scroll";
 
@@ -180,7 +180,7 @@ const EditAutoPostForm = () => {
 
   if (!postToEdit) {
     return (
-      <Box className="flex h-full items-center justify-center">
+      <Box className="flex justify-center items-center h-full">
         <Typography variant="h6" className="text-gray-600">
           Post not found or deleted
         </Typography>
@@ -197,14 +197,14 @@ const EditAutoPostForm = () => {
     >
       {({ values, setFieldValue, errors, touched, isSubmitting, dirty }) => {
         return (
-          <Form className="flex h-[calc(100vh-4rem)] w-full flex-col rounded-t-3xl bg-[#F2F4F7]">
-            <div className="border-mountain-200 flex h-16 w-full shrink-0 items-center rounded-t-3xl border-b-1 bg-white px-4 py-2">
-              <div className="flex w-full items-center justify-between">
+          <Form className="flex flex-col bg-[#F2F4F7] rounded-t-3xl w-full h-[calc(100vh-4rem)]">
+            <div className="flex items-center bg-white px-4 py-2 border-mountain-200 border-b-1 rounded-t-3xl w-full h-16 shrink-0">
+              <div className="flex justify-between items-center w-full">
                 <div className="flex space-x-4">
                   <div className="flex items-center space-x-4">
                     <div
                       onClick={handleNavigateToProject}
-                      className="border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-full border bg-indigo-100 p-2 px-4"
+                      className="flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer"
                     >
                       <span>Project Posts</span>
                       <TbGridDots />
@@ -215,25 +215,25 @@ const EditAutoPostForm = () => {
                       disabled={
                         postList.length >= MAX_POSTS_PER_PROJECT || !canEdit
                       }
-                      className="hover:bg-mountain-50 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border p-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex items-center space-x-2 hover:bg-mountain-50 disabled:opacity-50 p-2 border border-mountain-200 rounded-lg cursor-pointer disabled:cursor-not-allowed"
                     >
                       <PiStarFourFill className="size-4 text-purple-600" />
                       <span>Add Post</span>
                     </button>
-                    <div className="border-mountain-200 flex items-center border-l-1 px-4">
+                    <div className="flex items-center px-4 border-mountain-200 border-l-1">
                       <div className="flex items-center space-x-2">
                         <Button
                           onClick={() =>
                             handleNavigateToPost(navigationData.prevPostId)
                           }
                           disabled={!navigationData.prevPostId}
-                          className="border-mountain-200 flex items-center rounded-lg border bg-white p-2 text-gray-700 normal-case disabled:opacity-50"
+                          className="flex items-center bg-white disabled:opacity-50 p-2 border border-mountain-200 rounded-lg h-10 font-normal text-gray-700 normal-case"
                         >
                           <ChevronLeft className="size-4" />
-                          <span>Prev</span>
+                          <span>Prev Post</span>
                         </Button>
                         {navigationData.currentPostIndex !== -1 && (
-                          <div className="border-mountain-200 flex items-center rounded-lg border bg-white p-2 text-sm text-gray-500 select-none">
+                          <div className="flex items-center bg-white p-2 border border-mountain-200 rounded-lg h-10 text-gray-500 text-sm select-none">
                             <span>{`Post ${navigationData.currentPostIndex + 1} of ${postList.length}`}</span>
                           </div>
                         )}
@@ -242,9 +242,9 @@ const EditAutoPostForm = () => {
                             handleNavigateToPost(navigationData.nextPostId)
                           }
                           disabled={!navigationData.nextPostId}
-                          className="border-mountain-200 flex items-center rounded-lg border bg-white p-2 text-gray-700 normal-case disabled:opacity-50"
+                          className="flex items-center bg-white disabled:opacity-50 p-2 border border-mountain-200 rounded-lg h-10 font-normal text-gray-700 normal-case"
                         >
-                          <span>Next</span>
+                          <span>Next Post</span>
                           <ChevronRight className="size-4" />
                         </Button>
                       </div>
@@ -263,24 +263,24 @@ const EditAutoPostForm = () => {
                     <Button
                       type="button"
                       onClick={() => openDialog(postId!)}
-                      className="bg-mountain-100 hover:bg-mountain-50 border-mountain-200 flex items-center space-x-2 rounded-lg border p-2"
+                      className="flex items-center space-x-2 bg-mountain-100 hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg"
                     >
                       <LuTrash2 className="size-4" />
                       <div>Delete</div>
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2 rounded-lg border border-yellow-200 bg-yellow-100 p-2 px-4 text-yellow-800">
+                  <div className="flex items-center space-x-2 bg-yellow-100 p-2 px-4 border border-yellow-200 rounded-lg text-yellow-800">
                     <ShieldAlert className="size-5" />
                     <span>This project is active. Editing is disabled.</span>
                   </div>
                 )}
               </div>
             </div>
-            <Box className="flex h-screen min-h-0 w-full">
-              <Box className="border-mountain-200 custom-scrollbar flex min-h-0 w-lg flex-col space-y-8 overflow-x-hidden overflow-y-auto border-r-1 px-2">
+            <Box className="flex w-full h-screen min-h-0">
+              <Box className="flex flex-col space-y-8 px-2 border-mountain-200 border-r-1 w-lg min-h-0 overflow-x-hidden overflow-y-auto custom-scrollbar">
                 <Box className="flex flex-col space-y-4">
-                  <Typography className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
+                  <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
                     <span className="mr-2">🖊️</span>Post Content
                   </Typography>
                   <PostContentEditor
@@ -295,7 +295,7 @@ const EditAutoPostForm = () => {
                   </ErrorMessage>
                 </Box>
                 <Box className="flex flex-col space-y-4">
-                  <div className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
+                  <div className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
                     <p>🖼️</p>
                     <p>Post Images</p>
                   </div>
@@ -312,7 +312,7 @@ const EditAutoPostForm = () => {
                   </ErrorMessage>
                 </Box>
                 <Box className="flex flex-col space-y-4">
-                  <Typography className="border-mountain-200 flex items-center space-x-2 border-b py-2 font-medium text-indigo-900">
+                  <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b font-medium text-indigo-900">
                     <span className="mr-2">📅</span> Post Scheduling
                   </Typography>
                   <PostScheduleEditor

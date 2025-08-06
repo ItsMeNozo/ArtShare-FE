@@ -9,8 +9,9 @@ import { IoLayersOutline } from "react-icons/io5";
 interface LayerToolsBarProp {
   layers: Layer[];
   zoomLevel: number;
-  currentZIndex: number;
+  zIndex: { min: number; max: number };
   selectedLayerId: string | null;
+  setZIndex: Dispatch<SetStateAction<{ min: number; max: number }>>;
   setLayers: Dispatch<SetStateAction<Layer[]>>;
   handleZoomIn: () => void;
   handleZoomOut: () => void;
@@ -21,7 +22,8 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   layers,
   zoomLevel,
   selectedLayerId,
-  currentZIndex,
+  zIndex,
+  setZIndex,
   setLayers,
   handleZoomIn,
   handleZoomOut,
@@ -73,10 +75,14 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             saturation: 100,
             hue: 0,
             sepia: 0,
-            zIndex: currentZIndex,
+            zIndex: zIndex.max + 1,
             isLocked: false,
           },
         ]);
+        setZIndex((prev) => ({
+          min: prev.min,
+          max: prev.max + 1,
+        }));
       };
 
       img.src = imageSrc;

@@ -18,6 +18,7 @@ import vi from 'javascript-time-ago/locale/vi';
 
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import MobileBlocker from './components/MobileBlocker.tsx';
 
 TimeAgo.addDefaultLocale(en);
 TimeAgo.addLocale(vi);
@@ -55,7 +56,9 @@ createRoot(document.getElementById('root')!).render(
             <SnackbarProvider>
               <FocusProvider>
                 <Elements stripe={stripePromise}>
-                  <App />
+                  <MobileBlocker>
+                    <App />
+                  </MobileBlocker>
                 </Elements>
               </FocusProvider>
             </SnackbarProvider>

@@ -18,7 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { visuallyHidden } from '@mui/utils';
 import { useState } from 'react';
 import { AiFillEdit } from 'react-icons/ai';
-import { IoFilter, IoTrashBin } from 'react-icons/io5';
+import { IoTrashBin } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import {
   AutoProjectListItem,
@@ -151,25 +151,22 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             ),
         },
       ]}
-      className="flex justify-end"
+      className="flex justify-between items-center px-4 py-2 border-mountain-100 border-b-2 rounded-t-3xl"
     >
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-      {numSelected > 0 ? (
-        <Tooltip title="Delete Selected">
-          <IconButton onClick={onDelete}>
-            <IoTrashBin />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <IoFilter />
-          </IconButton>
-        </Tooltip>
-      )}
+      <span className='font-medium'>Post Automation Table</span>
+      <div className="flex items-center gap-4">
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
+        />
+        {numSelected > 0 &&
+          <Tooltip title="Delete Selected">
+            <IconButton onClick={onDelete}>
+              <IoTrashBin />
+            </IconButton>
+          </Tooltip>
+        }
+      </div>
     </Toolbar>
   );
 }
@@ -324,7 +321,7 @@ export default function ProjectTable({
                 sx={{
                   minWidth: 750,
                   '& .MuiTableCell-head': {
-                    backgroundColor: '#e5e5e5',
+                    backgroundColor: '#ffffff',
                     fontWeight: 'bold',
                     borderBottom: '2px solid #e5e7eb',
                   },
@@ -375,8 +372,7 @@ export default function ProjectTable({
                         <TableCell align="right">
                           <div className="flex flex-wrap justify-end gap-2">
                             {
-                              <div className="bg-mountain-100 px-2 py-1 rounded">
-                                {/* CHANGE: Using the helper function here */}
+                              <div className="bg-indigo-100 px-2 py-1 rounded">
                                 {formatToTitleCase(row.platform.name)}
                               </div>
                             }

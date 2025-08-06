@@ -27,9 +27,11 @@ import {
   Tooltip,
 } from '@mui/material';
 import { saveAs } from 'file-saver';
+import { useFormikContext } from 'formik';
 import JSZip from 'jszip';
+import { nanoid } from 'nanoid';
 import { RiShareBoxFill } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
+import { AutoPostFormValues } from '../../types';
 import GenImage from './GenImage';
 
 interface promptResultProps {
@@ -37,8 +39,13 @@ interface promptResultProps {
   useToShare?: boolean | null;
 }
 
-const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
+const PromptResultForAutoPost: React.FC<promptResultProps> = ({
+  result,
+  useToShare,
+}) => {
   const [open, setOpen] = useState(false);
+
+  const { setFieldValue } = useFormikContext<AutoPostFormValues>();
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -52,8 +59,6 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
 
     return () => clearTimeout(timeout);
   }, [open]);
-
-  const navigate = useNavigate();
 
   const handleDownloadAll = async () => {
     const zip = new JSZip();
@@ -69,15 +74,20 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
     saveAs(zipBlob, 'images.zip');
   };
 
-  const handleNavigateToUploadPost = (prompt: PromptResult) => {
-    navigate('/posts/new?type=ai-gen', {
-      state: { prompt, skipUnsavedGuard: true },
-    });
+  const handleShareThese = (urls: string[]) => {
+    // Implement share functionality here
+    // create ImageState array from result.imageUrls
+    const newImages = urls.map((url) => ({
+      id: nanoid(),
+      status: 'existing',
+      url,
+    }));
+    setFieldValue('images', newImages);
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full">
-      <div className="flex justify-between items-center space-x-2 w-full">
+    <div className="flex w-full flex-col space-y-2">
+      <div className="flex w-full items-center justify-between space-x-2">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
           {truncateText(result.userPrompt, 60)}
@@ -86,7 +96,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
           <div className="flex items-center space-x-2">
             <Tooltip title="Post this" placement="bottom" arrow>
               <Button
-                onClick={() => handleNavigateToUploadPost(result!)}
+                onClick={() => handleShareThese(result.imageUrls)}
                 className={`bg-mountain-100 flex ${useToShare ? 'w-36' : 'w-8'}`}
               >
                 <RiShareBoxFill className="size-5" />
@@ -108,14 +118,14 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
               <PopoverTrigger asChild>
                 <Tooltip title="Delete" placement="bottom" arrow>
                   <Button
-                    className="flex bg-mountain-100 w-4"
+                    className="bg-mountain-100 flex w-4"
                     hidden={useToShare || false}
                   >
                     <FiTrash2 className="size-5 text-red-900" />
                   </Button>
                 </Tooltip>
               </PopoverTrigger>
-              <PopoverContent className="dark:bg-mountain-900 mt-2 mr-6 p-2 border-mountain-100 dark:border-mountain-700 w-48">
+              <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-2 mr-6 w-48 p-2">
                 <div className="flex flex-col space-y-2">
                   <p className="text-sm">Are you sure to delete?</p>
                   <Dialog>
@@ -126,13 +136,13 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                       </Button>
                     </DialogTrigger>
                     <DialogContent
-                      className="flex justify-center sm:max-w-[320px] h-fit cursor-not-allowed"
+                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
                       hideCloseButton
                     >
                       <DialogHeader>
-                        <DialogDescription className="flex justify-center items-center space-x-4">
+                        <DialogDescription className="flex items-center justify-center space-x-4">
                           <CircularProgress size={32} thickness={4} />
-                          <DialogTitle className="font-normal text-base text-center">
+                          <DialogTitle className="text-center text-base font-normal">
                             Deleting These Images
                           </DialogTitle>
                         </DialogDescription>
@@ -149,9 +159,9 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
         {result.imageUrls.map((__, index) => (
           <ImageListItem key={index} className="flex h-full object-cover">
             {result.generating ? (
-              <div className="relative flex justify-center items-center bg-mountain-100 rounded-[8px] h-full">
+              <div className="bg-mountain-100 relative flex h-full items-center justify-center rounded-[8px]">
                 <CircularProgress size={64} thickness={4} />
-                <p className="absolute font-medium text-gray-700 text-xs">
+                <p className="absolute text-xs font-medium text-gray-700">
                   Loading
                 </p>
               </div>
@@ -161,7 +171,8 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 otherImages={result.imageUrls}
                 index={index}
                 useToShare={useToShare}
-              // onDelete={onDeleteSingle!}
+                handleShareThis={handleShareThese}
+                // onDelete={onDeleteSingle!}
               />
             )}
           </ImageListItem>
@@ -171,4 +182,4 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   );
 };
 
-export default PromptResult;
+export default PromptResultForAutoPost;
