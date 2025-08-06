@@ -79,6 +79,7 @@ const WriteBlog = () => {
     setHasUnsavedChanges,
     editorRef,
     isDialogOpen,
+    isPublished,
   });
 
   const hasContentToSave = useCallback(() => {
