@@ -168,7 +168,9 @@ const renderSliderItem = (
                 {title}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {loadingCollections ? '...' : `${item.count} items`}
+                {loadingCollections
+                  ? '...'
+                  : `${item.count} ${item.count === 1 ? 'item' : 'items'}`}
               </Typography>
             </CardContent>
             {isCollection && item.isPrivate && (

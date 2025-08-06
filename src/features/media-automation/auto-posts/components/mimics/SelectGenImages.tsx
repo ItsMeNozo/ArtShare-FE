@@ -34,9 +34,7 @@ const SelectAiImagesPanel: React.FC = () => {
         <DialogDescription hidden />
         <div className="flex justify-between items-center shadow-md p-4 w-full h-24">
           <div className="flex flex-col">
-            <p className="flex font-medium text-lg">
-              Post With Your AI Images
-            </p>
+            <p className="flex font-medium text-lg">Post With Your AI Images</p>
             <p className="flex text-mountain-600 text-sm">
               Browse your ai images and start sharing over the world
             </p>

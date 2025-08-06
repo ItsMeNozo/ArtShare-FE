@@ -29,6 +29,7 @@ export function useGetPosts({
         page: pageParam,
         filter: filterParams,
         isAi,
+        limit: 10,
       });
 
       return apiResponse;

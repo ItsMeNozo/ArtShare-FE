@@ -20,6 +20,7 @@ const example_1 =
 
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
+import DeleteButton from '@/features/gen-art/components/DeleteConfirmation';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -31,15 +32,14 @@ import {
 import { FiDownload, FiTrash2 } from 'react-icons/fi';
 import { IoIosSquareOutline } from 'react-icons/io';
 import { IoCopyOutline } from 'react-icons/io5';
-import { RiFolderUploadLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
-import DeleteButton from '@/features/gen-art/components/DeleteConfirmation';
 
 interface GenImageProps {
   index: number;
   result: PromptResult;
   otherImages: string[];
   useToShare?: boolean | null;
+  handleShareThis: (urls: string[]) => void;
   // onDelete?: (resultId: number, imgId: number) => void;
 }
 
@@ -50,6 +50,7 @@ const GenImage: React.FC<GenImageProps> = ({
   result,
   otherImages,
   useToShare,
+  handleShareThis,
 }) => {
   const [deleteImage, setDeleteImage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -105,10 +106,6 @@ const GenImage: React.FC<GenImageProps> = ({
         name: `image-${result.id}`,
       },
     });
-  };
-
-  const handleNavigateToUpload = (prompt: PromptResult) => {
-    navigate('/posts/new?type=ai-gen', { state: { prompt } });
   };
 
   const { data: user, error } = useQuery({
@@ -205,7 +202,7 @@ const GenImage: React.FC<GenImageProps> = ({
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleNavigateToUpload(result);
+                      handleShareThis([result.imageUrls[index]]);
                     }}
                     className="z-50 flex justify-center items-center bg-white hover:bg-mountain-50 opacity-0 group-hover:opacity-100 rounded-md w-28 h-6 duration-300 ease-in-out hover:cursor-pointer transform"
                   >
@@ -331,8 +328,8 @@ const GenImage: React.FC<GenImageProps> = ({
                       <div
                         key={index}
                         className={`h-2 w-8 rounded-lg hover:bg-white hover:opacity-100 ${currentIndex === index
-                          ? 'bg-white opacity-100'
-                          : 'bg-mountain-200 opacity-50'
+                            ? 'bg-white opacity-100'
+                            : 'bg-mountain-200 opacity-50'
                           }`}
                         onClick={() => handleNav(navIndex)}
                       />
@@ -434,21 +431,6 @@ const GenImage: React.FC<GenImageProps> = ({
                     <p className="text-mountain-600 capitalize">1024x1024</p>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className="p-2">
-              <div
-                onClick={() => {
-                  const copyResult = {
-                    ...result,
-                    imageUrls: [result.imageUrls[currentIndex]],
-                  };
-                  handleNavigateToUpload(copyResult);
-                }}
-                className="flex justify-center items-center bg-indigo-100 hover:bg-indigo-200/80 shadow-sm border border-mountain-300 rounded-lg w-full h-12 font-normal duration-300 ease-in-out hover:cursor-pointer select-none transform"
-              >
-                <RiFolderUploadLine className="mr-2 size-5" />
-                <p>Post This Image</p>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { HistoryFilter } from '@/features/gen-art/enum';
 import { usePromptHistory } from '@/hooks/usePromptHistory';
 import { CircularProgress } from '@mui/material';
 import { Clock, Sparkles } from 'lucide-react';
-import PromptResult from './PromptResult';
+import PromptResultForAutoPost from './PromptResultForAutoPost';
 
 const BrowseGenHistory = () => {
   const {
@@ -66,7 +66,11 @@ const BrowseGenHistory = () => {
             {displayedResults &&
               displayedResults.length > 0 &&
               displayedResults.map((result, index) => (
-                <PromptResult key={index} result={result} useToShare={true} />
+                <PromptResultForAutoPost
+                  key={index}
+                  result={result}
+                  useToShare={true}
+                />
               ))}
           </div>
         </div>
