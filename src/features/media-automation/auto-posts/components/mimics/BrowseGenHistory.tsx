@@ -1,10 +1,10 @@
-import PromptResult from '@/features/gen-art/components/PromptResult';
 import { HistoryFilter } from '@/features/gen-art/enum';
 import { usePromptHistory } from '@/hooks/usePromptHistory';
 import { CircularProgress } from '@mui/material';
 import { Clock, Sparkles } from 'lucide-react';
+import PromptResult from './PromptResult';
 
-const BrowsePromptHistory = () => {
+const BrowseGenHistory = () => {
   const {
     scrollRef,
     displayedResults,
@@ -76,4 +76,4 @@ const BrowsePromptHistory = () => {
   );
 };
 
-export default BrowsePromptHistory;
+export default BrowseGenHistory;

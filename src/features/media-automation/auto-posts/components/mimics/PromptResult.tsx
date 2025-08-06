@@ -70,7 +70,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   };
 
   const handleNavigateToUploadPost = (prompt: PromptResult) => {
-    navigate('/posts/new?type=ai-gen', {
+    navigate('/auto/projects/12/posts/13/edit', {
       state: { prompt, skipUnsavedGuard: true },
     });
   };

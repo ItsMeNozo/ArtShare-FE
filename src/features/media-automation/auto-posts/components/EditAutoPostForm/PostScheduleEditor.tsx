@@ -25,17 +25,27 @@ export default function PostScheduleEditor({
     value ? dayjs(value) : null,
   );
 
+  const [inputValue, setInputValue] = useState<Dayjs | null>(
+    value ? dayjs(value) : null,
+  );
+
   useEffect(() => {
-    setInternalDate(value ? dayjs(value) : null);
+    const date = value ? dayjs(value) : null;
+    setInternalDate(date);
+    setInputValue(date);
   }, [value]);
 
   const handleDateChange = (newDate: Dayjs | null) => {
-    setInternalDate(newDate);
+    setInputValue(newDate);
 
     if (newDate && newDate.isValid()) {
-      onChange(newDate.toDate());
-    } else {
-      onChange(null);
+      const updatedDateTime = (internalDate || dayjs())
+        .year(newDate.year())
+        .month(newDate.month())
+        .date(newDate.date());
+
+      setInternalDate(updatedDateTime);
+      onChange(updatedDateTime.toDate());
     }
   };
 
@@ -47,6 +57,8 @@ export default function PostScheduleEditor({
 
     setInternalDate(updatedDateTime);
 
+    setInputValue(updatedDateTime);
+
     if (updatedDateTime && updatedDateTime.isValid()) {
       onChange(updatedDateTime.toDate());
     } else {
@@ -56,6 +68,7 @@ export default function PostScheduleEditor({
 
   const handleClear = () => {
     setInternalDate(null);
+    setInputValue(null);
     onChange(null);
   };
 
@@ -77,7 +90,7 @@ export default function PostScheduleEditor({
           <Stack direction="row" spacing={2} alignItems="center">
             <DatePicker
               label="Date"
-              value={internalDate}
+              value={inputValue}
               onChange={handleDateChange}
               slotProps={{
                 textField: {
@@ -103,22 +116,6 @@ export default function PostScheduleEditor({
             />
           </Stack>
         </LocalizationProvider>
-
-        {/* <FormControl fullWidth margin="normal">
-          <InputLabel id="timezone-label">Timezone</InputLabel>
-          <Select
-            labelId="timezone-label"
-            value={timezone}
-            label="Timezone"
-            onChange={handleTimezoneChange}
-          >
-            <MenuItem value="Asia/Ho_Chi_Minh">Vietnam (GMT+7)</MenuItem>
-            <MenuItem value="Asia/Tokyo">Japan (GMT+9)</MenuItem>
-            <MenuItem value="Europe/London">London (GMT+0)</MenuItem>
-            <MenuItem value="America/New_York">New York (GMT-5)</MenuItem>
-            <MenuItem value="UTC">UTC</MenuItem>
-          </Select>
-        </FormControl> */}
 
         {internalDate && internalDate.isValid() && (
           <Box mt={2} p={2} sx={{ bgcolor: '#f0f4ff', borderRadius: 1 }}>

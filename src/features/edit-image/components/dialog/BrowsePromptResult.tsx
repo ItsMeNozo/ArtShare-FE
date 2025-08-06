@@ -28,16 +28,14 @@ import {
 } from '@mui/material';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
-import { RiShareBoxFill } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
-import GenImage from './GenImage';
+import BrowseGenImage from './BrowseGenImage';
 
 interface promptResultProps {
   result: PromptResult;
-  useToShare?: boolean | null;
+  useToEdit?: boolean | null;
 }
 
-const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
+const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -53,8 +51,6 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
     return () => clearTimeout(timeout);
   }, [open]);
 
-  const navigate = useNavigate();
-
   const handleDownloadAll = async () => {
     const zip = new JSZip();
     await Promise.all(
@@ -69,12 +65,6 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
     saveAs(zipBlob, 'images.zip');
   };
 
-  const handleNavigateToUploadPost = (prompt: PromptResult) => {
-    navigate('/posts/new?type=ai-gen', {
-      state: { prompt, skipUnsavedGuard: true },
-    });
-  };
-
   return (
     <div className="flex flex-col space-y-2 w-full">
       <div className="flex justify-between items-center space-x-2 w-full">
@@ -84,22 +74,11 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
         </p>
         {!result.generating && (
           <div className="flex items-center space-x-2">
-            <Tooltip title="Post this" placement="bottom" arrow>
-              <Button
-                onClick={() => handleNavigateToUploadPost(result!)}
-                className={`bg-mountain-100 flex ${useToShare ? 'w-36' : 'w-8'}`}
-              >
-                <RiShareBoxFill className="size-5" />
-                <p className={`${!useToShare ? 'hidden' : 'ml-2 font-normal'}`}>
-                  Share These
-                </p>
-              </Button>
-            </Tooltip>
             <Tooltip title="Download" placement="bottom" arrow>
               <Button
                 className="bg-mountain-100"
                 onClick={handleDownloadAll}
-                hidden={useToShare || false}
+                hidden={useToEdit || false}
               >
                 <FiDownload className="size-5" />
               </Button>
@@ -109,7 +88,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 <Tooltip title="Delete" placement="bottom" arrow>
                   <Button
                     className="flex bg-mountain-100 w-4"
-                    hidden={useToShare || false}
+                    hidden={useToEdit || false}
                   >
                     <FiTrash2 className="size-5 text-red-900" />
                   </Button>
@@ -156,11 +135,11 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 </p>
               </div>
             ) : (
-              <GenImage
+              <BrowseGenImage
                 result={result}
                 otherImages={result.imageUrls}
                 index={index}
-                useToShare={useToShare}
+                useToEdit={useToEdit}
               // onDelete={onDeleteSingle!}
               />
             )}
@@ -171,4 +150,4 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   );
 };
 
-export default PromptResult;
+export default BrowsePromptResult;

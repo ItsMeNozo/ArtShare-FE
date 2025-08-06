@@ -3,7 +3,6 @@ import { Switch } from '@/components/ui/switch';
 import { Box, Button, Slider, Typography } from '@mui/material';
 import { Field, useFormikContext } from 'formik';
 import { Settings2 } from 'lucide-react';
-import { BiChevronDown } from 'react-icons/bi';
 import { GenAutoPostFormValues } from '../../types';
 
 const SettingsPanel = () => {
@@ -15,7 +14,7 @@ const SettingsPanel = () => {
   };
 
   return (
-    <Box className="space-y-6 bg-white shadow-sm p-4 border border-mountain-200 rounded-lg w-80 h-full shrink-0">
+    <Box className="flex flex-col space-y-6 bg-white shadow-sm p-4 border border-mountain-200 rounded-lg w-80 h-full">
       <Typography className="flex items-center gap-2 font-bold text-mountain-800 text-sm">
         <Settings2 className="size-4" />
         Prompt Settings
@@ -38,13 +37,6 @@ const SettingsPanel = () => {
               {tone}
             </Button>
           ))}
-          <Button
-            disabled
-            className="flex items-center bg-white px-3 py-1 border border-gray-300 rounded-md text-gray-400 text-sm cursor-not-allowed"
-          >
-            <BiChevronDown className="mr-1" />
-            <Typography>More</Typography>
-          </Button>
         </Box>
       </Box>
       {/* Word Count */}
@@ -103,4 +95,4 @@ const SettingsPanel = () => {
 
 export default SettingsPanel;
 
-const tones = ['Friendly', 'Professional', 'Casual', 'Inspiring', 'Witty'];
+const tones = ['Friendly', 'Professional', 'Casual', 'Inspiring', 'Witty', 'Empathetic'];

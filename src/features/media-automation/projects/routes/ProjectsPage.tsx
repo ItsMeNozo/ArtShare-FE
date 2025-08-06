@@ -115,7 +115,7 @@ const ProjectsPage = () => {
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Active Projects</p>
               <p className="font-medium text-2xl capitalize">
-                {summaryStats.active} projects
+                {summaryStats.active}{summaryStats.active > 1 ? ' projects' : ' project'}
               </p>
             </div>
             <FaCalendarCheck className="size-10 text-teal-600" />
@@ -124,7 +124,7 @@ const ProjectsPage = () => {
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Completed</p>
               <p className="font-medium text-2xl capitalize">
-                {summaryStats.completed} projects
+                {summaryStats.completed}{summaryStats.completed > 1 ? ' projects' : ' project'}
               </p>
             </div>
             <FaCalendarDays className="size-10 text-amber-600" />
@@ -133,7 +133,7 @@ const ProjectsPage = () => {
             <div className="flex flex-col space-y-1">
               <p className="text-mountain-800 text-xs">Cancelled / Failed</p>
               <p className="font-medium text-2xl capitalize">
-                {summaryStats.cancelledOrFailed} project
+                {summaryStats.cancelledOrFailed}{summaryStats.cancelledOrFailed > 1 ? ' projects' : ' project'}
               </p>
             </div>
             <FaCalendarTimes className="size-10 text-rose-600" />

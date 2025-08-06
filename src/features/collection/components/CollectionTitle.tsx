@@ -18,7 +18,8 @@ import {
 
 interface CollectionTitleProps {
   title: string;
-  itemCountText: string;
+
+  itemCount: number;
   isEditable: boolean;
   isPrivate: boolean;
   isLoading?: boolean;
@@ -33,7 +34,8 @@ interface CollectionTitleProps {
 
 export const CollectionTitle: React.FC<CollectionTitleProps> = ({
   title,
-  itemCountText,
+
+  itemCount,
   isEditable,
   isPrivate,
   isLoading = false,
@@ -47,7 +49,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
 }) => {
   const [editedTitle, setEditedTitle] = useState<string>(title);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -67,7 +68,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
 
   const handlePrivacyClick = async () => {
     handleMenuClose();
-    // Assuming onSetPrivacy will handle the API call and state update
     await onSetPrivacy(!isPrivate);
   };
 
@@ -76,7 +76,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
       setEditedTitle(title);
       setSaveError(null);
     }
-
     setEditedTitle(title);
   }, [title, isEditing]);
 
@@ -85,7 +84,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
       setEditedTitle(title);
       setSaveError(null);
       onEditRequest();
-      setIsHovered(false);
     }
   }, [title, isLoading, onEditRequest]);
 
@@ -132,19 +130,13 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
 
   const displayError = error || saveError;
 
+  const itemCountText = `${itemCount} ${itemCount === 1 ? 'item' : 'items'}`;
+
   return (
-    <Box
-      minHeight={48}
-      onMouseEnter={() =>
-        isEditable && !isEditing && !isLoading && setIsHovered(true)
-      }
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <Box minHeight={48}>
       <Stack direction="row" alignItems="center" spacing={1}>
-        {/* Check the isEditing prop passed from parent */}
         {isEditing && isEditable ? (
           <>
-            {/* Text Field */}
             <TextField
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
@@ -159,7 +151,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
               error={!!saveError}
               sx={{ flexGrow: 1, maxWidth: 400 }}
             />
-            {/* Save Button */}
             <Tooltip title="Save Changes">
               <span>
                 <IconButton
@@ -180,7 +171,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
                 </IconButton>
               </span>
             </Tooltip>
-            {/* Cancel Button */}
             <Tooltip title="Cancel Edit">
               <span>
                 <IconButton
@@ -195,7 +185,6 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
           </>
         ) : (
           <>
-            {/* Display Mode */}
             <Typography variant="h6" component="h2" fontWeight="normal" noWrap>
               {isLoading ? 'Loading Title...' : title}
             </Typography>
@@ -211,14 +200,7 @@ export const CollectionTitle: React.FC<CollectionTitleProps> = ({
             {isEditable && !isLoading && (
               <>
                 <Tooltip title="Options">
-                  <IconButton
-                    size="small"
-                    onClick={handleMenuOpen}
-                    sx={{
-                      opacity: isHovered || isMenuOpen ? 1 : 0,
-                      transition: 'opacity 0.2s ease-in-out',
-                    }}
-                  >
+                  <IconButton size="small" onClick={handleMenuOpen}>
                     <MoreIcon fontSize={20} />
                   </IconButton>
                 </Tooltip>
