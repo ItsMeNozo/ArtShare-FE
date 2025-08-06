@@ -7,9 +7,13 @@ import SelectAiImagesPanel from './SelectGenImages';
 
 interface AddMoreImagesButtonProps {
   disabled: boolean;
+  onFileChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const AddMoreImagesButton = ({ disabled }: AddMoreImagesButtonProps) => {
+const AddMoreImagesButton = ({
+  disabled,
+  onFileChange,
+}: AddMoreImagesButtonProps) => {
   return (
     <Box
       className={`${disabled ? 'pointer-events-none opacity-50' : ''} hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex w-2/3 cursor-pointer items-center justify-center gap-2 rounded-md border bg-white px-4 py-2 text-center text-sm font-medium shadow-sm`}
@@ -58,9 +62,14 @@ const AddMoreImagesButton = ({ disabled }: AddMoreImagesButtonProps) => {
           size="small"
           className="bg-blue-400 text-white"
         >
-          <label htmlFor="imageUpload">
-            <span>From device</span>
-          </label>
+          <span>From device</span>
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            accept="image/*"
+            multiple
+            onChange={onFileChange}
+          />
         </Button>
         <SelectAiImagesPanel>
           <Button

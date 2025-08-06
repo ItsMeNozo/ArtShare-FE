@@ -37,7 +37,7 @@ const PostImagesEditor = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (images.length + files.length >= MAX_IMAGE_COUNT) {
+    if (images.length + files.length > MAX_IMAGE_COUNT) {
       showSnackbar('You can only upload up to 4 images', 'warning');
       return;
     }
@@ -156,7 +156,10 @@ const PostImagesEditor = ({
               <Upload />
               <span>Add More</span>
             </label> */}
-            <AddMoreImagesButton disabled={images.length >= MAX_IMAGE_COUNT} />
+            <AddMoreImagesButton
+              disabled={images.length >= MAX_IMAGE_COUNT}
+              onFileChange={handleFileChange}
+            />
           </div>
         ))}
       <input
