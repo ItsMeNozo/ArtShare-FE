@@ -1,3 +1,4 @@
+import Loading from '@/components/loading/Loading';
 import { CollectionGallery } from '@/features/collection/components/CollectionGallery';
 import { CollectionSlider } from '@/features/collection/components/CollectionSlider';
 import { useCollectionsData } from '@/features/collection/hooks/useCollectionsData';
@@ -26,6 +27,18 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
     error: collectionsError,
     isLoading: loadingCollections,
   } = useCollectionsData(username);
+
+  const activeCollectionId = useMemo<SelectedCollectionId | null>(() => {
+    if (selectedCollectionId !== null) {
+      return selectedCollectionId;
+    }
+
+    if (!loadingCollections && collections.length >= 0) {
+      return 'all';
+    }
+
+    return null;
+  }, [collections, loadingCollections, selectedCollectionId]);
 
   const handleCollectionSelect = (id: SelectedCollectionId) => {
     setSelectedCollectionId(id);
@@ -58,12 +71,12 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
 
   const filteredPosts = useMemo<Post[]>(() => {
     if (loadingCollections) return [];
-    if (selectedCollectionId === 'all') {
+    if (activeCollectionId === 'all') {
       return allPublicPosts;
     }
     return currentCollection?.posts || [];
   }, [
-    selectedCollectionId,
+    activeCollectionId,
     currentCollection?.posts,
     allPublicPosts,
     loadingCollections,
@@ -73,8 +86,10 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
     return filteredPosts ? [{ data: filteredPosts }] : [];
   }, [filteredPosts]);
 
-  const { photoPages, isProcessing: isProcessingPhotos } =
-    useGalleryPhotos(pages);
+  const { photoPages, isProcessing: isProcessingPhotos } = useGalleryPhotos(
+    pages,
+    activeCollectionId,
+  );
 
   const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
@@ -122,21 +137,33 @@ const UserPublicCollections: React.FC<UserPublicCollectionsProps> = ({
   }, [collectionsForDisplay, allPublicPosts]);
 
   const galleryTitle = useMemo(() => {
-    if (selectedCollectionId === 'all') return 'All';
+    if (activeCollectionId === 'all') return 'All';
     if (currentCollection) return currentCollection.name;
     return 'Loading...';
-  }, [selectedCollectionId, currentCollection]);
+  }, [activeCollectionId, currentCollection]);
 
   if (loadingCollections) {
-    return <Typography>Loading collections...</Typography>;
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <Loading />
+      </Box>
+    );
   }
 
   if (collectionsError) {
-    return <Typography color="error">Failed to load collections.</Typography>;
+    return (
+      <Typography color="error" sx={{ textAlign: 'center', p: 4 }}>
+        Failed to load collections.
+      </Typography>
+    );
   }
 
   if (publicCollections.length === 0) {
-    return <Typography>This user has no public collections.</Typography>;
+    return (
+      <Typography sx={{ textAlign: 'center', p: 4 }}>
+        This user has no public collections.
+      </Typography>
+    );
   }
 
   return (
