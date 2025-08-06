@@ -142,6 +142,19 @@ export default defineConfig({
         trace: 'on-first-retry',
       },
     },
+
+    // Speed Insights (Production Only)
+    {
+      name: 'speed-insights',
+      testDir: './tests/e2e',
+      testMatch: /speed-insights\.spec\.ts$/,
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+        baseURL: environments.production.baseURL,
+        trace: 'off',
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */
