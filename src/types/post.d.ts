@@ -23,4 +23,6 @@ export interface Post {
   medias: MediaDto[];
   categories?: Category[];
   thumbnailCropMeta: ThumbnailMeta;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
 }

@@ -146,8 +146,17 @@ const CollectionPage: React.FC = () => {
     loadingCollections,
   ]);
 
-  const { galleryPhotos, isProcessing: isProcessingPhotos } =
-    useGalleryPhotos(filteredPosts);
+  const pages = useMemo(() => {
+    return filteredPosts ? [{ data: filteredPosts }] : [];
+  }, [filteredPosts]);
+
+  const { photoPages, isProcessing: isProcessingPhotos } =
+    useGalleryPhotos(pages);
+
+  const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
+
+  const isGalleryLoading =
+    loadingCollections || (isProcessingPhotos && allPhotosFlat.length === 0);
 
   const collectionsForDisplay = useMemo<CollectionDisplayInfo[]>(() => {
     if (loadingCollections) return [];
@@ -336,7 +345,6 @@ const CollectionPage: React.FC = () => {
     return 'Loading...';
   }, [selectedCollectionId, currentCollection]);
 
-  const isGalleryLoading = loadingCollections || isProcessingPhotos;
   const anyMutationError =
     createCollectionMutation.error ||
     updateCollectionMutation.error ||
@@ -425,7 +433,7 @@ const CollectionPage: React.FC = () => {
       <Box>
         <CollectionTitle
           title={galleryTitle}
-          itemCount={galleryPhotos.length}
+          itemCount={allPhotosFlat.length}
           isEditable={typeof selectedCollectionId === 'number'}
           isPrivate={!!currentCollection?.isPrivate}
           isLoading={updateCollectionMutation.isPending}
@@ -441,7 +449,8 @@ const CollectionPage: React.FC = () => {
 
       {/* Gallery */}
       <CollectionGallery
-        photos={galleryPhotos}
+        photoPages={photoPages}
+        allPhotosFlat={allPhotosFlat}
         isLoading={isGalleryLoading}
         isError={!!displayError && !isGalleryLoading}
         error={displayError ? (displayError as Error).message : null}
