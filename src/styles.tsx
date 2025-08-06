@@ -1,40 +1,41 @@
 import { createTheme } from '@mui/material/styles';
 
-// Light theme
 export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      // Use Indigo 500 (#5c6bc0) as the main primary color
-      main: '#5c6bc0',
-      // Add Indigo 400 (#7986cb) as the light variant
-      light: '#7986cb',
-      // Add Indigo 600 (#3f51b5) as the dark variant (useful for hovers)
-      dark: '#3f51b5',
+      main: '#7058be',
+      light: '#8d7ccb',
+      dark: '#5d4a9f',
     },
     secondary: {
-      main: '#6b7280', // Grey
+      main: '#6b7280',
     },
     background: {
-      default: '#f3f4f6', // Light grey background
-      paper: '#ffffff', // White content surfaces
+      default: '#f3f4f6',
+      paper: '#ffffff',
     },
     text: {
-      primary: '#111827', // Almost black
-      secondary: '#6b7280', // Grey
+      primary: '#111827',
+      secondary: '#6b7280',
     },
-    divider: '#d1d5db', // Soft grey for borders
+    divider: '#d1d5db',
+
     success: {
-      main: '#2EB67D',
+      main: '#269d69',
+      contrastText: '#ffffff',
     },
     error: {
-      main: '#E01E5A',
+      main: '#e14775',
+      contrastText: '#ffffff',
     },
     warning: {
-      main: '#ECB22E',
+      main: '#e16032',
+      contrastText: '#ffffff',
     },
     info: {
-      main: '#36C5F0',
+      main: '#1c8ca8',
+      contrastText: '#ffffff',
     },
   },
   components: {
@@ -55,10 +56,10 @@ export const lightTheme = createTheme({
                 },
               }
             : {
-                backgroundColor: '#7986cb',
+                backgroundColor: theme.palette.primary.main,
                 color: '#ffffff',
                 '&:hover': {
-                  backgroundColor: '#5c6bc0',
+                  backgroundColor: theme.palette.primary.dark,
                 },
               }),
         }),
@@ -82,11 +83,11 @@ export const lightTheme = createTheme({
                 },
               }
             : {
-                borderColor: '#5c6bc0',
-                color: '#5c6bc0',
+                borderColor: theme.palette.primary.main,
+                color: theme.palette.primary.main,
                 '&:hover': {
-                  borderColor: '#3f51b5',
-                  backgroundColor: 'rgba(121, 134, 203, 0.04)',
+                  borderColor: theme.palette.primary.dark,
+                  backgroundColor: 'rgba(112, 88, 190, 0.04)',
                 },
               }),
         }),
@@ -96,9 +97,9 @@ export const lightTheme = createTheme({
     MuiCheckbox: {
       styleOverrides: {
         root: {
-          color: '#6b7280', // grey when unchecked
+          color: '#6b7280',
           '&.Mui-checked': {
-            color: '#a5b4fc', // Indigo when checked
+            color: '#a5b4fc',
           },
         },
       },
@@ -113,7 +114,7 @@ export const lightTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: {
-          backgroundColor: '#e5e7eb', // Light gray chip
+          backgroundColor: '#e5e7eb',
           color: '#111827',
           fontWeight: 500,
         },
@@ -138,7 +139,7 @@ export const lightTheme = createTheme({
               borderColor: '#9ca3af',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#a5b4fc', // Indigo when focused
+              borderColor: '#a5b4fc',
             },
           },
           '& .MuiInputBase-input': {
@@ -201,7 +202,7 @@ export const lightTheme = createTheme({
           },
         },
         track: {
-          backgroundColor: '#d1d5db', // Light grey when off
+          backgroundColor: '#d1d5db',
         },
       },
     },
@@ -234,7 +235,7 @@ export const lightTheme = createTheme({
     MuiTypography: {
       styleOverrides: {
         root: {
-          color: '#111827', // Default dark gray for light mode
+          color: '#111827',
         },
         h1: { fontWeight: 700 },
         h2: { fontWeight: 700 },
@@ -242,8 +243,8 @@ export const lightTheme = createTheme({
         h4: { fontWeight: 600 },
         h5: { fontWeight: 500 },
         h6: { fontWeight: 500 },
-        subtitle1: { color: '#374151' }, // Slightly lighter than primary text
-        subtitle2: { color: '#6b7280' }, // Even lighter
+        subtitle1: { color: '#374151' },
+        subtitle2: { color: '#6b7280' },
         body1: { color: '#374151' },
         body2: { color: '#6b7280' },
       },
@@ -258,24 +259,24 @@ export const lightTheme = createTheme({
     MuiAlert: {
       styleOverrides: {
         standardSuccess: {
-          backgroundColor: '#22c55e', // Tailwind green-500
+          backgroundColor: '#269d69',
           color: '#ffffff',
         },
         standardError: {
-          backgroundColor: '#ef4444', // Tailwind red-500
+          backgroundColor: '#e14775',
           color: '#ffffff',
         },
         standardInfo: {
-          backgroundColor: '#3b82f6', // Tailwind blue-500
+          backgroundColor: '#1c8ca8',
           color: '#ffffff',
         },
         standardWarning: {
-          backgroundColor: '#f59e0b', // Tailwind amber-500
+          backgroundColor: '#e16032',
           color: '#ffffff',
         },
       },
     },
-    // Menus
+
     MuiMenu: {
       styleOverrides: {
         paper: {
@@ -287,7 +288,7 @@ export const lightTheme = createTheme({
             fontWeight: 500,
             color: '#111827',
             transition: 'background-color .15s',
-            '&:hover': { backgroundColor: '#f3f4f6' }, // hover tint
+            '&:hover': { backgroundColor: '#f3f4f6' },
           },
         },
       },
@@ -296,7 +297,6 @@ export const lightTheme = createTheme({
       styleOverrides: {
         root: {
           '&.danger': {
-            // optional “Delete” utility class
             color: '#ef4444',
             '&:hover': { backgroundColor: 'rgba(239,68,68,.08)' },
           },
@@ -310,7 +310,6 @@ export const lightTheme = createTheme({
           color: theme.palette.text.primary,
         }),
         flexContainer: ({ theme }) => ({
-          // gap: theme.spacing(2) — TS error avoided by using the function form
           gap: theme.spacing(2),
         }),
       },
@@ -336,22 +335,35 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#a5b4fc',
+      main: '#ab9df2',
     },
     secondary: {
-      main: '#8F8F8F',
-    },
-    mountain: {
-      100: '#e7e7e7',
-      400: '#9ca3af',
+      main: '#9e9e9e',
     },
     background: {
-      default: '#121212', // Dark background color
-      paper: '#262626', // Darker paper color
+      default: '#121212',
+      paper: '#1e1e1e',
     },
     text: {
-      primary: '#ffffff', // White text for dark mode
-      secondary: '#9ca3af', // Lighter text color for secondary elements
+      primary: '#ffffff',
+      secondary: '#b0b0b0',
+    },
+
+    success: {
+      main: '#a9dc76',
+      contrastText: '#000000',
+    },
+    error: {
+      main: '#ff6188',
+      contrastText: '#000000',
+    },
+    warning: {
+      main: '#fc9867',
+      contrastText: '#000000',
+    },
+    info: {
+      main: '#78dce8',
+      contrastText: '#000000',
     },
   },
   components: {
@@ -372,10 +384,10 @@ export const darkTheme = createTheme({
                 },
               }
             : {
-                backgroundColor: '000',
-                color: '#ffffff',
+                backgroundColor: theme.palette.primary.main,
+                color: '#000000',
                 '&:hover': {
-                  backgroundColor: '#818cf8', // hover variant of primary
+                  backgroundColor: '#c0b1f5',
                 },
               }),
         }),
@@ -386,15 +398,15 @@ export const darkTheme = createTheme({
                 color: theme.palette.error.main,
                 '&:hover': {
                   borderColor: theme.palette.error.dark,
-                  backgroundColor: 'rgba(211, 47, 47, 0.08)',
+                  backgroundColor: 'rgba(255, 97, 136, 0.08)',
                 },
               }
             : {
                 borderColor: theme.palette.primary.main,
-                color: '#ffffff',
+                color: theme.palette.primary.main,
                 '&:hover': {
-                  borderColor: '#818cf8',
-                  backgroundColor: 'rgba(165, 180, 252, 0.08)',
+                  borderColor: '#c0b1f5',
+                  backgroundColor: 'rgba(171, 157, 242, 0.08)',
                 },
               }),
         }),
@@ -422,15 +434,15 @@ export const darkTheme = createTheme({
           '& .MuiInputBase-root': {
             backgroundColor: '#262626',
             '& fieldset': {
-              borderColor: '#9ca3af', // mountain-400
+              borderColor: '#9ca3af',
               borderWidth: '2px',
             },
             '&:hover fieldset': {
-              borderColor: '#e7e7e7', // mountain-100
+              borderColor: '#e7e7e7',
               borderWidth: '2px',
             },
             '&.Mui-focused fieldset': {
-              borderColor: '#a5b4fc', // primary.main on focus
+              borderColor: '#a5b4fc',
               borderWidth: '2px',
             },
           },
@@ -486,24 +498,24 @@ export const darkTheme = createTheme({
     MuiAlert: {
       styleOverrides: {
         standardSuccess: {
-          backgroundColor: '#22c55e',
-          color: '#ffffff',
+          backgroundColor: '#a9dc76',
+          color: '#000000',
         },
         standardError: {
-          backgroundColor: '#ef4444',
-          color: '#ffffff',
+          backgroundColor: '#ff6188',
+          color: '#000000',
         },
         standardInfo: {
-          backgroundColor: '#3b82f6',
-          color: '#ffffff',
+          backgroundColor: '#78dce8',
+          color: '#000000',
         },
         standardWarning: {
-          backgroundColor: '#f59e0b',
-          color: '#ffffff',
+          backgroundColor: '#fc9867',
+          color: '#000000',
         },
       },
     },
-    // Menus
+
     MuiMenu: {
       styleOverrides: {
         paper: {
@@ -536,7 +548,6 @@ export const darkTheme = createTheme({
           color: theme.palette.text.primary,
         }),
         flexContainer: ({ theme }) => ({
-          // gap: theme.spacing(2) — TS error avoided by using the function form
           gap: theme.spacing(2),
         }),
       },
