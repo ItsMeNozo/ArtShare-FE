@@ -32,22 +32,24 @@ export const ExploreGallery: React.FC<ExploreGalleryProps> = ({
     isAi,
   });
 
-  const photos = useMemo(() => {
-    return postsData?.pages.flatMap((page) => page.data) ?? [];
-  }, [postsData]);
+  const { photoPages, isProcessing: isProcessingPhotos } = useGalleryPhotos(
+    postsData?.pages,
+  );
 
-  const { galleryPhotos, isProcessing: isProcessingPhotos } =
-    useGalleryPhotos(photos);
+  const isInitialLoading =
+    isLoadingPosts || (isProcessingPhotos && photoPages.length === 0);
 
-  if (isProcessingPhotos) {
-    return <></>;
-  }
+  const isFetchingMore =
+    isFetchingNextPage || (isProcessingPhotos && photoPages.length > 0);
+
+  const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
   return (
     <IGallery
-      photos={galleryPhotos}
-      isLoading={isLoadingPosts}
-      isFetchingNextPage={isFetchingNextPage}
+      photoPages={photoPages}
+      allPhotosFlat={allPhotosFlat}
+      isLoading={isInitialLoading}
+      isFetchingNextPage={isFetchingMore}
       isError={isPostsError}
       error={postsError}
       hasNextPage={hasNextPage}

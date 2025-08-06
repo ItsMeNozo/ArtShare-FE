@@ -6,7 +6,7 @@ export const getMediaDimensions = (
       console.warn(
         'getMediaDimensions called with missing URL. Using default.',
       );
-      resolve({ width: 500, height: 500 });
+      resolve({ width: 256, height: 256 });
       return;
     }
     const img = new Image();
@@ -14,7 +14,7 @@ export const getMediaDimensions = (
     img.onerror = (err) => {
       console.error('Error loading image for dimensions:', url, err);
 
-      resolve({ width: 500, height: 500 });
+      resolve({ width: 256, height: 256 });
     };
     img.src = url;
   });

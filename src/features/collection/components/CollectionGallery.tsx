@@ -8,7 +8,8 @@ import {
 } from './CollectionImageRenderer';
 
 interface CollectionGalleryProps {
-  photos: GalleryPhoto[];
+  photoPages: GalleryPhoto[][];
+  allPhotosFlat: GalleryPhoto[];
   isLoading: boolean;
   isError: boolean;
   error: string | null;
@@ -18,7 +19,8 @@ interface CollectionGalleryProps {
 }
 
 export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
-  photos,
+  photoPages,
+  allPhotosFlat,
   isLoading,
   isError,
   error,
@@ -39,13 +41,10 @@ export const CollectionGallery: React.FC<CollectionGalleryProps> = ({
     [onRemovePost, selectedCollectionId, isReadOnly],
   );
 
-  if (isLoading) {
-    return <></>;
-  }
-
   return (
     <IGallery
-      photos={photos}
+      photoPages={photoPages}
+      allPhotosFlat={allPhotosFlat}
       isLoading={isLoading}
       isFetchingNextPage={false}
       isError={isError}

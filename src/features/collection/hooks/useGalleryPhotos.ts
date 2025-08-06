@@ -1,91 +1,112 @@
 import { GalleryPhoto } from '@/components/gallery/Gallery';
 import { Post } from '@/types';
-import { getMediaDimensions } from '@/utils/helpers/gallery.helper';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+interface PostPage {
+  data: Post[];
+}
 
 export interface UseGalleryPhotosResult {
-  galleryPhotos: GalleryPhoto[];
+  photoPages: GalleryPhoto[][];
   isProcessing: boolean;
   processingError: string | null;
 }
 
-export function useGalleryPhotos(posts: Post[]): UseGalleryPhotosResult {
-  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([]);
+export function useGalleryPhotos(
+  pages: PostPage[] = [],
+): UseGalleryPhotosResult {
+  const [processedPhotoPages, setProcessedPhotoPages] = useState<
+    GalleryPhoto[][]
+  >([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processingError, setProcessingError] = useState<string | null>(null);
 
-  // Create a stable dependency that only changes when posts actually change
-  const postsKey = useMemo(() => {
-    return posts
-      .map((p) => p.id)
-      .sort()
-      .join(',');
-  }, [posts]);
-
   useEffect(() => {
-    const transformPosts = async () => {
-      if (posts.length === 0) {
-        setGalleryPhotos([]);
-        setIsProcessing(false);
-        setProcessingError(null);
+    const transformNewPages = async () => {
+      const numProcessedPages = processedPhotoPages.length;
+
+      if (!pages || pages.length <= numProcessedPages) {
+        if (pages.length < numProcessedPages) {
+          setProcessedPhotoPages([]);
+        }
         return;
       }
 
       setIsProcessing(true);
       setProcessingError(null);
 
+      const newPages = pages.slice(numProcessedPages);
+
       try {
-        const photosPromises = posts
-          .filter(
-            (post) =>
-              post?.thumbnailUrl || (post?.medias && post.medias.length > 0),
-          )
-          .map(async (post): Promise<GalleryPhoto | null> => {
-            const imageUrl = post?.thumbnailUrl || post?.medias?.[0]?.url;
-            if (!imageUrl) return null;
+        const newlyProcessedPages = await Promise.all(
+          newPages.map(async (page): Promise<GalleryPhoto[]> => {
+            if (!page || !page.data) return [];
 
-            try {
-              const { width, height } = await getMediaDimensions(imageUrl);
-              return {
-                src: imageUrl,
-                width,
-                height,
-                key: post.id.toString(),
-                title: post.title || 'Untitled Post',
-                postId: post.id,
-                postLength: post.medias?.length || 0,
-                author: post.user?.username || 'Unknown',
-                isMature: post.isMature || false,
-                aiCreated: post.aiCreated || false,
-                likeCount: post.likeCount,
-                commentCount: post.commentCount,
-                viewCount: post.viewCount,
-              };
-            } catch (dimensionError) {
-              console.warn(
-                `Error getting dimensions for post ${post.id} (${imageUrl}):`,
-                dimensionError,
-              );
-              return null;
-            }
-          });
+            const photosPromises = page.data
+              .filter(
+                (post) =>
+                  post?.thumbnailUrl ||
+                  (post?.medias && post.medias.length > 0),
+              )
+              .map(async (post): Promise<GalleryPhoto | null> => {
+                const imageUrl = post?.thumbnailUrl || post?.medias?.[0]?.url;
+                if (!imageUrl) return null;
 
-        const resolvedPhotos = await Promise.all(photosPromises);
-        const validPhotos = resolvedPhotos.filter(
-          (photo): photo is GalleryPhoto => photo !== null,
+                try {
+                  return {
+                    src: imageUrl,
+                    width: post.thumbnailWidth || 256,
+                    height: post.thumbnailHeight || 256,
+                    key: post.id.toString(),
+                    title: post.title || 'Untitled Post',
+                    postId: post.id,
+                    postLength: post.medias?.length || 0,
+                    author: post.user?.username || 'Unknown',
+                    profilePictureUrl: post.user?.profilePictureUrl,
+                    isMature: post.isMature || false,
+                    aiCreated: post.aiCreated || false,
+                    likeCount: post.likeCount,
+                    commentCount: post.commentCount,
+                    viewCount: post.viewCount,
+                  };
+                } catch (dimensionError) {
+                  console.warn(
+                    `Error getting dimensions for post ${post.id} (${imageUrl}):`,
+                    dimensionError,
+                  );
+                  return null;
+                }
+              });
+
+            const resolvedPhotos = await Promise.all(photosPromises);
+
+            return resolvedPhotos.filter(
+              (photo): photo is GalleryPhoto => photo !== null,
+            );
+          }),
         );
-        setGalleryPhotos(validPhotos);
+
+        setProcessedPhotoPages((prev) => [...prev, ...newlyProcessedPages]);
       } catch (error) {
         console.error('Error during post transformation:', error);
-        setProcessingError('Failed to process post images.');
-        setGalleryPhotos([]);
+        setProcessingError('Failed to process new images.');
       } finally {
         setIsProcessing(false);
       }
     };
 
-    transformPosts();
-  }, [postsKey, posts]);
+    transformNewPages();
+  }, [pages, processedPhotoPages.length]);
 
-  return { galleryPhotos, isProcessing, processingError };
+  useEffect(() => {
+    if (pages.length > 0 && pages.length < processedPhotoPages.length) {
+      setProcessedPhotoPages([]);
+    }
+  }, [pages, processedPhotoPages.length]);
+
+  return {
+    photoPages: processedPhotoPages,
+    isProcessing,
+    processingError,
+  };
 }

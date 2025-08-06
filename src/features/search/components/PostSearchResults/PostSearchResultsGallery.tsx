@@ -29,22 +29,24 @@ export const PostSearchResultsGallery: React.FC<
     enabled: !!finalQuery && finalQuery.length > 0,
   });
 
-  const posts = useMemo(() => {
-    return postsData?.pages.flatMap((page) => page.data) ?? [];
-  }, [postsData]);
+  const { photoPages, isProcessing: isProcessingPhotos } = useGalleryPhotos(
+    postsData?.pages,
+  );
 
-  const { galleryPhotos, isProcessing: isProcessingPhotos } =
-    useGalleryPhotos(posts);
+  const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
-  if (isProcessingPhotos) {
-    return <></>;
-  }
+  const isInitialLoading =
+    isLoadingPosts || (isProcessingPhotos && photoPages.length === 0);
+
+  const isFetchingMore =
+    isFetchingNextPage || (isProcessingPhotos && photoPages.length > 0);
 
   return (
     <IGallery
-      photos={galleryPhotos}
-      isLoading={isLoadingPosts}
-      isFetchingNextPage={isFetchingNextPage}
+      photoPages={photoPages}
+      allPhotosFlat={allPhotosFlat}
+      isLoading={isInitialLoading}
+      isFetchingNextPage={isFetchingMore}
       isError={isPostsError}
       error={postsError}
       hasNextPage={hasNextPage}
