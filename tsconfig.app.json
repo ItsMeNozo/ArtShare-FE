@@ -26,5 +26,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "src/pages/MatureContent"]
+  "include": ["src", "src/pages/MatureContent", "src/components/.tsx"]
 }

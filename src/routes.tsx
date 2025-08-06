@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { createBrowserRouter, Outlet, RouteObject } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet, RouteObject } from 'react-router-dom';
 
 // Layouts & Wrappers
 import OnboardingRoute from '@/components/ProtectedItems/OnboardingRoute';
@@ -22,7 +22,7 @@ const RequireOnboard = lazy(
 );
 
 // Lazy imports for pages/features
-const LandingPage = lazy(() => import('@/pages/Home'));
+// const LandingPage = lazy(() => import('@/pages/Home'));
 const Login = lazy(() => import('@/features/authentication/Login'));
 const SignUp = lazy(() => import('@/features/authentication/SignUp'));
 const ForgotPassword = lazy(
@@ -106,7 +106,7 @@ const routeConfig: RouteObject[] = [
     ),
     children: [
       // Landing
-      { index: true, element: <LandingPage /> },
+      // { index: true, element: <LandingPage /> },
       // Public Auth
       {
         element: (
@@ -256,6 +256,7 @@ const routeConfig: RouteObject[] = [
           },
         ],
       },
+      { index: true, element: <Navigate to="/explore" replace /> },
       // Catch-all -> redirect
       { path: '*', element: <NotFoundPage /> },
     ],

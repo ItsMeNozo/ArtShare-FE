@@ -14,9 +14,9 @@ const BrowseGenHistory = () => {
   } = usePromptHistory();
 
   return (
-    <div className="flex min-h-0 flex-1 justify-between">
-      <div className="bg-mountain-50 border-mountain-200 m-4 flex w-[220px] min-w-[220px] flex-col rounded-md border">
-        <div className="border-mountain-200 flex h-12 w-full items-center justify-center border-b-1">
+    <div className="flex flex-1 justify-between min-h-0">
+      <div className="flex flex-col bg-mountain-50 m-4 border border-mountain-200 rounded-md w-[220px] min-w-[220px]">
+        <div className="flex justify-center items-center border-mountain-200 border-b-1 w-full h-12">
           <Clock className="mr-2 size-4" />
           <p>Prompt History</p>
         </div>
@@ -33,20 +33,20 @@ const BrowseGenHistory = () => {
         </div>
       </div>
       {loading ? (
-        <div className="mt-4 flex h-full w-full items-start justify-center">
+        <div className="flex justify-center items-start mt-4 w-full h-full">
           <div className="flex items-center space-x-4">
             <CircularProgress size={32} thickness={4} />
             <p className="text-sm">Loading...</p>
           </div>
         </div>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex flex-col flex-1 min-h-0">
           {/* Header with count information */}
-          <div className="border-mountain-200 flex items-center justify-between border-b p-4">
+          <div className="flex justify-between items-center p-4 border-mountain-200 border-b">
             <div className="flex items-center space-x-2">
               <Sparkles className="size-5 text-purple-500" />
               <div>
-                <h2 className="text-mountain-800 text-lg font-semibold">
+                <h2 className="font-semibold text-mountain-800 text-lg">
                   Post With Your AI Images
                 </h2>
                 <p className="text-mountain-600 text-sm">
@@ -75,7 +75,7 @@ const BrowseGenHistory = () => {
           </div>
         </div>
       )}
-      <div className="absolute bottom-0 z-0 flex h-20 w-full bg-white blur-3xl" />
+      <div className="bottom-0 z-0 absolute flex bg-white blur-3xl w-full h-20" />
     </div>
   );
 };

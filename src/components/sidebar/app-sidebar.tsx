@@ -295,7 +295,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {
                 icon: PiVideo,
                 label: 'App Tutorials',
-                href: 'https://www.youtube.com/channel/UCpg3O1quTzj7QpDHdhu6pNw',
+                href: 'https://www.youtube.com/@artshareofficial',
               },
             ].map((item, key) => {
               const isActive = pathname === item.href;
