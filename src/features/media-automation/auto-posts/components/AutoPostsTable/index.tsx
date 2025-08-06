@@ -37,7 +37,7 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
   } = useConfirmationDialog<number>();
   const projectId = useNumericParam('projectId');
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<SortableKeysItemTable>('content');
+  const [orderBy, setOrderBy] = useState<SortableKeysItemTable>('id');
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
