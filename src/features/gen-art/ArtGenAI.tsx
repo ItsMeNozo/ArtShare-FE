@@ -278,7 +278,7 @@ const ArtGenAI = () => {
               Generate
             </Button>
           </div>
-          <AIBot />
+          <AIBot setCustomUserPrompt={setUserPrompt} />
         </div>
       </div>
     </div>

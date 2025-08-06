@@ -10,15 +10,20 @@ import { Button } from '@/components/ui/button';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { CircularProgress, TextareaAutosize } from '@mui/material';
 import { ArrowUp } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RiChatAiLine, RiChatNewLine, RiRobot2Line } from 'react-icons/ri';
 import { useChat } from '../../hook/useChat';
 
-const AIBotPopover = () => {
+interface AIBotProps {
+  setCustomUserPrompt?: (prompt: string) => void;
+}
+
+const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
   const [promptExpanded, setPromptExpanded] = useState<boolean>(false);
   const [userPrompt, setUserPrompt] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { messages, isLoading, sendMessage, clearChat } = useChat();
 
@@ -50,10 +55,19 @@ const AIBotPopover = () => {
   };
 
   const handlePromptClick = async (prompt: string) => {
+    if (setCustomUserPrompt) {
+      try {
+        setCustomUserPrompt(prompt);
+        setIsOpen(false);
+        return;
+      } catch (err) {
+        console.error('Failed to set custom user prompt:', err);
+        showSnackbar('Failed to paste prompt', 'error');
+      }
+    }
     try {
       await navigator.clipboard.writeText(prompt);
       showSnackbar('Prompt copied to clipboard!', 'success');
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       showSnackbar('Failed to copy prompt', 'error');
     }
@@ -86,7 +100,7 @@ const AIBotPopover = () => {
   }, [promptExpanded, userPrompt]);
 
   return (
-    <Popover>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button className="bg-white hover:bg-mountain-50 shadow-md ml-4 border border-mountain-300 rounded-full w-15 h-15 hover:cursor-pointer">
           <RiChatAiLine className="size-8 text-indigo-950" />
@@ -98,7 +112,7 @@ const AIBotPopover = () => {
       >
         <div className="flex justify-between items-center p-3 border-mountain-100 border-b h-16">
           <span className="font-semibold text-mountain-700 text-base">
-            ArtShare AI Bot
+            Imagine Bot
           </span>
           <Button
             onClick={() => {
