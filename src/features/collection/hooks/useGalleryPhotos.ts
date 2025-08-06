@@ -14,12 +14,17 @@ export interface UseGalleryPhotosResult {
 
 export function useGalleryPhotos(
   pages: PostPage[] = [],
+  key?: number | string | null,
 ): UseGalleryPhotosResult {
   const [processedPhotoPages, setProcessedPhotoPages] = useState<
     GalleryPhoto[][]
   >([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [processingError, setProcessingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setProcessedPhotoPages([]);
+  }, [key]);
 
   useEffect(() => {
     const transformNewPages = async () => {
