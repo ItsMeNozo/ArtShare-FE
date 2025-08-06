@@ -1,6 +1,6 @@
 import { Tooltip } from '@mui/material';
 import { InfoIcon } from 'lucide-react';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { AiOutlineSave } from 'react-icons/ai';
 import { FaArrowLeftLong, FaEye } from 'react-icons/fa6';
 import { MdCheckCircle, MdLockOutline } from 'react-icons/md';
@@ -57,16 +57,27 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
     const { user, loading } = useUser();
     const navigate = useNavigate();
     const { blogId } = useParams<{ blogId: string }>();
+    const [isFocused, setIsFocused] = useState(false);
 
     const isNewDocument = blogId === 'new';
 
+    // Determine what to display in the input
+    const displayValue = useMemo(() => {
+      if (isFocused) {
+        return text; // When focused, show actual text (empty if no title)
+      }
+      return text || 'Untitled Document'; // When not focused, show "Untitled Document" if empty
+    }, [text, isFocused]);
+
     const dynamicWidth = useMemo(() => {
       const { base, max, charMultiplier, baseCharCount } = TITLE_WIDTH_CONFIG;
+      const textToMeasure = text || 'Untitled Document'; // Use fallback for width calculation
       return Math.min(
-        base + Math.max(0, (text.length - baseCharCount) * charMultiplier),
+        base +
+          Math.max(0, (textToMeasure.length - baseCharCount) * charMultiplier),
         max,
       );
-    }, [text.length]);
+    }, [text]);
 
     const handlePreview = () => {
       if (blogId && !isNewDocument) {
@@ -133,11 +144,13 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
         {/* Center Section */}
         <div className="flex flex-grow items-center justify-center gap-4">
           <Input
-            value={text}
+            value={displayValue}
             onChange={(e) => setText(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             style={{ width: `${dynamicWidth}px` }}
             className={`dark:bg-mountain-800/80 dark:border-mountain-600 placeholder:text-mountain-600 dark:placeholder:text-mountain-400 h-12 flex-shrink rounded-full border border-gray-200 bg-white/60 px-4 transition-all duration-300 ease-in-out focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
-              isTitleEmpty
+              isTitleEmpty && !isFocused
                 ? 'text-gray-500 dark:text-gray-400'
                 : 'text-gray-900 dark:text-gray-100'
             }`}
