@@ -125,12 +125,15 @@ export const useAutoSave = ({
     updateSaveStatus('saving');
 
     try {
+      const images = editorRef.current?.getImages() || [];
+
       await updateExistingBlog(
         parseInt(blogId, 10),
         {
           content,
           title: blogTitle?.trim() || 'Untitled Document',
           isPublished: isPublished,
+          pictures: images.map((img) => img.src),
         },
         { signal: currentAbortController.signal },
       );
@@ -219,11 +222,14 @@ export const useAutoSave = ({
         updateSaveStatus('saving');
 
         try {
+          const images = editorRef.current?.getImages() || [];
+
           await updateExistingBlog(
             numericBlogId,
             {
               title: titleToSave.trim() || 'Untitled Document',
               isPublished: isPublished,
+              pictures: images.map((img) => img.src),
             },
             { signal: currentAbortController.signal },
           );
@@ -257,6 +263,7 @@ export const useAutoSave = ({
       captureCurrentTitle,
       abortTitleRequest,
       isPublished,
+      editorRef,
     ],
   );
 
