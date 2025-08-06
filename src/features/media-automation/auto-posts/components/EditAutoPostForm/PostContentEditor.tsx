@@ -51,11 +51,11 @@ const PostContentEditor = ({
 
   return (
     <Box
-      className={`border-mountain-200 relative flex h-[520px] w-full flex-col border bg-white shadow-md ${!canEdit ? 'cursor-not-allowed bg-gray-50' : ''} `}
+      className={`border-mountain-200 relative flex h-fit max-h-[520px] w-full flex-col border bg-white shadow-md ${!canEdit ? 'cursor-not-allowed bg-gray-50' : ''} `}
     >
-      <div className="border-mountain-200 flex h-12 shrink-0 items-center gap-2 rounded-t-md border-b bg-white px-4">
+      <div className="flex items-center gap-2 bg-white px-4 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
         {editor && (
-          <div className="flex w-full items-center justify-between">
+          <div className="flex justify-between items-center w-full">
             <div className="flex items-center space-x-2">
               <span className="text-mountain-600 text-sm">
                 Tips: Click on text editor to start editing
@@ -70,7 +70,7 @@ const PostContentEditor = ({
         )}
       </div>
       {editor ? (
-        <div className="custom-scrollbar h-full w-full overflow-auto p-4 text-left">
+        <div className="p-4 w-full h-full overflow-auto text-left custom-scrollbar">
           <EditorContent editor={editor} />
         </div>
       ) : (

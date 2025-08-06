@@ -1,8 +1,8 @@
-import PromptResult from '@/features/gen-art/components/PromptResult';
 import { HistoryFilter } from '@/features/gen-art/enum';
 import { usePromptHistory } from '@/hooks/usePromptHistory';
 import { CircularProgress } from '@mui/material';
 import { Clock, Sparkles } from 'lucide-react';
+import BrowsePromptResult from './BrowsePromptResult';
 
 const BrowsePromptHistory = () => {
   const {
@@ -32,6 +32,7 @@ const BrowsePromptHistory = () => {
           ))}
         </div>
       </div>
+
       {loading ? (
         <div className="flex justify-center items-start mt-4 w-full h-full">
           <div className="flex items-center space-x-4">
@@ -42,19 +43,19 @@ const BrowsePromptHistory = () => {
       ) : (
         <div className="flex flex-col flex-1 min-h-0">
           {/* Header with count information */}
-          <div className="flex justify-between items-center p-4 border-mountain-200 border-b">
-            <div className="flex items-center space-x-2">
-              <Sparkles className="size-5 text-purple-500" />
-              <div>
+          <div className="flex justify-between items-center py-4 border-mountain-200 border-b">
+            <div className="flex flex-col">
+              <div className='flex items-center space-x-2'>
+                <Sparkles className="size-5 text-purple-500" />
                 <h2 className="font-semibold text-mountain-800 text-lg">
-                  Post With Your AI Images
+                  Edit With Your AI Images
                 </h2>
-                <p className="text-mountain-600 text-sm">
-                  You have {displayedResults.length} previous{' '}
-                  {displayedResults.length === 1 ? 'chat' : 'chats'} with
-                  ArtNova.
-                </p>
               </div>
+              <p className="text-mountain-600 text-sm">
+                You have {displayedResults.length} previous{' '}
+                {displayedResults.length === 1 ? 'chat' : 'chats'} with
+                ArtNova.
+              </p>
             </div>
           </div>
 
@@ -66,7 +67,7 @@ const BrowsePromptHistory = () => {
             {displayedResults &&
               displayedResults.length > 0 &&
               displayedResults.map((result, index) => (
-                <PromptResult key={index} result={result} useToShare={true} />
+                <BrowsePromptResult key={index} result={result} useToEdit={true} />
               ))}
           </div>
         </div>

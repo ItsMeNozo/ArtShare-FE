@@ -60,7 +60,7 @@ const UpgradePlanModal: React.FC<UpgradePlanModalProps> = ({
           <div className='bottom-0 absolute flex justify-between p-2 w-full'>
             <Button
               variant="outline"
-              onClick={() => window.open('https://artshare-docs.netlify.app/', '_blank')}
+              onClick={() => window.open('https://artshare-docs.vercel.app/', '_blank')}
               disabled={loading}
               className="border-mountain-200"
             >

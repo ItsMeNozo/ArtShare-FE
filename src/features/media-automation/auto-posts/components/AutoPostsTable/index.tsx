@@ -26,6 +26,7 @@ import { MAX_POSTS_PER_PROJECT } from '../../constants';
 import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
 import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import PostsTableHeader from './AutoPostsTableHeader';
+import { BsQuestion } from 'react-icons/bs';
 
 const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
   const {
@@ -94,12 +95,17 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
   const emptyRows = Math.max(0, MAX_POSTS_PER_PROJECT - posts.length);
 
   return (
-    <div className="flex w-full flex-col space-y-2">
-      <div className="flex w-full">
-        <p>Number Of Posts: {totalPosts}</p>
+    <div className="flex flex-col space-y-2 w-full">
+      <div className="flex items-center w-full">
+        <p className='mr-2 font-medium'>Number Of Posts: {totalPosts} / 7</p>
+        <Tooltip title="The project allows a maximum of 7 posts." placement="top">
+          <div className="flex justify-center items-center bg-white border border-mountain-200 rounded-full w-6 h-6 text-mountain-950">
+            <BsQuestion className='size-5' />
+          </div>
+        </Tooltip>
       </div>
-      <div className="border-mountain-200 flex h-full w-full overflow-hidden rounded-3xl border bg-white">
-        <TableContainer className="h-[calc(100vh-14rem)] flex-col justify-between overflow-hidden">
+      <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-full overflow-hidden">
+        <TableContainer className="flex-col justify-between h-[calc(100vh-14rem)] overflow-hidden">
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
@@ -119,20 +125,20 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
                     tabIndex={-1}
                     key={row.id}
                     sx={{ cursor: 'pointer' }}
-                    className="hover:bg-mountain-50 border-mountain-100 h-12 border-b-2 last:border-b-0"
+                    className="hover:bg-mountain-50 border-mountain-100 border-b-2 last:border-b-0 h-12"
                     onClick={() => handleRowClick(row.id)}
                   >
                     <TableCell component="th" scope="row" align="right">
                       {row.id}
                     </TableCell>
                     <TableCell align="left" padding="none">
-                      <p className="line-clamp-1 w-96">{row.content}</p>
+                      <p className="w-96 line-clamp-1">{row.content}</p>
                     </TableCell>
                     <TableCell align="right">
                       {row.imageUrls?.length || 0}
                     </TableCell>
                     <TableCell align="right">
-                      <span className="flex items-center justify-end gap-2 text-sm">
+                      <span className="flex justify-end items-center gap-2 text-sm">
                         <span
                           className={`h-2 w-2 rounded-full${getStatusChipProps(row.status)}`}
                         ></span>
@@ -151,13 +157,13 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
                       {canEdit && (
                         <>
                           <Tooltip title="Edit">
-                            <Button className="border-mountain-200 border-1 bg-indigo-50 py-2 font-normal">
+                            <Button className="bg-indigo-50 py-2 border-1 border-mountain-200 font-normal">
                               <AiFillEdit className="size-5 text-indigo-600" />
                             </Button>
                           </Tooltip>
                           <Tooltip title="Delete">
                             <Button
-                              className="border-mountain-200 border-1 bg-red-50 py-2 font-normal"
+                              className="bg-red-50 py-2 border-1 border-mountain-200 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClick(row.id);
@@ -173,13 +179,13 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
                 );
               })}
               {canEdit && posts.length < MAX_POSTS_PER_PROJECT && (
-                <TableRow sx={{ cursor: 'pointer' }} className="h-12 w-full">
+                <TableRow sx={{ cursor: 'pointer' }} className="w-full h-12">
                   <TableCell colSpan={7} align="center">
                     <Button
                       onClick={handleAddPostClick}
                       variant="outlined"
                       color="primary"
-                      className="border-mountain-200 text-mountain-950 w-48 bg-white"
+                      className="bg-white border-mountain-200 w-48 text-mountain-950"
                     >
                       + Add Post
                     </Button>

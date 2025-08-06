@@ -1,5 +1,5 @@
-import { updateExistingBlog } from '@/features/user-writing/api/blog.api';
-import { EditorHandle } from '@/features/user-writing/components/Editor';
+import { updateExistingBlog } from '@/features/write-blog/api/blog.api';
+import { EditorHandle } from '@/features/write-blog/components/Editor';
 import { useCallback, useEffect, useRef } from 'react';
 import type { SaveStatus } from './useBlogState';
 import { useDebounce } from './useDebounce';
