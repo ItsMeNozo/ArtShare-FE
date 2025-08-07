@@ -36,15 +36,21 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
   ];
 
   const handleGenerate = async () => {
-    if (!userPrompt.trim() || isLoading) return;
+    const trimmedPrompt = userPrompt.trim();
+    if (!trimmedPrompt || isLoading) return;
+
+    // Optimistically clear the input field
+    setUserPrompt('');
+    setPromptExpanded(false);
 
     try {
-      await sendMessage(userPrompt);
-      setUserPrompt('');
-      setPromptExpanded(false);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      await sendMessage(trimmedPrompt);
+      // The message was sent successfully, nothing more to do here.
     } catch (error) {
+      // If sending fails, show an error and restore the user's original prompt
       showSnackbar('Failed to send message', 'error');
+      setUserPrompt(trimmedPrompt); // Restore the prompt
+      setPromptExpanded(true); // Re-expand the input area
     }
   };
 
