@@ -24,7 +24,7 @@ const UserPosts = () => {
   });
 
   const pages = useMemo(() => (posts ? [{ data: posts }] : []), [posts]);
-  const { photoPages, isProcessing, processingError } = useGalleryPhotos(pages);
+  const { photoPages, isProcessing, processingError } = useGalleryPhotos(pages, username);
   const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
   const handlePostDeleted = (postId: number) => {
