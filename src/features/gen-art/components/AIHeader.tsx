@@ -39,7 +39,7 @@ const AIHeader = ({ onGuideClick }: AIHeaderProps) => {
   return (
     <nav className={`z-50 flex relative justify-between w-[calc(100vw-18rem)] pr-4 items-center dark:bg-mountain-950 dark:border-b-mountain-700 h-16`}>
       <div className="flex justify-between items-center px-4 w-full">
-        <Link to="/explore" className="flex items-center bg-mountain-50 hover:bg-mountain-100/80 px-4 border border border-mountain-100 border-mountain-200 rounded-lg h-10">
+        <Link to="/dashboard" className="flex items-center bg-mountain-50 hover:bg-mountain-100/80 px-4 border border border-mountain-100 border-mountain-200 rounded-lg h-10">
           <div className='flex justify-center items-center hover:bg-mountain-100 mr-2 rounded-lg'>
             <IoHome className='size-5 text-mountain-600' />
           </div>
