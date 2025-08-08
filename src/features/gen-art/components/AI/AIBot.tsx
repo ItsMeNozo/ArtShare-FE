@@ -46,6 +46,7 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
     try {
       await sendMessage(trimmedPrompt);
       // The message was sent successfully, nothing more to do here.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // If sending fails, show an error and restore the user's original prompt
       showSnackbar('Failed to send message', 'error');
@@ -74,6 +75,7 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
     try {
       await navigator.clipboard.writeText(prompt);
       showSnackbar('Prompt copied to clipboard!', 'success');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       showSnackbar('Failed to copy prompt', 'error');
     }
