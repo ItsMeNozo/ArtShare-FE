@@ -91,7 +91,7 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
       status: 'existing',
       url,
     }));
-    setFieldValue('images', newImages);
+    setFieldValue('images', [...currentImages, ...newImages]);
   };
 
   return (

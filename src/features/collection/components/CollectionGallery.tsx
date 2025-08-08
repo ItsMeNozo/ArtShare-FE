@@ -13,7 +13,7 @@ interface CollectionGalleryProps {
   isLoading: boolean;
   isError: boolean;
   error: string | null;
-  selectedCollectionId: SelectedCollectionId;
+  selectedCollectionId: SelectedCollectionId | null;
   onRemovePost: (postId: number) => void;
   isReadOnly?: boolean;
 }

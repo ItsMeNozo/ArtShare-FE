@@ -71,15 +71,17 @@ const IGallery: React.FC<IGalleryProps> = ({
       >
         {stableWidth > 0 &&
           photoPages.map((pagePhotos, index) => (
-            <RowsPhotoAlbum
-              key={`page-${index}`}
-              defaultContainerWidth={stableWidth}
-              rowConstraints={{ singleRowMaxHeight: 256 }}
-              spacing={8}
-              targetRowHeight={256}
-              photos={pagePhotos}
-              render={{ image: effectiveRenderPhoto }}
-            />
+            <div key={`page-${index}`} className="mb-2">
+              <RowsPhotoAlbum
+                key={`page-${index}`}
+                defaultContainerWidth={stableWidth}
+                rowConstraints={{ singleRowMaxHeight: 256 }}
+                spacing={8}
+                targetRowHeight={256}
+                photos={pagePhotos}
+                render={{ image: effectiveRenderPhoto }}
+              />
+            </div>
           ))}
       </InfiniteScroll>
     </div>

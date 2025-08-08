@@ -414,9 +414,7 @@ const EditImage: React.FC = () => {
         if (layer.type === 'image') {
           const promise = new Promise<void>((resolveImg) => {
             const img = new Image();
-            if (layer.src.startsWith("https://artsharing.s3.ap-southeast-1.amazonaws.com")) {
-              img.crossOrigin = "anonymous";
-            }
+            img.crossOrigin = "anonymous";
             img.src = layer.src;
             img.onload = () => {
               const {
