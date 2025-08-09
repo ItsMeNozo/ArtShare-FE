@@ -45,6 +45,19 @@ export const featuresShowcase = [
   //   url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ydd0gojvbdnqejqifk2o?blur=300&q=1',
   //   destination: '/image/tool/text-to-image',
   // },
+  {
+    label: 'Scheduled Content Posting',
+    description: 'Schedule when to publish the content automatically.',
+    url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/leuamzwred3navfdhc6v?blur=300&q=1',
+    destination: '/auto/projects',
+  },
+  // {
+  //   label: 'Automatic Content Creator',
+  //   description:
+  //     'Prepare the ideas for bots to create and upload content row by row',
+  //   url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ydd0gojvbdnqejqifk2o?blur=300&q=1',
+  //   destination: '/image/tool/text-to-image',
+  // },
   // {
   //   label: 'Scheduled Content Posting',
   //   description: 'Schedule when to publish the content automatically.',
