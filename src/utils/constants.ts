@@ -8,7 +8,7 @@ export const dashboardBG =
 
 export const featuresShowcase = [
   {
-    label: 'Text To Image',
+    label: 'Image Generation',
     description: 'Create art from text using advanced AI.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/nxyormqdp4kggz0ncymu?blur=300&q=1',
     destination: '/image/tool/text-to-image',
@@ -32,7 +32,7 @@ export const featuresShowcase = [
     destination: '/docs',
   },
   {
-    label: 'Content Approval Workflow',
+    label: 'Post Automation',
     description:
       'Approve automation pushing content to other social platforms.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/uxeuuht93gl7mbtp1f3r?blur=300&q=1',
@@ -51,6 +51,19 @@ export const featuresShowcase = [
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/leuamzwred3navfdhc6v?blur=300&q=1',
     destination: '/auto/projects',
   },
+  // {
+  //   label: 'Automatic Content Creator',
+  //   description:
+  //     'Prepare the ideas for bots to create and upload content row by row',
+  //   url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ydd0gojvbdnqejqifk2o?blur=300&q=1',
+  //   destination: '/image/tool/text-to-image',
+  // },
+  // {
+  //   label: 'Scheduled Content Posting',
+  //   description: 'Schedule when to publish the content automatically.',
+  //   url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/leuamzwred3navfdhc6v?blur=300&q=1',
+  //   destination: '/auto/projects',
+  // },
 ];
 
 export enum TargetType {

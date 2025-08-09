@@ -5,6 +5,10 @@ export const fetchPost = async (postId: number) => {
   return await api.get<Post>(`/posts/${postId}`);
 };
 
+export const fetchPostForView = async (postId: number) => {
+  return await api.get<Post>(`/posts/${postId}/view`);
+};
+
 interface LikePayload {
   targetId: number;
   targetType: string;
