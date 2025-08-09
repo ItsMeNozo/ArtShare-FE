@@ -158,7 +158,7 @@ export class PostCreationPage {
 
   async browseAIStock(): Promise<void> {
     await this.page
-      .locator('label')
+      .getByRole('button')
       .filter({ hasText: 'Browse My Stock' })
       .click();
 

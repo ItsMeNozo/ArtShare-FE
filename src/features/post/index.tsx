@@ -11,7 +11,7 @@ import MatureContentWarning from './components/MatureContentWarning.tsx';
 import PostArtist from './components/PostArtist';
 import PostAssets from './components/PostAssets';
 import PostInfo from './components/PostInfo';
-import { useGetPostDetails } from './hooks/useGetPostDetails.tsx';
+import { useGetPostDetailsForView } from './hooks/useGetPostDetails.tsx';
 
 const Post: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -36,7 +36,7 @@ const Post: React.FC = () => {
     isLoading: isPostLoading,
     error: postError,
     refetch: refetchPostData,
-  } = useGetPostDetails(numericPostId);
+  } = useGetPostDetailsForView(numericPostId);
 
   const {
     data: comments,
