@@ -154,6 +154,7 @@ export interface ProjectSummaryStats {
   active: number;
   completed: number;
   cancelledOrFailed: number;
+  paused: number;
 }
 
 export interface CreateAutoProjectPayload {
