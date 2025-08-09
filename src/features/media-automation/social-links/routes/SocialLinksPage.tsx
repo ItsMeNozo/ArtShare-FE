@@ -106,7 +106,8 @@ const SocialLinksPage = () => {
           <div className="flex flex-col space-y-2 px-4">
             {platformsMenu.map((platform) => {
               const isDisabled = platform !== 'Facebook';
-              const isSelected = selectedPlatform.toLowerCase() === platform.toLowerCase();
+              const isSelected =
+                selectedPlatform.toLowerCase() === platform.toLowerCase();
               return (
                 <button
                   key={platform}
