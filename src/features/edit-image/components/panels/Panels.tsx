@@ -8,13 +8,14 @@ import ArrangePanel from './ArrangePanel';
 import CropPanel from './CropPanel';
 import FilterPanel from './FilterPanel';
 import TextPanel from './TextPanel';
+import ShapePanel from './ShapePanel';
 
 type PanelsProp = {
   selectedLayerId: string;
   activePanel: string;
   layers: Layer[];
   setActivePanel: Dispatch<
-    SetStateAction<'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null>
+    SetStateAction<'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | 'shape' | null>
   >;
   updateSelectedLayer: (updates: Partial<ImageLayer>) => void;
   handleLayerXPosition: (newXPos: number) => void;
@@ -38,6 +39,12 @@ type PanelsProp = {
   handleChangeTextColor: (newColor: string) => void;
   handleLockLayer: (layerId: string) => void;
   addText: () => void;
+  addShape: (shapeType: 'square' | 'circle' | 'rect-horizontal' | 'rect-vertical') => void;
+  updateShape: (updates: Partial<ShapeLayer>) => void;
+  handleChangeShapeColor: (color: string) => void;
+  handleChangeShapeSize: (size: { width: number; height: number }) => void;
+  handleChangeShapeRotation: (rotation: number) => void;
+  handleChangeShapeOpacity: (opacity: number) => void;
 };
 
 const Panels: React.FC<PanelsProp> = ({
@@ -65,7 +72,12 @@ const Panels: React.FC<PanelsProp> = ({
   handleChangeFontSize,
   handleChangeFontFamily,
   handleChangeTextColor,
-  handleLockLayer
+  handleLockLayer,
+  addShape,
+  handleChangeShapeColor,
+  handleChangeShapeOpacity,
+  handleChangeShapeRotation,
+  handleChangeShapeSize
 }) => {
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
   const isNonTextLayer = selectedLayer?.type === 'image' || !selectedLayer;
@@ -190,6 +202,16 @@ const Panels: React.FC<PanelsProp> = ({
                   non-image layer.
                 </div>
               ))}
+            {activePanel === 'shape' &&
+              <ShapePanel
+                selectedLayer={selectedLayer as ShapeLayer}
+                addShape={addShape}
+                handleChangeShapeSize={handleChangeShapeSize}
+                handleChangeShapeColor={handleChangeShapeColor}
+                handleChangeShapeRotation={handleChangeShapeRotation}
+                handleChangeShapeOpacity={handleChangeShapeOpacity}
+              />
+            }
           </div>
         </div>
       )}

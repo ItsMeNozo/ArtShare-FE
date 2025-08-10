@@ -13,7 +13,7 @@ import LayerToolsBar from './components/tools/LayerToolsBar';
 
 //Icons
 import { HiOutlineAdjustmentsHorizontal } from 'react-icons/hi2';
-import { IoCrop } from 'react-icons/io5';
+import { IoCrop, IoShapesOutline } from 'react-icons/io5';
 import { RiText } from 'react-icons/ri';
 // import { IoShapesOutline } from "react-icons/io5";
 // import { PiDiamondsFourLight } from "react-icons/pi";
@@ -26,12 +26,21 @@ import { MdFlipToFront } from 'react-icons/md';
 import { useImageStyleHandlers } from './hooks/useImageStyleHandlers';
 import { useLayerTransformHandlers } from './hooks/useLayerTransformHandlers';
 import { useTextStyleHandlers } from './hooks/useTextStyleHandlers';
+import { useShapeStyleHandlers } from './hooks/useShapeStyleHandlers';
+import { designSamples } from './utils/constant';
 
 const EditImage: React.FC = () => {
   //Handle getting images
   const location = useLocation();
   const navigate = useNavigate();
-  const { imageUrl, name, canvas, editCanvas, color } = location.state || {};
+  const {
+    sampleId,
+    imageUrl,
+    name,
+    canvas = { width: 560, height: 560 },
+    editCanvas,
+    color = '#ffffff',
+  } = location.state || {};
 
   //Toolbar
   const [fullScreen, setFullScreen] = useState(false);
@@ -43,7 +52,7 @@ const EditImage: React.FC = () => {
   const [zIndex, setZIndex] = useState({ min: 1, max: 1 });
   const [zoomLevel, setZoomLevel] = useState(1);
   const [activePanel, setActivePanel] = useState<
-    'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | null
+    'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | 'shape' | null
   >(null);
   const [globalZIndex, setGlobalZIndex] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -114,9 +123,49 @@ const EditImage: React.FC = () => {
   }, [layers]);
 
   useEffect(() => {
+    if (sampleId && designSamples[sampleId]) {
+      const sample = designSamples[sampleId];
+      setCanvasSize(sample.canvas);
+      setFinalCanvasSize(sample.finalCanvas);
+      setLayers(sample.layers);
+      setNewDesign(null);
+    } else if (!location.state) {
+      // existing fallback if no state or sampleId
+      setCanvasSize(canvas || { width: 560, height: 560 });
+      setFinalCanvasSize(canvas || { width: 560, height: 560 });
+      setLayers([
+        {
+          type: 'image',
+          id: crypto.randomUUID(),
+          src: '',
+          zoom: 1,
+          opacity: 1,
+          flipH: false,
+          flipV: false,
+          x: 0,
+          y: 0,
+          width: canvas?.width || 560,
+          height: canvas?.height || 560,
+          rotation: 0,
+          brightness: 100,
+          contrast: 100,
+          saturation: 100,
+          hue: 0,
+          sepia: 0,
+          backgroundColor: color,
+          zIndex: 0,
+          isLocked: false,
+        },
+      ]);
+    }
+  }, [sampleId, canvas, color]);
+
+  useEffect(() => {
     if (!newDesign || !newDesign.canvas) return;
     hasAppendedInitialImage.current = false;
-    location.state.imageUrl = null;
+    if (location.state) {
+      location.state.imageUrl = null;
+    }
     setLayers([]);
     setSelectedLayerId(null);
     setEditingLayerId(null);
@@ -297,6 +346,7 @@ const EditImage: React.FC = () => {
     setSepia,
   });
 
+  //Text hooks
   const {
     addText,
     handleTextChange,
@@ -310,6 +360,21 @@ const EditImage: React.FC = () => {
     globalZIndex,
     setGlobalZIndex,
   });
+
+  const {
+    addShape,
+    updateShape,
+    handleChangeShapeColor,
+    handleChangeShapeSize,
+    handleChangeShapeRotation,
+    handleChangeShapeOpacity,
+  } = useShapeStyleHandlers({
+    layers,
+    setLayers,
+    selectedLayerId,
+    globalZIndex,
+    setGlobalZIndex,
+  })
 
   // Transform hooks
   const {
@@ -369,19 +434,20 @@ const EditImage: React.FC = () => {
   const renderToCanvas = (includeWatermark: boolean): Promise<void> => {
     return new Promise((resolve) => {
       if (!canvasRef.current) return resolve();
+
       const canvas = canvasRef.current;
       canvas.width = canvasSize.width;
       canvas.height = canvasSize.height;
       const ctx = canvas.getContext('2d');
       if (!ctx) return resolve();
 
+      // Clear and fill background
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Prepare layers
       const allLayers = [...layers];
-
-      // Add watermark as a layer if needed
       if (includeWatermark) {
         const watermarkLayer: ImageLayer = {
           id: 'watermark',
@@ -407,84 +473,91 @@ const EditImage: React.FC = () => {
         };
         allLayers.push(watermarkLayer);
       }
-      // Sort by zIndex
+
       const sortedLayers = allLayers.sort(
-        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0)
       );
+
+      const imageLayers = sortedLayers.filter((l) => l.type === 'image');
+      const textLayers = sortedLayers.filter((l) => l.type === 'text');
+
       const imagePromises: Promise<void>[] = [];
-      sortedLayers.forEach((layer) => {
-        if (layer.type === 'image') {
-          const promise = new Promise<void>((resolveImg) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.src = layer.src;
-            img.onload = () => {
-              const {
-                x,
-                y,
-                zoom,
-                rotation,
-                flipH,
-                flipV,
-                opacity,
-                brightness,
-                contrast,
-                saturation,
-                hue,
-                sepia,
-                width,
-                height,
-              } = layer;
-              const drawWidth = width ?? img.naturalWidth;
-              const drawHeight = height ?? img.naturalHeight;
-              ctx.save();
-              ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
-              ctx.rotate((rotation * Math.PI) / 180);
-              ctx.scale((flipH ? -1 : 1) * zoom, (flipV ? -1 : 1) * zoom);
-              ctx.globalAlpha = opacity;
-              ctx.filter = `
-              brightness(${brightness}%)
-              contrast(${contrast}%)
-              saturate(${saturation}%)
-              hue-rotate(${hue}deg)
-              sepia(${sepia}%)
-            `;
-              ctx.drawImage(
-                img,
-                -drawWidth / 2,
-                -drawHeight / 2,
-                drawWidth,
-                drawHeight,
-              );
-              ctx.restore();
-              resolveImg();
-            };
-            img.onerror = () => resolveImg();
-          });
-          imagePromises.push(promise);
-        } else if (layer.type === 'text') {
+
+      // Pass 1: Draw images
+      imageLayers.forEach((layer) => {
+        const promise = new Promise<void>((resolveImg) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = layer.src;
+          img.onload = () => {
+            const {
+              x, y, zoom, rotation, flipH, flipV, opacity,
+              brightness, contrast, saturation, hue, sepia, width, height
+            } = layer;
+
+            const drawWidth = width ?? img.naturalWidth;
+            const drawHeight = height ?? img.naturalHeight;
+
+            ctx.save();
+            ctx.translate(x + drawWidth / 2, y + drawHeight / 2);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.scale((flipH ? -1 : 1) * zoom, (flipV ? -1 : 1) * zoom);
+            ctx.globalAlpha = opacity;
+            ctx.filter = `
+            brightness(${brightness}%)
+            contrast(${contrast}%)
+            saturate(${saturation}%)
+            hue-rotate(${hue}deg)
+            sepia(${sepia}%)
+          `;
+            ctx.drawImage(
+              img,
+              -drawWidth / 2,
+              -drawHeight / 2,
+              drawWidth,
+              drawHeight
+            );
+            ctx.restore();
+            resolveImg();
+          };
+          img.onerror = () => resolveImg();
+        });
+        imagePromises.push(promise);
+      });
+
+      Promise.all(imagePromises).then(() => {
+        // Pass 2: Draw text
+        textLayers.forEach((layer) => {
           ctx.save();
-          ctx.translate(layer.x + layer.width / 2, layer.y);
+          ctx.filter = 'none'; // reset filters for text
+
+          const centerX = layer.x + (layer.width ?? 0) / 2;
+          const centerY = layer.y + (layer.height ?? layer.fontSize ?? 0) / 2;
+          ctx.translate(centerX, centerY);
+
           ctx.rotate(((layer.rotation || 0) * Math.PI) / 180);
           ctx.font = `${layer.fontSize}px ${layer.fontFamily || 'sans-serif'}`;
           ctx.fillStyle = layer.color;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.globalAlpha = layer.opacity ?? 1;
+
           ctx.fillText(layer.text, 0, 0);
           ctx.restore();
-        }
+        });
+
+        resolve();
       });
-      Promise.all(imagePromises).then(() => resolve());
     });
   };
 
-  const handleDownload = (
+
+  const handleDownload = async (
     format: 'png' | 'jpg',
     fileName: string,
     includeWaterMark: boolean,
   ) => {
-    renderToCanvas(includeWaterMark);
+    await renderToCanvas(includeWaterMark);
     setTimeout(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -497,35 +570,37 @@ const EditImage: React.FC = () => {
     }, 300);
   };
 
+  const canvasToFile = (canvas: HTMLCanvasElement): Promise<File | null> => {
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        if (!blob) return resolve(null);
+        resolve(new File([blob], 'canvas-output.png', { type: 'image/png' }));
+      }, 'image/png');
+    });
+  };
+
   const handleShare = async () => {
     await renderToCanvas(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const file = new File([blob], 'canvas-output.png', {
-        type: 'image/png',
-      });
-      navigate('/posts/new', {
-        state: {
-          fromEditorImage: file,
-        },
-      });
-    }, 'image/png');
+
+    const file = await canvasToFile(canvas);
+    if (!file) return;
+
+    navigate('/posts/new', { state: { fromEditorImage: file } });
   };
 
-  console.log('Layers:', layers);
-
+  console.log("layers", layers);
   return (
-    <div className="group relative flex h-full w-full flex-col">
+    <div className="group relative flex flex-col w-full h-full">
       {/* Floating Button */}
       <button
         aria-label="Collapse Color Picker"
         onClick={() => setFullScreen(!fullScreen)}
         className={`absolute top-0 left-1/2 z-50 flex h-10 w-10 -translate-x-1/2 items-center justify-center transition-all ${fullScreen ? '' : 'hidden'}`}
       >
-        <div className="relative -top-4 cursor-pointer rounded-full bg-white p-2 opacity-50 transition-all duration-300 ease-in-out hover:top-0 hover:opacity-100">
-          <ChevronDown className="text-mountain-950 size-5 transition-opacity duration-200" />
+        <div className="-top-4 hover:top-0 relative bg-white opacity-50 hover:opacity-100 p-2 rounded-full transition-all duration-300 ease-in-out cursor-pointer">
+          <ChevronDown className="size-5 text-mountain-950 transition-opacity duration-200" />
         </div>
       </button>
       <EditHeader
@@ -557,7 +632,7 @@ const EditImage: React.FC = () => {
           />
           <div
             onMouseDown={() => setSelectedLayerId(null)}
-            className="bg-mountain-200 relative flex h-full w-full items-center justify-center"
+            className="relative flex justify-center items-center bg-mountain-200 w-full h-full"
           >
             <div
               ref={imageContainerRef}
@@ -605,9 +680,9 @@ const EditImage: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="text-mountain-600 absolute bottom-2 left-2 flex h-8 w-24 items-center justify-center rounded-lg bg-white text-sm opacity-50">
+            <div className="bottom-2 left-2 absolute flex justify-center items-center bg-white opacity-50 rounded-lg w-24 h-8 text-mountain-600 text-sm">
               <span>
-                {finalCanvasSize.width} x {finalCanvasSize.height}
+                {finalCanvasSize?.width} x {finalCanvasSize?.height}
               </span>
             </div>
           </div>
@@ -639,6 +714,12 @@ const EditImage: React.FC = () => {
             handleChangeFontSize={handleChangeFontSize}
             handleChangeFontFamily={handleChangeFontFamily}
             handleChangeTextColor={handleChangeTextColor}
+            addShape={addShape}
+            updateShape={updateShape}
+            handleChangeShapeColor={handleChangeShapeColor}
+            handleChangeShapeSize={handleChangeShapeSize}
+            handleChangeShapeRotation={handleChangeShapeRotation}
+            handleChangeShapeOpacity={handleChangeShapeOpacity}
           />
           {/* Tools Bar */}
           <div
@@ -650,51 +731,56 @@ const EditImage: React.FC = () => {
                   prev === 'arrange' ? null : 'arrange',
                 )
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <MdFlipToFront className="text-mountain-600 size-6" />
+              <MdFlipToFront className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Arrange</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <IoCrop className="text-mountain-600 size-6" />
+              <IoCrop className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Crop</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
+              <HiOutlineAdjustmentsHorizontal className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Adjust</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <IoIosColorFilter className="text-mountain-600 size-6" />
+              <IoIosColorFilter className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Filter</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'text' ? null : 'text'))
               }
-              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
             >
-              <RiText className="text-mountain-600 size-6" />
+              <RiText className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Text</p>
             </div>
-            {/* <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
+            <div
+              onClick={() =>
+                setActivePanel((prev) => (prev === 'shape' ? null : 'shape'))
+              }
+              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 pointer-events-none select-none">
               <IoShapesOutline className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Shape</p>
             </div>
+            {/* 
             <div className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none">
               <PiDiamondsFourLight className="size-6 text-mountain-600" />
               <p className="text-mountain-600 text-xs">Element</p>

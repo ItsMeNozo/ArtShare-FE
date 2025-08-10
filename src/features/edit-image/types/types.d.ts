@@ -6,12 +6,13 @@ interface Canvas {
 type CanvasSize = { width: number; height: number };
 
 interface NewDesign {
-  ratio: string;
+  ratio?: string;
   canvas: CanvasSize;
   finalCanvas: CanvasSize;
+  layers: Layer[];
 }
 
-type LayerType = 'image' | 'text';
+type LayerType = 'image' | 'text' | 'shape';
 
 type BaseLayer = {
   id: string;
@@ -60,7 +61,16 @@ type TextLayer = BaseLayer & {
   opacity: number;
 };
 
-type Layer = ImageLayer | TextLayer;
+type ShapeLayer = BaseLayer & {
+  type: 'shape';
+  shapeType: ShapeType;
+  color: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  opacity: number;
+};
+
+type Layer = ImageLayer | TextLayer | ShapeLayer;
 
 type TextItem = {
   id: string;
