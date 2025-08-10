@@ -49,11 +49,11 @@ const SettingsPanel: React.FC<PanelProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-72 h-full shrink-0">
+    <div className="flex h-full w-72 shrink-0 flex-col">
       <div
-        aria-controls="panel2-content"
-        id="panel2-header"
-        className={`border-mountain-300 z-50 flex items-center justify-between border bg-white bg-gradient-to-r from-indigo-100 to-purple-100 p-4 hover:cursor-pointer ${isExpanded ? 'rounded-t-xl border-b-0' : 'rounded-xl'}`}
+        aria-controls="generation-options-content"
+        id="generation-options-header"
+        className={`border-mountain-300 z-50 flex items-center justify-between border bg-white bg-gradient-to-r from-indigo-100 to-purple-100 hover:cursor-pointer ${isExpanded ? 'rounded-t-xl border-b-0 p-4' : 'rounded-xl p-3'}`}
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <Typography
@@ -74,16 +74,17 @@ const SettingsPanel: React.FC<PanelProps> = ({
             timeout: 200,
           },
         }}
-        className={`flex ${isExpanded ? '' : 'hidden'} border-mountain-300 custom-scrollbar z-10 m-0 w-72 flex-col rounded-xl rounded-t-none border bg-white shadow-md ${isExpanded ? 'max-h-[calc(100vh)]' : 'h-fit'
-          } overflow-y-auto`}
+        className={`flex ${isExpanded ? '' : 'hidden'} border-mountain-300 custom-scrollbar z-10 m-0 w-72 flex-col rounded-xl rounded-t-none border bg-white shadow-md ${
+          isExpanded ? 'max-h-[calc(100vh)]' : 'h-fit'
+        } overflow-y-auto`}
       >
-        <AccordionDetails className="flex flex-col flex-1 p-0 min-h-0 overflow-y-auto">
+        <AccordionDetails className="flex min-h-0 flex-1 flex-col overflow-y-auto p-0">
           {/* Nested Accordions */}
           <Accordion className="shadow-none" defaultExpanded>
             <AccordionSummary
               expandIcon={<IoIosArrowDown />}
-              aria-controls="panel2-content"
-              id="panel2-header"
+              aria-controls="general-settings-content"
+              id="general-settings-header"
             >
               <Typography component="span" className="font-medium">
                 General Settings
@@ -106,22 +107,22 @@ const SettingsPanel: React.FC<PanelProps> = ({
           <Accordion className="shadow-none" defaultExpanded>
             <AccordionSummary
               expandIcon={<IoIosArrowDown />}
-              aria-controls="panel2-content"
-              id="panel2-header"
+              aria-controls="effects-content"
+              id="effects-header"
             >
               <Typography component="span" className="font-medium">
                 Effects
               </Typography>
             </AccordionSummary>
             <AccordionDetails className="flex flex-col space-y-1">
-              <div className="flex flex-col space-y-1 w-full">
+              <div className="flex w-full flex-col space-y-1">
                 <p className="text-mountain-600 text-sm">Lighting</p>
                 <LightingOptions
                   selectedLighting={lighting}
                   onChange={setLighting}
                 />
               </div>
-              <div className="flex flex-col space-y-1 w-full">
+              <div className="flex w-full flex-col space-y-1">
                 <p className="text-mountain-600 text-sm">Camera</p>
                 <CameraOptions selectedCamera={camera} onChange={setCamera} />
               </div>
@@ -130,8 +131,8 @@ const SettingsPanel: React.FC<PanelProps> = ({
           <Accordion className="shadow-none" defaultExpanded>
             <AccordionSummary
               expandIcon={<IoIosArrowDown />}
-              aria-controls="panel2-content"
-              id="panel2-header"
+              aria-controls="advance-settings-content"
+              id="advance-settings-header"
             >
               <Typography component="span" className="font-medium">
                 Advance Settings
@@ -141,7 +142,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
               <div className="flex flex-col space-y-1">
                 <p className="text-mountain-600 text-sm">Number of Images</p>
                 <ToggleButtonGroup
-                  className="flex justify-between gap-2 m-1.5"
+                  className="m-1.5 flex justify-between gap-2"
                   size="large"
                   value={numberOfImages}
                   exclusive
@@ -149,7 +150,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                 >
                   <ToggleButton
                     value={1}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
@@ -168,7 +169,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                   </ToggleButton>
                   <ToggleButton
                     value={2}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
@@ -187,7 +188,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                   </ToggleButton>
                   <ToggleButton
                     value={3}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
@@ -206,7 +207,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                   </ToggleButton>
                   <ToggleButton
                     value={4}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
