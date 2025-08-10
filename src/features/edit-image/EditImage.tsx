@@ -580,7 +580,7 @@ const EditImage: React.FC = () => {
   };
 
   const handleShare = async () => {
-    await renderToCanvas(false);
+    await renderToCanvas(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
 
