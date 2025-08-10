@@ -1,5 +1,10 @@
 import { lazy } from 'react';
-import { createBrowserRouter, Navigate, Outlet, RouteObject } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  RouteObject,
+} from 'react-router-dom';
 
 // Layouts & Wrappers
 import OnboardingRoute from '@/components/ProtectedItems/OnboardingRoute';
@@ -163,7 +168,7 @@ const routeConfig: RouteObject[] = [
           </RequireOnboard>
         ),
         children: [
-          { path: '/docs/:blogId', element: <MyWriting /> }, // ✅ FIXED: Comes after
+          { path: '/docs/:blogId', element: <MyWriting /> },
           { path: '/image/tool/editor', element: <ImageEditor /> },
           { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
           { path: '/image/tool/editor/new', element: <BrowseImage /> },
