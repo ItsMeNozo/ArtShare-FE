@@ -1,10 +1,16 @@
-import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import ZoomTool from "./Zoom";
-import { Tooltip } from "@mui/material";
-import { Lock, Plus } from "lucide-react";
-import Draggable from "react-draggable";
+import { Tooltip } from '@mui/material';
 import { Sketch } from '@uiw/react-color';
-import { IoLayersOutline } from "react-icons/io5";
+import { Lock, Plus } from 'lucide-react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import Draggable from 'react-draggable';
+import { IoLayersOutline } from 'react-icons/io5';
+import ZoomTool from './Zoom';
 
 interface LayerToolsBarProp {
   layers: Layer[];
@@ -92,7 +98,10 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(event.target as Node)
+      ) {
         setOpenColorSettings(false); // Close the color picker
       }
     }
@@ -109,16 +118,16 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
       <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full overflow-y-auto custom-scrollbar">
         <div className="flex flex-col space-y-2 pb-24">
           {/* Layers Header */}
-          <div className="flex justify-center items-center space-x-2 bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
+          <div className="border-mountain-400 text-mountain-800 flex h-10 items-center justify-center space-x-2 border-b-1 bg-white font-medium">
             <IoLayersOutline />
             <span>Layers</span>
           </div>
           <Tooltip title="Add Layer" arrow placement="right">
             <div
-              className="flex justify-center items-center p-2 py-0 border-mountain-400 w-full h-10 hover:cursor-pointer"
+              className="border-mountain-400 flex h-10 w-full items-center justify-center p-2 py-0 hover:cursor-pointer"
               onClick={() => document.getElementById('image-upload')?.click()}
             >
-              <div className="flex justify-center items-center border border-mountain-200 w-full h-full">
+              <div className="border-mountain-200 flex h-full w-full items-center justify-center border">
                 <Plus className="size-4" />
               </div>
               <input
@@ -136,21 +145,22 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
             .map((layer) => (
               <div
                 key={layer.id}
-                className="relative flex justify-center items-center px-2 rounded-sm w-full h-20 hover:cursor-pointer"
+                className="relative flex h-20 w-full items-center justify-center rounded-sm px-2 hover:cursor-pointer"
                 onClick={() => setSelectedLayerId(layer.id)}
               >
                 {layer.type === 'image' ? (
                   <img
                     src={layer.src}
-                    className={`rounded-sm w-full h-20 object-cover border-1 ${selectedLayerId === layer.id
-                      ? "border-indigo-400"
-                      : "border-mountain-200"
-                      }`}
+                    className={`h-20 w-full rounded-sm object-cover ${
+                      selectedLayerId === layer.id
+                        ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200'
+                        : 'border-mountain-200 border'
+                    }`}
                     alt="Layer Preview"
                   />
                 ) : (
                   <div
-                    className={`relative h-20 w-full overflow-hidden rounded border bg-white ${selectedLayerId === layer.id ? 'border-indigo-400' : 'border-mountain-200'}`}
+                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${selectedLayerId === layer.id ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border'}`}
                   >
                     {layer.type === 'text' && (
                       <div
@@ -159,14 +169,16 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                           fontSize: '12px',
                           color: layer.color,
                         }}
-                        className="top-1/2 left-1/2 flex-nowrap text-nowrap -translate-x-1/2 -translate-y-1/2"
+                        className="top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex-nowrap text-nowrap"
                       >
                         {layer.text || 'Text Layer'}
                       </div>
                     )}
                   </div>
                 )}
-                <div className={`${layer.isLocked ? '' : 'hidden'} right-2 bottom-1 z-50 absolute flex bg-mountain-950/50 p-2`}>
+                <div
+                  className={`${layer.isLocked ? '' : 'hidden'} bg-mountain-950/50 absolute right-2 bottom-1 z-50 flex p-2`}
+                >
                   <Lock className="size-3 text-white" />
                 </div>
               </div>
@@ -181,7 +193,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
               className="relative flex px-2"
             >
               <div
-                className={`text-mountain-600 flex h-12 w-full items-center justify-center border-2 text-sm italic hover:cursor-pointer ${selectedLayerId === layers[0].id ? 'border-indigo-400' : 'border-mountain-200'}`}
+                className={`text-mountain-600 flex h-12 w-full items-center justify-center text-sm italic hover:cursor-pointer ${selectedLayerId === layers[0].id ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border-2'}`}
                 style={{
                   backgroundColor:
                     layers[0].type === 'image'
@@ -189,18 +201,21 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                       : '#fffff',
                 }}
               />
-              <span className="top-1/2 left-1/2 absolute text-mountain-400 text-xs italic -translate-x-1/2 -translate-y-1/2">
+              <span className="text-mountain-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs italic">
                 Background
               </span>
             </div>
           </Tooltip>
           {openColorSettings && selectedLayerId === layers[0].id && (
             <Draggable handle=".drag-handle">
-              <div ref={pickerRef} className="z-50 absolute bg-white shadow-md rounded">
-                <div className="bg-mountain-100 px-3 py-1 rounded-t font-normal text-mountain-950 text-sm cursor-move drag-handle">
+              <div
+                ref={pickerRef}
+                className="absolute z-50 rounded bg-white shadow-md"
+              >
+                <div className="bg-mountain-100 text-mountain-950 drag-handle cursor-move rounded-t px-3 py-1 text-sm font-normal">
                   🎨 Color Picker
                 </div>
-                {layers[0].type === "image" && (
+                {layers[0].type === 'image' && (
                   <Sketch
                     color={(layers[0] as ImageLayer).backgroundColor}
                     onChange={(color) => {
