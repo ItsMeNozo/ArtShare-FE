@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Photo, RenderPhotoContext, RowsPhotoAlbum } from 'react-photo-album';
 import 'react-photo-album/rows.css';
 import useMeasure from 'react-use-measure';
@@ -20,7 +20,8 @@ export interface GalleryPhoto extends Photo {
 }
 
 interface IGalleryProps {
-  photos: GalleryPhoto[];
+  photoPages: GalleryPhoto[][];
+  allPhotosFlat: GalleryPhoto[];
   isLoading: boolean;
   isFetchingNextPage: boolean;
   isError: boolean;
@@ -34,7 +35,8 @@ interface IGalleryProps {
 }
 
 const IGallery: React.FC<IGalleryProps> = ({
-  photos,
+  photoPages,
+  allPhotosFlat,
   isLoading,
   isFetchingNextPage,
   isError,
@@ -43,13 +45,23 @@ const IGallery: React.FC<IGalleryProps> = ({
   hasNextPage,
   fetchNextPage,
 }) => {
-  const [ref, { width }] = useMeasure();
+  const [ref, { width }] = useMeasure({ debounce: 50 });
+
+  const [stableWidth, setStableWidth] = useState(0);
+
+  useEffect(() => {
+    const roundedWidth = Math.round(width);
+    if (roundedWidth > 0 && roundedWidth !== stableWidth) {
+      setStableWidth(roundedWidth);
+    }
+  }, [width, stableWidth]);
+
   const effectiveRenderPhoto = renderPhoto || ImageRenderer;
 
   return (
-    <div ref={ref} className="relative pb-20 overflow-auto custom-scrollbar">
+    <div ref={ref} className="custom-scrollbar relative overflow-auto">
       <InfiniteScroll
-        data={photos}
+        data={allPhotosFlat}
         isLoading={isLoading}
         isFetchingNextPage={isFetchingNextPage}
         isError={isError}
@@ -57,16 +69,20 @@ const IGallery: React.FC<IGalleryProps> = ({
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}
       >
-        {width > 0 && (
-          <RowsPhotoAlbum
-            defaultContainerWidth={width}
-            rowConstraints={{ singleRowMaxHeight: 256 }}
-            spacing={8}
-            targetRowHeight={256}
-            photos={photos}
-            render={{ image: effectiveRenderPhoto }}
-          />
-        )}
+        {stableWidth > 0 &&
+          photoPages.map((pagePhotos, index) => (
+            <div key={`page-${index}`} className="mb-2">
+              <RowsPhotoAlbum
+                key={`page-${index}`}
+                defaultContainerWidth={stableWidth}
+                rowConstraints={{ singleRowMaxHeight: 256 }}
+                spacing={8}
+                targetRowHeight={256}
+                photos={pagePhotos}
+                render={{ image: effectiveRenderPhoto }}
+              />
+            </div>
+          ))}
       </InfiniteScroll>
     </div>
   );

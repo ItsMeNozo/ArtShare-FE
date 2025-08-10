@@ -20,7 +20,7 @@ const CARD_MIN_WIDTH = 256;
 
 interface CollectionSliderProps {
   items: SliderItem[];
-  selectedId: SelectedCollectionId;
+  selectedId: SelectedCollectionId | null;
   loading: boolean;
   onSelect: (id: SelectedCollectionId) => void;
   onAdd: () => void;
@@ -43,7 +43,7 @@ const getSliderItemId = (item: SliderItem): string => {
 
 const renderSliderItem = (
   item: SliderItem,
-  selectedId: SelectedCollectionId,
+  selectedId: SelectedCollectionId | null,
   loadingCollections: boolean,
   onSelect: (id: SelectedCollectionId) => void,
   onAdd: () => void,

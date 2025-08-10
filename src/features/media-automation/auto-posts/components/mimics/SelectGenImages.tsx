@@ -6,26 +6,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@mui/material';
 import React from 'react';
 import { IoSparkles } from 'react-icons/io5';
-import { RiImageCircleAiFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import BrowseGenHistory from './BrowseGenHistory';
 
-const SelectAiImagesPanel: React.FC = () => {
+interface SelectAiImagesPanelProps {
+  children: React.ReactNode;
+}
+
+const SelectAiImagesPanel: React.FC<SelectAiImagesPanelProps> = ({
+  children,
+}) => {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="text"
-          component="label"
-          className="flex flex-col items-center shadow-sm mx-2 px-4 py-2 border border-mountain-200 rounded-md w-48 font-medium text-mountain-950 text-sm text-center cursor-pointer"
-        >
-          <RiImageCircleAiFill className="mb-2 size-6" />
-          <p>Browse Your Stock</p>
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         hideCloseButton
         className="z-50 flex flex-col gap-0 p-0 border-mountain-200 min-w-[90%] h-[95%]"

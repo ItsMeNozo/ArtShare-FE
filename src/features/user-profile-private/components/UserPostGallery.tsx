@@ -1,13 +1,14 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
 import React from 'react';
 
 import IGallery, { GalleryPhoto } from '@/components/gallery/Gallery';
 
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { RenderPhotoContext } from 'react-photo-album';
 import { UserPostRenderer, UserPostRendererOptions } from './UserPostRenderer';
 
 interface UserPostGalleryProps {
-  photos: GalleryPhoto[];
+  photoPages: GalleryPhoto[][];
+  allPhotosFlat: GalleryPhoto[];
   isLoading: boolean;
   isError: boolean;
   error: string | null;
@@ -17,7 +18,8 @@ interface UserPostGalleryProps {
 }
 
 export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
-  photos,
+  photoPages,
+  allPhotosFlat,
   isLoading,
   isError,
   error,
@@ -37,8 +39,7 @@ export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
     },
     [isOwner, onPostDeleted, username],
   );
-
-  if (isLoading) {
+  if (isLoading && allPhotosFlat.length === 0) {
     return (
       <Box
         sx={{
@@ -53,7 +54,7 @@ export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
     );
   }
 
-  if (isError) {
+  if (!isLoading && isError && allPhotosFlat.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography color="error">
@@ -63,7 +64,7 @@ export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
     );
   }
 
-  if (photos.length === 0) {
+  if (!isLoading && !isError && allPhotosFlat.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography color="text.secondary">No posts available.</Typography>
@@ -73,7 +74,8 @@ export const UserPostGallery: React.FC<UserPostGalleryProps> = ({
 
   return (
     <IGallery
-      photos={photos}
+      photoPages={photoPages}
+      allPhotosFlat={allPhotosFlat}
       isLoading={isLoading}
       isFetchingNextPage={false}
       isError={isError}

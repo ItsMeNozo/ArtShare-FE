@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { IoText } from "react-icons/io5";
 import Draggable from "react-draggable";
 import { Sketch } from "@uiw/react-color";
+import FontSelector from "../../mimics/FontSelector";
 
 type PanelsProp = {
   selectedLayer: TextLayer | undefined;
@@ -28,15 +29,14 @@ const TextPanel: React.FC<PanelsProp> = ({
         setSettingColor(false); // Close the color picker
       }
     }
-
     if (settingColor) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [settingColor]);
+
   return (
     <>
       <div
@@ -49,25 +49,10 @@ const TextPanel: React.FC<PanelsProp> = ({
         </Button>
       </div>
       <hr className="flex border-mountain-200 border-t-1 w-full" />
-      <div className="flex justify-between items-center w-full">
-        <p className="w-1/4 font-medium">Font</p>
-        <div className="relative flex justify-end w-3/4">
-          <select
-            id="font-family"
-            value={selectedLayer?.fontFamily || 'Arial'}
-            onChange={(e) => handleChangeFontFamily(e.target.value)}
-            className="p-2 border border-mountain-200 rounded-md outline-none text-sm"
-          >
-            <option value="Arial">Arial</option>
-            <option value="Helvetica">Helvetica</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Comic Sans MS">Comic Sans</option>
-          </select>
-        </div>
-      </div>
+      <FontSelector
+        selectedLayer={selectedLayer}
+        handleChangeFontFamily={handleChangeFontFamily}
+      />
       <div className="flex justify-between items-center w-full">
         <p className="w-1/2 font-medium">Text size</p>
         <div className="relative w-fit">

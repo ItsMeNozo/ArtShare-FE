@@ -1,9 +1,12 @@
-import { Box } from '@mui/material';
+import { useSnackbar } from '@/hooks/useSnackbar';
+import { Box, Button } from '@mui/material';
 import { Trash2, Upload } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { useEffect } from 'react';
+import { RiImageCircleAiFill } from 'react-icons/ri';
 import { MAX_IMAGE_COUNT } from '../../constants';
 import { ImageState } from '../../types';
+import AddMoreImagesButton from '../mimics/AddMoreImagesButton';
 import SelectAiImagesPanel from '../mimics/SelectGenImages';
 
 interface PostImagesEditorProps {
@@ -19,6 +22,8 @@ const PostImagesEditor = ({
   isInvalid = false,
   canEdit,
 }: PostImagesEditorProps) => {
+  const { showSnackbar } = useSnackbar();
+
   useEffect(() => {
     return () => {
       images.forEach((image) => {
@@ -32,7 +37,10 @@ const PostImagesEditor = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    console.log('Selected files:', files);
+    if (images.length + files.length > MAX_IMAGE_COUNT) {
+      showSnackbar('You can only upload up to 4 images', 'warning');
+      return;
+    }
     const availableSlots = MAX_IMAGE_COUNT - images.length;
     const validImages = files
       .filter((file) => file.type.startsWith('image/'))
@@ -120,7 +128,16 @@ const PostImagesEditor = ({
               <Upload />
               <p>Upload From Device</p>
             </label>
-            <SelectAiImagesPanel />
+            <SelectAiImagesPanel>
+              <Button
+                variant="text"
+                component="label"
+                className="border-mountain-200 text-mountain-950 mx-2 flex w-48 cursor-pointer flex-col items-center rounded-md border px-4 py-2 text-center text-sm font-medium shadow-sm"
+              >
+                <RiImageCircleAiFill className="mb-2 size-6" />
+                <p>Browse Your Stock</p>
+              </Button>
+            </SelectAiImagesPanel>
           </div>
         ) : (
           <div className="flex justify-center gap-4 p-2 w-full">
@@ -132,13 +149,17 @@ const PostImagesEditor = ({
               <Trash2 className="size-4" />
               <span>Clear All</span>
             </button>
-            <label
+            {/* <label
               htmlFor="imageUpload"
               className={`${images.length >= MAX_IMAGE_COUNT ? 'pointer-events-none opacity-50' : ''} hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex w-2/3 cursor-pointer items-center justify-center gap-2 rounded-md border bg-white px-4 py-2 text-center text-sm font-medium shadow-sm`}
             >
               <Upload />
               <span>Add More</span>
-            </label>
+            </label> */}
+            <AddMoreImagesButton
+              disabled={images.length >= MAX_IMAGE_COUNT}
+              onFileChange={handleFileChange}
+            />
           </div>
         ))}
       <input

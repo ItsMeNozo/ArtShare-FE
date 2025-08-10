@@ -1,47 +1,34 @@
 import { useUser } from '@/contexts/user';
 import { useGalleryPhotos } from '@/features/collection/hooks/useGalleryPhotos';
-import { Post } from '@/types';
-import { useEffect, useState } from 'react';
+import { useDeletePost } from '@/features/post/hooks/useDeletePost';
+import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchUserPosts } from '../api/get-posts-by-user';
+import { useGetUserPosts } from '../hooks/useGetUserPosts';
 import { UserPostGallery } from './UserPostGallery';
 
 const UserPosts = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-
   const { username } = useParams<{ username: string }>();
   const { user } = useUser();
 
-  const { galleryPhotos, isProcessing, processingError } =
-    useGalleryPhotos(posts);
+  const {
+    data: posts = [],
+    isLoading: loadingPosts,
+    error: fetchError,
+  } = useGetUserPosts(username);
 
-  useEffect(() => {
-    if (!username) {
-      setLoadingPosts(false);
-      return;
-    }
+  const { mutate: deletePost } = useDeletePost({
+    username: username,
+    onError: (errorMessage) => {
+      console.error(errorMessage);
+    },
+  });
 
-    const loadUserPosts = async () => {
-      try {
-        setLoadingPosts(true);
-        setFetchError(null);
-        const userPosts = await fetchUserPosts(username, 1);
-        setPosts(userPosts);
-      } catch (err) {
-        console.error('Error fetching user posts:', err);
-        setFetchError('Failed to fetch user posts.');
-      } finally {
-        setLoadingPosts(false);
-      }
-    };
-
-    loadUserPosts();
-  }, [username]);
+  const pages = useMemo(() => (posts ? [{ data: posts }] : []), [posts]);
+  const { photoPages, isProcessing, processingError } = useGalleryPhotos(pages, username);
+  const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
   const handlePostDeleted = (postId: number) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    deletePost(postId);
   };
 
   if (!username) {
@@ -49,14 +36,15 @@ const UserPosts = () => {
   }
 
   const isOwner = user?.username === username;
-
-  const isLoading = loadingPosts || isProcessing;
+  const isLoading =
+    loadingPosts || (isProcessing && allPhotosFlat.length === 0);
   const isError = !!fetchError || !!processingError;
-  const error = fetchError || processingError;
+  const error = (fetchError?.message || processingError) as string | null;
 
   return (
     <UserPostGallery
-      photos={galleryPhotos}
+      photoPages={photoPages}
+      allPhotosFlat={allPhotosFlat}
       isLoading={isLoading}
       isError={isError}
       error={error}

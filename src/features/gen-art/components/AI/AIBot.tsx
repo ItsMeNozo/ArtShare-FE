@@ -36,15 +36,22 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
   ];
 
   const handleGenerate = async () => {
-    if (!userPrompt.trim() || isLoading) return;
+    const trimmedPrompt = userPrompt.trim();
+    if (!trimmedPrompt || isLoading) return;
+
+    // Optimistically clear the input field
+    setUserPrompt('');
+    setPromptExpanded(false);
 
     try {
-      await sendMessage(userPrompt);
-      setUserPrompt('');
-      setPromptExpanded(false);
+      await sendMessage(trimmedPrompt);
+      // The message was sent successfully, nothing more to do here.
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      // If sending fails, show an error and restore the user's original prompt
       showSnackbar('Failed to send message', 'error');
+      setUserPrompt(trimmedPrompt); // Restore the prompt
+      setPromptExpanded(true); // Re-expand the input area
     }
   };
 
@@ -68,6 +75,7 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
     try {
       await navigator.clipboard.writeText(prompt);
       showSnackbar('Prompt copied to clipboard!', 'success');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       showSnackbar('Failed to copy prompt', 'error');
     }
@@ -119,7 +127,7 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
               clearChat();
               showSnackbar('Started new chat');
             }}
-            className='flex bg-indigo-50 hover:bg-indigo-100 text-indigo-950 cursor-pointer'
+            className="flex bg-indigo-50 hover:bg-indigo-100 text-indigo-950 cursor-pointer"
           >
             <RiChatNewLine />
             <p>New Chat</p>
@@ -165,8 +173,8 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
                   >
                     <div
                       className={`max-w-[70%] rounded-xl p-4 ${message.role === 'USER'
-                        ? 'text-mountain-50 bg-indigo-600'
-                        : 'bg-mountain-100'
+                          ? 'text-mountain-50 bg-indigo-600'
+                          : 'bg-mountain-100'
                         }`}
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
@@ -175,7 +183,7 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
                         message.generatedPrompts && (
                           <div className="space-y-2">
                             <p className="mb-2 text-mountain-500 text-xs">
-                              Click any prompt to copy:
+                              Click to use this prompt
                             </p>
                             {message.generatedPrompts.map((prompt, index) => (
                               <div
@@ -183,12 +191,7 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
                                 onClick={() => handlePromptClick(prompt)}
                                 className="group bg-white hover:shadow-md p-3 border border-mountain-200 hover:border-indigo-400 rounded-lg transition-all cursor-pointer"
                               >
-                                <div className="flex justify-between items-center">
-                                  <span className="opacity-0 group-hover:opacity-100 text-mountain-400 text-xs transition-opacity">
-                                    📋 Copy
-                                  </span>
-                                </div>
-                                <p className="mt-1 text-mountain-700 text-sm">
+                                <p className="text-mountain-700 text-sm">
                                   {prompt}
                                 </p>
                               </div>
@@ -235,8 +238,8 @@ const AIBotPopover: React.FC<AIBotProps> = ({ setCustomUserPrompt }) => {
                 onClick={handleGenerate}
                 disabled={isLoading || !userPrompt.trim()}
                 className={`absolute right-4 -bottom-2 flex -translate-y-1/2 items-center px-4 ${isLoading || !userPrompt.trim()
-                  ? 'bg-mountain-200 text-mountain-950 cursor-not-allowed'
-                  : 'bg-indigo-400 hover:cursor-pointer hover:bg-indigo-300'
+                    ? 'bg-mountain-200 text-mountain-950 cursor-not-allowed'
+                    : 'bg-indigo-400 hover:cursor-pointer hover:bg-indigo-300'
                   }`}
               >
                 {isLoading ? (

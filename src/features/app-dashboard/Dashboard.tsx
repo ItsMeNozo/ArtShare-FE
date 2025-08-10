@@ -35,9 +35,9 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex space-x-4">
-            <div className="flex justify-center items-center space-x-2 bg-mountain-950 hover:brightness-105 p-4 rounded-xl w-40 text-white hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
+            <Link to="updates" className="flex justify-center items-center space-x-2 bg-mountain-950 hover:brightness-105 p-4 rounded-xl w-40 text-white hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
               <p className="font-bold select-none">Version 1.52</p>
-            </div>
+            </Link>
             <Link to="updates" className="flex justify-center items-center space-x-2 bg-gradient-to-r from-indigo-100 to-purple-50 hover:brightness-105 p-4 border border-mountain-200 rounded-xl w-40 text-mountain-950 hover:scale-105 transition duration-300 ease-in-out hover:cursor-pointer">
               <IoNewspaperOutline />
               <p className="font-thin select-none">What's new</p>

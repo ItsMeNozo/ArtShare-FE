@@ -26,7 +26,7 @@ export const InfiniteScroll = ({
 }: InfiniteScrollProps) => {
   const { ref, inView } = useInView({
     threshold: 0, // Trigger as soon as 1px of the element is visible
-    rootMargin: '400px', // Start fetching 400px *before* the user reaches the end
+    rootMargin: '800px', // Start fetching 800px *before* the user reaches the end
     // Tell the hook to completely ignore intersection events while we are fetching.
     // This is the key to breaking the rapid-fire loop.
     skip: isFetchingNextPage,
@@ -60,7 +60,7 @@ export const InfiniteScroll = ({
     >
       {children}
 
-      {data.length === 0 && (
+      {data.length === 0 && !isFetchingNextPage && (
         <p className="text-mountain-500 dark:text-mountain-400 text-center">
           No results found.
         </p>
@@ -86,7 +86,7 @@ export const InfiniteScroll = ({
         </Box>
       )}
 
-      {!isLoading && !hasNextPage && data.length > 0 && (
+      {!isLoading && !isFetchingNextPage && !hasNextPage && data.length > 0 && (
         <Box className="my-2 text-right text-lg">
           <Typography variant="body2" color="text.secondary">
             🎉 You have reached the end.
