@@ -315,27 +315,24 @@ const GenImage: React.FC<GenImageProps> = ({
   return (
     <Dialog open={openDiaLog} onOpenChange={setOpenDiaLog}>
       <DialogTrigger asChild>
-        <div className="group relative inline-flex overflow-hidden">
-          <div className="relative">
+        <div className="group relative flex h-full min-h-0 w-full min-w-0 items-center justify-center overflow-hidden">
+          <div className="group relative">
             <img
               src={result.imageUrls[index]}
               alt={`Image ${result.id}`}
               loading="lazy"
-              className="block cursor-pointer shadow-md"
+              className="max-h-full max-w-full cursor-pointer object-contain shadow-md"
               style={{
                 borderRadius: '8px',
-                maxWidth: '100%',
-                height: 'auto',
-                display: 'block',
+                aspectRatio: 'auto',
               }}
               onClick={() => {
-                setCurrentIndex(index);
-                setOpenDiaLog(true);
+                setCurrentIndex(index), setOpenDiaLog(true);
               }}
             />
-            {deleteImage && (
+            {deleteImage === true && (
               <div
-                className="absolute inset-0 flex items-center justify-center bg-black/20"
+                className={`absolute inset-0 flex items-center justify-center bg-black/20`}
                 style={{ borderRadius: '8px' }}
               >
                 <div className="flex h-fit flex-col space-y-2 rounded-lg bg-white p-2">
@@ -343,9 +340,9 @@ const GenImage: React.FC<GenImageProps> = ({
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
-                        className="bg-mountain-100"
+                        className={`bg-mountain-100`}
                         onClick={(e) => {
-                          e.stopPropagation();
+                          e.stopPropagation(); // Prevent opening dialog
                           handleDelete();
                         }}
                       >
@@ -371,23 +368,25 @@ const GenImage: React.FC<GenImageProps> = ({
               </div>
             )}
             {useToShare ? (
-              <div className="absolute bottom-2 left-2">
-                <Tooltip title="Click to share this">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleNavigateToUpload(result);
-                    }}
-                    className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
-                  >
-                    <Check className="text-mountain-600 mr-1 size-4" />
-                    <p>Share This</p>
-                  </div>
-                </Tooltip>
-              </div>
+              <>
+                <div className="absolute bottom-2 left-2 flex">
+                  <Tooltip title="Click to share this">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigateToUpload(result);
+                      }}
+                      className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    >
+                      <Check className="text-mountain-600 mr-1 size-4" />
+                      <p>Share This</p>
+                    </div>
+                  </Tooltip>
+                </div>
+              </>
             ) : (
               <>
-                <div className="absolute bottom-2 left-2">
+                <div className="absolute bottom-2 left-2 flex">
                   <div
                     onClick={(e) => {
                       e.preventDefault();
@@ -409,7 +408,7 @@ const GenImage: React.FC<GenImageProps> = ({
                   <Tooltip title="Edit">
                     <div
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent opening dialog
                         handleNavigateToEdit();
                       }}
                       className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
@@ -420,7 +419,7 @@ const GenImage: React.FC<GenImageProps> = ({
                   <Tooltip title="Delete">
                     <div
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); // Prevent opening dialog
                         setDeleteImage(true);
                       }}
                       className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
