@@ -121,7 +121,7 @@ const LayerItem = React.memo(
                     opacity: layer.opacity,
                   }}
                 />
-              ) : (layer.type === "text" && editingLayerId === layer.id) ? (
+              ) : (layer.type === "text") ? (
                 <div
                   onDoubleClick={() => setEditingLayerId(layer.id)}
                   style={{
