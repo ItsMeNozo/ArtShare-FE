@@ -10,9 +10,8 @@ const Login = () => {
   const {
     loginWithEmail,
     authenWithGoogle,
-    // signUpWithFacebook,
-    user,
-    loading,
+    isAuthenticated,
+    isOnboard,
   } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,14 +23,9 @@ const Login = () => {
 
   // Navigate when user state changes after successful login
   useEffect(() => {
-    if (user && !loading) {
-      if (!user.isOnboard) {
-        navigate('/onboarding');
-      } else {
-        navigate('/explore');
-      }
-    }
-  }, [user, loading, navigate]);
+    if (isAuthenticated && isOnboard) navigate('/onboarding');
+    if (isAuthenticated) navigate('/explore');
+  }, [isAuthenticated, isOnboard, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

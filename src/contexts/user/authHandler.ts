@@ -11,13 +11,15 @@ import {
   LOADING_DELAY_MS,
 } from './constants';
 import { AuthFlags } from './types';
+import { QueryClient } from '@tanstack/react-query';
 
 export const handleFirebaseUserAuth = async (
   firebaseUser: FirebaseUser,
   flags: AuthFlags,
-  setUser: (user: User | null) => void,
+  setIsAuthenticated: (authenticated: boolean) => void,
   setError: (error: string | null) => void,
   setLoading: (loading: boolean) => void,
+  queryClient: QueryClient,
 ) => {
   console.log(
     '🔐 UserProvider: Firebase user detected, fetching backend token',
@@ -45,13 +47,15 @@ export const handleFirebaseUserAuth = async (
         `Bearer ${tokenAfterExternalLogin}`;
 
       try {
-        const data = await getUserProfile();
-        setUser(data);
+        // const data = await getUserProfile();
+        // setUser(data);
+        await queryClient.fetchQuery<User, Error>({
+          queryKey: ['userProfile'],
+          queryFn: getUserProfile,
+        });
+        setIsAuthenticated(true);
         flags.authenticatedInSessionRef.current = true; // Mark as authenticated in this session
-        console.log(
-          '🔐 UserProvider: User profile set successfully from external login token:',
-          data.username,
-        );
+      
         // Clear the external login flag after successful profile fetch
         flags.externalLoginInProgressRef.current = false;
         console.log(
@@ -106,8 +110,7 @@ export const handleFirebaseUserAuth = async (
     // Still validate the token periodically, but don't fetch a new one
     try {
       api.defaults.headers.common['Authorization'] = `Bearer ${existingToken}`;
-      const data = await getUserProfile();
-      setUser(data);
+      setIsAuthenticated(true);
       console.log(
         '🔐 UserProvider: Session token still valid, user profile loaded',
       );
@@ -142,11 +145,13 @@ export const handleFirebaseUserAuth = async (
       console.log(
         '🔐 UserProvider: Attempting to fetch user profile with existing token',
       );
-      const data = await getUserProfile();
-      setUser(data);
+      await queryClient.fetchQuery<User, Error>({
+        queryKey: ['userProfile'],
+        queryFn: getUserProfile,
+      });
+      setIsAuthenticated(true);
       console.log(
         '🔐 UserProvider: User profile set successfully from existing token:',
-        data.username,
       );
       flags.authenticatedInSessionRef.current = true; // Mark as authenticated in this session
       console.log('🔐 UserProvider: Existing token is valid, stopping here');
@@ -174,6 +179,7 @@ export const handleFirebaseUserAuth = async (
         console.log('🔐 UserProvider: Token is actually invalid, clearing it');
         localStorage.removeItem('accessToken');
         delete api.defaults.headers.common['Authorization'];
+        queryClient.resetQueries();
         // Continue to get new token since this one is definitely invalid
       } else {
         console.log(
@@ -181,7 +187,7 @@ export const handleFirebaseUserAuth = async (
         );
         // For temporary errors (network issues, 500 errors), don't fetch a new token
         // Just set the user to null and keep the existing token for future retries
-        setUser(null);
+        setIsAuthenticated(false);
         console.log(
           '🔐 UserProvider: Keeping existing token due to temporary error, stopping here',
         );
@@ -260,13 +266,12 @@ export const handleFirebaseUserAuth = async (
     );
 
     console.log('🔐 UserProvider: Fetching user profile');
-    const data = await getUserProfile();
-    setUser(data);
+    await queryClient.fetchQuery<User, Error>({
+      queryKey: ['userProfile'],
+      queryFn: getUserProfile,
+    });
+    setIsAuthenticated(true);
     flags.authenticatedInSessionRef.current = true; // Mark as authenticated in this session
-    console.log(
-      '🔐 UserProvider: User profile set successfully:',
-      data.username,
-    );
   } catch (err) {
     console.error('🔐 UserProvider: Error retrieving user token:', err);
 
@@ -280,8 +285,11 @@ export const handleFirebaseUserAuth = async (
       console.log('🔐 UserProvider: Auth not ready, retrying in 1000ms');
       setTimeout(async () => {
         try {
-          const data = await getUserProfile();
-          setUser(data);
+          await queryClient.fetchQuery<User, Error>({
+            queryKey: ['userProfile'],
+            queryFn: getUserProfile,
+          });
+          setIsAuthenticated(true);
           console.log('🔐 UserProvider: Retry successful');
         } catch (retryErr) {
           console.error('🔐 UserProvider: Retry failed:', retryErr);
@@ -299,8 +307,9 @@ export const handleFirebaseUserAuth = async (
 
 export const handleNoFirebaseUser = async (
   flags: AuthFlags,
-  setUser: (user: User | null) => void,
+  setIsAuthenticated: (authenticated: boolean) => void,
   setLoading: (loading: boolean) => void,
+  queryClient: QueryClient,
 ) => {
   console.log('🔐 UserProvider: No Firebase user detected');
 
@@ -310,7 +319,7 @@ export const handleNoFirebaseUser = async (
     console.log(
       '🔐 UserProvider: Explicit logout detected, clearing state immediately',
     );
-    setUser(null);
+    setIsAuthenticated(false);
     flags.authenticatedInSessionRef.current = false;
     delete api.defaults.headers.common['Authorization'];
     localStorage.removeItem('accessToken');
@@ -333,8 +342,13 @@ export const handleNoFirebaseUser = async (
         // Try to validate the existing token before clearing it
         api.defaults.headers.common['Authorization'] =
           `Bearer ${existingToken}`;
-        const data = await getUserProfile();
-        setUser(data);
+        // const data = await getUserProfile();
+        // setUser(data);
+        await queryClient.fetchQuery<User, Error>({
+          queryKey: ['userProfile'],
+          queryFn: getUserProfile,
+        });
+        setIsAuthenticated(true);
         console.log(
           '🔐 UserProvider: Existing token is still valid, keeping user logged in',
         );
@@ -361,7 +375,7 @@ export const handleNoFirebaseUser = async (
           console.log(
             '🔐 UserProvider: Firebase auth state still null after delay, confirming logout',
           );
-          setUser(null);
+          setIsAuthenticated(false);
           flags.authenticatedInSessionRef.current = false;
           delete api.defaults.headers.common['Authorization'];
           localStorage.removeItem('accessToken');
@@ -386,7 +400,7 @@ export const handleNoFirebaseUser = async (
   }
 
   console.log('🔐 UserProvider: Clearing user state and tokens');
-  setUser(null);
+  setIsAuthenticated(false);
   flags.authenticatedInSessionRef.current = false; // Reset authentication flag
   // Clear authorization header when user logs out
   delete api.defaults.headers.common['Authorization'];

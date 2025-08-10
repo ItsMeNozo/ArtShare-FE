@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { updateUserProfile } from '../api/user-profile.api';
 
 export const EditProfileForm: React.FC<{
-  initialData: UserProfile;
+  initialData: User;
   newAvatarFile: File | null;
   onSaveSuccess: () => void;
 }> = ({ initialData, newAvatarFile, onSaveSuccess }) => {
@@ -34,7 +34,7 @@ export const EditProfileForm: React.FC<{
     formState: { errors, isSubmitting, isDirty: formIsDirty },
     reset,
     watch,
-  } = useForm<UserProfile>({
+  } = useForm<User>({
     defaultValues: {
       ...initialData,
       birthday: initialData.birthday ? initialData.birthday.slice(0, 10) : '',

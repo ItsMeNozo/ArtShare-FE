@@ -20,16 +20,16 @@ import TrendingPrompt from "./AI/TrendingPrompt";
 import UserButton from "../../../components/header/user-button";
 
 //Context
-import { useUser } from '@/contexts/user/useUser';
 import UserInAppConfigs from "@/components/popovers/UserInAppConfigs";
 import { Book } from "lucide-react";
+import { useUserProfile } from "@/features/user-profile-private/hooks/useUserProfile";
 
 type AIHeaderProps = {
   onGuideClick: () => void;
 };
 
 const AIHeader = ({ onGuideClick }: AIHeaderProps) => {
-  const { user, loading } = useUser();
+  const { data: user, isLoading: loading } = useUserProfile();
   const [open, setOpen] = useState(false);
 
   const handleOpenModal = () => {

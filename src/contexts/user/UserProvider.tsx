@@ -14,10 +14,12 @@ import {
   signUpWithFacebook as signUpWithFacebookAuth,
 } from './socialAuth';
 import { AuthFlags } from './types';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [logoutInProgress, setLogoutInProgress] = useState<boolean>(false);
 
@@ -26,6 +28,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const externalLoginInProgressRef = useRef<boolean>(false);
   const authStateInitializedRef = useRef<boolean>(false);
   const authenticatedInSessionRef = useRef<boolean>(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     console.log('🔐 UserProvider: Setting up auth listener');
@@ -55,12 +58,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           await handleFirebaseUserAuth(
             firebaseUser,
             flags,
-            setUser,
+            setIsAuthenticated,
             setError,
             setLoading,
+            queryClient,
           );
         } else {
-          await handleNoFirebaseUser(flags, setUser, setLoading);
+          await handleNoFirebaseUser(flags, setIsAuthenticated, setLoading, queryClient);
         }
 
         setLoading(false);
@@ -109,14 +113,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       );
     } finally {
       setLogoutInProgress(false);
+      setIsAuthenticated(false);
+      queryClient.resetQueries();
     }
   };
+
+  const cachedUser = queryClient.getQueryData<User>(['userProfile']);
 
   const value = useMemo(
     () => ({
       user: logoutInProgress ? null : user,
-      isAuthenticated: logoutInProgress ? false : !!user,
-      isOnboard: logoutInProgress ? false : (user?.isOnboard ?? false),
+      // isAuthenticated: logoutInProgress ? false : !!user,
+      isOnboard: logoutInProgress ? false : (cachedUser?.isOnboard ?? false),
       error,
       loading,
       loginWithEmail, // Assuming these are memoized with useCallback
@@ -127,8 +135,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       loginWithFacebook: signUpWithFacebook,
       setUser,
       setError,
+      isAuthenticated,
+      setIsAuthenticated,
     }),
-    [user, error, loading, logoutInProgress],
+    [user, error, loading, logoutInProgress, isAuthenticated],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

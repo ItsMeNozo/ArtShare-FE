@@ -29,9 +29,11 @@ import { FaRegCircleUser } from 'react-icons/fa6';
 import { LuSettings } from 'react-icons/lu';
 import { TbChessQueen } from 'react-icons/tb';
 import { Link, useNavigate } from 'react-router-dom';
+import { useUserProfile } from '@/features/user-profile-private/hooks/useUserProfile';
 
 const UserInAppConfigs = () => {
-  const { user, loading, logout } = useUser();
+  const { data: user, isLoading: loading } = useUserProfile();
+  const { logout } = useUser()
   const [open, setOpen] = useState(false);
   const { toggleTheme } = useTheme();
   const navigate = useNavigate();
