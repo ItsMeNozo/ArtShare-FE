@@ -106,8 +106,8 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
 
   return (
     <div className="z-50 relative flex h-full">
-      <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full">
-        <div className="flex flex-col space-y-2">
+      <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col space-y-2 pb-24">
           {/* Layers Header */}
           <div className="flex justify-center items-center space-x-2 bg-white border-mountain-400 border-b-1 h-10 font-medium text-mountain-800">
             <IoLayersOutline />

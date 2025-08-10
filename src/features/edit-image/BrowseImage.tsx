@@ -20,11 +20,13 @@ import {
   Square,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { BsCardImage } from 'react-icons/bs';
-import { MdAspectRatio, MdOutlinePhotoSizeSelectActual } from 'react-icons/md';
+import { MdAspectRatio, MdOutlineFileUpload, MdOutlinePhotoSizeSelectActual } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import EditHeader from './components/EditHeader';
 import SelectAiImagesPanel from './components/dialog';
+import { PiStarFourFill } from 'react-icons/pi';
+
+const sample_1 = "https://res.cloudinary.com/dqxtf297o/image/upload/v1754810122/artshare-asset/design-sample/sample-1/Screenshot_2025-08-10_141500_h3icjl.png"
 
 const BrowseImage = () => {
   const navigate = useNavigate();
@@ -109,6 +111,35 @@ const BrowseImage = () => {
     }
   };
 
+  const handleNewBlankDesign = () => {
+    navigate('/image/tool/editor', {
+      state: {
+        imageUrl: '',
+        name: '',
+        ratio: selectedRatio.value,
+        canvas: {
+          width: selectedCanvasSize.width,
+          height: selectedCanvasSize.height,
+        },
+        editCanvas: editCanvas,
+        color: color,
+      },
+    });
+  }
+
+  const handleLoadDesignSample = (sampleId: string) => {
+    const size = smallCanvasByRatio['3:4'];
+    navigate('/image/tool/editor', {
+      state: {
+        sampleId,
+        ratio: '3:4',
+        canvas: { width: 768, height: 1024 },
+        editCanvas: size,
+        color,
+      },
+    });
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -130,131 +161,157 @@ const BrowseImage = () => {
     <div className="group relative flex flex-col w-full h-full">
       <EditHeader />
       <div
-        className={`flex h-[calc(100vh-4rem)] w-full items-center justify-center overflow-hidden p-4`}
+        className={`flex h-[calc(100vh-4rem)] w-full items-center justify-center overflow-hidden`}
         data-testid="image-editor"
       >
         <div
-          className={`bg-mountain-100 border-mountain-200 flex h-full w-full items-center justify-center space-x-8 overflow-y-hidden rounded-lg border`}
+          className={`bg-mountain-100 pb-0 flex h-full w-full space-x-8 overflow-y-hidden`}
         >
-          <div className="relative flex justify-center items-center bg-gradient-to-b from-white via-indigo-100 to-purple-100 shadow-md w-96 h-96 cursor-pointer">
-            <BsCardImage className="w-20 h-20 font-bold text-mountain-600" />
-          </div>
-          <div className="flex flex-col justify-between gap-4 w-96 h-96">
-            <Label className="flex justify-center items-center bg-mountain-950 hover:bg-mountain-900 shadow-md p-4 border-1 border-mountain-200 rounded-full w-full h-16 cursor-pointer">
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                hidden
-                onChange={handleFileChange}
-              />
-              <Plus className="size-6 text-white" />
-              <Typography variant="body1" className="text-white text-sm">
-                Open Image
-              </Typography>
-            </Label>
-            <SelectAiImagesPanel />
-            <div className="flex flex-col flex-1 justify-center gap-4 bg-white shadow p-4 border border-gray-300 rounded-lg w-full h-full font-normal text-gray-700">
-              {/* Select Aspect Ratio */}
-              <div className="flex justify-between items-center w-full">
-                <p className="flex items-center space-x-2">
-                  <MdAspectRatio />
-                  <span>Aspect Ratio</span>
-                </p>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
-                    >
-                      {selectedRatio.label}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="border-mountain-200 w-48">
-                    {canvasSizeOptions.map((ratio) => {
-                      const Icon = ratio.icon;
-                      return (
-                        <DropdownMenuItem
-                          key={ratio.value}
-                          onClick={() => {
-                            setSelectedRatio(ratio);
-                            setSelectedCanvasSize(ratio.sizes[1]);
-                          }}
-                          className="flex items-center space-x-2"
-                        >
-                          {Icon && (
-                            <Icon className="size-4 text-muted-foreground" />
-                          )}
-                          <span>{ratio.label}</span>
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+          <div className='flex justify-center items-center w-1/2 h-full'>
+            <div className="flex flex-col justify-between gap-4 w-108 h-96">
+              <div
+                onClick={handleNewBlankDesign}
+                className="flex justify-center items-center bg-gradient-to-r from-indigo-100 to-purple-100 shadow-md p-4 border border-mountain-200 rounded-full w-full h-16 text-mountain-950 cursor-pointer"
+              >
+                <Plus className="size-6" />
+                <Typography variant="body1" className="ml-2 text-sm">
+                  New Blank Design
+                </Typography>
               </div>
-              {/* Select Canvas Size */}
-              <div className="flex justify-between items-center w-full">
-                <p className="flex items-center space-x-2">
-                  <MdOutlinePhotoSizeSelectActual />
-                  <span>Canvas Size</span>
-                </p>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
-                    >
-                      {selectedCanvasSize.label}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="border-mountain-200 w-48">
-                    {selectedRatio.sizes.map((size) => (
-                      <DropdownMenuItem
-                        key={size.label}
-                        onClick={() => setSelectedCanvasSize(size)}
+              <div className='flex gap-2'>
+                <Label className="flex justify-center items-center bg-mountain-950 hover:bg-mountain-900 shadow-md p-4 border-1 border-mountain-200 rounded-full w-full h-16 cursor-pointer">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    hidden
+                    onChange={handleFileChange}
+                  />
+                  <MdOutlineFileUpload className="size-6 text-white" />
+                  <Typography variant="body1" className="text-white text-sm">
+                    Upload From Device
+                  </Typography>
+                </Label>
+                <SelectAiImagesPanel />
+              </div>
+              <div className="flex flex-col flex-1 justify-center gap-4 bg-white shadow p-4 border border-gray-300 rounded-lg w-full h-full font-normal text-gray-700">
+                {/* Select Aspect Ratio */}
+                <div className="flex justify-between items-center w-full">
+                  <p className="flex items-center space-x-2">
+                    <MdAspectRatio />
+                    <span>Aspect Ratio</span>
+                  </p>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
                       >
-                        {size.label}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <div className="flex justify-between items-center w-full">
-                <p>Background Color</p>
-                <Popover
-                  open={openColorSettings}
-                  onOpenChange={setOpenColorSettings}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
-                    >
-                      <div
-                        className="shadow-md border border-mountain-200 rounded w-6 h-6"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="ml-2">{color.replace('#', '')}</span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="ml-4 p-2 border-mountain-200 w-auto"
-                    side="right"
+                        {selectedRatio.label}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="border-mountain-200 w-48">
+                      {canvasSizeOptions.map((ratio) => {
+                        const Icon = ratio.icon;
+                        return (
+                          <DropdownMenuItem
+                            key={ratio.value}
+                            onClick={() => {
+                              setSelectedRatio(ratio);
+                              setSelectedCanvasSize(ratio.sizes[1]);
+                            }}
+                            className="flex items-center space-x-2"
+                          >
+                            {Icon && (
+                              <Icon className="size-4 text-muted-foreground" />
+                            )}
+                            <span>{ratio.label}</span>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                {/* Select Canvas Size */}
+                <div className="flex justify-between items-center w-full">
+                  <p className="flex items-center space-x-2">
+                    <MdOutlinePhotoSizeSelectActual />
+                    <span>Canvas Size</span>
+                  </p>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
+                      >
+                        {selectedCanvasSize.label}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="border-mountain-200 w-48">
+                      {selectedRatio.sizes.map((size) => (
+                        <DropdownMenuItem
+                          key={size.label}
+                          onClick={() => setSelectedCanvasSize(size)}
+                        >
+                          {size.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex justify-between items-center w-full">
+                  <p>Background Color</p>
+                  <Popover
+                    open={openColorSettings}
+                    onOpenChange={setOpenColorSettings}
                   >
-                    <div className="flex flex-col">
-                      <div className="mb-2 font-medium text-mountain-950 text-sm">
-                        🎨 Pick a color
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="justify-start bg-mountain-50 border-mountain-200 rounded-full w-48 h-12"
+                      >
+                        <div
+                          className="shadow-md border border-mountain-200 rounded w-6 h-6"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span className="ml-2">{color.replace('#', '')}</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="ml-4 p-2 border-mountain-200 w-auto"
+                      side="right"
+                    >
+                      <div className="flex flex-col">
+                        <div className="mb-2 font-medium text-mountain-950 text-sm">
+                          🎨 Pick a color
+                        </div>
+                        <Sketch
+                          color={color}
+                          onChange={(colorResult) => {
+                            setColor(colorResult.hex);
+                          }}
+                        />
                       </div>
-                      <Sketch
-                        color={color}
-                        onChange={(colorResult) => {
-                          setColor(colorResult.hex);
-                        }}
-                      />
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
+            </div>
+          </div>
+          <div className="relative flex flex-col space-y-4 bg-gradient-to-b from-white to-purple-50/80 shadow-md p-4 w-1/2 h-full">
+            <div className='flex py-2 border-mountain-200 border-b-1 w-full'>
+              <p className='flex items-center space-x-2 w-fit h-fit font-medium pointer-events-none'>
+                <PiStarFourFill className="text-purple-600" />
+                <span>Try These Design Samples</span>
+              </p>
+            </div>
+            <div className='flex'>
+              <button
+                className="bg-white border border-mountain-200 rounded-lg w-48 h-fit cursor-pointer"
+                onClick={() => handleLoadDesignSample('sample1')}
+              >
+                <img src={sample_1} className='rounded-lg' />
+              </button>
             </div>
           </div>
         </div>

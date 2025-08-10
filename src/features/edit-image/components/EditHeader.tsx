@@ -240,6 +240,7 @@ const EditHeader: React.FC<EditHeaderProps> = ({
                       onClick={() => {
                         setOpen(false);
                         setNewDesign?.({
+                          layers: [],
                           ratio: aspectRatio,
                           canvas: editCanvas,
                           finalCanvas: {
@@ -327,6 +328,7 @@ const EditHeader: React.FC<EditHeaderProps> = ({
                     onClick={() => {
                       if (!canvasSize || !aspectRatio || !setNewEdit) return;
                       setNewEdit({
+                        layers: [],
                         ratio: aspectRatio,
                         canvas: editCanvas,
                         finalCanvas: canvasSize,
