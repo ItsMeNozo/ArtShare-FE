@@ -73,14 +73,180 @@ const GenImage: React.FC<GenImageProps> = ({
     setCurrentIndex((prev) => (prev + 1) % otherImages.length);
   };
 
-  const handleDownload = () => {
-    const currentImageUrl = otherImages[currentIndex];
-    const link = document.createElement('a');
-    link.href = currentImageUrl;
-    link.download = `image-${currentIndex + 1}.jpg`; // or use original file name
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const downloadImage = async (imageUrl: string, filename: string) => {
+    const maxRetries = 3;
+    const retryDelay = 1000;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Check if image exists first
+        const headResponse = await fetch(imageUrl, { method: 'HEAD' });
+        if (!headResponse.ok) {
+          throw new Error(`Image not ready (${headResponse.status})`);
+        }
+
+        // Download with timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(imageUrl, {
+          signal: controller.signal,
+          cache: 'no-cache',
+        });
+        clearTimeout(timeout);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+        return;
+      } catch (error) {
+        console.warn(`Download attempt ${attempt} failed:`, error);
+
+        if (attempt === maxRetries) {
+          throw new Error(`Download failed after ${maxRetries} attempts`);
+        }
+
+        // Exponential backoff
+        await new Promise((resolve) =>
+          setTimeout(resolve, retryDelay * attempt),
+        );
+      }
+    }
+  };
+
+  const waitForImageReady = async (
+    imageUrl: string,
+    maxWait: number = 30000,
+  ) => {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWait) {
+      try {
+        const response = await fetch(imageUrl, { method: 'HEAD' });
+        if (response.ok) return true;
+      } catch {
+        // Silently continue if HEAD request fails
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    throw new Error('Image not ready within timeout');
+  };
+
+  const handleDownload = async () => {
+    const imageUrl = result.imageUrls[index];
+    const urlParts = imageUrl.split('/');
+    const originalFilename = urlParts[urlParts.length - 1];
+    const filename = originalFilename.includes('.')
+      ? originalFilename
+      : `${originalFilename}.png`;
+
+    try {
+      // Wait for image to be ready, then download
+      await waitForImageReady(imageUrl);
+      await downloadImage(imageUrl, filename);
+    } catch (error) {
+      console.error('Download failed:', error);
+
+      // Fallback to canvas approach for CORS issues
+      try {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        const imageLoaded = new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error('Canvas image load failed'));
+
+          // Timeout for canvas approach
+          setTimeout(
+            () => reject(new Error('Canvas image load timeout')),
+            10000,
+          );
+        });
+
+        img.src = imageUrl;
+        await imageLoaded;
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          throw new Error('Could not get canvas context');
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Convert canvas to blob and download
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = filename;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+
+              setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+              }, 100);
+            } else {
+              throw new Error('Failed to create blob from canvas');
+            }
+          },
+          'image/png',
+          1.0,
+        );
+      } catch (canvasError) {
+        console.error('Canvas fallback failed:', canvasError);
+
+        // Final user-friendly fallback
+        const userChoice = confirm(
+          `Download failed due to network or server issues.\n\n` +
+            `Would you like to:\n` +
+            `• Click "OK" to open the image in a new tab (you can then right-click to save)\n` +
+            `• Click "Cancel" to copy the image URL to clipboard`,
+        );
+
+        if (userChoice) {
+          window.open(imageUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          try {
+            await navigator.clipboard.writeText(imageUrl);
+            alert(
+              'Image URL copied to clipboard! You can paste it in your browser to download.',
+            );
+          } catch {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = imageUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert(
+              'Image URL copied to clipboard! You can paste it in your browser to download.',
+            );
+          }
+        }
+      }
+    }
   };
 
   const handleNavigateToEdit = () => {
@@ -136,7 +302,7 @@ const GenImage: React.FC<GenImageProps> = ({
     }
 
     return () => clearTimeout(timeout);
-  }, [open, user]);
+  }, [open, user, error]);
 
   const handleDelete = () => {
     setTimeout(() => {
@@ -218,17 +384,22 @@ const GenImage: React.FC<GenImageProps> = ({
           ) : (
             <>
               <div className="absolute bottom-2 left-2 flex">
-                <Tooltip title="Download">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
-                      handleDownload();
-                    }}
-                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
-                  >
-                    <FiDownload className="text-mountain-600" />
-                  </div>
-                </Tooltip>
+                <div
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDownload();
+                    return false;
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                  title="Download"
+                >
+                  <FiDownload className="text-mountain-600 pointer-events-none" />
+                </div>
               </div>
               <div className="absolute right-2 bottom-2 flex space-x-2">
                 <Tooltip title="Edit">
