@@ -110,9 +110,8 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full">
-      {/* Toolbar */}
-      <div className="flex justify-between items-center space-x-2 w-full">
+    <div className="flex w-full flex-col space-y-2">
+      <div className="flex w-full items-center justify-between space-x-2">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
           {truncateText(result.userPrompt, 120)}
@@ -139,18 +138,56 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 <FiDownload className="size-5" />
               </Button>
             </Tooltip>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Tooltip title="Delete" placement="bottom" arrow>
+                  <Button
+                    className="bg-mountain-100 flex w-4"
+                    hidden={useToShare || false}
+                  >
+                    <FiTrash2 className="size-5 text-red-900" />
+                  </Button>
+                </Tooltip>
+              </PopoverTrigger>
+              <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-2 mr-6 w-48 p-2">
+                <div className="flex flex-col space-y-2">
+                  <p className="text-sm">Are you sure to delete?</p>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="bg-mountain-100">
+                        <FiTrash2 className="mr-2 size-5" />
+                        <p className="font-normal">Delete All</p>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent
+                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
+                      hideCloseButton
+                    >
+                      <DialogHeader>
+                        <DialogDescription className="flex items-center justify-center space-x-4">
+                          <CircularProgress size={32} thickness={4} />
+                          <DialogTitle className="text-center text-base font-normal">
+                            Deleting These Images
+                          </DialogTitle>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
       </div>
-
-      {/* Images */}
-      <ImageList cols={4} gap={8} sx={{ width: '100%', minHeight: '268px' }}>
+      <ImageList cols={4} gap={8} sx={{ width: '100%' }}>
         {result.imageUrls.map((__, index) => (
-          <ImageListItem key={index} className="flex h-full object-cover">
+          <ImageListItem key={index} sx={{ height: 'auto !important' }}>
             {result.generating ? (
-              <div className="relative flex justify-center items-center bg-mountain-100 rounded-[8px] h-full">
+              <div className="bg-mountain-100 relative flex aspect-square w-full items-center justify-center rounded-[8px]">
                 <CircularProgress size={64} thickness={4} />
-                <p className="absolute font-medium text-gray-700 text-xs">Loading</p>
+                <p className="absolute text-xs font-medium text-gray-700">
+                  Loading
+                </p>
               </div>
             ) : (
               <GenImage
