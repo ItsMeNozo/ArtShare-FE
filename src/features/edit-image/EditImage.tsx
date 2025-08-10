@@ -252,6 +252,22 @@ const EditImage: React.FC = () => {
     setZIndex({ min: minZIndex, max: maxZIndex });
   }, [layers]);
 
+  // Auto-focus the first image layer when it's added
+  useEffect(() => {
+    // Only auto-focus if no layer is currently selected
+    if (selectedLayerId) return;
+
+    // Find the first non-background image layer (layers with zIndex > 0 and type 'image')
+    const firstImageLayer = layers.find(
+      (layer) =>
+        layer.type === 'image' && layer.zIndex && layer.zIndex > 0 && layer.src,
+    );
+
+    if (firstImageLayer) {
+      setSelectedLayerId(firstImageLayer.id);
+    }
+  }, [layers, selectedLayerId]);
+
   const updateSelectedLayer = (updates: Partial<Layer>) => {
     setLayers((prev) =>
       prev.map((layer) => {
