@@ -30,7 +30,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 
 //Context
-import { useUser } from '@/contexts/user/useUser';
 import { MdAspectRatio, MdOutlineSaveAlt } from "react-icons/md";
 import { TbInfoCircleFilled, TbSettings2 } from "react-icons/tb";
 import { BiExpandAlt } from 'react-icons/bi';
@@ -44,6 +43,7 @@ import BackButton from "./headerItems/BackButton";
 import ShareButton from "./headerItems/ShareButton";
 import { Link, useLocation } from "react-router-dom";
 import { PiStarFourFill } from "react-icons/pi";
+import { useUserProfile } from "@/features/user-profile-private/hooks/useUserProfile";
 
 interface EditHeaderProps {
   hideTopBar?: boolean;
@@ -66,7 +66,7 @@ const EditHeader: React.FC<EditHeaderProps> = ({
   handleShare,
   handleDownload
 }) => {
-  const { user, loading } = useUser();
+  const { data: user,   isLoading: loading } = useUserProfile();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [aspectRatio, setAspectRatio] = useState("1:1");

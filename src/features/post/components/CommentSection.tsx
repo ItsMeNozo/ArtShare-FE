@@ -1,6 +1,5 @@
 import api from '@/api/baseApi';
 import { useFocusContext } from '@/contexts/focus/useFocusText';
-import { useUser } from '@/contexts/user/useUser';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { isTemporaryCommentId } from '@/lib/utils';
@@ -45,6 +44,7 @@ import {
   unlikeComment,
 } from '../api/comment.api';
 import { FreshRepliesCtx } from './FreshReplies';
+import { useUserProfile } from '@/features/user-profile-private/hooks/useUserProfile';
 /* ------------------------------------------------------------------ */
 /* Constants & helpers                                                */
 /* ------------------------------------------------------------------ */
@@ -200,7 +200,7 @@ const CommentRow = ({
   /* ── fresh-reply context ──────────────────────────────── */
   const { map: freshMap, clear: clearFreshIds } = useContext(FreshRepliesCtx);
   const freshIds: Set<number> = freshMap[comment.id] ?? new Set();
-  const { user } = useUser();
+  const { data: user } = useUserProfile();
   const { showSnackbar } = useSnackbar();
   const CURRENT_USER_ID = user?.id;
   const isMine = comment.userId === CURRENT_USER_ID;
@@ -231,24 +231,24 @@ const CommentRow = ({
    * `comment.replies` is still empty.  Pull the replies once so the new
    * comment can render even while the thread is collapsed.
    */
-  useEffect(() => {
-    if (
-      freshIds.size > 0 &&
-      (!comment.replies || comment.replies.length === 0) &&
-      !loading
-    ) {
-      (async () => {
-        try {
-          setLoading(true);
-          const fetched = await fetchComments(targetId, targetType, comment.id);
-          onRepliesFetched(comment.id, fetched as CommentUI[]);
-        } finally {
-          setLoading(false);
-        }
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [freshIds]);
+  // useEffect(() => {
+  //   if (
+  //     freshIds.size > 0 &&
+  //     (!comment.replies || comment.replies.length === 0) &&
+  //     !loading
+  //   ) {
+  //     (async () => {
+  //       try {
+  //         setLoading(true);
+  //         const fetched = await fetchComments(targetId, targetType, comment.id);
+  //         onRepliesFetched(comment.id, fetched as CommentUI[]);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     })();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [freshIds]);
 
   useEffect(() => {
     const prev = prevReplyCountRef.current;
@@ -676,7 +676,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     },
     _ref,
   ) => {
-    const { user } = useUser();
+    const { data: user } = useUserProfile();
     const { showSnackbar } = useSnackbar();
     const CURRENT_USER_ID = user?.id;
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -1551,20 +1551,20 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     };
 
     /* -------------------- FETCH ----------------------------------- */
-    useEffect(() => {
-      const loadComments = async () => {
-        try {
-          const data = await fetchComments(targetId, targetType);
-          setComments(data as CommentUI[]);
-        } catch (err) {
-          console.error('Failed to load comments:', err);
-          showSnackbar('Failed to load comments', 'error');
-        }
-      };
-      if (targetId) {
-        loadComments();
-      }
-    }, [targetId, showSnackbar, targetType]);
+    // useEffect(() => {
+    //   const loadComments = async () => {
+    //     try {
+    //       const data = await fetchComments(targetId, targetType);
+    //       setComments(data as CommentUI[]);
+    //     } catch (err) {
+    //       console.error('Failed to load comments:', err);
+    //       showSnackbar('Failed to load comments', 'error');
+    //     }
+    //   };
+    //   if (targetId) {
+    //     loadComments();
+    //   }
+    // }, [targetId, showSnackbar, targetType]);
 
     const InputBar = (
       <div

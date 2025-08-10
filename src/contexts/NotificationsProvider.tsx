@@ -14,12 +14,12 @@ import {
   NotificationsContextType,
   ReportResolvedPayload,
 } from './NotificationsContext';
-import { useUser } from './user/useUser';
+import { useUserProfile } from '@/features/user-profile-private/hooks/useUserProfile';
 
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user } = useUser();
+  const { data: user } = useUserProfile();
   const socketRef = useRef<Socket | null>(null);
   const [notifications, setNotifications] = useState<
     Notification<ReportResolvedPayload>[]

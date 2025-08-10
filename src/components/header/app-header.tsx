@@ -1,5 +1,4 @@
 import { useSearch } from '@/contexts/SearchProvider';
-import { useUser } from '@/contexts/user/useUser';
 import { HeaderRoute, routesForHeaders } from '@/utils/constants';
 import React, { useRef, useState } from 'react';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -15,6 +14,7 @@ import UserInAppConfigs from '../popovers/UserInAppConfigs';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import UserButton from './user-button';
+import { useUserProfile } from '@/features/user-profile-private/hooks/useUserProfile';
 
 function findMatchedRoute(pathname: string) {
   return routesForHeaders.find((route) =>
@@ -64,7 +64,7 @@ function useBreadcrumbs(currentUsername?: string) {
 }
 
 const Header: React.FC = () => {
-  const { user, loading } = useUser();
+  const { data: user, isLoading: loading } = useUserProfile();
   const breadcrumbs = useBreadcrumbs(user?.username);
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');

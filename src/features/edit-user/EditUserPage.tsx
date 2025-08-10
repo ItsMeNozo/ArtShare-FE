@@ -1,23 +1,22 @@
 import { Box, Container } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import {
-  getUserProfile,
-  UserProfile,
-} from '../user-profile-public/api/user-profile.api';
 import { AvatarSection } from './components/AvatarSection';
 import EditProfileForm from './components/EditProfileForm';
+import { useUserProfile } from '../user-profile-private/hooks/useUserProfile';
+import { User } from '@/types';
 
 export default function EditUser() {
-  const { data: profileData, isLoading: loadingProfile } = useQuery<
-    UserProfile,
-    Error
-  >({
-    queryKey: ['userProfile'],
-    queryFn: () => getUserProfile(),
-  });
+  // const { data: profileData, isLoading: loadingProfile } = useQuery<
+  //   UserProfile,
+  //   Error
+  // >({
+  //   queryKey: ['userProfile'],
+  //   queryFn: () => getUserProfile(),
+  // });
+  const {data: profileData, isLoading: loadingProfile }= useUserProfile();
+  
 
-  const [formData, setFormData] = useState<UserProfile | null>(null);
+  const [formData, setFormData] = useState<User | null>(null);
   const [newAvatarFile, setNewAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
