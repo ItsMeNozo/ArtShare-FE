@@ -92,7 +92,7 @@ const LayerItem = React.memo(
                   }}
                   draggable={false}
                 />
-              ) : editingLayerId === layer.id ? (
+              ) : editingLayerId === layer.id && layer.type === "text" ? (
                 <textarea
                   autoFocus
                   value={layer.text}
@@ -121,7 +121,7 @@ const LayerItem = React.memo(
                     opacity: layer.opacity,
                   }}
                 />
-              ) : (
+              ) : (layer.type === "text" && editingLayerId === layer.id) ? (
                 <div
                   onDoubleClick={() => setEditingLayerId(layer.id)}
                   style={{
@@ -143,7 +143,7 @@ const LayerItem = React.memo(
                 >
                   {layer.text}
                 </div>
-              )}
+              ) : null}
             </div>
             {selectedLayerId === layer.id && !layer.isLocked && (
               <Moveable
