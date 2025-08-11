@@ -61,14 +61,50 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
     setCurrentIndex((prev) => (prev + 1) % otherImages.length);
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const currentImageUrl = otherImages[currentIndex];
-    const link = document.createElement('a');
-    link.href = currentImageUrl;
-    link.download = `image-${currentIndex + 1}.jpg`; // or use original file name
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    try {
+      // Try fetch approach with CORS handling first
+      const response = await fetch(currentImageUrl, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          Accept: 'image/*',
+        },
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `image-${currentIndex + 1}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return;
+      }
+    } catch (error) {
+      console.warn('Fetch download failed, trying fallback:', error);
+    }
+
+    // Fallback to direct link approach
+    try {
+      const link = document.createElement('a');
+      link.href = currentImageUrl;
+      link.download = `image-${currentIndex + 1}.jpg`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('All download methods failed:', error);
+      // Final fallback: open in new tab
+      window.open(currentImageUrl, '_blank');
+    }
   };
 
   const handleNavigateToEdit = () => {

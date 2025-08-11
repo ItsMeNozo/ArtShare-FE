@@ -114,8 +114,8 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   }, [openColorSettings]);
 
   return (
-    <div className="z-50 relative flex h-full">
-      <div className="flex flex-col justify-between bg-white border border-mountain-200 w-28 h-full overflow-y-auto custom-scrollbar">
+    <div className="relative z-50 flex h-full">
+      <div className="border-mountain-200 custom-scrollbar flex h-full w-28 flex-col justify-between overflow-y-auto border bg-white">
         <div className="flex flex-col space-y-2 pb-24">
           {/* Layers Header */}
           <div className="border-mountain-400 text-mountain-800 flex h-10 items-center justify-center space-x-2 border-b-1 bg-white font-medium">
@@ -160,7 +160,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                   />
                 ) : (
                   <div
-                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${selectedLayerId === layer.id ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border'}`}
+                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${selectedLayerId === layer.id ? 'border-2 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border'}`}
                   >
                     {layer.type === 'text' && (
                       <div
