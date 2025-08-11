@@ -82,12 +82,16 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
 
   const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
     try {
-      // Try direct fetch first
+      // Try direct fetch with connection management
       const response = await fetch(url, {
+        method: 'GET',
         mode: 'cors',
-        credentials: 'omit',
+        cache: 'no-cache', // Prevents caching issues that block CORS headers
+        keepalive: false, // Forces connection closure
         headers: {
           Accept: 'image/*',
+          'Content-Type': 'application/octet-stream',
+          Connection: 'close', // Prevents connection reuse that causes pool exhaustion
         },
       });
 

@@ -169,7 +169,7 @@ const GenImage: React.FC<GenImageProps> = ({
     }
 
     return () => clearTimeout(timeout);
-  }, [open, user]);
+  }, [open, user, error]);
 
   const handleDelete = () => {
     setTimeout(() => {

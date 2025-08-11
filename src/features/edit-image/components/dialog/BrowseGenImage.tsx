@@ -1,6 +1,7 @@
 import React, { ElementType, useEffect, useState } from 'react';
 
 //Libs
+import BoringAvatar from 'boring-avatars';
 import ShowMoreText from 'react-show-more-text';
 
 //Components
@@ -13,6 +14,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+
+//API
+import { getUserProfile } from '@/api/authentication/auth';
+import { useQuery } from '@tanstack/react-query';
 
 //Assets
 const example_1 =
@@ -45,6 +50,15 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
   const [openDiaLog, setOpenDiaLog] = useState(false);
   const navigate = useNavigate();
 
+  const { data: user, error } = useQuery({
+    queryKey: ['user-profile', result?.userId],
+    queryFn: async () => {
+      const response = await getUserProfile(result?.userId);
+      return response ? response : null;
+    },
+    retry: 1,
+  });
+
   const handlePrev = () => {
     setCurrentIndex(
       (prev) => (prev - 1 + otherImages.length) % otherImages.length,
@@ -63,47 +77,87 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
 
   const handleDownload = async () => {
     const currentImageUrl = otherImages[currentIndex];
+    const fileName = `image-${currentIndex + 1}.jpg`;
 
-    try {
-      // Try fetch approach with CORS handling first
-      const response = await fetch(currentImageUrl, {
-        mode: 'cors',
-        credentials: 'omit',
-        headers: {
-          Accept: 'image/*',
-        },
-      });
+    // Retry logic for intermittent CORS issues
+    const maxRetries = 3;
 
-      if (response.ok) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Download attempt ${attempt}/${maxRetries}`);
+
+        // Use connection management to prevent pool exhaustion
+        const response = await fetch(currentImageUrl, {
+          method: 'GET',
+          mode: 'cors', // Ensures CORS is handled
+          cache: 'no-cache', // Prevents caching issues that block CORS headers
+          keepalive: false, // Forces connection closure
+          headers: {
+            'Content-Type': 'application/octet-stream',
+            Connection: 'close', // Prevents connection reuse that causes pool exhaustion
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch the file: ${response.status} ${response.statusText}`,
+          );
+        }
+
         const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
+        link.style.display = 'none';
         link.href = url;
-        link.download = `image-${currentIndex + 1}.jpg`;
+
+        // Extract filename from URL or use default
+        const urlParts = currentImageUrl.split('/');
+        const originalFileName = decodeURIComponent(urlParts.pop() || fileName);
+        link.download = originalFileName;
+
         document.body.appendChild(link);
         link.click();
+        window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+
+        console.log(`Download successful on attempt ${attempt}`);
         return;
+      } catch (error) {
+        console.warn(`Download attempt ${attempt} failed:`, error);
+
+        // Wait before retrying (exponential backoff)
+        if (attempt < maxRetries) {
+          const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
+          console.log(`Retrying in ${delay}ms...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
       }
-    } catch (error) {
-      console.warn('Fetch download failed, trying fallback:', error);
     }
 
-    // Fallback to direct link approach
+    // All retry attempts failed, try fallback methods
+    console.warn('All fetch attempts failed, trying fallback methods');
+
+    // Fallback 1: Try direct download link
     try {
       const link = document.createElement('a');
       link.href = currentImageUrl;
-      link.download = `image-${currentIndex + 1}.jpg`;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      link.download = fileName;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      console.log('Download attempted via direct link');
     } catch (error) {
-      console.error('All download methods failed:', error);
-      // Final fallback: open in new tab
-      window.open(currentImageUrl, '_blank');
+      console.error('Direct download failed:', error);
+
+      // Final fallback: Inform user with better message
+      const userConfirm = confirm(
+        `Download failed after ${maxRetries} attempts due to server issues. Would you like to open the image in a new tab so you can save it manually?`,
+      );
+
+      if (userConfirm) {
+        window.open(currentImageUrl, '_blank', 'noopener,noreferrer');
+      }
     }
   };
 
@@ -142,8 +196,12 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
       }, 2000);
     }
 
+    if (error) {
+      console.log('error fetching user profile', error);
+    }
+
     return () => clearTimeout(timeout);
-  }, [open]);
+  }, [open, error]);
 
   return (
     <Dialog open={openDiaLog} onOpenChange={setOpenDiaLog}>
@@ -271,12 +329,27 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
                   <div className="flex items-center space-x-2">
                     <Avatar className="size-12">
                       <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
+                        src={user?.profilePictureUrl}
+                        alt={user?.fullName || 'User'}
                       />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>
+                        <BoringAvatar
+                          size={48}
+                          name={user?.username || user?.fullName || 'User'}
+                          variant="beam"
+                          colors={[
+                            '#84bfc3',
+                            '#fff5d6',
+                            '#ffb870',
+                            '#d96153',
+                            '#000511',
+                          ]}
+                        />
+                      </AvatarFallback>
                     </Avatar>
-                    <p className="font-medium">Nguyễn Minh Thông</p>
+                    <p className="font-medium">
+                      {user?.fullName || 'Loading...'}
+                    </p>
                   </div>
                   <div className="flex">
                     <Button title="Download" onClick={handleDownload}>
