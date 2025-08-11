@@ -292,7 +292,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
       </div>
       <ImageList cols={4} gap={8} sx={{ width: '100%' }}>
         {result.imageUrls.map((__, index) => (
-          <ImageListItem key={index} sx={{ height: 'auto !important' }}>
+          <ImageListItem key={index} sx={{ height: 'auto' }}>
             {result.generating ? (
               <div className="bg-mountain-100 relative flex aspect-square w-full items-center justify-center rounded-[8px]">
                 <CircularProgress size={64} thickness={4} />

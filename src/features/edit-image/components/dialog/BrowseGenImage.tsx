@@ -86,7 +86,7 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
       try {
         console.log(`Download attempt ${attempt}/${maxRetries}`);
 
-        // Use connection management to prevent pool exhaustion
+        // Set fetch options to improve reliability and handle CORS issues
         const response = await fetch(currentImageUrl, {
           method: 'GET',
           mode: 'cors', // Ensures CORS is handled
@@ -94,7 +94,7 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
           keepalive: false, // Forces connection closure
           headers: {
             'Content-Type': 'application/octet-stream',
-            Connection: 'close', // Prevents connection reuse that causes pool exhaustion
+            Connection: 'close', // Prevents connection reuse for better CORS handling
           },
         });
 

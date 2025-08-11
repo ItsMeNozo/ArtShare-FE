@@ -165,11 +165,11 @@ const GenImage: React.FC<GenImageProps> = ({
     }
 
     if (error) {
-      console.log('error fetching user profile', user);
+      console.log('error fetching user profile', error);
     }
 
     return () => clearTimeout(timeout);
-  }, [open, user, error]);
+  }, [open, error]);
 
   const handleDelete = () => {
     setTimeout(() => {

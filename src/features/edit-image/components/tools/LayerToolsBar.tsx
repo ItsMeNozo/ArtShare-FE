@@ -39,6 +39,12 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
 
+  const getLayerBorderClass = (isSelected: boolean) => {
+    return isSelected
+      ? 'border-2 border-indigo-500 shadow-lg shadow-indigo-200'
+      : 'border-mountain-200 border';
+  };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -151,16 +157,12 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                 {layer.type === 'image' ? (
                   <img
                     src={layer.src}
-                    className={`h-20 w-full rounded-sm object-cover ${
-                      selectedLayerId === layer.id
-                        ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200'
-                        : 'border-mountain-200 border'
-                    }`}
+                    className={`h-20 w-full rounded-sm object-cover ${getLayerBorderClass(selectedLayerId === layer.id)}`}
                     alt="Layer Preview"
                   />
                 ) : (
                   <div
-                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${selectedLayerId === layer.id ? 'border-2 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border'}`}
+                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${getLayerBorderClass(selectedLayerId === layer.id)}`}
                   >
                     {layer.type === 'text' && (
                       <div
@@ -193,7 +195,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
               className="relative flex px-2"
             >
               <div
-                className={`text-mountain-600 flex h-12 w-full items-center justify-center text-sm italic hover:cursor-pointer ${selectedLayerId === layers[0].id ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border-2'}`}
+                className={`text-mountain-600 flex h-12 w-full items-center justify-center text-sm italic hover:cursor-pointer ${getLayerBorderClass(selectedLayerId === layers[0].id)}`}
                 style={{
                   backgroundColor:
                     layers[0].type === 'image'

@@ -301,7 +301,7 @@ const EditImage: React.FC = () => {
     setZIndex({ min: minZIndex, max: maxZIndex });
   }, [layers]);
 
-  // Auto-focus the first image layer when it's added
+  // Auto-focus the first image layer when layers change and no layer is currently selected
   useEffect(() => {
     // Only auto-focus if no layer is currently selected
     if (selectedLayerId) return;
