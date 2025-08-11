@@ -56,7 +56,19 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({
           severity={severity}
           variant="standard"
           action={actionNode}
-          sx={{ width: '100%' }}
+          sx={{
+            width: '100%',
+            color: '#123456',
+            '& .MuiAlert-icon': {
+              color: '#123456',
+            },
+            '& .MuiAlert-icon svg': {
+              color: '#123456',
+            },
+            '& .MuiIconButton-root svg': {
+              color: '#123456',
+            },
+          }}
         >
           {message}
         </Alert>

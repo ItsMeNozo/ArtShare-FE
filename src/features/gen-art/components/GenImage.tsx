@@ -1,4 +1,10 @@
-import React, { ElementType, useEffect, useState } from 'react';
+import React, {
+  Dispatch,
+  ElementType,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 //Libs
 import ShowMoreText from 'react-show-more-text';
@@ -40,6 +46,7 @@ interface GenImageProps {
   result: PromptResult;
   otherImages: string[];
   useToShare?: boolean | null;
+  setOpenDownload: Dispatch<SetStateAction<boolean>>;
   // onDelete?: (resultId: number, imgId: number) => void;
 }
 
@@ -50,6 +57,7 @@ const GenImage: React.FC<GenImageProps> = ({
   result,
   otherImages,
   useToShare,
+  setOpenDownload,
 }) => {
   const [deleteImage, setDeleteImage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -332,6 +340,7 @@ const GenImage: React.FC<GenImageProps> = ({
                 setCurrentIndex(index);
                 setOpenDiaLog(true);
               }}
+              onContextMenu={(e) => e.preventDefault()}
             />
             {deleteImage && (
               <div
@@ -392,7 +401,7 @@ const GenImage: React.FC<GenImageProps> = ({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      handleDownload();
+                      setOpenDownload(true);
                       return false;
                     }}
                     onMouseDown={(e) => {
@@ -459,6 +468,7 @@ const GenImage: React.FC<GenImageProps> = ({
                       src={_img}
                       alt={`Preview ${index}`}
                       className="max-h-[680px] max-w-full object-contain"
+                      onContextMenu={(e) => e.preventDefault()}
                     />
                   </div>
                 ))}
@@ -537,7 +547,10 @@ const GenImage: React.FC<GenImageProps> = ({
                     <p className="font-medium">{user?.fullName}</p>
                   </div>
                   <div className="flex">
-                    <Button title="Download" onClick={handleDownload}>
+                    <Button
+                      title="Download"
+                      onClick={() => setOpenDownload(true)}
+                    >
                       <FiDownload className="size-5" />
                     </Button>
                     <DeleteButton open={open} setOpen={setOpen} />

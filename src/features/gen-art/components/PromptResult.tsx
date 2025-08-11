@@ -1,5 +1,5 @@
 //Core
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 //Icons
 import { FiDownload, FiTrash2 } from 'react-icons/fi';
@@ -30,43 +30,184 @@ import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 import { RiShareBoxFill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import DownloadModal from './DownloadModal';
 import GenImage from './GenImage';
 
 interface promptResultProps {
   result: PromptResult;
   useToShare?: boolean | null;
 }
+interface DownloadSettings {
+  format: string; // jpg, png, webp, original
+  device: string; // e.g., Desktop, Mobile, Tablet
+  size: string; // e.g., 1920x1080
+  filename?: string;
+}
 
 const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout;
-
-    if (open) {
-      timeout = setTimeout(() => {
-        // onDelete?.(result?.id!); // Trigger delete --> RESOVLE THIS
-        setOpen(false); // Close dialog after delete
-      }, 2000);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [open]);
+  const [downloadTargetUrl, setDownloadTargetUrl] = useState<string | null>(
+    null,
+  );
+  const [openDownload, setOpenDownload] = useState<boolean>(false);
+  const [openDownloadSingle, setOpenDownloadSingle] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
-  const handleDownloadAll = async () => {
-    const zip = new JSZip();
-    await Promise.all(
-      result!.imageUrls.map(async (url, index) => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        zip.file(`image-${index + 1}.jpg`, blob);
-      }),
-    );
+  const resizeImage = async (
+    blob: Blob,
+    targetWidth: number,
+    targetHeight: number,
+    format: string,
+  ) => {
+    const img = await createImageBitmap(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'images.zip');
+    return new Promise<Blob>((resolve) => {
+      canvas.toBlob(
+        (resizedBlob) => resolve(resizedBlob || blob),
+        format === 'original' ? blob.type : `image/${format}`,
+      );
+    });
+  };
+
+  const parseSize = (size: string) => {
+    const [w, h] = size.split('x').map(Number);
+    return { width: w, height: h };
+  };
+
+  const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
+    try {
+      // Try direct fetch first
+      const response = await fetch(url, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          Accept: 'image/*',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.blob();
+    } catch (error) {
+      console.warn('Direct fetch failed, trying canvas approach:', error);
+
+      // Fallback to canvas approach for CORS issues
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Canvas to blob conversion failed'));
+            }
+          }, 'image/png');
+        };
+
+        img.onerror = () => {
+          // If canvas approach also fails, create a fallback download link
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `image-${Date.now()}.png`;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          reject(new Error('Could not load image for canvas approach'));
+        };
+
+        img.src = url;
+      });
+    }
+  };
+
+  const handleDownloadAll = async (settings: DownloadSettings) => {
+    if (!result || !result.imageUrls || result.imageUrls.length === 0) return;
+
+    const { format, size, filename } = settings;
+    const { width, height } = parseSize(size);
+
+    try {
+      // If only one image, download directly
+      if (result.imageUrls.length === 1) {
+        let blob = await fetchImageWithCorsHandling(result.imageUrls[0]);
+        if (format !== 'original' || size !== 'original') {
+          blob = await resizeImage(blob, width, height, format);
+        }
+        saveAs(blob, `${filename || `image-${Date.now()}`}.${format}`);
+        return;
+      }
+
+      // Otherwise, create ZIP
+      const zip = new JSZip();
+      await Promise.all(
+        result.imageUrls.map(async (url, index) => {
+          try {
+            let blob = await fetchImageWithCorsHandling(url);
+            if (format !== 'original' || size !== 'original') {
+              blob = await resizeImage(blob, width, height, format);
+            }
+            zip.file(`${filename || 'image'}-${index + 1}.${format}`, blob);
+          } catch (error) {
+            console.error(`Failed to download image ${index + 1}:`, error);
+            // Continue with other images even if one fails
+          }
+        }),
+      );
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, `${filename || 'images'}.zip`);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback: open images in new tabs for manual download
+      result.imageUrls.forEach((url, index) => {
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, index * 100); // Stagger to avoid popup blocking
+      });
+    }
+  };
+
+  const handleDownloadSingle = async (settings: DownloadSettings) => {
+    if (!downloadTargetUrl) return;
+    const { format, size, filename } = settings;
+    const { width, height } = parseSize(size);
+
+    try {
+      let blob = await fetchImageWithCorsHandling(downloadTargetUrl);
+      if (format !== 'original' || size !== 'original') {
+        blob = await resizeImage(blob, width, height, format);
+      }
+      saveAs(blob, `${filename || `image-${Date.now()}`}.${format}`);
+    } catch (error) {
+      console.error('Single image download failed:', error);
+      // Fallback: open image in new tab for manual download
+      window.open(downloadTargetUrl, '_blank');
+    }
   };
 
   const handleNavigateToUploadPost = (prompt: PromptResult) => {
@@ -80,7 +221,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
       <div className="flex w-full items-center justify-between space-x-2">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
-          {truncateText(result.userPrompt, 60)}
+          {truncateText(result.userPrompt, 120)}
         </p>
         {!result.generating && (
           <div className="flex items-center space-x-2">
@@ -98,7 +239,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
             <Tooltip title="Download" placement="bottom" arrow>
               <Button
                 className="bg-mountain-100"
-                onClick={handleDownloadAll}
+                onClick={() => setOpenDownload(true)}
                 hidden={useToShare || false}
               >
                 <FiDownload className="size-5" />
@@ -161,11 +302,34 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 otherImages={result.imageUrls}
                 index={index}
                 useToShare={useToShare}
+                setOpenDownload={(open) => {
+                  setDownloadTargetUrl(result.imageUrls[index]);
+                  setOpenDownloadSingle(open);
+                }}
               />
             )}
           </ImageListItem>
         ))}
       </ImageList>
+      {/* Modals */}
+      {openDownload && (
+        <DownloadModal
+          imageURL={result.imageUrls!}
+          imageRatio={result.aspectRatio}
+          onDownload={handleDownloadAll}
+          openDownload={openDownload}
+          setOpenDownload={setOpenDownload}
+        />
+      )}
+      {openDownloadSingle && (
+        <DownloadModal
+          imageRatio={result.aspectRatio}
+          imageURL={downloadTargetUrl!}
+          onDownload={handleDownloadSingle}
+          openDownload={openDownloadSingle}
+          setOpenDownload={setOpenDownloadSingle}
+        />
+      )}
     </div>
   );
 };
