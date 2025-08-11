@@ -20,7 +20,6 @@ const example_1 =
 
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
-import DeleteButton from '@/features/gen-art/components/DeleteConfirmation';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -32,14 +31,15 @@ import {
 import { FiDownload, FiTrash2 } from 'react-icons/fi';
 import { IoIosSquareOutline } from 'react-icons/io';
 import { IoCopyOutline } from 'react-icons/io5';
+import { RiFolderUploadLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import DeleteButton from './DeleteConfirmation';
 
 interface GenImageProps {
   index: number;
   result: PromptResult;
   otherImages: string[];
   useToShare?: boolean | null;
-  handleShareThis: (urls: string[]) => void;
   // onDelete?: (resultId: number, imgId: number) => void;
 }
 
@@ -50,7 +50,6 @@ const GenImage: React.FC<GenImageProps> = ({
   result,
   otherImages,
   useToShare,
-  handleShareThis,
 }) => {
   const [deleteImage, setDeleteImage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -74,49 +73,179 @@ const GenImage: React.FC<GenImageProps> = ({
     setCurrentIndex((prev) => (prev + 1) % otherImages.length);
   };
 
-  const handleDownload = async () => {
-    const currentImageUrl = otherImages[currentIndex];
+  const downloadImage = async (imageUrl: string, filename: string) => {
+    const maxRetries = 3;
+    const retryDelay = 1000;
 
-    try {
-      // Try fetch approach with CORS handling first
-      const response = await fetch(currentImageUrl, {
-        mode: 'cors',
-        credentials: 'omit',
-        headers: {
-          Accept: 'image/*',
-        },
-      });
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Check if image exists first
+        const headResponse = await fetch(imageUrl, { method: 'HEAD' });
+        if (!headResponse.ok) {
+          throw new Error(`Image not ready (${headResponse.status})`);
+        }
 
-      if (response.ok) {
+        // Download with timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+
+        const response = await fetch(imageUrl, {
+          signal: controller.signal,
+          cache: 'no-cache',
+        });
+        clearTimeout(timeout);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `image-${currentIndex + 1}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
         URL.revokeObjectURL(url);
         return;
+      } catch (error) {
+        console.warn(`Download attempt ${attempt} failed:`, error);
+
+        if (attempt === maxRetries) {
+          throw new Error(`Download failed after ${maxRetries} attempts`);
+        }
+
+        // Exponential backoff
+        await new Promise((resolve) =>
+          setTimeout(resolve, retryDelay * attempt),
+        );
       }
-    } catch (error) {
-      console.warn('Fetch download failed, trying fallback:', error);
+    }
+  };
+
+  const waitForImageReady = async (
+    imageUrl: string,
+    maxWait: number = 30000,
+  ) => {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWait) {
+      try {
+        const response = await fetch(imageUrl, { method: 'HEAD' });
+        if (response.ok) return true;
+      } catch {
+        // Silently continue if HEAD request fails
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    // Fallback to direct link approach
+    throw new Error('Image not ready within timeout');
+  };
+
+  const handleDownload = async () => {
+    const imageUrl = result.imageUrls[index];
+    const urlParts = imageUrl.split('/');
+    const originalFilename = urlParts[urlParts.length - 1];
+    const filename = originalFilename.includes('.')
+      ? originalFilename
+      : `${originalFilename}.png`;
+
     try {
-      const link = document.createElement('a');
-      link.href = currentImageUrl;
-      link.download = `image-${currentIndex + 1}.jpg`;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Wait for image to be ready, then download
+      await waitForImageReady(imageUrl);
+      await downloadImage(imageUrl, filename);
     } catch (error) {
-      console.error('All download methods failed:', error);
-      // Final fallback: open in new tab
-      window.open(currentImageUrl, '_blank');
+      console.error('Download failed:', error);
+
+      // Fallback to canvas approach for CORS issues
+      try {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        const imageLoaded = new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error('Canvas image load failed'));
+
+          // Timeout for canvas approach
+          setTimeout(
+            () => reject(new Error('Canvas image load timeout')),
+            10000,
+          );
+        });
+
+        img.src = imageUrl;
+        await imageLoaded;
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          throw new Error('Could not get canvas context');
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Convert canvas to blob and download
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = filename;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+
+              setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+              }, 100);
+            } else {
+              throw new Error('Failed to create blob from canvas');
+            }
+          },
+          'image/png',
+          1.0,
+        );
+      } catch (canvasError) {
+        console.error('Canvas fallback failed:', canvasError);
+
+        // Final user-friendly fallback
+        const userChoice = confirm(
+          `Download failed due to network or server issues.\n\n` +
+            `Would you like to:\n` +
+            `• Click "OK" to open the image in a new tab (you can then right-click to save)\n` +
+            `• Click "Cancel" to copy the image URL to clipboard`,
+        );
+
+        if (userChoice) {
+          window.open(imageUrl, '_blank', 'noopener,noreferrer');
+        } else {
+          try {
+            await navigator.clipboard.writeText(imageUrl);
+            alert(
+              'Image URL copied to clipboard! You can paste it in your browser to download.',
+            );
+          } catch {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = imageUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert(
+              'Image URL copied to clipboard! You can paste it in your browser to download.',
+            );
+          }
+        }
+      }
     }
   };
 
@@ -144,6 +273,10 @@ const GenImage: React.FC<GenImageProps> = ({
     });
   };
 
+  const handleNavigateToUpload = (prompt: PromptResult) => {
+    navigate('/posts/new?type=ai-gen', { state: { prompt } });
+  };
+
   const { data: user, error } = useQuery({
     queryKey: ['user-profile', result?.userId],
     queryFn: async () => {
@@ -158,22 +291,22 @@ const GenImage: React.FC<GenImageProps> = ({
 
     if (open) {
       timeout = setTimeout(() => {
-        // onDelete?.(result.id, result); --> RESOVLE HERE
+        // onDelete?.(result.id, result); --> RESOLVE HERE
         setOpen(false); // Close dialog after delete
         setOpenDiaLog(false);
       }, 2000);
     }
 
     if (error) {
-      console.log('error fetching user profile', error);
+      console.log('error fetching user profile', user);
     }
 
     return () => clearTimeout(timeout);
-  }, [open, error]);
+  }, [open, user, error]);
 
   const handleDelete = () => {
     setTimeout(() => {
-      // onDelete?.(resultId, imageId); --> RESOVLE HERE
+      // onDelete?.(resultId, imageId); --> RESOLVE HERE
       setOpen(false);
       setDeleteImage(false);
     }, 2000);
@@ -182,21 +315,25 @@ const GenImage: React.FC<GenImageProps> = ({
   return (
     <Dialog open={openDiaLog} onOpenChange={setOpenDiaLog}>
       <DialogTrigger asChild>
-        <div className="group relative flex h-full">
-          <div className="relative flex">
+        <div className="group relative flex h-full min-h-0 w-full min-w-0 items-center justify-center overflow-hidden">
+          <div className="group relative">
             <img
               src={result.imageUrls[index]}
               alt={`Image ${result.id}`}
               loading="lazy"
-              className="relative flex h-full cursor-pointer object-cover shadow-md"
-              style={{ borderRadius: '8px' }}
+              className="max-h-full max-w-full cursor-pointer object-contain shadow-md"
+              style={{
+                borderRadius: '8px',
+                aspectRatio: 'auto',
+              }}
               onClick={() => {
                 setCurrentIndex(index), setOpenDiaLog(true);
               }}
             />
             {deleteImage === true && (
               <div
-                className={`absolute flex h-full w-full items-center justify-center bg-black/20`}
+                className={`absolute inset-0 flex items-center justify-center bg-black/20`}
+                style={{ borderRadius: '8px' }}
               >
                 <div className="flex h-fit flex-col space-y-2 rounded-lg bg-white p-2">
                   <p className="text-sm">Are you sure to delete?</p>
@@ -230,65 +367,70 @@ const GenImage: React.FC<GenImageProps> = ({
                 </div>
               </div>
             )}
-          </div>
-          {useToShare ? (
-            <>
-              <div className="absolute bottom-2 left-2 flex">
-                <Tooltip title="Click to share this">
+            {useToShare ? (
+              <>
+                <div className="absolute bottom-2 left-2 flex">
+                  <Tooltip title="Click to share this">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigateToUpload(result);
+                      }}
+                      className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    >
+                      <Check className="text-mountain-600 mr-1 size-4" />
+                      <p>Share This</p>
+                    </div>
+                  </Tooltip>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="absolute bottom-2 left-2 flex">
                   <div
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
-                      handleShareThis([result.imageUrls[index]]);
-                    }}
-                    className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
-                  >
-                    <Check className="text-mountain-600 mr-1 size-4" />
-                    <p>Share This</p>
-                  </div>
-                </Tooltip>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="absolute bottom-2 left-2 flex">
-                <Tooltip title="Download">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
                       handleDownload();
+                      return false;
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                     }}
                     className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    title="Download"
                   >
-                    <FiDownload className="text-mountain-600" />
+                    <FiDownload className="text-mountain-600 pointer-events-none" />
                   </div>
-                </Tooltip>
-              </div>
-              <div className="absolute right-2 bottom-2 flex space-x-2">
-                <Tooltip title="Edit">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
-                      handleNavigateToEdit();
-                    }}
-                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
-                  >
-                    <FaRegPenToSquare className="text-mountain-600 size-4" />
-                  </div>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
-                      setDeleteImage(true);
-                    }}
-                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
-                  >
-                    <FiTrash2 className="text-mountain-600" />
-                  </div>
-                </Tooltip>
-              </div>
-            </>
-          )}
+                </div>
+                <div className="absolute right-2 bottom-2 flex space-x-2">
+                  <Tooltip title="Edit">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent opening dialog
+                        handleNavigateToEdit();
+                      }}
+                      className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    >
+                      <FaRegPenToSquare className="text-mountain-600 size-4" />
+                    </div>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent opening dialog
+                        setDeleteImage(true);
+                      }}
+                      className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    >
+                      <FiTrash2 className="text-mountain-600" />
+                    </div>
+                  </Tooltip>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </DialogTrigger>
       <DialogContent className="min-w-7xl rounded-xl border-0 p-0">
@@ -468,6 +610,21 @@ const GenImage: React.FC<GenImageProps> = ({
                     <p className="text-mountain-600 capitalize">1024x1024</p>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="p-2">
+              <div
+                onClick={() => {
+                  const copyResult = {
+                    ...result,
+                    imageUrls: [result.imageUrls[currentIndex]],
+                  };
+                  handleNavigateToUpload(copyResult);
+                }}
+                className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
+              >
+                <RiFolderUploadLine className="mr-2 size-5" />
+                <p>Post This Image</p>
               </div>
             </div>
           </div>

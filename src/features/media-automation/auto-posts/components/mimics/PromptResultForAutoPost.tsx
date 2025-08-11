@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { truncateText } from '@/utils/text';
 import {
   Button,
@@ -64,17 +65,33 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
   }, [open]);
 
   const handleDownloadAll = async () => {
-    const zip = new JSZip();
-    await Promise.all(
-      result!.imageUrls.map(async (url, index) => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        zip.file(`image-${index + 1}.jpg`, blob);
-      }),
-    );
+    try {
+      const zip = new JSZip();
+      await Promise.all(
+        result!.imageUrls.map(async (url, index) => {
+          try {
+            const blob = await fetchImageWithCorsHandling(url);
+            zip.file(`image-${index + 1}.jpg`, blob);
+          } catch (error) {
+            console.error(`Failed to download image ${index + 1}:`, error);
+            // Continue with other images even if one fails
+          }
+        }),
+      );
 
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'images.zip');
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, 'images.zip');
+    } catch (error) {
+      console.error('Download failed:', error);
+      showSnackbar('Download failed. Please try again.', 'error');
+
+      // Fallback: open images in new tabs for manual download
+      result!.imageUrls.forEach((url, index) => {
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, index * 100); // Stagger to avoid popup blocking
+      });
+    }
   };
 
   const handleShareThese = (urls: string[]) => {

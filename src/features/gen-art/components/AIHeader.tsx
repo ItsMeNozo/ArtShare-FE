@@ -1,11 +1,12 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 //Icons
-import { IoHome } from "react-icons/io5";
-import { PiStarFourFill } from "react-icons/pi";
+import { IoHome } from 'react-icons/io5';
+import { PiStarFourFill } from 'react-icons/pi';
 
 //Components
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,16 +14,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Tooltip } from "@mui/material";
-import TrendingPrompt from "./AI/TrendingPrompt";
-import UserButton from "../../../components/header/user-button";
+} from '@/components/ui/dialog';
+import { Tooltip } from '@mui/material';
+import UserButton from '../../../components/header/user-button';
+import TrendingPrompt from './AI/TrendingPrompt';
 
 //Context
+import UserInAppConfigs from '@/components/popovers/UserInAppConfigs';
 import { useUser } from '@/contexts/user/useUser';
-import UserInAppConfigs from "@/components/popovers/UserInAppConfigs";
-import { Book } from "lucide-react";
+import { Book } from 'lucide-react';
 
 type AIHeaderProps = {
   onGuideClick: () => void;
@@ -37,32 +37,35 @@ const AIHeader = ({ onGuideClick }: AIHeaderProps) => {
   };
 
   return (
-    <nav className={`z-50 flex relative justify-between w-[calc(100vw-18rem)] pr-4 items-center dark:bg-mountain-950 dark:border-b-mountain-700 h-16`}>
-      <div className="flex justify-between items-center px-4 w-full">
-        <Link to="/dashboard" className="flex items-center bg-mountain-50 hover:bg-mountain-100/80 px-4 border border border-mountain-100 border-mountain-200 rounded-lg h-10">
-          <div className='flex justify-center items-center hover:bg-mountain-100 mr-2 rounded-lg'>
-            <IoHome className='size-5 text-mountain-600' />
+    <nav
+      className={`dark:bg-mountain-950 dark:border-b-mountain-700 relative z-50 flex h-16 w-[calc(100vw-18rem)] items-center justify-between pr-4`}
+    >
+      <div className="flex w-full items-center justify-between px-4">
+        <Link
+          to="/dashboard"
+          className="bg-mountain-50 hover:bg-mountain-100/80 border-mountain-100 border-mountain-200 flex h-10 items-center rounded-lg border px-4"
+        >
+          <div className="hover:bg-mountain-100 mr-2 flex items-center justify-center rounded-lg">
+            <IoHome className="text-mountain-600 size-5" />
           </div>
-          <span className='flex font-medium'>
-            Dashboard
-          </span>
+          <span className="flex font-medium">Home</span>
         </Link>
-        <div className="flex items-center space-x-4 px-4 border-mountain-200 border-r-1">
+        <div className="border-mountain-200 flex items-center space-x-4 border-r-1 px-4">
           <Dialog open={open} onOpenChange={handleOpenModal}>
             <DialogTrigger asChild>
               <Tooltip title="See top trending AI prompts">
-                <Button className="flex justify-center items-center bg-purple-200 hover:bg-purple-200/80 rounded-lg w-32 h-10 font-medium text-purple-900 text-sm cursor-pointer">
+                <Button className="flex h-10 w-32 cursor-pointer items-center justify-center rounded-lg bg-purple-200 text-sm font-medium text-purple-900 hover:bg-purple-200/80">
                   <PiStarFourFill className="size-6" />
                   Trending AI
                 </Button>
               </Tooltip>
             </DialogTrigger>
-            <DialogContent className="flex flex-col gap-0 space-y-0 bg-white p-0 border-0 rounded-xl w-[90%] h-[95%]">
+            <DialogContent className="flex h-[95%] w-[90%] flex-col gap-0 space-y-0 rounded-xl border-0 bg-white p-0">
               <DialogHeader
                 hidden
-                className="flex p-4 border-mountain-200 border-b-[1px] h-12"
+                className="border-mountain-200 flex h-12 border-b-[1px] p-4"
               >
-                <DialogTitle className="font-normal text-mountain-700">
+                <DialogTitle className="text-mountain-700 font-normal">
                   ArtShare AI Bot
                 </DialogTitle>
                 <DialogDescription hidden>Image Description</DialogDescription>
@@ -72,7 +75,8 @@ const AIHeader = ({ onGuideClick }: AIHeaderProps) => {
           </Dialog>
           <Button
             onClick={onGuideClick}
-            className="flex justify-center items-center bg-white hover:bg-mountain-50 border border-mountain-200 rounded-lg w-24 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
+            className="hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex h-10 w-24 cursor-pointer items-center justify-center rounded-lg border bg-white text-sm font-medium"
+          >
             <Book className="size-6" />
             Guide
           </Button>

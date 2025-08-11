@@ -1,20 +1,20 @@
-import React, { Dispatch, useState, useEffect } from "react";
 import {
+  Box,
+  Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  TextField,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
-  Button,
-  Box,
-} from "@mui/material";
-import { FaDesktop, FaMobileAlt } from "react-icons/fa";
-import { MdLaptopMac } from "react-icons/md";
-import { IoMdTabletPortrait } from "react-icons/io";
+  Select,
+  TextField,
+} from '@mui/material';
+import React, { Dispatch, useEffect, useMemo, useState } from 'react';
+import { FaDesktop, FaMobileAlt } from 'react-icons/fa';
+import { IoMdTabletPortrait } from 'react-icons/io';
+import { MdLaptopMac } from 'react-icons/md';
 
 interface DownloadModalProps {
   openDownload: boolean;
@@ -34,29 +34,29 @@ const deviceSizeOptions: Record<
   { label: string; value: string; ratio: string }[]
 > = {
   desktop: [
-    { label: "Small", value: "1920x1080", ratio: "16:9" },
-    { label: "Medium", value: "2560x1440", ratio: "16:9" },
-    { label: "Large", value: "3840x2160", ratio: "16:9" },
-    { label: "Square Small", value: "1080x1080", ratio: "1:1" },
-    { label: "Square Large", value: "2048x2048", ratio: "1:1" },
+    { label: 'Small', value: '1920x1080', ratio: '16:9' },
+    { label: 'Medium', value: '2560x1440', ratio: '16:9' },
+    { label: 'Large', value: '3840x2160', ratio: '16:9' },
+    { label: 'Square Small', value: '1080x1080', ratio: '1:1' },
+    { label: 'Square Large', value: '2048x2048', ratio: '1:1' },
   ],
   laptop: [
-    { label: "Small", value: "1366x768", ratio: "16:9" },
-    { label: "Medium", value: "1440x900", ratio: "16:10" },
-    { label: "Large", value: "1920x1080", ratio: "16:9" },
-    { label: "Square Small", value: "1024x1024", ratio: "1:1" },
+    { label: 'Small', value: '1366x768', ratio: '16:9' },
+    { label: 'Medium', value: '1440x900', ratio: '16:10' },
+    { label: 'Large', value: '1920x1080', ratio: '16:9' },
+    { label: 'Square Small', value: '1024x1024', ratio: '1:1' },
   ],
   tablet: [
-    { label: "Small", value: "1024x768", ratio: "4:3" },
-    { label: "Medium", value: "1280x800", ratio: "16:10" },
-    { label: "Large", value: "2048x1536", ratio: "4:3" },
-    { label: "Square", value: "1080x1080", ratio: "1:1" },
+    { label: 'Small', value: '1024x768', ratio: '4:3' },
+    { label: 'Medium', value: '1280x800', ratio: '16:10' },
+    { label: 'Large', value: '2048x1536', ratio: '4:3' },
+    { label: 'Square', value: '1080x1080', ratio: '1:1' },
   ],
   mobile: [
-    { label: "Small", value: "720x1280", ratio: "9:16" },
-    { label: "Medium", value: "1080x1920", ratio: "9:16" },
-    { label: "Large", value: "1440x2560", ratio: "9:16" },
-    { label: "Square", value: "1080x1080", ratio: "1:1" },
+    { label: 'Small', value: '720x1280', ratio: '9:16' },
+    { label: 'Medium', value: '1080x1920', ratio: '9:16' },
+    { label: 'Large', value: '1440x2560', ratio: '9:16' },
+    { label: 'Square', value: '1080x1080', ratio: '1:1' },
   ],
 };
 
@@ -67,6 +67,13 @@ const deviceIcons = {
   mobile: <FaMobileAlt fontSize="small" />,
 };
 
+// Map categories to actual aspect ratios
+const RATIO_CATEGORY_MAP: Record<string, string[]> = {
+  square: ['1:1'],
+  landscape: ['16:9', '4:3', '16:10'],
+  portrait: ['9:16', '3:4'],
+};
+
 const DownloadModal: React.FC<DownloadModalProps> = ({
   onDownload,
   openDownload,
@@ -74,53 +81,58 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
   imageURL,
   imageRatio,
 }) => {
-
-  const [format, setFormat] = useState("jpg");
-  const [filename, setFilename] = useState("my-image");
-  const [device, setDevice] = useState<keyof typeof deviceSizeOptions>("desktop");
+  const [format, setFormat] = useState('jpg');
+  const [filename, setFilename] = useState('my-image');
+  const [device, setDevice] =
+    useState<keyof typeof deviceSizeOptions>('desktop');
   const [size, setSize] = useState(deviceSizeOptions.desktop[0].value);
 
-  // Map categories to actual aspect ratios
-  const ratioCategoryMap: Record<string, string[]> = {
-    SQUARE: ["1:1"],
-    LANDSCAPE: ["16:9", "4:3", "16:10"],
-    PORTRAIT: ["9:16", "3:4"],
-  };
-
-  // Normalize the incoming ratio to actual aspect values
-  const allowedRatios = ratioCategoryMap[imageRatio] || [];
-
-  // Filter sizes to only match allowed aspect values
-  const filteredSizes = deviceSizeOptions[device].filter((opt) =>
-    allowedRatios.includes(opt.ratio)
+  // Normalize the incoming ratio to lowercase and get actual aspect values
+  const normalizedRatio = imageRatio.toLowerCase();
+  const allowedRatios = useMemo(
+    () => RATIO_CATEGORY_MAP[normalizedRatio] || [],
+    [normalizedRatio],
   );
 
-  // Always pick a matching size by default
+  // Filter sizes to only match allowed aspect values
+  const filteredSizes = useMemo(
+    () =>
+      deviceSizeOptions[device].filter((opt) =>
+        allowedRatios.includes(opt.ratio),
+      ),
+    [device, allowedRatios],
+  );
+
+  // Update size when device changes or when filtered sizes change
   useEffect(() => {
     if (filteredSizes.length > 0) {
-      setSize(filteredSizes[0].value);
+      // Check if current size is still valid
+      const currentSizeExists = filteredSizes.some((opt) => opt.value === size);
+      if (!currentSizeExists) {
+        setSize(filteredSizes[0].value);
+      }
     } else {
-      setSize("");
-    }
-  }, [device, allowedRatios]);
-
-  useEffect(() => {
-    if (!deviceSizeOptions[device].some((opt) => allowedRatios.includes(opt.ratio))) {
-      const firstMatchDevice = Object.keys(deviceSizeOptions).find((dev) =>
-        deviceSizeOptions[dev as keyof typeof deviceSizeOptions].some(
-          (opt) => allowedRatios.includes(opt.ratio)
-        )
+      // If no sizes match, try to find a device that has matching sizes
+      const deviceWithMatchingSizes = Object.keys(deviceSizeOptions).find(
+        (dev) =>
+          deviceSizeOptions[dev as keyof typeof deviceSizeOptions].some((opt) =>
+            allowedRatios.includes(opt.ratio),
+          ),
       ) as keyof typeof deviceSizeOptions | undefined;
 
-      if (firstMatchDevice) {
-        setDevice(firstMatchDevice);
-        const match = deviceSizeOptions[firstMatchDevice].find(
-          (opt) => allowedRatios.includes(opt.ratio)
+      if (deviceWithMatchingSizes && deviceWithMatchingSizes !== device) {
+        setDevice(deviceWithMatchingSizes);
+        const matchingSizes = deviceSizeOptions[deviceWithMatchingSizes].filter(
+          (opt) => allowedRatios.includes(opt.ratio),
         );
-        if (match) setSize(match.value);
+        if (matchingSizes.length > 0) {
+          setSize(matchingSizes[0].value);
+        }
+      } else {
+        setSize('');
       }
     }
-  }, [imageRatio, device]);
+  }, [device, normalizedRatio, allowedRatios, filteredSizes, size]);
 
   const handleConfirm = () => {
     onDownload({ format, filename, device, size });
@@ -129,32 +141,12 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
 
   const handleDeviceChange = (newDevice: string) => {
     setDevice(newDevice as keyof typeof deviceSizeOptions);
-    const sizes = deviceSizeOptions[newDevice as keyof typeof deviceSizeOptions];
-    setSize(sizes[0]?.value || "");
+    // The useEffect will handle setting the appropriate size
   };
-
-  // Ensure selected device & size match the image ratio
-  useEffect(() => {
-    if (!deviceSizeOptions[device].some((opt) => opt.ratio === imageRatio)) {
-      const firstMatchDevice = Object.keys(deviceSizeOptions).find((dev) =>
-        deviceSizeOptions[dev as keyof typeof deviceSizeOptions].some(
-          (opt) => opt.ratio === imageRatio
-        )
-      ) as keyof typeof deviceSizeOptions | undefined;
-
-      if (firstMatchDevice) {
-        setDevice(firstMatchDevice);
-        const match = deviceSizeOptions[firstMatchDevice].find(
-          (opt) => opt.ratio === imageRatio
-        );
-        if (match) setSize(match.value);
-      }
-    }
-  }, [imageRatio, device]);
 
   // Handle single vs multiple preview logic
   const previewImages =
-    typeof imageURL === "string"
+    typeof imageURL === 'string'
       ? [imageURL]
       : Array.isArray(imageURL)
         ? imageURL.slice(0, 4)
@@ -176,7 +168,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
                 key={idx}
                 src={img}
                 alt={`Preview ${idx + 1}`}
-                className="rounded-md w-20 h-auto object-cover aspect-square"
+                className="aspect-square h-auto w-20 rounded-md object-cover"
               />
             ))}
           </div>
@@ -235,8 +227,13 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
             <Select
               labelId="size-label"
               label="Size"
-              value={size}
+              value={
+                filteredSizes.some((opt) => opt.value === size)
+                  ? size
+                  : filteredSizes[0]?.value || ''
+              }
               onChange={(e) => setSize(e.target.value)}
+              disabled={filteredSizes.length === 0}
             >
               {filteredSizes.length > 0 ? (
                 filteredSizes.map((s) => (
@@ -245,7 +242,9 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
                   </MenuItem>
                 ))
               ) : (
-                <MenuItem disabled>No matching sizes</MenuItem>
+                <MenuItem disabled value="">
+                  No matching sizes
+                </MenuItem>
               )}
             </Select>
           </FormControl>

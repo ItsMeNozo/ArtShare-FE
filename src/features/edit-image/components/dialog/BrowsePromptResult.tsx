@@ -35,7 +35,10 @@ interface promptResultProps {
   useToEdit?: boolean | null;
 }
 
-const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) => {
+const BrowsePromptResult: React.FC<promptResultProps> = ({
+  result,
+  useToEdit,
+}) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -51,23 +54,93 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) 
     return () => clearTimeout(timeout);
   }, [open]);
 
-  const handleDownloadAll = async () => {
-    const zip = new JSZip();
-    await Promise.all(
-      result!.imageUrls.map(async (url, index) => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        zip.file(`image-${index + 1}.jpg`, blob);
-      }),
-    );
+  const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
+    try {
+      // Try direct fetch first
+      const response = await fetch(url, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          Accept: 'image/*',
+        },
+      });
 
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'images.zip');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.blob();
+    } catch (error) {
+      console.warn('Direct fetch failed, trying canvas approach:', error);
+
+      // Fallback to canvas approach for CORS issues
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Canvas to blob conversion failed'));
+            }
+          }, 'image/png');
+        };
+
+        img.onerror = () => {
+          reject(new Error('Could not load image for canvas approach'));
+        };
+
+        img.src = url;
+      });
+    }
+  };
+
+  const handleDownloadAll = async () => {
+    try {
+      const zip = new JSZip();
+      await Promise.all(
+        result!.imageUrls.map(async (url, index) => {
+          try {
+            const blob = await fetchImageWithCorsHandling(url);
+            zip.file(`image-${index + 1}.jpg`, blob);
+          } catch (error) {
+            console.error(`Failed to download image ${index + 1}:`, error);
+            // Continue with other images even if one fails
+          }
+        }),
+      );
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, 'images.zip');
+    } catch (error) {
+      console.error('Download failed:', error);
+
+      // Fallback: open images in new tabs for manual download
+      result!.imageUrls.forEach((url, index) => {
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, index * 100); // Stagger to avoid popup blocking
+      });
+    }
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full">
-      <div className="flex justify-between items-center space-x-2 w-full">
+    <div className="flex w-full flex-col space-y-2">
+      <div className="flex w-full items-center justify-between space-x-2">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
           {truncateText(result.userPrompt, 60)}
@@ -87,14 +160,14 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) 
               <PopoverTrigger asChild>
                 <Tooltip title="Delete" placement="bottom" arrow>
                   <Button
-                    className="flex bg-mountain-100 w-4"
+                    className="bg-mountain-100 flex w-4"
                     hidden={useToEdit || false}
                   >
                     <FiTrash2 className="size-5 text-red-900" />
                   </Button>
                 </Tooltip>
               </PopoverTrigger>
-              <PopoverContent className="dark:bg-mountain-900 mt-2 mr-6 p-2 border-mountain-100 dark:border-mountain-700 w-48">
+              <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-2 mr-6 w-48 p-2">
                 <div className="flex flex-col space-y-2">
                   <p className="text-sm">Are you sure to delete?</p>
                   <Dialog>
@@ -105,13 +178,13 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) 
                       </Button>
                     </DialogTrigger>
                     <DialogContent
-                      className="flex justify-center sm:max-w-[320px] h-fit cursor-not-allowed"
+                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
                       hideCloseButton
                     >
                       <DialogHeader>
-                        <DialogDescription className="flex justify-center items-center space-x-4">
+                        <DialogDescription className="flex items-center justify-center space-x-4">
                           <CircularProgress size={32} thickness={4} />
-                          <DialogTitle className="font-normal text-base text-center">
+                          <DialogTitle className="text-center text-base font-normal">
                             Deleting These Images
                           </DialogTitle>
                         </DialogDescription>
@@ -128,9 +201,9 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) 
         {result.imageUrls.map((__, index) => (
           <ImageListItem key={index} className="flex h-full object-cover">
             {result.generating ? (
-              <div className="relative flex justify-center items-center bg-mountain-100 rounded-[8px] h-full">
+              <div className="bg-mountain-100 relative flex h-full items-center justify-center rounded-[8px]">
                 <CircularProgress size={64} thickness={4} />
-                <p className="absolute font-medium text-gray-700 text-xs">
+                <p className="absolute text-xs font-medium text-gray-700">
                   Loading
                 </p>
               </div>
@@ -140,7 +213,7 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({ result, useToEdit }) 
                 otherImages={result.imageUrls}
                 index={index}
                 useToEdit={useToEdit}
-              // onDelete={onDeleteSingle!}
+                // onDelete={onDeleteSingle!}
               />
             )}
           </ImageListItem>

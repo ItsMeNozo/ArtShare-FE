@@ -25,8 +25,8 @@ import { MdFlipToFront } from 'react-icons/md';
 //Hooks
 import { useImageStyleHandlers } from './hooks/useImageStyleHandlers';
 import { useLayerTransformHandlers } from './hooks/useLayerTransformHandlers';
-import { useTextStyleHandlers } from './hooks/useTextStyleHandlers';
 import { useShapeStyleHandlers } from './hooks/useShapeStyleHandlers';
+import { useTextStyleHandlers } from './hooks/useTextStyleHandlers';
 import { designSamples } from './utils/constant';
 
 const EditImage: React.FC = () => {
@@ -120,7 +120,7 @@ const EditImage: React.FC = () => {
         base.backgroundColor === color) ||
       '#ffffff';
     setHasChanges(!isBase);
-  }, [layers]);
+  }, [layers, color]);
 
   useEffect(() => {
     if (sampleId && designSamples[sampleId]) {
@@ -282,7 +282,7 @@ const EditImage: React.FC = () => {
       };
       setLayers((prev) => [...prev, newImageLayer]);
     };
-  }, [imageUrl, layers, newDesign]);
+  }, [imageUrl, layers, newDesign, canvasSize.width, canvasSize.height, name]);
 
   useEffect(() => {
     const imageLayer = layers.find(
@@ -300,6 +300,30 @@ const EditImage: React.FC = () => {
     const minZIndex = zIndexes.length > 0 ? Math.min(...zIndexes) : 1;
     setZIndex({ min: minZIndex, max: maxZIndex });
   }, [layers]);
+
+  // Auto-focus the first image layer when layers change and no layer is currently selected
+  useEffect(() => {
+    // Only auto-focus if no layer is currently selected
+    if (selectedLayerId) return;
+
+    // Debounce the auto-focus logic to prevent frequent updates
+    const timeoutId = setTimeout(() => {
+      // Find the first non-background image layer (layers with zIndex > 0 and type 'image')
+      const firstImageLayer = layers.find(
+        (layer) =>
+          layer.type === 'image' &&
+          layer.zIndex &&
+          layer.zIndex > 0 &&
+          layer.src,
+      );
+
+      if (firstImageLayer) {
+        setSelectedLayerId(firstImageLayer.id);
+      }
+    }, 100); // 100ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [layers, selectedLayerId]);
 
   const updateSelectedLayer = (updates: Partial<Layer>) => {
     setLayers((prev) =>
@@ -374,7 +398,7 @@ const EditImage: React.FC = () => {
     selectedLayerId,
     globalZIndex,
     setGlobalZIndex,
-  })
+  });
 
   // Transform hooks
   const {
@@ -475,7 +499,7 @@ const EditImage: React.FC = () => {
       }
 
       const sortedLayers = allLayers.sort(
-        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0)
+        (a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0),
       );
 
       const imageLayers = sortedLayers.filter((l) => l.type === 'image');
@@ -491,8 +515,20 @@ const EditImage: React.FC = () => {
           img.src = layer.src;
           img.onload = () => {
             const {
-              x, y, zoom, rotation, flipH, flipV, opacity,
-              brightness, contrast, saturation, hue, sepia, width, height
+              x,
+              y,
+              zoom,
+              rotation,
+              flipH,
+              flipV,
+              opacity,
+              brightness,
+              contrast,
+              saturation,
+              hue,
+              sepia,
+              width,
+              height,
             } = layer;
 
             const drawWidth = width ?? img.naturalWidth;
@@ -515,7 +551,7 @@ const EditImage: React.FC = () => {
               -drawWidth / 2,
               -drawHeight / 2,
               drawWidth,
-              drawHeight
+              drawHeight,
             );
             ctx.restore();
             resolveImg();
@@ -550,7 +586,6 @@ const EditImage: React.FC = () => {
       });
     });
   };
-
 
   const handleDownload = async (
     format: 'png' | 'jpg',
@@ -590,17 +625,16 @@ const EditImage: React.FC = () => {
     navigate('/posts/new', { state: { fromEditorImage: file } });
   };
 
-  console.log("layers", layers);
   return (
-    <div className="group relative flex flex-col w-full h-full">
+    <div className="group relative flex h-full w-full flex-col">
       {/* Floating Button */}
       <button
         aria-label="Collapse Color Picker"
         onClick={() => setFullScreen(!fullScreen)}
         className={`absolute top-0 left-1/2 z-50 flex h-10 w-10 -translate-x-1/2 items-center justify-center transition-all ${fullScreen ? '' : 'hidden'}`}
       >
-        <div className="-top-4 hover:top-0 relative bg-white opacity-50 hover:opacity-100 p-2 rounded-full transition-all duration-300 ease-in-out cursor-pointer">
-          <ChevronDown className="size-5 text-mountain-950 transition-opacity duration-200" />
+        <div className="relative -top-4 cursor-pointer rounded-full bg-white p-2 opacity-50 transition-all duration-300 ease-in-out hover:top-0 hover:opacity-100">
+          <ChevronDown className="text-mountain-950 size-5 transition-opacity duration-200" />
         </div>
       </button>
       <EditHeader
@@ -632,7 +666,7 @@ const EditImage: React.FC = () => {
           />
           <div
             onMouseDown={() => setSelectedLayerId(null)}
-            className="relative flex justify-center items-center bg-mountain-200 w-full h-full"
+            className="bg-mountain-200 relative flex h-full w-full items-center justify-center"
           >
             <div
               ref={imageContainerRef}
@@ -680,7 +714,7 @@ const EditImage: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="bottom-2 left-2 absolute flex justify-center items-center bg-white opacity-50 rounded-lg w-24 h-8 text-mountain-600 text-sm">
+            <div className="text-mountain-600 absolute bottom-2 left-2 flex h-8 w-24 items-center justify-center rounded-lg bg-white text-sm opacity-50">
               <span>
                 {finalCanvasSize?.width} x {finalCanvasSize?.height}
               </span>
@@ -731,53 +765,54 @@ const EditImage: React.FC = () => {
                   prev === 'arrange' ? null : 'arrange',
                 )
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <MdFlipToFront className="size-6 text-mountain-600" />
+              <MdFlipToFront className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Arrange</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'crop' ? null : 'crop'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <IoCrop className="size-6 text-mountain-600" />
+              <IoCrop className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Crop</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'adjust' ? null : 'adjust'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <HiOutlineAdjustmentsHorizontal className="size-6 text-mountain-600" />
+              <HiOutlineAdjustmentsHorizontal className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Adjust</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'filter' ? null : 'filter'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <IoIosColorFilter className="size-6 text-mountain-600" />
+              <IoIosColorFilter className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Filter</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'text' ? null : 'text'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 select-none"
+              className="hover:bg-mountain-50 flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
             >
-              <RiText className="size-6 text-mountain-600" />
+              <RiText className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Text</p>
             </div>
             <div
               onClick={() =>
                 setActivePanel((prev) => (prev === 'shape' ? null : 'shape'))
               }
-              className="flex flex-col justify-center items-center space-y-1 hover:bg-mountain-50 rounded-lg w-full h-20 pointer-events-none select-none">
-              <IoShapesOutline className="size-6 text-mountain-600" />
+              className="hover:bg-mountain-50 pointer-events-none flex h-20 w-full flex-col items-center justify-center space-y-1 rounded-lg select-none"
+            >
+              <IoShapesOutline className="text-mountain-600 size-6" />
               <p className="text-mountain-600 text-xs">Shape</p>
             </div>
             {/* 

@@ -1,15 +1,15 @@
-import React from "react";
-import { IoCopyOutline } from "react-icons/io5";
-import { GoMoveToTop, GoMoveToBottom } from "react-icons/go";
-import { TbChevronUp, TbChevronDown } from "react-icons/tb";
-import { Lock, Trash2Icon, Unlock } from "lucide-react";
-import Moveable from "react-moveable";
 import {
   ContextMenu,
-  ContextMenuTrigger,
   ContextMenuContent,
   ContextMenuItem,
-} from "@/components/ui/context-menu";
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import { Lock, Trash2Icon, Unlock } from 'lucide-react';
+import React from 'react';
+import { GoMoveToBottom, GoMoveToTop } from 'react-icons/go';
+import { IoCopyOutline } from 'react-icons/io5';
+import { TbChevronDown, TbChevronUp } from 'react-icons/tb';
+import Moveable from 'react-moveable';
 
 const LayerItem = React.memo(
   ({
@@ -57,28 +57,28 @@ const LayerItem = React.memo(
                 width: layer.width,
                 height: layer.height,
                 transform: `translate(${layer.x}px, ${layer.y}px) rotate(${layer.rotation}deg)`,
-                transformOrigin: "center",
-                position: "absolute",
+                transformOrigin: 'center',
+                position: 'absolute',
                 zIndex: layer.zIndex,
-                background: "transparent",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                pointerEvents: "auto",
+                background: 'transparent',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                pointerEvents: 'auto',
               }}
               onMouseDown={(e) => {
                 e.stopPropagation();
                 setSelectedLayerId(layer.id);
               }}
             >
-              {layer.type === "image" ? (
+              {layer.type === 'image' ? (
                 <img
                   src={layer.src}
                   alt=""
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none',
                     filter: `
                       saturate(${layer.saturation}%)
                       hue-rotate(${layer.hue}deg)
@@ -88,11 +88,11 @@ const LayerItem = React.memo(
                       sepia(${layer.sepia}%)
                     `,
                     transform: `scaleX(${layer.flipH ? -1 : 1}) scaleY(${layer.flipV ? -1 : 1})`,
-                    zIndex: layer.zIndex
+                    zIndex: layer.zIndex,
                   }}
                   draggable={false}
                 />
-              ) : editingLayerId === layer.id && layer.type === "text" ? (
+              ) : editingLayerId === layer.id && layer.type === 'text' ? (
                 <textarea
                   autoFocus
                   value={layer.text}
@@ -103,39 +103,39 @@ const LayerItem = React.memo(
                     e.target.setSelectionRange(val.length, val.length);
                   }}
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    width: '100%',
+                    height: '100%',
                     fontSize: layer.fontSize,
                     color: layer.color,
                     zIndex: layer.zIndex,
-                    fontWeight: layer.fontWeight || "normal",
-                    fontFamily: layer.fontFamily || "sans-serif",
-                    textAlign: "center",
-                    background: "transparent",
-                    border: "none",
-                    resize: "none",
-                    outline: "none",
-                    overflow: "hidden",
-                    whiteSpace: "pre-wrap",
+                    fontWeight: layer.fontWeight || 'normal',
+                    fontFamily: layer.fontFamily || 'sans-serif',
+                    textAlign: 'center',
+                    background: 'transparent',
+                    border: 'none',
+                    resize: 'none',
+                    outline: 'none',
+                    overflow: 'hidden',
+                    whiteSpace: 'pre-wrap',
                     transform: `scaleX(${layer.flipH ? -1 : 1}) scaleY(${layer.flipV ? -1 : 1})`,
                     opacity: layer.opacity,
                   }}
                 />
-              ) : (layer.type === "text") ? (
+              ) : layer.type === 'text' ? (
                 <div
                   onDoubleClick={() => setEditingLayerId(layer.id)}
                   style={{
-                    width: "100%",
-                    height: "100%",
+                    width: '100%',
+                    height: '100%',
                     fontSize: layer.fontSize,
                     color: layer.color,
                     zIndex: layer.zIndex,
-                    fontWeight: layer.fontWeight || "normal",
-                    fontFamily: layer.fontFamily || "sans-serif",
-                    textAlign: "center",
-                    whiteSpace: "pre-wrap",
-                    userSelect: "none",
-                    cursor: "text",
+                    fontWeight: layer.fontWeight || 'normal',
+                    fontFamily: layer.fontFamily || 'sans-serif',
+                    textAlign: 'center',
+                    whiteSpace: 'pre-wrap',
+                    userSelect: 'none',
+                    cursor: 'text',
                     transform: `scaleX(${layer.flipH ? -1 : 1}) scaleY(${layer.flipV ? -1 : 1})`,
                     opacity: layer.opacity,
                   }}
@@ -154,12 +154,14 @@ const LayerItem = React.memo(
                 rotatable
                 rotationPosition="top"
                 throttleResize={1}
-                renderDirections={["nw", "ne", "sw", "se"]}
+                renderDirections={['nw', 'ne', 'sw', 'se']}
                 keepRatio={false}
                 onDrag={({ beforeTranslate }) => {
                   setLayers((prev) =>
                     prev.map((l) =>
-                      l.id === layer.id ? { ...l, x: beforeTranslate[0], y: beforeTranslate[1] } : l,
+                      l.id === layer.id
+                        ? { ...l, x: beforeTranslate[0], y: beforeTranslate[1] }
+                        : l,
                     ),
                   );
                 }}
@@ -174,54 +176,79 @@ const LayerItem = React.memo(
                   setLayers((prev) =>
                     prev.map((l) =>
                       l.id === layer.id
-                        ? { ...l, width, height, x: drag.beforeTranslate[0], y: drag.beforeTranslate[1] }
+                        ? {
+                            ...l,
+                            width,
+                            height,
+                            x: drag.beforeTranslate[0],
+                            y: drag.beforeTranslate[1],
+                          }
                         : l,
                     ),
                   );
                 }}
                 onRotate={({ rotation }) => {
                   setLayers((prev) =>
-                    prev.map((l) => (l.id === layer.id ? { ...l, rotation } : l)),
+                    prev.map((l) =>
+                      l.id === layer.id ? { ...l, rotation } : l,
+                    ),
                   );
                 }}
               />
             )}
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent className="p-2 border-mountain-200 w-48 text-sm">
+        <ContextMenuContent className="border-mountain-200 w-48 p-2 text-sm">
           <ContextMenuItem onClick={() => handleLockLayer(layer.id)}>
-            {layer.isLocked ?
+            {layer.isLocked ? (
               <>
                 <Unlock className="size-4" />
                 <span>UnLock Layer</span>
-              </> :
+              </>
+            ) : (
               <>
                 <Lock className="size-4" />
                 <span>Lock Layer</span>
               </>
-            }
+            )}
           </ContextMenuItem>
           <ContextMenuItem onClick={() => handleDuplicate(layer.id)}>
             <IoCopyOutline className="size-4" />
             <span>Duplicate</span>
           </ContextMenuItem>
-          <ContextMenuItem disabled={layer?.zIndex === zIndex?.max} onClick={() => bringToFront(layer.id)}>
+          <ContextMenuItem
+            disabled={layer?.zIndex === zIndex?.max}
+            onClick={() => bringToFront(layer.id)}
+          >
             <GoMoveToTop className="size-4" />
             <span>Bring To Front</span>
           </ContextMenuItem>
-          <ContextMenuItem disabled={layer?.zIndex === zIndex?.max} onClick={() => moveForward(layer.id)}>
+          <ContextMenuItem
+            disabled={layer?.zIndex === zIndex?.max}
+            onClick={() => moveForward(layer.id)}
+          >
             <TbChevronUp className="size-4" />
             <span>Move Forward</span>
           </ContextMenuItem>
-          <ContextMenuItem disabled={layer?.zIndex === zIndex?.min} onClick={() => moveBackward(layer.id)}>
+          <ContextMenuItem
+            disabled={layer?.zIndex === zIndex?.min}
+            onClick={() => moveBackward(layer.id)}
+          >
             <TbChevronDown className="size-4" />
             <span>Move Backward</span>
           </ContextMenuItem>
-          <ContextMenuItem disabled={layer?.zIndex === zIndex?.min} onClick={() => sendToBack(layer.id)}>
+          <ContextMenuItem
+            disabled={layer?.zIndex === zIndex?.min}
+            onClick={() => sendToBack(layer.id)}
+          >
             <GoMoveToBottom className="size-4" />
             <span>Bring To Back</span>
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => setLayers((prev) => prev.filter((l) => l.id !== layer.id))}>
+          <ContextMenuItem
+            onClick={() =>
+              setLayers((prev) => prev.filter((l) => l.id !== layer.id))
+            }
+          >
             <Trash2Icon className="size-4" />
             <span>Delete</span>
           </ContextMenuItem>

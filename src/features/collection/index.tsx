@@ -355,6 +355,15 @@ const CollectionPage: React.FC = () => {
     return 'Loading...';
   }, [activeCollectionId, currentCollection]);
 
+  const galleryItemCount = useMemo(() => {
+    if (activeCollectionId === 'all') {
+      return showOnlyPrivate
+        ? allPostsData.allPrivatePosts.length
+        : allPostsData.allPostsCombined.length;
+    }
+    return currentCollection?.posts?.length || 0;
+  }, [activeCollectionId, showOnlyPrivate, allPostsData, currentCollection]);
+
   const anyMutationError =
     createCollectionMutation.error ||
     updateCollectionMutation.error ||
@@ -459,7 +468,7 @@ const CollectionPage: React.FC = () => {
       <Box>
         <CollectionTitle
           title={galleryTitle}
-          itemCount={allPhotosFlat.length}
+          itemCount={galleryItemCount}
           isEditable={typeof selectedCollectionId === 'number'}
           isPrivate={!!currentCollection?.isPrivate}
           isLoading={updateCollectionMutation.isPending}
