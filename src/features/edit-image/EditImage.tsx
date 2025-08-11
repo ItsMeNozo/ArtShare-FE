@@ -120,7 +120,7 @@ const EditImage: React.FC = () => {
         base.backgroundColor === color) ||
       '#ffffff';
     setHasChanges(!isBase);
-  }, [layers]);
+  }, [layers, color]);
 
   useEffect(() => {
     if (sampleId && designSamples[sampleId]) {
@@ -282,7 +282,7 @@ const EditImage: React.FC = () => {
       };
       setLayers((prev) => [...prev, newImageLayer]);
     };
-  }, [imageUrl, layers, newDesign]);
+  }, [imageUrl, layers, newDesign, canvasSize.width, canvasSize.height, name]);
 
   useEffect(() => {
     const imageLayer = layers.find(
@@ -306,15 +306,23 @@ const EditImage: React.FC = () => {
     // Only auto-focus if no layer is currently selected
     if (selectedLayerId) return;
 
-    // Find the first non-background image layer (layers with zIndex > 0 and type 'image')
-    const firstImageLayer = layers.find(
-      (layer) =>
-        layer.type === 'image' && layer.zIndex && layer.zIndex > 0 && layer.src,
-    );
+    // Debounce the auto-focus logic to prevent frequent updates
+    const timeoutId = setTimeout(() => {
+      // Find the first non-background image layer (layers with zIndex > 0 and type 'image')
+      const firstImageLayer = layers.find(
+        (layer) =>
+          layer.type === 'image' &&
+          layer.zIndex &&
+          layer.zIndex > 0 &&
+          layer.src,
+      );
 
-    if (firstImageLayer) {
-      setSelectedLayerId(firstImageLayer.id);
-    }
+      if (firstImageLayer) {
+        setSelectedLayerId(firstImageLayer.id);
+      }
+    }, 100); // 100ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [layers, selectedLayerId]);
 
   const updateSelectedLayer = (updates: Partial<Layer>) => {
@@ -617,7 +625,6 @@ const EditImage: React.FC = () => {
     navigate('/posts/new', { state: { fromEditorImage: file } });
   };
 
-  console.log('layers', layers);
   return (
     <div className="group relative flex h-full w-full flex-col">
       {/* Floating Button */}

@@ -291,7 +291,7 @@ const GenImage: React.FC<GenImageProps> = ({
 
     if (open) {
       timeout = setTimeout(() => {
-        // onDelete?.(result.id, result); --> RESOVLE HERE
+        // onDelete?.(result.id, result); --> RESOLVE HERE
         setOpen(false); // Close dialog after delete
         setOpenDiaLog(false);
       }, 2000);
@@ -306,7 +306,7 @@ const GenImage: React.FC<GenImageProps> = ({
 
   const handleDelete = () => {
     setTimeout(() => {
-      // onDelete?.(resultId, imageId); --> RESOVLE HERE
+      // onDelete?.(resultId, imageId); --> RESOLVE HERE
       setOpen(false);
       setDeleteImage(false);
     }, 2000);

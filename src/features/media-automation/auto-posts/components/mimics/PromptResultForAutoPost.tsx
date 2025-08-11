@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { truncateText } from '@/utils/text';
 import {
   Button,
@@ -62,61 +63,6 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
 
     return () => clearTimeout(timeout);
   }, [open]);
-
-  const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
-    try {
-      // Try direct fetch first
-      const response = await fetch(url, {
-        mode: 'cors',
-        credentials: 'omit',
-        headers: {
-          Accept: 'image/*',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      return await response.blob();
-    } catch (error) {
-      console.warn('Direct fetch failed, trying canvas approach:', error);
-
-      // Fallback to canvas approach for CORS issues
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-
-          if (!ctx) {
-            reject(new Error('Could not get canvas context'));
-            return;
-          }
-
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Canvas to blob conversion failed'));
-            }
-          }, 'image/png');
-        };
-
-        img.onerror = () => {
-          reject(new Error('Could not load image for canvas approach'));
-        };
-
-        img.src = url;
-      });
-    }
-  };
 
   const handleDownloadAll = async () => {
     try {

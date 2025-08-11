@@ -17,6 +17,7 @@ import {
 
 //API
 import { getUserProfile } from '@/api/authentication/auth';
+import { downloadImageWithRetry } from '@/utils/cors-handling';
 import { useQuery } from '@tanstack/react-query';
 
 //Assets
@@ -79,85 +80,10 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
     const currentImageUrl = otherImages[currentIndex];
     const fileName = `image-${currentIndex + 1}.jpg`;
 
-    // Retry logic for intermittent CORS issues
-    const maxRetries = 3;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`Download attempt ${attempt}/${maxRetries}`);
-
-        // Set fetch options to improve reliability and handle CORS issues
-        const response = await fetch(currentImageUrl, {
-          method: 'GET',
-          mode: 'cors', // Ensures CORS is handled
-          cache: 'no-cache', // Prevents caching issues that block CORS headers
-          keepalive: false, // Forces connection closure
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            Connection: 'close', // Prevents connection reuse for better CORS handling
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch the file: ${response.status} ${response.statusText}`,
-          );
-        }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        link.href = url;
-
-        // Extract filename from URL or use default
-        const urlParts = currentImageUrl.split('/');
-        const originalFileName = decodeURIComponent(urlParts.pop() || fileName);
-        link.download = originalFileName;
-
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(link);
-
-        console.log(`Download successful on attempt ${attempt}`);
-        return;
-      } catch (error) {
-        console.warn(`Download attempt ${attempt} failed:`, error);
-
-        // Wait before retrying (exponential backoff)
-        if (attempt < maxRetries) {
-          const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s
-          console.log(`Retrying in ${delay}ms...`);
-          await new Promise((resolve) => setTimeout(resolve, delay));
-        }
-      }
-    }
-
-    // All retry attempts failed, try fallback methods
-    console.warn('All fetch attempts failed, trying fallback methods');
-
-    // Fallback 1: Try direct download link
     try {
-      const link = document.createElement('a');
-      link.href = currentImageUrl;
-      link.download = fileName;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      console.log('Download attempted via direct link');
+      await downloadImageWithRetry(currentImageUrl, fileName, 3);
     } catch (error) {
-      console.error('Direct download failed:', error);
-
-      // Final fallback: Inform user with better message
-      const userConfirm = confirm(
-        `Download failed after ${maxRetries} attempts due to server issues. Would you like to open the image in a new tab so you can save it manually?`,
-      );
-
-      if (userConfirm) {
-        window.open(currentImageUrl, '_blank', 'noopener,noreferrer');
-      }
+      console.error('Download failed:', error);
     }
   };
 

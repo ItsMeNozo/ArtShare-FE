@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { truncateText } from '@/utils/text';
 import {
   Button,
@@ -78,75 +79,6 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   const parseSize = (size: string) => {
     const [w, h] = size.split('x').map(Number);
     return { width: w, height: h };
-  };
-
-  const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
-    try {
-      // Try direct fetch with connection management
-      const response = await fetch(url, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache', // Prevents caching issues that block CORS headers
-        keepalive: false, // Forces connection closure
-        headers: {
-          Accept: 'image/*',
-          'Content-Type': 'application/octet-stream',
-          Connection: 'close', // Prevents connection reuse that causes pool exhaustion
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      return await response.blob();
-    } catch (error) {
-      console.warn('Direct fetch failed, trying canvas approach:', error);
-
-      // Fallback to canvas approach for CORS issues
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-
-          if (!ctx) {
-            reject(new Error('Could not get canvas context'));
-            return;
-          }
-
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Canvas to blob conversion failed'));
-            }
-          }, 'image/png');
-        };
-
-        img.onerror = () => {
-          // If canvas approach also fails, create a fallback download link
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `image-${Date.now()}.png`;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-
-          reject(new Error('Could not load image for canvas approach'));
-        };
-
-        img.src = url;
-      });
-    }
   };
 
   const handleDownloadAll = async (settings: DownloadSettings) => {
