@@ -63,18 +63,89 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
     return () => clearTimeout(timeout);
   }, [open]);
 
-  const handleDownloadAll = async () => {
-    const zip = new JSZip();
-    await Promise.all(
-      result!.imageUrls.map(async (url, index) => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        zip.file(`image-${index + 1}.jpg`, blob);
-      }),
-    );
+  const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
+    try {
+      // Try direct fetch first
+      const response = await fetch(url, {
+        mode: 'cors',
+        credentials: 'omit',
+        headers: {
+          Accept: 'image/*',
+        },
+      });
 
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'images.zip');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return await response.blob();
+    } catch (error) {
+      console.warn('Direct fetch failed, trying canvas approach:', error);
+
+      // Fallback to canvas approach for CORS issues
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Canvas to blob conversion failed'));
+            }
+          }, 'image/png');
+        };
+
+        img.onerror = () => {
+          reject(new Error('Could not load image for canvas approach'));
+        };
+
+        img.src = url;
+      });
+    }
+  };
+
+  const handleDownloadAll = async () => {
+    try {
+      const zip = new JSZip();
+      await Promise.all(
+        result!.imageUrls.map(async (url, index) => {
+          try {
+            const blob = await fetchImageWithCorsHandling(url);
+            zip.file(`image-${index + 1}.jpg`, blob);
+          } catch (error) {
+            console.error(`Failed to download image ${index + 1}:`, error);
+            // Continue with other images even if one fails
+          }
+        }),
+      );
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, 'images.zip');
+    } catch (error) {
+      console.error('Download failed:', error);
+      showSnackbar('Download failed. Please try again.', 'error');
+
+      // Fallback: open images in new tabs for manual download
+      result!.imageUrls.forEach((url, index) => {
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, index * 100); // Stagger to avoid popup blocking
+      });
+    }
   };
 
   const handleShareThese = (urls: string[]) => {

@@ -160,7 +160,7 @@ const LayerToolsBar: React.FC<LayerToolsBarProp> = ({
                   />
                 ) : (
                   <div
-                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${selectedLayerId === layer.id ? 'border-4 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border'}`}
+                    className={`relative h-20 w-full overflow-hidden rounded bg-white ${selectedLayerId === layer.id ? 'border-2 border-indigo-500 shadow-lg shadow-indigo-200' : 'border-mountain-200 border'}`}
                   >
                     {layer.type === 'text' && (
                       <div
