@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Photo, RenderPhotoContext, RowsPhotoAlbum } from 'react-photo-album';
-import 'react-photo-album/rows.css';
+import {
+  MasonryPhotoAlbum,
+  Photo,
+  RenderPhotoContext,
+} from 'react-photo-album';
+import 'react-photo-album/masonry.css';
 import useMeasure from 'react-use-measure';
 import { InfiniteScroll } from '../InfiniteScroll';
 import { ImageRenderer } from './ImageRenderer';
@@ -35,7 +39,6 @@ interface IGalleryProps {
 }
 
 const IGallery: React.FC<IGalleryProps> = ({
-  photoPages,
   allPhotosFlat,
   isLoading,
   isFetchingNextPage,
@@ -46,7 +49,6 @@ const IGallery: React.FC<IGalleryProps> = ({
   fetchNextPage,
 }) => {
   const [ref, { width }] = useMeasure({ debounce: 50 });
-
   const [stableWidth, setStableWidth] = useState(0);
 
   useEffect(() => {
@@ -57,6 +59,13 @@ const IGallery: React.FC<IGalleryProps> = ({
   }, [width, stableWidth]);
 
   const effectiveRenderPhoto = renderPhoto || ImageRenderer;
+
+  const columns = (containerWidth: number) => {
+    if (containerWidth >= 1200) return 5;
+    if (containerWidth >= 800) return 4;
+    if (containerWidth >= 500) return 3;
+    return 2;
+  };
 
   return (
     <div ref={ref} className="custom-scrollbar relative overflow-auto">
@@ -69,20 +78,14 @@ const IGallery: React.FC<IGalleryProps> = ({
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}
       >
-        {stableWidth > 0 &&
-          photoPages.map((pagePhotos, index) => (
-            <div key={`page-${index}`} className="mb-2">
-              <RowsPhotoAlbum
-                key={`page-${index}`}
-                defaultContainerWidth={stableWidth}
-                rowConstraints={{ singleRowMaxHeight: 256 }}
-                spacing={8}
-                targetRowHeight={256}
-                photos={pagePhotos}
-                render={{ image: effectiveRenderPhoto }}
-              />
-            </div>
-          ))}
+        {stableWidth > 0 && (
+          <MasonryPhotoAlbum
+            photos={allPhotosFlat}
+            spacing={12}
+            columns={columns}
+            render={{ image: effectiveRenderPhoto }}
+          />
+        )}
       </InfiniteScroll>
     </div>
   );
