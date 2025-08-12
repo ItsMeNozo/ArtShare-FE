@@ -1,5 +1,6 @@
 import { Platform } from '@/features/media-automation/projects/types/platform';
 import { format } from 'date-fns';
+import { useState } from 'react';
 import {
   BiComment,
   BiDesktop,
@@ -9,10 +10,8 @@ import {
 } from 'react-icons/bi';
 import { IoEarthSharp } from 'react-icons/io5';
 import { MdMoreHoriz } from 'react-icons/md';
-import { ExpandablePostContent } from './ExpandTextArea';
-import { useState } from 'react';
 import { MobileImageGrid } from '../mimics/MobileImageGrid';
-import { FaUserCircle } from 'react-icons/fa';
+import { ExpandablePostContent } from './ExpandTextArea';
 interface FacebookPostPreviewProps {
   content: string;
   images: string[];
@@ -50,40 +49,46 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
   const [desktopMode, setDesktopMode] = useState(true);
   return (
     <div className="flex flex-1 justify-center p-4 overflow-y-auto custom-scrollbar">
-      <div className='flex flex-col items-center space-y-4 w-[680px] h-full'>
-        <div className='flex items-center space-x-2 w-full'>
-          <div className='flex items-center space-x-2 bg-white shadow-sm p-2 py-2.5 rounded-md w-56 text-sm'>
+      <div className="flex flex-col items-center space-y-4 w-[680px] h-full">
+        <div className="flex items-center space-x-2 w-full">
+          <div className="flex items-center space-x-2 bg-white shadow-sm p-2 py-2.5 rounded-md w-56 text-sm">
             <SkeletonIconImage src={facebookIcon} alt="Facebook Icon" />
             <p className="font-medium">Facebook Feed Preview</p>
           </div>
-          <div className='flex bg-mountain-100 shadow p-0.5 rounded-lg w-24 h-full'>
-            <button type='button' onClick={() => setDesktopMode(!desktopMode)} className={`${desktopMode === true ? 'bg-white' : 'group'} flex justify-center items-center cursor-pointer transform duration-300 ease-in-out rounded-lg w-1/2 h-full`}>
-              <BiDesktop className='size-5 group-hover:text-indigo-600' />
+          <div className="flex bg-mountain-100 shadow p-0.5 rounded-lg w-24 h-full">
+            <button
+              type="button"
+              onClick={() => setDesktopMode(!desktopMode)}
+              className={`${desktopMode === true ? 'bg-white' : 'group'} flex h-full w-1/2 transform cursor-pointer items-center justify-center rounded-lg duration-300 ease-in-out`}
+            >
+              <BiDesktop className="size-5 group-hover:text-indigo-600" />
             </button>
-            <button type='button' onClick={() => setDesktopMode(!desktopMode)} className={`${desktopMode === false ? 'bg-white' : 'group'} flex justify-center items-center cursor-pointer transform duration-300 ease-in-out rounded-lg w-1/2 h-full`}>
-              <BiMobile className='size-5 group-hover:text-indigo-600' />
+            <button
+              type="button"
+              onClick={() => setDesktopMode(!desktopMode)}
+              className={`${desktopMode === false ? 'bg-white' : 'group'} flex h-full w-1/2 transform cursor-pointer items-center justify-center rounded-lg duration-300 ease-in-out`}
+            >
+              <BiMobile className="size-5 group-hover:text-indigo-600" />
             </button>
           </div>
         </div>
-        <div className={`flex justify-center w-[680px] bg-mountain-200 items-center shadow-md rounded-lg`}>
+        <div
+          className={`bg-mountain-200 flex w-[680px] items-center justify-center rounded-lg shadow-md`}
+        >
           <div
-            className={`flex flex-col space-y-2 bg-white h-fit ${desktopMode ? 'min-w-[680px] rounded-lg' : 'w-[425px]'}`}
+            className={`flex h-fit flex-col space-y-2 bg-white ${desktopMode ? 'min-w-[680px] rounded-lg' : 'w-[425px]'}`}
           >
             <div className="flex justify-between items-center p-4 pb-0">
               <div className="flex items-center space-x-2">
-
-                {platform?.pictureUrl ? <img
-                  src={platform?.pictureUrl}
+                <img
+                  src={platform?.pictureUrl || facebookIcon}
                   alt="Avatar"
                   className="rounded-full w-10 h-10"
-                /> :
-                  <FaUserCircle className='size-10 text-mountain-300' />
-                }
+                />
                 <div className="flex flex-col">
-                  {platform?.config.pageName ?
-                    <p className="font-medium">{platform?.config.pageName}</p>
-                    : <p className='font-medium'>Sample Page</p>
-                  }
+                  <p className="font-medium">
+                    {platform?.config?.pageName || 'Facebook Page'}
+                  </p>
                   <div className="flex space-x-2 text-mountain-400 text-xs">
                     <p>
                       {scheduledAt
@@ -98,7 +103,9 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
               <MdMoreHoriz className="size-6 text-mountain-600" />
             </div>
             <ExpandablePostContent content={content} />
-            <div className={`border-mountain-200 w-full border-b overflow-hidden ${images.length === 0 ? 'hidden' : ''}`}>
+            <div
+              className={`border-mountain-200 w-full overflow-hidden border-b ${images.length === 0 ? 'hidden' : ''}`}
+            >
               {desktopMode ? (
                 <div
                   className={`grid gap-1 ${images.length === 1
@@ -141,6 +148,6 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };

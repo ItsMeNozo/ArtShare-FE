@@ -1,9 +1,8 @@
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import Draggable from "react-draggable";
-import { Sketch } from "@uiw/react-color";
+import { Input } from '@/components/ui/input';
+import { Button } from '@mui/material';
+import { Sketch } from '@uiw/react-color';
+import React, { useEffect, useRef, useState } from 'react';
+import Draggable from 'react-draggable';
 
 type ShapeType = 'square' | 'circle' | 'rect-horizontal' | 'rect-vertical';
 type ShapePanelProps = {
@@ -28,36 +27,46 @@ const ShapePanel: React.FC<ShapePanelProps> = ({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(event.target as Node)
+      ) {
         setSettingColor(false);
       }
     }
     if (settingColor) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [settingColor]);
 
   return (
     <>
       {/* Add Shape Buttons */}
-      <div className="flex flex-col space-y-2 mb-4">
-        {(["square", "circle", "rect-horizontal", "rect-vertical"] as ShapeType[]).map((shape) => (
+      <div className="mb-4 flex flex-col space-y-2">
+        {(
+          [
+            'square',
+            'circle',
+            'rect-horizontal',
+            'rect-vertical',
+          ] as ShapeType[]
+        ).map((shape) => (
           <Button
             key={shape}
             variant="outlined"
             onClick={() => addShape(shape)}
           >
-            Add {shape.replace("-", " ")}
+            Add {shape.replace('-', ' ')}
           </Button>
         ))}
       </div>
       {/* Size Controls */}
       {selectedLayer && (
         <>
-          <div className="flex justify-between items-center mb-3 w-full">
+          <div className="mb-3 flex w-full items-center justify-between">
             <p className="w-1/2 font-medium">Width</p>
             <Input
               type="number"
@@ -75,7 +84,7 @@ const ShapePanel: React.FC<ShapePanelProps> = ({
             <span className="ml-1">px</span>
           </div>
 
-          <div className="flex justify-between items-center mb-3 w-full">
+          <div className="mb-3 flex w-full items-center justify-between">
             <p className="w-1/2 font-medium">Height</p>
             <Input
               type="number"
@@ -94,21 +103,23 @@ const ShapePanel: React.FC<ShapePanelProps> = ({
           </div>
 
           {/* Rotation */}
-          <div className="flex justify-between items-center mb-3 w-full">
+          <div className="mb-3 flex w-full items-center justify-between">
             <p className="w-1/2 font-medium">Rotation</p>
             <Input
               type="number"
               min={0}
               max={360}
               value={selectedLayer.rotation}
-              onChange={(e) => handleChangeShapeRotation(Number(e.target.value))}
+              onChange={(e) =>
+                handleChangeShapeRotation(Number(e.target.value))
+              }
               className="w-24"
             />
             <span className="ml-1">°</span>
           </div>
 
           {/* Opacity */}
-          <div className="flex justify-between items-center mb-3 w-full">
+          <div className="mb-3 flex w-full items-center justify-between">
             <p className="w-1/2 font-medium">Opacity</p>
             <Input
               type="number"
@@ -122,11 +133,11 @@ const ShapePanel: React.FC<ShapePanelProps> = ({
           </div>
 
           {/* Color Picker */}
-          <div className="flex justify-between items-center w-full">
+          <div className="flex w-full items-center justify-between">
             <p className="w-1/2 font-medium">Color</p>
             <div className="flex items-center space-x-2">
               <div
-                className="border border-gray-300 rounded w-6 h-6"
+                className="h-6 w-6 rounded border border-gray-300"
                 style={{ backgroundColor: selectedLayer.color }}
               />
               <Button onClick={() => setSettingColor(!settingColor)}>
@@ -139,10 +150,10 @@ const ShapePanel: React.FC<ShapePanelProps> = ({
             <Draggable handle=".drag-handle">
               <div
                 ref={pickerRef}
-                className="z-50 absolute bg-white shadow-md p-2 rounded"
+                className="absolute z-50 rounded bg-white p-2 shadow-md"
                 style={{ width: 220 }}
               >
-                <div className="bg-gray-100 mb-2 px-2 py-1 rounded text-sm cursor-move drag-handle">
+                <div className="drag-handle mb-2 cursor-move rounded bg-gray-100 px-2 py-1 text-sm">
                   🎨 Color Picker
                 </div>
                 <Sketch

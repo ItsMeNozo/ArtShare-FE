@@ -1,4 +1,10 @@
-import React, { Dispatch, ElementType, SetStateAction, useEffect, useState } from 'react';
+import React, {
+  Dispatch,
+  ElementType,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 //Libs
 import ShowMoreText from 'react-show-more-text';
@@ -20,8 +26,10 @@ const example_1 =
 
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
+import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { saveAs } from 'file-saver';
 import { Check } from 'lucide-react';
 import {
   FaChevronLeft,
@@ -51,7 +59,7 @@ const GenImage: React.FC<GenImageProps> = ({
   result,
   otherImages,
   useToShare,
-  setOpenDownload
+  setOpenDownload,
 }) => {
   const [deleteImage, setDeleteImage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -103,6 +111,30 @@ const GenImage: React.FC<GenImageProps> = ({
     navigate('/posts/new?type=ai-gen', { state: { prompt } });
   };
 
+  const handleQuickDownload = async () => {
+    try {
+      const blob = await fetchImageWithCorsHandling(result.imageUrls[index]);
+      saveAs(blob, `image-${Date.now()}.jpg`);
+    } catch (error) {
+      console.error('Quick download failed:', error);
+      // Fallback: open image in new tab
+      window.open(result.imageUrls[index], '_blank');
+    }
+  };
+
+  const handleQuickDownloadFromModal = async () => {
+    try {
+      const blob = await fetchImageWithCorsHandling(
+        result.imageUrls[currentIndex],
+      );
+      saveAs(blob, `image-${Date.now()}.jpg`);
+    } catch (error) {
+      console.error('Quick download failed:', error);
+      // Fallback: open image in new tab
+      window.open(result.imageUrls[currentIndex], '_blank');
+    }
+  };
+
   const { data: user, error } = useQuery({
     queryKey: ['user-profile', result?.userId],
     queryFn: async () => {
@@ -128,7 +160,7 @@ const GenImage: React.FC<GenImageProps> = ({
     }
 
     return () => clearTimeout(timeout);
-  }, [open, user]);
+  }, [open, user, error]);
 
   const handleDelete = () => {
     setTimeout(() => {
@@ -141,32 +173,38 @@ const GenImage: React.FC<GenImageProps> = ({
   return (
     <Dialog open={openDiaLog} onOpenChange={setOpenDiaLog}>
       <DialogTrigger asChild>
-        <div className="group relative flex h-full">
-          <div className="relative flex">
+        <div className="group relative inline-flex overflow-hidden">
+          <div className="relative">
             <img
               src={result.imageUrls[index]}
               alt={`Image ${result.id}`}
               loading="lazy"
-              className="relative flex shadow-md h-full object-cover cursor-pointer"
-              style={{ borderRadius: '8px' }}
+              className="block cursor-pointer shadow-md"
+              style={{
+                borderRadius: '8px',
+                maxWidth: '100%',
+                height: 'auto',
+                display: 'block',
+              }}
               onClick={() => {
                 setCurrentIndex(index);
                 setOpenDiaLog(true);
               }}
               onContextMenu={(e) => e.preventDefault()}
             />
-            {deleteImage === true && (
+            {deleteImage && (
               <div
-                className={`absolute flex h-full w-full items-center justify-center bg-black/20`}
+                className="absolute inset-0 flex items-center justify-center bg-black/20"
+                style={{ borderRadius: '8px' }}
               >
-                <div className="flex flex-col space-y-2 bg-white p-2 rounded-lg h-fit">
+                <div className="flex h-fit flex-col space-y-2 rounded-lg bg-white p-2">
                   <p className="text-sm">Are you sure to delete?</p>
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
-                        className={`bg-mountain-100`}
+                        className="bg-mountain-100"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent opening dialog
+                          e.stopPropagation();
                           handleDelete();
                         }}
                       >
@@ -175,13 +213,13 @@ const GenImage: React.FC<GenImageProps> = ({
                       </Button>
                     </DialogTrigger>
                     <DialogContent
-                      className="flex justify-center sm:max-w-[320px] h-fit cursor-not-allowed"
+                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
                       hideCloseButton
                     >
                       <DialogHeader>
-                        <DialogDescription className="flex justify-center items-center space-x-4">
+                        <DialogDescription className="flex items-center justify-center space-x-4">
                           <CircularProgress size={32} thickness={4} />
-                          <DialogTitle className="font-normal text-base text-center">
+                          <DialogTitle className="text-center text-base font-normal">
                             Deleting This Image
                           </DialogTitle>
                         </DialogDescription>
@@ -191,76 +229,95 @@ const GenImage: React.FC<GenImageProps> = ({
                 </div>
               </div>
             )}
-          </div>
-          {useToShare ? (
-            <>
-              <div className="bottom-2 left-2 absolute flex">
+            {useToShare ? (
+              <div className="absolute bottom-2 left-2">
                 <Tooltip title="Click to share this">
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       handleNavigateToUpload(result);
                     }}
-                    className="z-50 flex justify-center items-center bg-white hover:bg-mountain-50 opacity-0 group-hover:opacity-100 rounded-md w-28 h-6 duration-300 ease-in-out hover:cursor-pointer transform"
+                    className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                   >
-                    <Check className="mr-1 size-4 text-mountain-600" />
+                    <Check className="text-mountain-600 mr-1 size-4" />
                     <p>Share This</p>
                   </div>
                 </Tooltip>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="bottom-2 left-2 absolute flex">
-                <Tooltip title="Download">
+            ) : (
+              <>
+                <div className="absolute bottom-2 left-2 flex items-center">
                   <div
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
-                      setOpenDownload(true);
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleQuickDownload();
+                      return false;
                     }}
-                    className="z-50 flex justify-center items-center bg-white opacity-0 group-hover:opacity-100 rounded-full w-6 h-6 duration-300 ease-in-out hover:cursor-pointer transform"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-l-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    title="Download"
                   >
-                    <FiDownload className="text-mountain-600" />
+                    <FiDownload className="text-mountain-600 pointer-events-none size-4" />
                   </div>
-                </Tooltip>
-              </div>
-              <div className="right-2 bottom-2 absolute flex space-x-2">
-                <Tooltip title="Edit">
                   <div
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
-                      handleNavigateToEdit();
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setOpenDownload?.(true);
+                      return false;
                     }}
-                    className="z-50 flex justify-center items-center bg-white opacity-0 group-hover:opacity-100 rounded-full w-6 h-6 duration-300 ease-in-out hover:cursor-pointer transform"
-                  >
-                    <FaRegPenToSquare className="size-4 text-mountain-600" />
-                  </div>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening dialog
-                      setDeleteImage(true);
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                     }}
-                    className="z-50 flex justify-center items-center bg-white opacity-0 group-hover:opacity-100 rounded-full w-6 h-6 duration-300 ease-in-out hover:cursor-pointer transform"
+                    className="z-50 flex h-6 w-4 transform items-center justify-center rounded-r-full border-l border-gray-300 bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    title="Download with options"
                   >
-                    <FiTrash2 className="text-mountain-600" />
+                    <span className="text-mountain-600 text-xs">▼</span>
                   </div>
-                </Tooltip>
-              </div>
-            </>
-          )}
+                </div>
+                <div className="absolute right-2 bottom-2 flex space-x-2">
+                  <Tooltip title="Edit">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigateToEdit();
+                      }}
+                      className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    >
+                      <FaRegPenToSquare className="text-mountain-600 size-4" />
+                    </div>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteImage(true);
+                      }}
+                      className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    >
+                      <FiTrash2 className="text-mountain-600" />
+                    </div>
+                  </Tooltip>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="p-0 border-0 rounded-xl min-w-7xl">
+      <DialogContent className="min-w-7xl rounded-xl border-0 p-0">
         <DialogHeader hidden>
           <DialogTitle>Image Preview</DialogTitle>
           <DialogDescription>Image Description</DialogDescription>
         </DialogHeader>
         <div className="relative flex h-[680px]">
-          <div className="relative bg-mountain-100 rounded-l-xl w-[65%] h-[680px] overflow-hidden">
+          <div className="bg-mountain-100 relative h-[680px] w-[65%] overflow-hidden rounded-l-xl">
             {/* Image Slider */}
-            <div className="flex justify-center items-center w-full h-full">
+            <div className="flex h-full w-full items-center justify-center">
               <div
                 className="flex h-full transition-transform duration-500 ease-in-out"
                 style={{
@@ -271,12 +328,12 @@ const GenImage: React.FC<GenImageProps> = ({
                 {otherImages.map((_img, index) => (
                   <div
                     key={index}
-                    className="flex flex-shrink-0 justify-center items-center w-full h-full"
+                    className="flex h-full w-full flex-shrink-0 items-center justify-center"
                   >
                     <img
                       src={_img}
                       alt={`Preview ${index}`}
-                      className="max-w-full max-h-[680px] object-contain"
+                      className="max-h-[680px] max-w-full object-contain"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                   </div>
@@ -287,7 +344,7 @@ const GenImage: React.FC<GenImageProps> = ({
               {/* Left Arrow */}
               <div
                 onClick={handlePrev}
-                className="top-1/2 left-4 z-50 absolute flex justify-center items-center bg-white hover:bg-mountain-50 rounded-full w-10 h-10 hover:scale-105 -translate-y-1/2 duration-300 ease-in-out cursor-pointer"
+                className="hover:bg-mountain-50 absolute top-1/2 left-4 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white duration-300 ease-in-out hover:scale-105"
               >
                 <FaChevronLeft />
               </div>
@@ -301,7 +358,7 @@ const GenImage: React.FC<GenImageProps> = ({
               {/* Gallery Navigating */}
               <div
                 onClick={handleNext}
-                className="bottom-4 left-1/2 z-50 absolute flex justify-center items-center space-x-2 rounded-full -translate-x-1/2 -translate-y-1/2 duration-300 ease-in-out cursor-pointer transform"
+                className="absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 transform cursor-pointer items-center justify-center space-x-2 rounded-full duration-300 ease-in-out"
               >
                 <div className={`flex gap-2`}>
                   {otherImages.map((_, index) => {
@@ -325,10 +382,11 @@ const GenImage: React.FC<GenImageProps> = ({
                     return (
                       <div
                         key={index}
-                        className={`h-2 w-8 rounded-lg hover:bg-white hover:opacity-100 ${currentIndex === index
-                          ? 'bg-white opacity-100'
-                          : 'bg-mountain-200 opacity-50'
-                          }`}
+                        className={`h-2 w-8 rounded-lg hover:bg-white hover:opacity-100 ${
+                          currentIndex === index
+                            ? 'bg-white opacity-100'
+                            : 'bg-mountain-200 opacity-50'
+                        }`}
                         onClick={() => handleNav(navIndex)}
                       />
                     );
@@ -337,10 +395,10 @@ const GenImage: React.FC<GenImageProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex flex-col justify-between w-[35%] h-full">
+          <div className="flex h-full w-[35%] flex-col justify-between">
             <div>
-              <div className="flex justify-between items-end p-4 border-mountain-100 border-b w-full h-28">
-                <div className="flex justify-between items-center w-full">
+              <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
+                <div className="flex w-full items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Avatar className="size-12">
                       <AvatarImage
@@ -355,24 +413,34 @@ const GenImage: React.FC<GenImageProps> = ({
                     <p className="font-medium">{user?.fullName}</p>
                   </div>
                   <div className="flex">
-                    <Button
-                      title="Download"
-                      onClick={() => setOpenDownload(true)}
-                    >
-                      <FiDownload className="size-5" />
-                    </Button>
+                    <div className="flex items-center">
+                      <Button
+                        className="h-9 min-w-9 rounded-r-none"
+                        title="Download"
+                        onClick={handleQuickDownloadFromModal}
+                      >
+                        <FiDownload className="size-5" />
+                      </Button>
+                      <Button
+                        className="flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
+                        title="Download with options"
+                        onClick={() => setOpenDownload?.(true)}
+                      >
+                        ▼
+                      </Button>
+                    </div>
                     <DeleteButton open={open} setOpen={setOpen} />
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col space-y-2 px-4 py-2 border-mountain-100 border-b w-full h-1/2">
-                <div className="flex justify-between items-center w-full">
+              <div className="border-mountain-100 flex h-1/2 w-full flex-col space-y-2 border-b px-4 py-2">
+                <div className="flex w-full items-center justify-between">
                   <p className="font-medium">Prompt</p>
                   <Button title="Copy" className="bg-mountain-100">
                     <IoCopyOutline className="size-5" />
                   </Button>
                 </div>
-                <div className="flex w-full h-40 overflow-y-auto custom-scrollbar">
+                <div className="custom-scrollbar flex h-40 w-full overflow-y-auto">
                   <AnyShowMoreText
                     lines={3}
                     more="Show more"
@@ -386,17 +454,17 @@ const GenImage: React.FC<GenImageProps> = ({
                   </AnyShowMoreText>
                 </div>
               </div>
-              <div className="flex p-4 w-full">
-                <div className="flex flex-col space-y-2 w-1/3">
+              <div className="flex w-full p-4">
+                <div className="flex w-1/3 flex-col space-y-2">
                   <p className="font-medium">Style</p>
                   <div className="flex items-center space-x-2">
-                    <img src={example_1} className="rounded-xs w-5 h-5" />
-                    <p className="text-mountain-600 capitalize line-clamp-1">
+                    <img src={example_1} className="h-5 w-5 rounded-xs" />
+                    <p className="text-mountain-600 line-clamp-1 capitalize">
                       {result.style}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col space-y-2 w-1/3">
+                <div className="flex w-1/3 flex-col space-y-2">
                   <p className="font-medium">Aspect Ratio</p>
                   <div className="flex items-center space-x-2">
                     <IoIosSquareOutline className="size-5" />
@@ -407,9 +475,9 @@ const GenImage: React.FC<GenImageProps> = ({
                   </div>
                 </div>
               </div>
-              <div className="flex px-4 w-full">
-                <div className="flex flex-col space-y-2 w-1/3">
-                  <div className="flex justify-between items-center w-full">
+              <div className="flex w-full px-4">
+                <div className="flex w-1/3 flex-col space-y-2">
+                  <div className="flex w-full items-center justify-between">
                     <p className="font-medium">Lighting</p>
                   </div>
                   <div className="flex items-center">
@@ -418,15 +486,15 @@ const GenImage: React.FC<GenImageProps> = ({
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col space-y-2 w-1/3">
+                <div className="flex w-1/3 flex-col space-y-2">
                   <p className="font-medium">Camera</p>
-                  <div className="flex text">
+                  <div className="text flex">
                     <p className="text-mountain-600 capitalize">
                       {result.camera}
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col space-y-2 w-1/3">
+                <div className="flex w-1/3 flex-col space-y-2">
                   <p className="w-full font-medium">Image Size</p>
                   <div className="flex items-center">
                     <p className="text-mountain-600 capitalize">1024x1024</p>
@@ -443,7 +511,7 @@ const GenImage: React.FC<GenImageProps> = ({
                   };
                   handleNavigateToUpload(copyResult);
                 }}
-                className="flex justify-center items-center bg-indigo-100 hover:bg-indigo-200/80 shadow-sm border border-mountain-300 rounded-lg w-full h-12 font-normal duration-300 ease-in-out hover:cursor-pointer select-none transform"
+                className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
               >
                 <RiFolderUploadLine className="mr-2 size-5" />
                 <p>Post This Image</p>

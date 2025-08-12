@@ -62,7 +62,7 @@ const EditPostPage: React.FC = () => {
 
     // Set original thumbnail
     setOriginalThumbnail({
-      url: fetchedPost.thumbnailCropMeta.initialThumbnail,
+      url: fetchedPost.thumbnailCropMeta?.initialThumbnail,
       type: MEDIA_TYPE.IMAGE,
       file: new File([], 'existing-original-thumbnail'),
     });

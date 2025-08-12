@@ -6,3 +6,9 @@ export interface PostMedia {
   file: File;
   isMature?: boolean;
 }
+
+export interface ThumbnailData {
+  file: File | null;
+  width?: number;
+  height?: number;
+}

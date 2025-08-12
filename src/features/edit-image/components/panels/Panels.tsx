@@ -7,15 +7,17 @@ import { Dispatch, SetStateAction } from 'react';
 import ArrangePanel from './ArrangePanel';
 import CropPanel from './CropPanel';
 import FilterPanel from './FilterPanel';
-import TextPanel from './TextPanel';
 import ShapePanel from './ShapePanel';
+import TextPanel from './TextPanel';
 
 type PanelsProp = {
   selectedLayerId: string;
   activePanel: string;
   layers: Layer[];
   setActivePanel: Dispatch<
-    SetStateAction<'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | 'shape' | null>
+    SetStateAction<
+      'arrange' | 'crop' | 'adjust' | 'filter' | 'text' | 'shape' | null
+    >
   >;
   updateSelectedLayer: (updates: Partial<ImageLayer>) => void;
   handleLayerXPosition: (newXPos: number) => void;
@@ -39,7 +41,9 @@ type PanelsProp = {
   handleChangeTextColor: (newColor: string) => void;
   handleLockLayer: (layerId: string) => void;
   addText: () => void;
-  addShape: (shapeType: 'square' | 'circle' | 'rect-horizontal' | 'rect-vertical') => void;
+  addShape: (
+    shapeType: 'square' | 'circle' | 'rect-horizontal' | 'rect-vertical',
+  ) => void;
   updateShape: (updates: Partial<ShapeLayer>) => void;
   handleChangeShapeColor: (color: string) => void;
   handleChangeShapeSize: (size: { width: number; height: number }) => void;
@@ -77,7 +81,7 @@ const Panels: React.FC<PanelsProp> = ({
   handleChangeShapeColor,
   handleChangeShapeOpacity,
   handleChangeShapeRotation,
-  handleChangeShapeSize
+  handleChangeShapeSize,
 }) => {
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
   const isNonTextLayer = selectedLayer?.type === 'image' || !selectedLayer;
@@ -85,16 +89,16 @@ const Panels: React.FC<PanelsProp> = ({
   return (
     <div className="z-50">
       {activePanel && (
-        <div className="flex flex-col space-y-2 bg-gradient-to-b from-white to-mountain-50 shadow border border-mountain-200 w-72 h-screen">
-          <div className="relative flex justify-center items-center bg-white border-mountain-200 border-b-1 h-[5%] font-semibold text-mountain-700 text-sm">
+        <div className="to-mountain-50 border-mountain-200 flex h-screen w-72 flex-col space-y-2 border bg-gradient-to-b from-white shadow">
+          <div className="border-mountain-200 text-mountain-700 relative flex h-[5%] items-center justify-center border-b-1 bg-white text-sm font-semibold">
             <X
-              className="left-2 absolute size-4 hover:text-red-700"
+              className="absolute left-2 size-4 hover:text-red-700"
               onClick={() => setActivePanel(null)}
             />
             <p className="capitalize">{activePanel}</p>
           </div>
-          <div className="flex flex-col space-y-4 px-6 py-4 max-h-[82%] overflow-y-auto custom-scrollbar">
-            {activePanel == "arrange" && (
+          <div className="custom-scrollbar flex max-h-[82%] flex-col space-y-4 overflow-y-auto px-6 py-4">
+            {activePanel == 'arrange' && (
               <ArrangePanel
                 layers={layers}
                 selectedLayerId={selectedLayerId}
@@ -105,7 +109,7 @@ const Panels: React.FC<PanelsProp> = ({
                 handleLockLayer={handleLockLayer}
               />
             )}
-            {activePanel == "crop" && (
+            {activePanel == 'crop' && (
               <CropPanel
                 layers={layers}
                 selectedLayerId={selectedLayerId}
@@ -119,7 +123,7 @@ const Panels: React.FC<PanelsProp> = ({
               />
             )}
 
-            {activePanel === "adjust" &&
+            {activePanel === 'adjust' &&
               (isNonTextLayer ? (
                 <>
                   <AdjustmentSlider
@@ -163,7 +167,7 @@ const Panels: React.FC<PanelsProp> = ({
                   />
                 </>
               ) : (
-                <div className="text-mountain-500 text-xs text-center italic">
+                <div className="text-mountain-500 text-center text-xs italic">
                   This tab is not used for text layers. Please choose any
                   non-text layers to continue.
                 </div>
@@ -182,7 +186,7 @@ const Panels: React.FC<PanelsProp> = ({
                   handleSepia={handleSepia}
                 />
               ) : (
-                <div className="text-mountain-500 text-xs text-center italic">
+                <div className="text-mountain-500 text-center text-xs italic">
                   This tab is not used for text layers. Please choose any
                   non-text layers to continue.
                 </div>
@@ -197,12 +201,12 @@ const Panels: React.FC<PanelsProp> = ({
                   addText={addText}
                 />
               ) : (
-                <div className="text-mountain-500 text-xs text-center italic">
+                <div className="text-mountain-500 text-center text-xs italic">
                   This tab is not used for image layer. Please continue with
                   non-image layer.
                 </div>
               ))}
-            {activePanel === 'shape' &&
+            {activePanel === 'shape' && (
               <ShapePanel
                 selectedLayer={selectedLayer as ShapeLayer}
                 addShape={addShape}
@@ -211,7 +215,7 @@ const Panels: React.FC<PanelsProp> = ({
                 handleChangeShapeRotation={handleChangeShapeRotation}
                 handleChangeShapeOpacity={handleChangeShapeOpacity}
               />
-            }
+            )}
           </div>
         </div>
       )}

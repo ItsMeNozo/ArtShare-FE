@@ -34,49 +34,82 @@ const PostContentEditor = ({
     ],
     content: value,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      // Convert HTML back to plain text with line breaks for the preview
+      const html = editor.getHTML();
+      const textWithLineBreaks = html
+        .replace(/<\/p><p>/gi, '\n') // Convert paragraph breaks to \n
+        .replace(/<\/p>/gi, '\n') // Convert closing p tags to \n
+        .replace(/<p>/gi, '') // Remove opening p tags
+        .replace(/<br\s*\/?>/gi, '\n') // Convert br tags to \n
+        .replace(/&nbsp;/gi, ' ') // Convert non-breaking spaces
+        .trim();
+      onChange(textWithLineBreaks);
     },
     editorProps: {
       attributes: {
         class: 'focus:outline-none flex flex-col overflow-x-hidden cursor-text',
+        style: 'white-space: pre-wrap;',
       },
     },
   });
 
   useEffect(() => {
     if (editor && editor.getHTML() !== value) {
-      editor.commands.setContent(value, false);
+      // Check if value contains raw line breaks, convert them to paragraphs
+      let htmlContent = value;
+      if (
+        value.includes('\n') &&
+        !value.includes('<br>') &&
+        !value.includes('<p>')
+      ) {
+        // Convert plain text with \n to proper HTML paragraphs
+        htmlContent = value
+          .split('\n')
+          .map((line) => (line.trim() ? `<p>${line}</p>` : '<p></p>'))
+          .join('');
+      }
+      editor.commands.setContent(htmlContent, false);
     }
   }, [value, editor]);
 
   return (
-    <Box
-      className={`border-mountain-200 relative flex h-fit w-full flex-col border bg-white shadow-md ${!canEdit ? 'cursor-not-allowed bg-gray-50' : ''} `}
-    >
-      <div className="flex items-center gap-2 bg-white px-4 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
-        {editor && (
-          <div className="flex justify-between items-center w-full">
-            <div className="flex items-center space-x-2">
-              <span className="text-mountain-600 text-sm">
-                Tips: Click on text editor to start editing
-              </span>
+    <>
+      <style>{`
+        .ProseMirror {
+          white-space: pre-wrap !important;
+        }
+        .ProseMirror p {
+          white-space: pre-wrap !important;
+        }
+      `}</style>
+      <Box
+        className={`border-mountain-200 relative flex h-fit max-h-[520px] w-full flex-col border bg-white shadow-md ${!canEdit ? 'cursor-not-allowed bg-gray-50' : ''} `}
+      >
+        <div className="flex items-center gap-2 bg-white px-4 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
+          {editor && (
+            <div className="flex justify-between items-center w-full">
+              <div className="flex items-center space-x-2">
+                <span className="text-mountain-600 text-sm">
+                  Tips: Click on text editor to start editing
+                </span>
+              </div>
+              <div
+                className={`text-mountain-600 character-count flex transform rounded-md bg-white p-2 text-xs opacity-50 duration-300 ease-in-out select-none hover:z-50 hover:opacity-100 ${editor.storage.characterCount.words() >= MAX_WORDS ? 'text-red-500' : ''}`}
+              >
+                {editor.storage.characterCount.words()} / {MAX_WORDS} words
+              </div>
             </div>
-            <div
-              className={`text-mountain-600 character-count flex transform rounded-md bg-white p-2 text-xs opacity-50 duration-300 ease-in-out select-none hover:z-50 hover:opacity-100 ${editor.storage.characterCount.words() >= MAX_WORDS ? 'text-red-500' : ''}`}
-            >
-              {editor.storage.characterCount.words()} / {MAX_WORDS} words
-            </div>
-          </div>
-        )}
-      </div>
-      {editor ? (
-        <div className="p-4 w-full h-full overflow-auto text-left custom-scrollbar">
-          <EditorContent editor={editor} />
+          )}
         </div>
-      ) : (
-        <p>Loading editor...</p>
-      )}
-    </Box>
+        {editor ? (
+          <div className="p-4 w-full h-full overflow-auto text-left custom-scrollbar">
+            <EditorContent editor={editor} />
+          </div>
+        ) : (
+          <p>Loading editor...</p>
+        )}
+      </Box>
+    </>
   );
 };
 

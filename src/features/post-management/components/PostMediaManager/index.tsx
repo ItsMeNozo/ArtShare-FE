@@ -23,7 +23,7 @@ import {
   VIDEO_THUMBNAIL_DEFAULT_URL,
 } from '../../helpers/media-upload.helper';
 import { useCheckMaturity } from '../../hooks/useIsMature';
-import { PostMedia } from '../../types/post-media';
+import { PostMedia, ThumbnailData } from '../../types/post-media';
 import AddMoreMediaButton from './AddMoreMediaButton';
 import InfoMediaRemaining from './InfoMediaRemaining';
 import MediaPreviewer from './MediaPreviewer';
@@ -34,7 +34,7 @@ import SelectDeviceMediaPanel from './UploadFromDevice';
 interface MediaSelectorPanelProps {
   postMedias: PostMedia[];
   setPostMedias: React.Dispatch<React.SetStateAction<PostMedia[]>>;
-  onThumbnailAddedOrRemoved: (file: File | null) => void;
+  onThumbnailAddedOrRemoved: (thumbnailData: ThumbnailData) => void;
   hasArtNovaImages: boolean;
   setHasArtNovaImages: React.Dispatch<React.SetStateAction<boolean>>;
   isMatureAutoDetected: boolean;
@@ -106,8 +106,10 @@ export default function PostMediaManager({
 
   const captureThumbnailFromVideo = (videoElement: HTMLVideoElement) => {
     const canvas = document.createElement('canvas');
-    canvas.width = videoElement.videoWidth;
-    canvas.height = videoElement.videoHeight;
+    const width = videoElement.videoWidth;
+    const height = videoElement.videoHeight;
+    canvas.width = width;
+    canvas.height = height;
 
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) {
@@ -120,11 +122,13 @@ export default function PostMediaManager({
 
     canvas.toBlob((blob) => {
       if (blob) {
-        onThumbnailAddedOrRemoved(
-          new File([blob], 'thumbnailFromVideo.png', {
+        onThumbnailAddedOrRemoved({
+          file: new File([blob], 'thumbnailFromVideo.png', {
             type: 'image/png',
           }),
-        );
+          width,
+          height,
+        });
       } else {
         console.error('Failed to create blob from canvas');
       }
@@ -135,7 +139,6 @@ export default function PostMediaManager({
     const newFiles = event.target.files;
     if (!newFiles || newFiles.length === 0) return;
 
-    // new post medias
     const newImageMedias = Array.from(newFiles).map((file) => ({
       file,
       type: MEDIA_TYPE.IMAGE,
@@ -145,10 +148,8 @@ export default function PostMediaManager({
     const matureProcessedImageMedias =
       await checkMaturityForNewItems(newImageMedias);
 
-    // combine with existing files
     const combinedMedias = [...postMedias, ...matureProcessedImageMedias];
 
-    // image count
     const imageCount = combinedMedias.filter(
       (media) => media.type === MEDIA_TYPE.IMAGE,
     ).length;
@@ -160,9 +161,18 @@ export default function PostMediaManager({
 
     onMediasChanged?.();
 
-    // first time adding a media
-    if (postMedias.length === 0) {
-      onThumbnailAddedOrRemoved(combinedMedias[0].file);
+    if (postMedias.length === 0 && combinedMedias[0]) {
+      const firstFile = combinedMedias[0].file;
+      const img = new Image();
+      img.onload = () => {
+        onThumbnailAddedOrRemoved({
+          file: firstFile,
+          width: img.width,
+          height: img.height,
+        });
+        URL.revokeObjectURL(img.src);
+      };
+      img.src = URL.createObjectURL(firstFile);
       setHasArtNovaImages?.(false);
     }
   };
@@ -185,7 +195,6 @@ export default function PostMediaManager({
       return;
     }
 
-    // build new video as post media and add to existing
     const previewUrl = URL.createObjectURL(file);
     const newVideoMedia = [
       {
@@ -198,14 +207,13 @@ export default function PostMediaManager({
     setPostMedias(combinedMedias);
     onMediasChanged?.();
 
-    // auto-thumbnail logic
     if (postMedias.length === 0) {
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.src = previewUrl;
 
       video.onloadeddata = () => {
-        video.currentTime = 0; // Go to the first frame
+        video.currentTime = 0;
       };
 
       video.onseeked = () => {
@@ -231,12 +239,12 @@ export default function PostMediaManager({
       const nextMedia = postMedias.find((m) => m !== media);
       setSelectedPreviewMedia(nextMedia || null);
     }
-    // if the last preview is removed, set selectedPreviewMedia to null
+
     if (postMedias.length === 1) {
       setSelectedPreviewMedia(null);
-      onThumbnailAddedOrRemoved(null);
+      onThumbnailAddedOrRemoved({ file: null });
     }
-    // if removing the last AI image
+
     if (postMedias.length === 1 && hasArtNovaImages) {
       setHasArtNovaImages(false);
     }
@@ -253,20 +261,20 @@ export default function PostMediaManager({
     postMedias.filter((media) => media.type === MEDIA_TYPE.VIDEO).length > 0;
 
   return (
-    <Box className="flex flex-col items-start dark:bg-mountain-900 rounded-md w-[60%] h-full text-gray-900 dark:text-white">
+    <Box className="dark:bg-mountain-900 flex h-full w-[60%] flex-col items-start rounded-md text-gray-900 dark:text-white">
       {/* Tabs */}
-      <div className="z-20 flex gap-x-1 bg-white mb-3 p-1.25 border border-mountain-200 rounded-full w-full">
+      <div className="border-mountain-200 z-20 mb-3 flex w-full gap-x-1 rounded-full border bg-white p-1.25">
         <MediaUploadTab
           isActive={tabValue === TabValue.UPLOAD_MEDIA}
           onClick={() => handleTabChange(TabValue.UPLOAD_MEDIA)}
-          icon={<TbDeviceDesktop className="mr-0.5 w-5 h-5" />}
+          icon={<TbDeviceDesktop className="mr-0.5 h-5 w-5" />}
           label="Upload from Device"
           examples="(images, video)"
         />
         <MediaUploadTab
           isActive={tabValue === TabValue.BROWSE_GENAI}
           onClick={() => handleTabChange(TabValue.BROWSE_GENAI)}
-          icon={<RiImageCircleAiLine className="mr-2 w-5 h-5 text-sm" />}
+          icon={<RiImageCircleAiLine className="mr-2 h-5 w-5 text-sm" />}
           label="Post My AI Images"
           examples=""
         />
@@ -289,7 +297,7 @@ export default function PostMediaManager({
               }}
             >
               <Box
-                className="top-2 z-50 absolute flex justify-between items-center space-x-2 mb-2 p-1 px-2 rounded-lg w-full"
+                className="absolute top-2 z-50 mb-2 flex w-full items-center justify-between space-x-2 rounded-lg p-1 px-2"
                 sx={{ flexShrink: 0 }}
               >
                 <InfoMediaRemaining
@@ -318,7 +326,7 @@ export default function PostMediaManager({
                   justifyContent: 'center',
                   overflow: 'hidden',
                 }}
-                className="flex flex-col justify-center items-center bg-mountain-100/80 border border-gray-500 border-dashed rounded-lg w-full h-full"
+                className="bg-mountain-100/80 flex h-full w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-500"
               >
                 {selectedPreviewMedia ? (
                   <MediaPreviewer media={selectedPreviewMedia} />
@@ -333,7 +341,7 @@ export default function PostMediaManager({
               </Box>
               {/* Carousel */}
               <Box
-                className="flex space-x-2 pt-3 h-fit custom-scrollbar"
+                className="custom-scrollbar flex h-fit space-x-2 pt-3"
                 sx={{
                   flexShrink: 0,
                 }}
@@ -341,7 +349,7 @@ export default function PostMediaManager({
                 {postMedias.map((media, i) => (
                   <Box
                     key={i}
-                    className="relative border-1 rounded-md cursor-pointer bounce-item"
+                    className="bounce-item relative cursor-pointer rounded-md border-1"
                     sx={{
                       borderColor:
                         selectedPreviewMedia?.file === media.file
@@ -365,10 +373,10 @@ export default function PostMediaManager({
                         handleRemoveMediaPreview(media);
                       }}
                       size="small"
-                      className="group -top-2 -right-2 absolute bg-gray-600 hover:bg-gray-400 opacity-60"
+                      className="group absolute -top-2 -right-2 bg-gray-600 opacity-60 hover:bg-gray-400"
                     >
                       <MdClose
-                        className="text-white group-hover:text-black text-sm"
+                        className="text-sm text-white group-hover:text-black"
                         size={16}
                       />
                     </IconButton>
@@ -389,7 +397,7 @@ export default function PostMediaManager({
         }}
       </AutoSizer>
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="flex flex-col w-108">
+        <DialogContent className="flex w-108 flex-col">
           <DialogHeader>
             <DialogTitle>Change Tab Confirmation</DialogTitle>
             <DialogDescription>
@@ -404,13 +412,13 @@ export default function PostMediaManager({
               Cancel
             </Button>
             <Button
-              className="bg-red-700 hover:bg-red-700/80 text-mountain-50"
+              className="text-mountain-50 bg-red-700 hover:bg-red-700/80"
               onClick={() => {
                 setPostMedias([]);
                 setTabValue(pendingTab!);
                 setConfirmDialogOpen(false);
                 setSelectedPreviewMedia(null);
-                onThumbnailAddedOrRemoved(null);
+                onThumbnailAddedOrRemoved({ file: null });
                 setHasArtNovaImages(false);
               }}
             >
@@ -420,7 +428,7 @@ export default function PostMediaManager({
         </DialogContent>
       </Dialog>
       <Dialog open={matureDialogOpen} onOpenChange={setMatureDialogOpen}>
-        <DialogContent className="flex flex-col w-108">
+        <DialogContent className="flex w-108 flex-col">
           <DialogHeader>
             <DialogTitle>Mature content detected</DialogTitle>
             <DialogDescription>

@@ -135,7 +135,7 @@ const ImageCropperModal: React.FC<Props> = ({
           <Cropper
             image={originalThumbnailUrl}
             initialCroppedAreaPixels={
-              thumbnailMeta.croppedAreaPixels ?? undefined
+              thumbnailMeta?.croppedAreaPixels ?? undefined
             }
             crop={crop}
             zoom={zoom}

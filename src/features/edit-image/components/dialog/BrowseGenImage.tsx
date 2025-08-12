@@ -1,6 +1,7 @@
 import React, { ElementType, useEffect, useState } from 'react';
 
 //Libs
+import BoringAvatar from 'boring-avatars';
 import ShowMoreText from 'react-show-more-text';
 
 //Components
@@ -13,6 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+
+//API
+import { getUserProfile } from '@/api/authentication/auth';
+import { downloadImageWithRetry } from '@/utils/cors-handling';
+import { useQuery } from '@tanstack/react-query';
 
 //Assets
 const example_1 =
@@ -45,6 +51,15 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
   const [openDiaLog, setOpenDiaLog] = useState(false);
   const navigate = useNavigate();
 
+  const { data: user, error } = useQuery({
+    queryKey: ['user-profile', result?.userId],
+    queryFn: async () => {
+      const response = await getUserProfile(result?.userId);
+      return response ? response : null;
+    },
+    retry: 1,
+  });
+
   const handlePrev = () => {
     setCurrentIndex(
       (prev) => (prev - 1 + otherImages.length) % otherImages.length,
@@ -61,14 +76,15 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
     setCurrentIndex((prev) => (prev + 1) % otherImages.length);
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const currentImageUrl = otherImages[currentIndex];
-    const link = document.createElement('a');
-    link.href = currentImageUrl;
-    link.download = `image-${currentIndex + 1}.jpg`; // or use original file name
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const fileName = `image-${currentIndex + 1}.jpg`;
+
+    try {
+      await downloadImageWithRetry(currentImageUrl, fileName, 3);
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
   };
 
   const handleNavigateToEdit = () => {
@@ -106,8 +122,12 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
       }, 2000);
     }
 
+    if (error) {
+      console.log('error fetching user profile', error);
+    }
+
     return () => clearTimeout(timeout);
-  }, [open]);
+  }, [open, error]);
 
   return (
     <Dialog open={openDiaLog} onOpenChange={setOpenDiaLog}>
@@ -235,12 +255,27 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
                   <div className="flex items-center space-x-2">
                     <Avatar className="size-12">
                       <AvatarImage
-                        src="https://github.com/shadcn.png"
-                        alt="@shadcn"
+                        src={user?.profilePictureUrl}
+                        alt={user?.fullName || 'User'}
                       />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>
+                        <BoringAvatar
+                          size={48}
+                          name={user?.username || user?.fullName || 'User'}
+                          variant="beam"
+                          colors={[
+                            '#84bfc3',
+                            '#fff5d6',
+                            '#ffb870',
+                            '#d96153',
+                            '#000511',
+                          ]}
+                        />
+                      </AvatarFallback>
                     </Avatar>
-                    <p className="font-medium">Nguyễn Minh Thông</p>
+                    <p className="font-medium">
+                      {user?.fullName || 'Loading...'}
+                    </p>
                   </div>
                   <div className="flex">
                     <Button title="Download" onClick={handleDownload}>

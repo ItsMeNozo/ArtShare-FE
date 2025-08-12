@@ -2,6 +2,9 @@ import ConfirmationDialog from '@/components/dialogs/Confirm';
 import InlineErrorMessage from '@/components/InlineErrorMessage';
 import Loading from '@/components/loading/Loading';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
+import { Platform } from '@/features/media-automation/projects/types/platform';
+import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
+import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,6 +12,7 @@ import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
 import { ChevronLeft, ChevronRight, Eye, Plus, ShieldAlert } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { MAX_IMAGE_COUNT, MAX_POSTS_PER_PROJECT } from '../../constants';
 import { useDeleteAutoPost } from '../../hooks/useDeleteAutoPost';
@@ -19,12 +23,9 @@ import { AutoPostFormValues, ImageState } from '../../types';
 import PostContentEditor from './PostContentEditor';
 import PostImagesEditor from './PostImagesEditor';
 import PostScheduleEditor from './PostScheduleEditor';
-import { FacebookPostPreview } from './PostPreviewer';
-import { useNavigate } from 'react-router-dom';
-import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
-import { Platform } from '@/features/media-automation/projects/types/platform';
-import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import AIWritingAssistant from './AIWritingAssistant';
+import { TbGridDots } from 'react-icons/tb';
+import { FacebookPostPreview } from './PostPreviewer';
 
 // import { Link, Element } from "react-scroll";
 
@@ -33,8 +34,42 @@ const EditAutoPostForm = () => {
   const navigate = useNavigate();
   const projectId = useNumericParam('projectId');
   const [tool, setTool] = useState<string>("preview");
-  const handleAddPost = () => {
-    navigate(`/auto/projects/${projectId}/posts/new`);
+  const {
+    isDialogOpen: isNavConfirmOpen,
+    itemToConfirm: navTarget,
+    openDialog: openNavConfirmDialog,
+    closeDialog: closeNavConfirmDialog,
+  } = useConfirmationDialog<() => void>();
+
+  const handleNavigation = (dirty: boolean, navigateFn: () => void) => {
+    if (dirty) {
+      openNavConfirmDialog(() => navigateFn);
+    } else {
+      navigateFn();
+    }
+  };
+
+  const handleNavigateToProject = (dirty: boolean) => {
+    handleNavigation(dirty, () =>
+      navigate(`/auto/projects/${projectId}/details`),
+    );
+  };
+
+  const handleAddPost = (dirty: boolean) => {
+    handleNavigation(dirty, () =>
+      navigate(`/auto/projects/${projectId}/posts/new`),
+    );
+  };
+
+  const handleNavigateToPost = (
+    dirty: boolean,
+    targetPostId: number | null,
+  ) => {
+    if (targetPostId) {
+      handleNavigation(dirty, () =>
+        navigate(`/auto/projects/${projectId}/posts/${targetPostId}/edit`),
+      );
+    }
   };
 
   const queryClient = useQueryClient();
@@ -72,27 +107,36 @@ const EditAutoPostForm = () => {
     return { currentPostIndex, prevPostId, nextPostId };
   }, [postList, postId]);
 
-  const handleNavigateToPost = (targetPostId: number | null) => {
-    if (targetPostId) {
-      navigate(`/auto/projects/${projectId}/posts/${targetPostId}/edit`);
-    }
-  };
-
   const { data: platforms } = useFetchPlatforms('FACEBOOK');
 
   const [matchedPlatform, setMatchedPlatform] = useState<Platform | null>(null);
 
-  const canEdit = useMemo(() => {
-    if (!projectDetails) return false;
-
+  const isProjectLocked = useMemo(() => {
+    if (!projectDetails) return true;
     const status = projectDetails.status.toUpperCase();
-    const isLocked =
+    return (
       status === 'ACTIVE' ||
       status === 'COMPLETED' ||
-      status === 'COMPLETED_WITH_ERRORS';
-
-    return !isLocked;
+      status === 'COMPLETED_WITH_ERRORS'
+    );
   }, [projectDetails]);
+
+  const isPostPublished = useMemo(() => {
+    if (!postToEdit?.status) return false;
+    return postToEdit?.status.toUpperCase() !== 'PENDING';
+  }, [postToEdit]);
+
+  const canEdit = !isProjectLocked && !isPostPublished;
+
+  const disabledReason = useMemo(() => {
+    if (isProjectLocked) {
+      return 'This project is active. Editing is disabled.';
+    }
+    if (isPostPublished) {
+      return 'This post has been published. Editing is disabled.';
+    }
+    return null;
+  }, [isProjectLocked, isPostPublished]);
 
   useEffect(() => {
     if (!postToEdit?.platformPostId || !platforms) return;
@@ -161,6 +205,22 @@ const EditAutoPostForm = () => {
   const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
     onSuccess: () => {
       closeDialog();
+      const currentIndex = postList.findIndex((p) => p.id === postIdToDelete);
+      if (currentIndex !== -1) {
+        if (postList.length > 1) {
+          if (currentIndex > 0) {
+            navigate(
+              `/auto/projects/${projectId}/posts/${postList[currentIndex - 1].id}/edit`,
+            );
+          } else {
+            navigate(
+              `/auto/projects/${projectId}/posts/${postList[currentIndex + 1].id}/edit`,
+            );
+          }
+        } else {
+          navigate(`/auto/projects/${projectId}/details`);
+        }
+      }
     },
   });
 
@@ -197,9 +257,16 @@ const EditAutoPostForm = () => {
               <div className="flex justify-between items-center w-full">
                 <div className="flex space-x-4">
                   <div className="flex items-center space-x-4">
+                    <div
+                      onClick={() => handleNavigateToProject(dirty)}
+                      className="flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer"
+                    >
+                      <span>Project Posts</span>
+                      <TbGridDots />
+                    </div>
                     <button
                       type="button"
-                      onClick={handleAddPost}
+                      onClick={() => handleAddPost(dirty)}
                       disabled={
                         postList.length >= MAX_POSTS_PER_PROJECT || !canEdit
                       }
@@ -212,7 +279,10 @@ const EditAutoPostForm = () => {
                       <div className="flex items-center space-x-2">
                         <Button
                           onClick={() =>
-                            handleNavigateToPost(navigationData.prevPostId)
+                            handleNavigateToPost(
+                              dirty,
+                              navigationData.prevPostId,
+                            )
                           }
                           disabled={!navigationData.prevPostId}
                           className="flex items-center bg-white disabled:opacity-50 p-2 border border-mountain-200 rounded-lg h-10 font-normal text-gray-700 normal-case"
@@ -222,12 +292,16 @@ const EditAutoPostForm = () => {
                         </Button>
                         {navigationData.currentPostIndex !== -1 && (
                           <div className="flex items-center bg-white p-2 border border-mountain-200 rounded-lg h-10 text-gray-500 text-sm select-none">
-                            <span>{`Post ${navigationData.currentPostIndex + 1} of ${postList.length}`}</span>
+                            <span>{`Post ${navigationData.currentPostIndex + 1
+                              } of ${postList.length}`}</span>
                           </div>
                         )}
                         <Button
                           onClick={() =>
-                            handleNavigateToPost(navigationData.nextPostId)
+                            handleNavigateToPost(
+                              dirty,
+                              navigationData.nextPostId,
+                            )
                           }
                           disabled={!navigationData.nextPostId}
                           className="flex items-center bg-white disabled:opacity-50 p-2 border border-mountain-200 rounded-lg h-10 font-normal text-gray-700 normal-case"
@@ -258,10 +332,12 @@ const EditAutoPostForm = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2 bg-yellow-100 p-2 px-4 border border-yellow-200 rounded-lg text-yellow-800">
-                    <ShieldAlert className="size-5" />
-                    <span>This project is active. Editing is disabled.</span>
-                  </div>
+                  disabledReason && (
+                    <div className="flex items-center space-x-2 bg-yellow-100 p-2 px-4 border border-yellow-200 rounded-lg text-yellow-800">
+                      <ShieldAlert className="size-5" />
+                      <span>{disabledReason}</span>
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -351,6 +427,19 @@ const EditAutoPostForm = () => {
               description="Are you sure you want to permanently delete this post? This action cannot be undone."
               confirmMessage="Delete Post"
               isLoading={isDeleting}
+            />
+            <ConfirmationDialog
+              open={isNavConfirmOpen}
+              onCancel={closeNavConfirmDialog}
+              onConfirm={() => {
+                if (navTarget) {
+                  navTarget();
+                }
+                closeNavConfirmDialog();
+              }}
+              title="Unsaved Changes"
+              description="You have unsaved changes. Are you sure you want to go to another post? Your changes will be lost."
+              confirmMessage="Yes"
             />
           </Form>
         );

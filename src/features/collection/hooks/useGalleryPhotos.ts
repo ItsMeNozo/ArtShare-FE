@@ -60,7 +60,9 @@ export function useGalleryPhotos(
                 try {
                   return {
                     src: imageUrl,
-                    width: post.thumbnailWidth || 256,
+                    width:
+                      Math.min(post.thumbnailWidth, post.thumbnailHeight) ||
+                      256,
                     height: post.thumbnailHeight || 256,
                     key: post.id.toString(),
                     title: post.title || 'Untitled Post',
