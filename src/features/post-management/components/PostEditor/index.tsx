@@ -23,13 +23,13 @@ import {
 } from 'formik';
 import { ImageUpIcon } from 'lucide-react';
 import { PostFormValues } from '../../types/post-form-values.type';
-import { PostMedia } from '../../types/post-media';
+import { PostMedia, ThumbnailData } from '../../types/post-media';
 import SelectCategorySection from './SelectCategorySection';
 
 const PostEditor: React.FC<{
   values: PostFormValues;
   setFieldValue: FormikHelpers<PostFormValues>['setFieldValue'];
-  onThumbnailAddedOrRemoved: (file: File | null) => void;
+  onThumbnailAddedOrRemoved: (thumbnailData: ThumbnailData) => void;
   thumbnail: PostMedia | null;
   setThumbnail: React.Dispatch<React.SetStateAction<PostMedia | null>>;
   originalThumbnail: PostMedia | null;
@@ -52,6 +52,33 @@ const PostEditor: React.FC<{
 }) => {
   const [thumbnailCropOpen, setThumbnailCropOpen] = useState(false);
 
+  const handleThumbnailFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      onThumbnailAddedOrRemoved({ file: null });
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      onThumbnailAddedOrRemoved({
+        file,
+        width: img.width,
+        height: img.height,
+      });
+
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => {
+      console.error('Failed to load image for dimension reading.');
+      URL.revokeObjectURL(img.src);
+    };
+
+    img.src = URL.createObjectURL(file);
+  };
+
   return (
     <Box className="mx-auto w-full space-y-3 text-left dark:text-white">
       {/* Artwork Title Box */}
@@ -68,8 +95,8 @@ const PostEditor: React.FC<{
           className="space-y-1 px-3 py-3"
         >
           <Field
-            name="title" // Connects to Formik state
-            as={TextField} // Render as an MUI TextField
+            name="title"
+            as={TextField}
             placeholder="What do you call your artwork"
             variant="outlined"
             error={touched.title && Boolean(errors.title)}
@@ -231,12 +258,7 @@ const PostEditor: React.FC<{
             type="file"
             accept="image/*"
             hidden
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                onThumbnailAddedOrRemoved(file);
-              }
-            }}
+            onChange={handleThumbnailFileChange}
           />
         </Box>
         {thumbnail && (
@@ -260,12 +282,7 @@ const PostEditor: React.FC<{
                   type="file"
                   accept="image/*"
                   hidden
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      onThumbnailAddedOrRemoved(file);
-                    }
-                  }}
+                  onChange={handleThumbnailFileChange}
                 />
               </IconButton>
             </Tooltip>
