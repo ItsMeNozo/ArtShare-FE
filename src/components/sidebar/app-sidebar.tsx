@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <div className="flex flex-col justify-between items-center space-y-1 w-full">
             {[
-              { icon: Home, label: 'Home', href: '/dashboard' },
+              { icon: Home, label: 'Dashboard', href: '/dashboard' },
               {
                 icon: MdOutlineExplore,
                 label: 'Explore Arts',
