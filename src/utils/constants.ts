@@ -28,7 +28,7 @@ export const featuresShowcase = [
   {
     label: 'Create Post',
     description: 'Share your artworks with AI tools.',
-    url: 'https://asset.cloudinary.com/dd8vklkam/49aa6b17ea101b6a3ea4f237bfa70591https://res.cloudinary.com/dd8vklkam/image/upload/fl_preserve_transparency/v1755007732/books/create-post_ei8vsm.jpg?_s=public-apps',
+    url: 'https://res.cloudinary.com/dd8vklkam/image/upload/fl_preserve_transparency/v1755007732/books/create-post_ei8vsm.jpg?_s=public-apps',
     destination: '/posts/new',
   },
   {
