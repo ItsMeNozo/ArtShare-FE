@@ -44,7 +44,7 @@ const EditImage: React.FC = () => {
 
   //Toolbar
   const [fullScreen, setFullScreen] = useState(false);
-  const [newEdit, setNewEdit] = useState<NewDesign | null>(null);
+  const [newEdit, setNewEdit] = useState<NewEdit | null>(null);
   const [newDesign, setNewDesign] = useState<NewDesign | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -200,35 +200,11 @@ const EditImage: React.FC = () => {
   useEffect(() => {
     if (!newEdit || !newEdit.canvas) return;
     hasAppendedInitialImage.current = false;
-    setLayers([]);
     setSelectedLayerId(null);
     setEditingLayerId(null);
     setCanvasSize(newEdit.canvas);
     setFinalCanvasSize(newEdit.finalCanvas);
-    const baseLayer: ImageLayer = {
-      type: 'image',
-      id: crypto.randomUUID(),
-      src: '',
-      zoom: zoomLevel,
-      opacity: opacity,
-      flipH: flipHorizontal,
-      flipV: flipVertical,
-      x: xPos,
-      y: yPos,
-      rotation: rotation,
-      brightness: brightness,
-      contrast: contrast,
-      saturation: saturation,
-      hue: hue,
-      sepia: sepia,
-      backgroundColor: color || '#ffffff',
-      height: newEdit.canvas.height,
-      width: newEdit.canvas.width,
-      zIndex: 0,
-      isLocked: false,
-    };
-    setLayers([baseLayer]);
-    setNewDesign(null);
+    setNewEdit(null);
   }, [newEdit]);
 
   const getSrcForImage = (url: string | undefined) => {
@@ -590,7 +566,6 @@ const EditImage: React.FC = () => {
     navigate('/posts/new', { state: { fromEditorImage: file } });
   };
 
-  console.log("layers", layers);
   return (
     <div className="group relative flex flex-col w-full h-full">
       {/* Floating Button */}

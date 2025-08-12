@@ -19,12 +19,7 @@ const UserSubscription = () => {
 
   useEffect(() => {
     if (searchParams.get('stripe_portal_return')) {
-      console.log(
-        'Returned from Stripe portal, invalidating subscription info...',
-      );
-
       queryClient.invalidateQueries({ queryKey: ['subscriptionInfo'] });
-
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
     }

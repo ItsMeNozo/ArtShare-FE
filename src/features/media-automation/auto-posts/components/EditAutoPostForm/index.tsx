@@ -6,7 +6,7 @@ import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
-import { ChevronLeft, ChevronRight, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, Plus, ShieldAlert } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
 import * as Yup from 'yup';
@@ -21,11 +21,10 @@ import PostImagesEditor from './PostImagesEditor';
 import PostScheduleEditor from './PostScheduleEditor';
 import { FacebookPostPreview } from './PostPreviewer';
 import { useNavigate } from 'react-router-dom';
-import { PiStarFourFill } from 'react-icons/pi';
 import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
 import { Platform } from '@/features/media-automation/projects/types/platform';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
-import { TbGridDots } from 'react-icons/tb';
+import AIWritingAssistant from './AIWritingAssistant';
 
 // import { Link, Element } from "react-scroll";
 
@@ -33,11 +32,7 @@ const EditAutoPostForm = () => {
   const postId = useNumericParam('postId');
   const navigate = useNavigate();
   const projectId = useNumericParam('projectId');
-
-  const handleNavigateToProject = () => {
-    navigate(`/auto/projects/${projectId}/details`);
-  };
-
+  const [tool, setTool] = useState<string>("preview");
   const handleAddPost = () => {
     navigate(`/auto/projects/${projectId}/posts/new`);
   };
@@ -202,13 +197,6 @@ const EditAutoPostForm = () => {
               <div className="flex justify-between items-center w-full">
                 <div className="flex space-x-4">
                   <div className="flex items-center space-x-4">
-                    <div
-                      onClick={handleNavigateToProject}
-                      className="flex items-center space-x-2 bg-indigo-100 p-2 px-4 border border-mountain-200 rounded-full cursor-pointer"
-                    >
-                      <span>Project Posts</span>
-                      <TbGridDots />
-                    </div>
                     <button
                       type="button"
                       onClick={handleAddPost}
@@ -217,8 +205,8 @@ const EditAutoPostForm = () => {
                       }
                       className="flex items-center space-x-2 hover:bg-mountain-50 disabled:opacity-50 p-2 border border-mountain-200 rounded-lg cursor-pointer disabled:cursor-not-allowed"
                     >
-                      <PiStarFourFill className="size-4 text-purple-600" />
-                      <span>Add Post</span>
+                      <Plus />
+                      <span>Add New Post</span>
                     </button>
                     <div className="flex items-center px-4 border-mountain-200 border-l-1">
                       <div className="flex items-center space-x-2">
@@ -278,10 +266,29 @@ const EditAutoPostForm = () => {
               </div>
             </div>
             <Box className="flex w-full h-screen min-h-0">
-              <Box className="flex flex-col space-y-8 px-2 border-mountain-200 border-r-1 w-lg min-h-0 overflow-x-hidden overflow-y-auto custom-scrollbar">
+              <Box className="flex flex-col space-y-8 px-2 py-4 border-mountain-200 border-r-1 w-lg min-h-0 overflow-x-hidden overflow-y-auto shrink-0 custom-scrollbar">
                 <Box className="flex flex-col space-y-4">
-                  <Typography className="flex items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
-                    <span className="mr-2">🖊️</span>Post Content
+                  <Typography className="flex justify-between items-center space-x-2 py-2 border-mountain-200 border-b-1 text-indigo-900">
+                    <span>🖊️ Post Content</span>
+                    <div className='flex space-x-2'>
+                      <div
+                        onClick={() => setTool("aiwriting")}
+                        className='group flex justify-center p-[2px] rounded-lg w-fit cursor-pointer'
+                        style={{
+                          background: "linear-gradient(to right, #3b82f6, #6366f1, #a855f7, #ec4899)",
+                          color: "white",
+                        }}
+                      >
+                        <div className='flex justify-center items-center bg-white group-hover:bg-mountain-50 p-1.5 rounded-md w-full h-full text-mountain-950 select-none'>
+                          AI Writing Assistant
+                        </div>
+                      </div>
+                      <div onClick={() => setTool("preview")}
+                        className='flex justify-center items-center space-x-2 bg-white hover:bg-mountain-50 p-1.5 border border-mountain-200 rounded-md w-fit h-full text-mountain-950 cursor-pointer select-none'>
+                        <Eye className='size-4' />
+                        <span>Preview</span>
+                      </div>
+                    </div>
                   </Typography>
                   <PostContentEditor
                     value={values.content}
@@ -325,12 +332,16 @@ const EditAutoPostForm = () => {
                   </ErrorMessage>
                 </Box>
               </Box>
-              <FacebookPostPreview
-                content={values.content}
-                images={values.images.map((img) => img.url)}
-                scheduledAt={values.scheduledAt}
-                platform={matchedPlatform!}
-              />
+              {tool === "preview" ?
+                <FacebookPostPreview
+                  content={values.content}
+                  images={values.images.map((img) => img.url)}
+                  scheduledAt={values.scheduledAt}
+                  platform={matchedPlatform!}
+                />
+                :
+                <AIWritingAssistant />
+              }
             </Box>
             <ConfirmationDialog
               open={isDialogOpen}

@@ -44,12 +44,14 @@ import BackButton from "./headerItems/BackButton";
 import ShareButton from "./headerItems/ShareButton";
 import { Link, useLocation } from "react-router-dom";
 import { PiStarFourFill } from "react-icons/pi";
+import { useSubscriptionInfo } from "@/hooks/useSubscription";
+import { Tooltip } from "@mui/material";
 
 interface EditHeaderProps {
   hideTopBar?: boolean;
   hasChanges?: boolean;
   finalCanvasSize?: Canvas;
-  setNewEdit?: React.Dispatch<React.SetStateAction<NewDesign | null>>;
+  setNewEdit?: React.Dispatch<React.SetStateAction<NewEdit | null>>;
   setNewDesign?: React.Dispatch<React.SetStateAction<NewDesign | null>>;
   setHideTopBar?: React.Dispatch<React.SetStateAction<boolean>>;
   handleShare?: () => void;
@@ -67,6 +69,9 @@ const EditHeader: React.FC<EditHeaderProps> = ({
   handleDownload
 }) => {
   const { user, loading } = useUser();
+  const {
+    data: subscriptionInfo,
+  } = useSubscriptionInfo();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [aspectRatio, setAspectRatio] = useState("1:1");
@@ -328,7 +333,6 @@ const EditHeader: React.FC<EditHeaderProps> = ({
                     onClick={() => {
                       if (!canvasSize || !aspectRatio || !setNewEdit) return;
                       setNewEdit({
-                        layers: [],
                         ratio: aspectRatio,
                         canvas: editCanvas,
                         finalCanvas: canvasSize,
@@ -350,16 +354,25 @@ const EditHeader: React.FC<EditHeaderProps> = ({
                   <div className='flex flex-col space-y-4'>
                     <div className='flex justify-between items-center'>
                       <p className='font-medium text-sm'>Download</p>
-                      <div className="flex items-center space-x-2 bg-indigo-100 p-1 px-2 rounded-lg select-none">
-                        <FaCrown className='text-amber-400' />
-                        <span className="text-sm">App Watermark</span>
-                        <Switch
-                          disabled
-                          checked={useWatermark}
-                          onCheckedChange={setUseWatermark}
-                          className="data-[state=checked]:bg-indigo-500"
-                        />
-                      </div>
+                      <Tooltip
+                        title={
+                          subscriptionInfo?.plan === "free"
+                            ? "Upgrade plan to check/un-check the watermark"
+                            : ""
+                        }
+                        disableHoverListener={subscriptionInfo?.plan !== "free"}
+                      >
+                        <div className="flex items-center space-x-2 bg-indigo-100 p-1 px-2 rounded-lg select-none">
+                          <FaCrown className="text-amber-400" />
+                          <span className="text-sm">App Watermark</span>
+                          <Switch
+                            disabled={subscriptionInfo?.plan === "free"}
+                            checked={useWatermark}
+                            onCheckedChange={setUseWatermark}
+                            className="data-[state=checked]:bg-indigo-500 cursor-pointer"
+                          />
+                        </div>
+                      </Tooltip>
                     </div>
                     <Input
                       placeholder="File Name"

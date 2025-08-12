@@ -12,6 +12,7 @@ import { MdMoreHoriz } from 'react-icons/md';
 import { ExpandablePostContent } from './ExpandTextArea';
 import { useState } from 'react';
 import { MobileImageGrid } from '../mimics/MobileImageGrid';
+import { FaUserCircle } from 'react-icons/fa';
 interface FacebookPostPreviewProps {
   content: string;
   images: string[];
@@ -70,13 +71,19 @@ export const FacebookPostPreview: React.FC<FacebookPostPreviewProps> = ({
           >
             <div className="flex justify-between items-center p-4 pb-0">
               <div className="flex items-center space-x-2">
-                <img
-                  src={platform?.pictureUrl || facebookIcon}
+
+                {platform?.pictureUrl ? <img
+                  src={platform?.pictureUrl}
                   alt="Avatar"
                   className="rounded-full w-10 h-10"
-                />
+                /> :
+                  <FaUserCircle className='size-10 text-mountain-300' />
+                }
                 <div className="flex flex-col">
-                  <p className="font-medium">{platform?.config.pageName}</p>
+                  {platform?.config.pageName ?
+                    <p className="font-medium">{platform?.config.pageName}</p>
+                    : <p className='font-medium'>Sample Page</p>
+                  }
                   <div className="flex space-x-2 text-mountain-400 text-xs">
                     <p>
                       {scheduledAt
