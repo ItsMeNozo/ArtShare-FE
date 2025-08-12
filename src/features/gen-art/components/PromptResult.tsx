@@ -81,6 +81,41 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
     return { width: w, height: h };
   };
 
+  const handleQuickDownload = async () => {
+    if (!result || !result.imageUrls || result.imageUrls.length === 0) return;
+
+    try {
+      // If only one image, download directly at original quality
+      if (result.imageUrls.length === 1) {
+        const blob = await fetchImageWithCorsHandling(result.imageUrls[0]);
+        saveAs(blob, `image-${Date.now()}.jpg`);
+        return;
+      }
+
+      // Multiple images - create ZIP with original quality
+      const zip = new JSZip();
+      await Promise.all(
+        result.imageUrls.map(async (url, index) => {
+          try {
+            const blob = await fetchImageWithCorsHandling(url);
+            zip.file(`image-${index + 1}.jpg`, blob);
+          } catch (error) {
+            console.error(`Failed to download image ${index + 1}:`, error);
+          }
+        }),
+      );
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, 'images.zip');
+    } catch (error) {
+      console.error('Quick download failed:', error);
+      // Fallback: open images in new tabs
+      result.imageUrls.forEach((url, index) => {
+        setTimeout(() => window.open(url, '_blank'), index * 100);
+      });
+    }
+  };
+
   const handleDownloadAll = async (settings: DownloadSettings) => {
     if (!result || !result.imageUrls || result.imageUrls.length === 0) return;
 
@@ -172,15 +207,26 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 </p>
               </Button>
             </Tooltip>
-            <Tooltip title="Download" placement="bottom" arrow>
-              <Button
-                className="bg-mountain-100"
-                onClick={() => setOpenDownload(true)}
-                hidden={useToShare || false}
-              >
-                <FiDownload className="size-5" />
-              </Button>
-            </Tooltip>
+            <div className="flex items-center">
+              <Tooltip title="Download" placement="bottom" arrow>
+                <Button
+                  className="bg-mountain-100 h-9 min-w-9 rounded-r-none"
+                  onClick={handleQuickDownload}
+                  hidden={useToShare || false}
+                >
+                  <FiDownload className="size-5" />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Download with options" placement="bottom" arrow>
+                <Button
+                  className="bg-mountain-100 flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
+                  onClick={() => setOpenDownload(true)}
+                  hidden={useToShare || false}
+                >
+                  ▼
+                </Button>
+              </Tooltip>
+            </div>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Tooltip title="Delete" placement="bottom" arrow>

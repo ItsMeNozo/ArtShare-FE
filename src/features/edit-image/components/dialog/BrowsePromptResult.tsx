@@ -111,6 +111,16 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({
 
   const handleDownloadAll = async () => {
     try {
+      const imageCount = result!.imageUrls.length;
+
+      // If only one image, download it directly without zip
+      if (imageCount === 1) {
+        const blob = await fetchImageWithCorsHandling(result!.imageUrls[0]);
+        saveAs(blob, 'image-1.jpg');
+        return;
+      }
+
+      // Multiple images - create zip
       const zip = new JSZip();
       await Promise.all(
         result!.imageUrls.map(async (url, index) => {
@@ -147,15 +157,22 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({
         </p>
         {!result.generating && (
           <div className="flex items-center space-x-2">
-            <Tooltip title="Download" placement="bottom" arrow>
-              <Button
-                className="bg-mountain-100"
-                onClick={handleDownloadAll}
-                hidden={useToEdit || false}
-              >
-                <FiDownload className="size-5" />
-              </Button>
-            </Tooltip>
+            <div className="flex flex-col items-end">
+              <Tooltip title="Download" placement="bottom" arrow>
+                <Button
+                  className="bg-mountain-100"
+                  onClick={handleDownloadAll}
+                  hidden={useToEdit || false}
+                >
+                  <FiDownload className="size-5" />
+                </Button>
+              </Tooltip>
+              {result.imageUrls.length > 1 && (
+                <span className="mt-1 text-xs text-gray-500 select-none">
+                  images.zip
+                </span>
+              )}
+            </div>
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Tooltip title="Delete" placement="bottom" arrow>
