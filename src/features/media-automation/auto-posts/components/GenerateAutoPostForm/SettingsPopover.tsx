@@ -1,9 +1,11 @@
 import { Input } from '@/components/ui/input';
+import { Input as InputMUI } from '@mui/material';
 import { Switch } from '@/components/ui/switch';
 import { Box, Button, Slider, Typography } from '@mui/material';
 import { Field, useFormikContext } from 'formik';
 import { Settings2 } from 'lucide-react';
 import { GenAutoPostFormValues } from '../../types';
+import { RiGlobalLine } from 'react-icons/ri';
 
 const SettingsPanel = () => {
   const { setFieldValue, values } = useFormikContext<GenAutoPostFormValues>();
@@ -14,7 +16,7 @@ const SettingsPanel = () => {
   };
 
   return (
-    <Box className="flex flex-col space-y-6 bg-white shadow-sm p-4 border border-mountain-200 rounded-lg w-80 h-full">
+    <div className="flex flex-col space-y-6 bg-white shadow-sm p-4 border border-mountain-200 rounded-lg w-80 h-full">
       <Typography className="flex items-center gap-2 font-bold text-mountain-800 text-sm">
         <Settings2 className="size-4" />
         Prompt Settings
@@ -89,7 +91,21 @@ const SettingsPanel = () => {
           className="cursor-pointer"
         />
       </Box>
-    </Box>
+      <div className='flex flex-col space-x-4 w-full h-fit'>
+        <button
+          type='button'
+          className='flex items-center space-x-2'
+          onClick={() => { }}
+        >
+          <RiGlobalLine className='size-4 text-mountain-600' />
+          <div className='flex items-end space-x-2 font-medium text-sm'>
+            <span>Reference</span>
+            <span className='text-mountain-600'>(Optional)</span>
+          </div>
+        </button>
+        <InputMUI className='flex flex-1 text-sm' />
+      </div>
+    </div>
   );
 };
 

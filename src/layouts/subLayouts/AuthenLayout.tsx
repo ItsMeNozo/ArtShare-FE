@@ -59,7 +59,7 @@ const AuthenLayout: React.FC<{ children: React.ReactNode }> = ({
         className="bottom-0 left-0 z-0 absolute bg-gradient-to-t from-indigo-400/30 via-indigo-200/20 to-transparent backdrop-blur-2xl blur-2xl w-full h-40 pointer-events-none"
       />
       <HeroImage />
-      <div className="z-10 flex flex-col justify-center px-20 w-full md:w-[40%] h-full shrink-0">
+      <div className="z-10 flex flex-col justify-start px-20 w-full md:w-[40%] h-full shrink-0">
         <div className={`flex w-full items-center justify-end space-x-2 ${showReturnToLogin ? 'justify-between' : 'justify-end'}`}>
           {showReturnToLogin && (
             <Link

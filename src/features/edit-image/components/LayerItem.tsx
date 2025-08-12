@@ -177,12 +177,12 @@ const LayerItem = React.memo(
                     prev.map((l) =>
                       l.id === layer.id
                         ? {
-                            ...l,
-                            width,
-                            height,
-                            x: drag.beforeTranslate[0],
-                            y: drag.beforeTranslate[1],
-                          }
+                          ...l,
+                          width,
+                          height,
+                          x: drag.beforeTranslate[0],
+                          y: drag.beforeTranslate[1],
+                        }
                         : l,
                     ),
                   );
@@ -198,7 +198,7 @@ const LayerItem = React.memo(
             )}
           </div>
         </ContextMenuTrigger>
-        <ContextMenuContent className="border-mountain-200 w-48 p-2 text-sm">
+        <ContextMenuContent className="p-2 border-mountain-200 w-48 text-sm">
           <ContextMenuItem onClick={() => handleLockLayer(layer.id)}>
             {layer.isLocked ? (
               <>
