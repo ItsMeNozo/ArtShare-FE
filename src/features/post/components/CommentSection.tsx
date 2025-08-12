@@ -1367,7 +1367,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
       // mark this reply so it stays visible even if thread is collapsed
       if (parentId) appendFresh(parentId, tmpId);
-      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+
       // Clear input and set states
       setNewComment('');
       setReplyParentId(null);
@@ -1420,16 +1420,8 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
         // update fresh-reply map from tmpId ➜ real id
         if (parentId) replaceTempFreshId(parentId, tmpId, data.id);
 
-        setTimeout(() => {
-          if (parentId) {
-            const parentEl = document.getElementById(`comment-${parentId}`);
-            if (parentEl) {
-              parentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          } else {
-            listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        }, 100);
+        // REMOVED: Unnecessary scrolling logic - keep user at current position
+
         setReplyParentId(null);
         onCommentAdded();
       } catch (err) {
@@ -1658,7 +1650,6 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                 ? 'pb-4' // Add padding to bottom if input is at top
                 : 'pt-4' // Add padding to top if input is at bottom
             }`}
-            style={{ scrollBehavior: 'smooth' }}
           >
             {comments.length > 0 ? (
               comments.map((c) => (

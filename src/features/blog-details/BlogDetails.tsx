@@ -214,6 +214,7 @@ const BlogDetails = () => {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const commentSectionRef = useRef<CommentSectionRef>(null);
+  const hasInitiallyLoadedRef = useRef(false);
 
   const safeBlogId = blogId || '';
 
@@ -235,9 +236,10 @@ const BlogDetails = () => {
   });
 
   useEffect(() => {
-    // This code will only run after the data has been successfully fetched.
-    if (blog && scrollContainerRef.current) {
+    // Only scroll to top on initial load, not on subsequent refetches
+    if (blog && scrollContainerRef.current && !hasInitiallyLoadedRef.current) {
       scrollContainerRef.current.scrollTop = 0;
+      hasInitiallyLoadedRef.current = true;
     }
   }, [blog]);
 
@@ -292,7 +294,7 @@ const BlogDetails = () => {
 
   if (!blogId) {
     return (
-      <div className="flex justify-center items-center bg-white dark:bg-mountain-950 h-screen">
+      <div className="dark:bg-mountain-950 flex h-screen items-center justify-center bg-white">
         <p className="text-gray-600 dark:text-gray-400">Blog ID not found.</p>
       </div>
     );
@@ -381,7 +383,7 @@ const BlogDetails = () => {
 
   if (isLoading || commentsLoading) {
     return (
-      <div className="flex justify-center items-center space-x-4 bg-white dark:bg-mountain-950 h-screen text-black dark:text-white">
+      <div className="dark:bg-mountain-950 flex h-screen items-center justify-center space-x-4 bg-white text-black dark:text-white">
         <CircularProgress size={36} />
         <p>Loading…</p>
       </div>
@@ -394,11 +396,11 @@ const BlogDetails = () => {
 
     if (statusCode === 403) {
       return (
-        <div className="flex flex-col justify-center items-center bg-white dark:bg-mountain-950 p-8 h-screen">
+        <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
           <div className="max-w-md text-center">
             <div className="mb-6">
               <svg
-                className="mx-auto w-20 h-20 text-yellow-500 dark:text-yellow-400"
+                className="mx-auto h-20 w-20 text-yellow-500 dark:text-yellow-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -411,7 +413,7 @@ const BlogDetails = () => {
                 />
               </svg>
             </div>
-            <h2 className="mb-2 font-bold text-gray-900 dark:text-white text-2xl">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
               Access Restricted
             </h2>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
@@ -422,7 +424,7 @@ const BlogDetails = () => {
             <div className="space-y-3">
               <Button
                 onClick={() => navigate('/blogs')}
-                className="bg-blue-600 hover:bg-blue-700 w-full text-white"
+                className="w-full bg-blue-600 text-white hover:bg-blue-700"
               >
                 Browse Other Blogs
               </Button>
@@ -443,11 +445,11 @@ const BlogDetails = () => {
 
     if (statusCode === 404) {
       return (
-        <div className="flex flex-col justify-center items-center bg-white dark:bg-mountain-950 p-8 h-screen">
+        <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
           <div className="max-w-md text-center">
             <div className="mb-6">
               <svg
-                className="mx-auto w-20 h-20 text-gray-400 dark:text-gray-600"
+                className="mx-auto h-20 w-20 text-gray-400 dark:text-gray-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -460,7 +462,7 @@ const BlogDetails = () => {
                 />
               </svg>
             </div>
-            <h2 className="mb-2 font-bold text-gray-900 dark:text-white text-2xl">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
               Blog Not Found
             </h2>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
@@ -470,7 +472,7 @@ const BlogDetails = () => {
             </p>
             <Button
               onClick={() => navigate('/blogs')}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 text-white hover:bg-blue-700"
             >
               Back to Blogs
             </Button>
@@ -480,11 +482,11 @@ const BlogDetails = () => {
     }
 
     return (
-      <div className="flex flex-col justify-center items-center bg-white dark:bg-mountain-950 p-8 h-screen">
+      <div className="dark:bg-mountain-950 flex h-screen flex-col items-center justify-center bg-white p-8">
         <div className="max-w-md text-center">
           <div className="mb-6">
             <svg
-              className="mx-auto w-20 h-20 text-red-500 dark:text-red-400"
+              className="mx-auto h-20 w-20 text-red-500 dark:text-red-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -497,7 +499,7 @@ const BlogDetails = () => {
               />
             </svg>
           </div>
-          <h2 className="mb-2 font-bold text-gray-900 dark:text-white text-2xl">
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             Something went wrong
           </h2>
           <p className="mb-6 text-gray-600 dark:text-gray-400">
@@ -508,7 +510,7 @@ const BlogDetails = () => {
           <div className="space-y-3">
             <Button
               onClick={() => refetch()}
-              className="bg-blue-600 hover:bg-blue-700 w-full text-white"
+              className="w-full bg-blue-600 text-white hover:bg-blue-700"
             >
               Try Again
             </Button>
@@ -531,7 +533,7 @@ const BlogDetails = () => {
 
   if (!blog) {
     return (
-      <div className="flex justify-center items-center bg-white dark:bg-mountain-950 h-screen">
+      <div className="dark:bg-mountain-950 flex h-screen items-center justify-center bg-white">
         <p className="text-gray-600 dark:text-gray-400">
           No blog data available.
         </p>
@@ -542,10 +544,10 @@ const BlogDetails = () => {
   const readingTime = Math.ceil(blog.content.split(/\s+/).length / 200);
 
   const ActionButtons = () => (
-    <div className="flex items-center space-x-3 bg-white dark:bg-mountain-900 shadow-sm p-2 border border-mountain-200 dark:border-mountain-700 rounded-full w-full h-full transition duration-300 ease-in-out">
+    <div className="dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 flex h-full w-full items-center space-x-3 rounded-full border bg-white p-2 shadow-sm transition duration-300 ease-in-out">
       <Tooltip title={isLiked ? 'Unlike' : 'Like'} placement="bottom" arrow>
         <div
-          className="flex justify-center items-center bg-blue-100 hover:bg-blue-200 dark:bg-blue-800/40 dark:hover:bg-blue-700/60 shadow-md p-2 rounded-full w-14 h-14 font-medium text-blue-700 hover:text-blue-800 dark:hover:text-blue-200 dark:text-blue-300 transition-all duration-200 hover:cursor-pointer"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 p-2 font-medium text-blue-700 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-blue-200 hover:text-blue-800 dark:bg-blue-800/40 dark:text-blue-300 dark:hover:bg-blue-700/60 dark:hover:text-blue-200"
           onClick={handleToggleLike}
           aria-disabled={likeMutation.isPending || unlikeMutation.isPending}
         >
@@ -555,7 +557,7 @@ const BlogDetails = () => {
             <AiOutlineLike className="size-5 text-blue-600 dark:text-blue-400" />
           )}
           <p
-            className="ml-1 font-medium text-blue-700 dark:text-blue-300 hover:underline"
+            className="ml-1 font-medium text-blue-700 hover:underline dark:text-blue-300"
             onClick={(e) => {
               e.stopPropagation();
               requireAuth('view likes', () => setLikesDialogOpen(true));
@@ -567,7 +569,7 @@ const BlogDetails = () => {
       </Tooltip>
       <Tooltip title="Comment" placement="bottom" arrow>
         <div
-          className="flex justify-center items-center bg-green-100 hover:bg-green-200 dark:bg-green-800/40 dark:hover:bg-green-700/60 shadow-md p-2 rounded-full w-14 h-14 font-medium text-green-700 hover:text-green-800 dark:hover:text-green-200 dark:text-green-300 transition-all duration-200 hover:cursor-pointer"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 p-2 font-medium text-green-700 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-green-200 hover:text-green-800 dark:bg-green-800/40 dark:text-green-300 dark:hover:bg-green-700/60 dark:hover:text-green-200"
           onClick={() => commentSectionRef.current?.focusCommentInput()}
         >
           <BiComment className="mr-1 size-4 text-green-600 dark:text-green-400" />
@@ -576,11 +578,11 @@ const BlogDetails = () => {
           </span>
         </div>
       </Tooltip>
-      <div className="flex items-center space-x-3 ml-auto">
+      <div className="ml-auto flex items-center space-x-3">
         <Tooltip title={copied ? 'Link copied!' : 'Copy link'} arrow>
           <IconButton
             onClick={handleCopyLink}
-            className="flex justify-center items-center bg-mountain-100 hover:bg-mountain-200 dark:bg-mountain-700 dark:hover:bg-mountain-600 shadow-md p-2 rounded-full w-12 h-12 font-medium text-mountain-700 hover:text-mountain-900 dark:hover:text-white dark:text-mountain-200 transition-all duration-200 hover:cursor-pointer"
+            className="bg-mountain-100 hover:bg-mountain-200 dark:bg-mountain-700 dark:hover:bg-mountain-600 text-mountain-700 hover:text-mountain-900 dark:text-mountain-200 flex h-12 w-12 items-center justify-center rounded-full p-2 font-medium shadow-md transition-all duration-200 hover:cursor-pointer dark:hover:text-white"
           >
             <LuLink className="size-4" />
           </IconButton>
@@ -605,7 +607,7 @@ const BlogDetails = () => {
                 }
                 setReportDialogOpen(true);
               }}
-              className="flex justify-center items-center bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-800/40 shadow-md p-2 rounded-full w-12 h-12 font-medium text-red-600 hover:text-red-700 dark:hover:text-red-300 dark:text-red-400 transition-all duration-200 hover:cursor-pointer"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 p-2 font-medium text-red-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-800/40 dark:hover:text-red-300"
             >
               <MdOutlineFlag className="size-4" />
             </IconButton>
@@ -616,7 +618,7 @@ const BlogDetails = () => {
             <Tooltip title="Edit" arrow>
               <IconButton
                 onClick={() => navigate(`/docs/${blog.id}`)}
-                className="flex justify-center items-center bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30 dark:hover:bg-purple-800/40 shadow-md p-2 rounded-full w-12 h-12 font-medium text-purple-600 hover:text-purple-700 dark:hover:text-purple-300 dark:text-purple-400 transition-all duration-200 hover:cursor-pointer"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-50 p-2 font-medium text-purple-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-purple-100 hover:text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-800/40 dark:hover:text-purple-300"
               >
                 <LuPencil className="size-4" />
               </IconButton>
@@ -624,7 +626,7 @@ const BlogDetails = () => {
             <Tooltip title="Delete" arrow>
               <IconButton
                 onClick={() => setDeleteConfirmOpen(true)}
-                className="flex justify-center items-center bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-800/40 shadow-md p-2 rounded-full w-12 h-12 font-medium text-red-600 hover:text-red-700 dark:hover:text-red-300 dark:text-red-400 transition-all duration-200 hover:cursor-pointer"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-red-50 p-2 font-medium text-red-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-800/40 dark:hover:text-red-300"
               >
                 <FiTrash2 className="size-4" />
               </IconButton>
@@ -638,14 +640,14 @@ const BlogDetails = () => {
   return (
     <div
       ref={scrollContainerRef}
-      className="bg-white dark:bg-mountain-950 w-full h-screen overflow-y-auto sidebar"
+      className="dark:bg-mountain-950 sidebar h-screen w-full overflow-y-auto bg-white"
     >
-      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-4xl">
+      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="group flex flex-col space-y-8">
-          <div className="flex space-x-2 w-full">
+          <div className="flex w-full space-x-2">
             <Link
               to="/blogs"
-              className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-300 dark:text-blue-400 underline"
+              className="text-blue-600 underline hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
             >
               Blogs
             </Link>
@@ -656,17 +658,17 @@ const BlogDetails = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <h1 className="font-medium text-black dark:text-white text-4xl">
+            <h1 className="text-4xl font-medium text-black dark:text-white">
               {blog.title}
             </h1>
             {!isPublished && isOwnBlog && (
-              <span className="inline-flex items-center bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 border border-yellow-200 dark:border-yellow-800 rounded-full font-medium text-yellow-800 dark:text-yellow-300 text-xs">
+              <span className="inline-flex items-center rounded-full border border-yellow-200 bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                 Draft
               </span>
             )}
           </div>
 
-          <div className="flex items-center space-x-2 text-mountain-600 dark:text-mountain-400 text-sm">
+          <div className="text-mountain-600 dark:text-mountain-400 flex items-center space-x-2 text-sm">
             {isPublished ? (
               <>
                 <p>
@@ -697,10 +699,10 @@ const BlogDetails = () => {
           </div>
 
           {!isPublished && isOwnBlog && (
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 mb-4 p-4 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
               <div className="flex items-start">
                 <svg
-                  className="flex-shrink-0 mt-0.5 w-5 h-5 text-yellow-600 dark:text-yellow-400"
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-600 dark:text-yellow-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -711,16 +713,16 @@ const BlogDetails = () => {
                   />
                 </svg>
                 <div className="ml-3">
-                  <p className="font-medium text-yellow-800 dark:text-yellow-300 text-sm">
+                  <p className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
                     This blog is not published yet
                   </p>
-                  <p className="mt-1 text-yellow-700 dark:text-yellow-400 text-sm">
+                  <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-400">
                     Only you can see this content. Click the "Publish" button in
                     the editor to make it public.
                   </p>
                   <Button
                     onClick={() => navigate(`/docs/${blog.id}`)}
-                    className="bg-yellow-600 hover:bg-yellow-700 mt-3 text-white text-sm"
+                    className="mt-3 bg-yellow-600 text-sm text-white hover:bg-yellow-700"
                   >
                     Continue Editing
                   </Button>
@@ -752,11 +754,11 @@ const BlogDetails = () => {
           />
 
           <div
-            className="bg-white dark:bg-mountain-950 dark:prose-invert p-2 rounded-md max-w-none text-black dark:text-white prose lg:prose-xl reset-tailwind"
+            className="dark:bg-mountain-950 dark:prose-invert prose lg:prose-xl reset-tailwind max-w-none rounded-md bg-white p-2 text-black dark:text-white"
             dangerouslySetInnerHTML={{ __html: blog.content }}
           />
 
-          <hr className="flex border-mountain-200 dark:border-mountain-700 border-t-1 w-full" />
+          <hr className="border-mountain-200 dark:border-mountain-700 flex w-full border-t-1" />
 
           {isPublished ? (
             <>
@@ -767,7 +769,7 @@ const BlogDetails = () => {
               </div>
 
               <RelatedBlogs currentBlogId={Number(blogId)} />
-              <hr className="flex border-mountain-200 dark:border-mountain-700 border-t-1 w-full" />
+              <hr className="border-mountain-200 dark:border-mountain-700 flex w-full border-t-1" />
 
               <CommentSection
                 ref={commentSectionRef}
@@ -782,9 +784,9 @@ const BlogDetails = () => {
             </>
           ) : (
             <div className="py-12 text-center">
-              <div className="inline-flex justify-center items-center bg-gray-100 dark:bg-gray-800 mb-4 rounded-full w-16 h-16">
+              <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
                 <svg
-                  className="w-8 h-8 text-gray-400 dark:text-gray-600"
+                  className="h-8 w-8 text-gray-400 dark:text-gray-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -797,7 +799,7 @@ const BlogDetails = () => {
                   />
                 </svg>
               </div>
-              <p className="mb-2 font-medium text-gray-500 dark:text-gray-400 text-lg">
+              <p className="mb-2 text-lg font-medium text-gray-500 dark:text-gray-400">
                 Comments are disabled for drafts
               </p>
               <p className="text-gray-400 dark:text-gray-500">
