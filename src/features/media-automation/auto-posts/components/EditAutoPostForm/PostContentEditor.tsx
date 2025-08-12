@@ -83,7 +83,7 @@ const PostContentEditor = ({
         }
       `}</style>
       <Box
-        className={`border-mountain-200 relative flex h-fit max-h-[520px] w-full flex-col border bg-white shadow-md ${!canEdit ? 'cursor-not-allowed bg-gray-50' : ''} `}
+        className={`border-mountain-200 relative flex h-fit w-full flex-col border bg-white shadow-md ${!canEdit ? 'cursor-not-allowed bg-gray-50' : ''} `}
       >
         <div className="flex items-center gap-2 bg-white px-4 border-mountain-200 border-b rounded-t-md h-12 shrink-0">
           {editor && (
