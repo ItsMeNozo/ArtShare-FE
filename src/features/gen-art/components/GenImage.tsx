@@ -26,8 +26,10 @@ const example_1 =
 
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
+import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { saveAs } from 'file-saver';
 import { Check } from 'lucide-react';
 import {
   FaChevronLeft,
@@ -107,6 +109,30 @@ const GenImage: React.FC<GenImageProps> = ({
 
   const handleNavigateToUpload = (prompt: PromptResult) => {
     navigate('/posts/new?type=ai-gen', { state: { prompt } });
+  };
+
+  const handleQuickDownload = async () => {
+    try {
+      const blob = await fetchImageWithCorsHandling(result.imageUrls[index]);
+      saveAs(blob, `image-${Date.now()}.jpg`);
+    } catch (error) {
+      console.error('Quick download failed:', error);
+      // Fallback: open image in new tab
+      window.open(result.imageUrls[index], '_blank');
+    }
+  };
+
+  const handleQuickDownloadFromModal = async () => {
+    try {
+      const blob = await fetchImageWithCorsHandling(
+        result.imageUrls[currentIndex],
+      );
+      saveAs(blob, `image-${Date.now()}.jpg`);
+    } catch (error) {
+      console.error('Quick download failed:', error);
+      // Fallback: open image in new tab
+      window.open(result.imageUrls[currentIndex], '_blank');
+    }
   };
 
   const { data: user, error } = useQuery({
@@ -220,22 +246,38 @@ const GenImage: React.FC<GenImageProps> = ({
               </div>
             ) : (
               <>
-                <div className="absolute bottom-2 left-2">
+                <div className="absolute bottom-2 left-2 flex items-center">
                   <div
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setOpenDownload(true);
+                      handleQuickDownload();
                       return false;
                     }}
                     onMouseDown={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-l-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                     title="Download"
                   >
-                    <FiDownload className="text-mountain-600 pointer-events-none" />
+                    <FiDownload className="text-mountain-600 pointer-events-none size-4" />
+                  </div>
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setOpenDownload?.(true);
+                      return false;
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    className="z-50 flex h-6 w-4 transform items-center justify-center rounded-r-full border-l border-gray-300 bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    title="Download with options"
+                  >
+                    <span className="text-mountain-600 text-xs">▼</span>
                   </div>
                 </div>
                 <div className="absolute right-2 bottom-2 flex space-x-2">
@@ -371,12 +413,22 @@ const GenImage: React.FC<GenImageProps> = ({
                     <p className="font-medium">{user?.fullName}</p>
                   </div>
                   <div className="flex">
-                    <Button
-                      title="Download"
-                      onClick={() => setOpenDownload(true)}
-                    >
-                      <FiDownload className="size-5" />
-                    </Button>
+                    <div className="flex items-center">
+                      <Button
+                        className="h-9 min-w-9 rounded-r-none"
+                        title="Download"
+                        onClick={handleQuickDownloadFromModal}
+                      >
+                        <FiDownload className="size-5" />
+                      </Button>
+                      <Button
+                        className="flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
+                        title="Download with options"
+                        onClick={() => setOpenDownload?.(true)}
+                      >
+                        ▼
+                      </Button>
+                    </div>
                     <DeleteButton open={open} setOpen={setOpen} />
                   </div>
                 </div>

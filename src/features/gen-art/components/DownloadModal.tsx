@@ -112,25 +112,9 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
         setSize(filteredSizes[0].value);
       }
     } else {
-      // If no sizes match, try to find a device that has matching sizes
-      const deviceWithMatchingSizes = Object.keys(deviceSizeOptions).find(
-        (dev) =>
-          deviceSizeOptions[dev as keyof typeof deviceSizeOptions].some((opt) =>
-            allowedRatios.includes(opt.ratio),
-          ),
-      ) as keyof typeof deviceSizeOptions | undefined;
-
-      if (deviceWithMatchingSizes && deviceWithMatchingSizes !== device) {
-        setDevice(deviceWithMatchingSizes);
-        const matchingSizes = deviceSizeOptions[deviceWithMatchingSizes].filter(
-          (opt) => allowedRatios.includes(opt.ratio),
-        );
-        if (matchingSizes.length > 0) {
-          setSize(matchingSizes[0].value);
-        }
-      } else {
-        setSize('');
-      }
+      // If no sizes match for this device, just clear the size selection
+      // Don't automatically change the device - respect user's choice
+      setSize('');
     }
   }, [device, normalizedRatio, allowedRatios, filteredSizes, size]);
 
@@ -151,6 +135,13 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
       : Array.isArray(imageURL)
         ? imageURL.slice(0, 4)
         : [];
+
+  // Determine if multiple images for zip naming
+  const isMultipleImages = Array.isArray(imageURL) && imageURL.length > 1;
+  const fileExtension = useMemo(
+    () => (isMultipleImages ? '.zip' : `.${format}`),
+    [isMultipleImages, format],
+  );
 
   return (
     <Dialog
@@ -176,13 +167,18 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
 
         {/* File Name */}
         <Box sx={{ mt: 2 }}>
-          <TextField
-            fullWidth
-            label="File Name"
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-            variant="outlined"
-          />
+          <div className="relative">
+            <TextField
+              fullWidth
+              label="File Name"
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+              variant="outlined"
+            />
+            <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-500 select-none">
+              {fileExtension}
+            </span>
+          </div>
         </Box>
 
         {/* Format */}
@@ -223,10 +219,12 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
           </FormControl>
 
           <FormControl fullWidth variant="outlined">
-            <InputLabel id="size-label">Size</InputLabel>
+            {filteredSizes.length > 0 && (
+              <InputLabel id="size-label">Size</InputLabel>
+            )}
             <Select
               labelId="size-label"
-              label="Size"
+              label={filteredSizes.length > 0 ? 'Size' : ''}
               value={
                 filteredSizes.some((opt) => opt.value === size)
                   ? size
@@ -234,6 +232,23 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
               }
               onChange={(e) => setSize(e.target.value)}
               disabled={filteredSizes.length === 0}
+              displayEmpty
+              renderValue={(selected) => {
+                if (filteredSizes.length === 0) {
+                  return (
+                    <span style={{ color: '#999', fontStyle: 'italic' }}>
+                      None
+                    </span>
+                  );
+                }
+                const selectedOption = filteredSizes.find(
+                  (opt) => opt.value === selected,
+                );
+                return selectedOption
+                  ? `${selectedOption.label} (${selectedOption.value})`
+                  : '';
+              }}
+              sx={{}}
             >
               {filteredSizes.length > 0 ? (
                 filteredSizes.map((s) => (
@@ -243,7 +258,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
                 ))
               ) : (
                 <MenuItem disabled value="">
-                  No matching sizes
+                  None
                 </MenuItem>
               )}
             </Select>
@@ -255,7 +270,11 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
         <Button onClick={() => setOpenDownload(false)} color="inherit">
           Cancel
         </Button>
-        <Button onClick={handleConfirm} variant="contained">
+        <Button
+          onClick={handleConfirm}
+          variant="contained"
+          disabled={filteredSizes.length === 0 || !size}
+        >
           Download
         </Button>
       </DialogActions>
