@@ -68,6 +68,7 @@ export interface HeaderRoute {
   path: string;
   label: string;
   parent?: string;
+  hideBackButton?: boolean;
 }
 
 export const routesForHeaders: HeaderRoute[] = [
@@ -136,6 +137,7 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/auto/social-links',
     label: 'Link Socials',
+    hideBackButton: true,
   },
   {
     path: '/auto/scheduling',
