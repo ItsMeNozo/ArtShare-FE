@@ -12,6 +12,12 @@ interface NewDesign {
   layers: Layer[];
 }
 
+interface NewEdit {
+  ratio?: string;
+  canvas: CanvasSize;
+  finalCanvas: CanvasSize;
+}
+
 type LayerType = 'image' | 'text' | 'shape';
 
 type BaseLayer = {

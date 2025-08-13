@@ -2,17 +2,21 @@ import ConfirmationDialog from '@/components/dialogs/Confirm';
 import InlineErrorMessage from '@/components/InlineErrorMessage';
 import Loading from '@/components/loading/Loading';
 import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
-import { Platform } from '@/features/media-automation/projects/types/platform';
 import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
-import { ChevronLeft, ChevronRight, ShieldAlert } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Plus,
+  ShieldAlert,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { LuTrash2 } from 'react-icons/lu';
-import { PiStarFourFill } from 'react-icons/pi';
 import { TbGridDots } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -22,6 +26,7 @@ import { useEditAutoPost } from '../../hooks/useEditAutoPost';
 import { useGetAutoPostDetails } from '../../hooks/useGetAutoPostDetails';
 import { useGetAutoPosts } from '../../hooks/useGetAutoPosts';
 import { AutoPostFormValues, ImageState } from '../../types';
+import AIWritingAssistant from './AIWritingAssistant';
 import PostContentEditor from './PostContentEditor';
 import PostImagesEditor from './PostImagesEditor';
 import { FacebookPostPreview } from './PostPreviewer';
@@ -31,7 +36,7 @@ const EditAutoPostForm = () => {
   const postId = useNumericParam('postId');
   const navigate = useNavigate();
   const projectId = useNumericParam('projectId');
-
+  const [tool, setTool] = useState<string>('preview');
   const {
     isDialogOpen: isNavConfirmOpen,
     itemToConfirm: navTarget,
@@ -107,7 +112,15 @@ const EditAutoPostForm = () => {
 
   const { data: platforms } = useFetchPlatforms('FACEBOOK');
 
-  const [matchedPlatform, setMatchedPlatform] = useState<Platform | null>(null);
+  const matchedPlatform = useMemo(() => {
+    if (!projectDetails || !platforms) {
+      return null;
+    }
+
+    const platform = platforms.find((p) => p.id === projectDetails.platform.id);
+
+    return platform ?? null;
+  }, [projectDetails, platforms]);
 
   const isProjectLocked = useMemo(() => {
     if (!projectDetails) return true;
@@ -135,15 +148,6 @@ const EditAutoPostForm = () => {
     }
     return null;
   }, [isProjectLocked, isPostPublished]);
-
-  useEffect(() => {
-    if (!postToEdit?.platformPostId || !platforms) return;
-    const [platformExternalId] = postToEdit.platformPostId.split('_');
-    const matched = platforms.find(
-      (p) => String(p.externalPageId) === platformExternalId,
-    );
-    setMatchedPlatform(matched ?? null);
-  }, [postToEdit, platforms]);
 
   const initialValues = useMemo((): AutoPostFormValues => {
     if (postToEdit) {
@@ -270,8 +274,8 @@ const EditAutoPostForm = () => {
                       }
                       className="hover:bg-mountain-50 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border p-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <PiStarFourFill className="size-4 text-purple-600" />
-                      <span>Add Post</span>
+                      <Plus />
+                      <span>Add New Post</span>
                     </button>
                     <div className="border-mountain-200 flex items-center border-l-1 px-4">
                       <div className="flex items-center space-x-2">
@@ -341,10 +345,32 @@ const EditAutoPostForm = () => {
               </div>
             </div>
             <Box className="flex h-screen min-h-0 w-full">
-              <Box className="border-mountain-200 custom-scrollbar flex min-h-0 w-lg flex-col space-y-8 overflow-x-hidden overflow-y-auto border-r-1 px-2">
+              <Box className="border-mountain-200 custom-scrollbar flex min-h-0 w-lg shrink-0 flex-col space-y-8 overflow-x-hidden overflow-y-auto border-r-1 px-2 py-4">
                 <Box className="flex flex-col space-y-4">
-                  <Typography className="border-mountain-200 flex items-center space-x-2 border-b-1 py-2 text-indigo-900">
-                    <span className="mr-2">🖊️</span>Post Content
+                  <Typography className="border-mountain-200 flex items-center justify-between space-x-2 border-b-1 py-2 text-indigo-900">
+                    <span>🖊️ Post Content</span>
+                    <div className="flex space-x-2">
+                      <div
+                        onClick={() => setTool('aiwriting')}
+                        className="group flex w-fit cursor-pointer justify-center rounded-lg p-[2px]"
+                        style={{
+                          background:
+                            'linear-gradient(to right, #3b82f6, #6366f1, #a855f7, #ec4899)',
+                          color: 'white',
+                        }}
+                      >
+                        <div className="group-hover:bg-mountain-50 text-mountain-950 flex h-full w-full items-center justify-center rounded-md bg-white p-1.5 select-none">
+                          AI Writing Assistant
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => setTool('preview')}
+                        className="hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex h-full w-fit cursor-pointer items-center justify-center space-x-2 rounded-md border bg-white p-1.5 select-none"
+                      >
+                        <Eye className="size-4" />
+                        <span>Preview</span>
+                      </div>
+                    </div>
                   </Typography>
                   <PostContentEditor
                     value={values.content}
@@ -388,12 +414,16 @@ const EditAutoPostForm = () => {
                   </ErrorMessage>
                 </Box>
               </Box>
-              <FacebookPostPreview
-                content={values.content}
-                images={values.images.map((img) => img.url)}
-                scheduledAt={values.scheduledAt}
-                platform={matchedPlatform!}
-              />
+              {tool === 'preview' ? (
+                <FacebookPostPreview
+                  content={values.content}
+                  images={values.images.map((img) => img.url)}
+                  scheduledAt={values.scheduledAt}
+                  platform={matchedPlatform!}
+                />
+              ) : (
+                <AIWritingAssistant />
+              )}
             </Box>
             <ConfirmationDialog
               open={isDialogOpen}
