@@ -23,7 +23,7 @@ export const useGetAutoPosts = (params: UseGetAutoPostsOptions) => {
       limit,
       orderBy,
       order,
-    }),
+    } as Record<string, unknown>),
 
     queryFn: () =>
       getAutoPosts({

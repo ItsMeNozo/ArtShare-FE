@@ -1,5 +1,6 @@
 import { deletePost } from '@/api/post/post';
 import { useLoading } from '@/contexts/Loading/useLoading';
+import { postKeys } from '@/lib/react-query/query-keys';
 import { Post } from '@/types';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -29,7 +30,7 @@ export const useDeletePost = (options: UseDeletePostOptions = {}) => {
       console.log('Post deleted successfully!');
 
       if (options.username) {
-        const userPostsQueryKey = ['posts', 'user', options.username];
+        const userPostsQueryKey = postKeys.userPosts(options.username);
 
         queryClient.setQueryData<Post[]>(userPostsQueryKey, (oldData) => {
           if (!oldData) return [];
@@ -37,9 +38,9 @@ export const useDeletePost = (options: UseDeletePostOptions = {}) => {
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
 
-      queryClient.removeQueries({ queryKey: ['postDetails', postId] });
+      queryClient.removeQueries({ queryKey: postKeys.details(postId) });
 
       options.onSuccess?.(postId);
     },

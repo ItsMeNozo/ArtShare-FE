@@ -1,6 +1,7 @@
 import api from '@/api/baseApi';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import {
@@ -60,7 +61,7 @@ const ProjectsPage = () => {
       Promise.all(projectIds.map((id) => api.delete(`/auto-project/${id}`))),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['projects', 'list'] });
+      await queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
       setSelected([]);
       closeDeleteDialog();
     },

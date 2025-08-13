@@ -26,8 +26,9 @@ TimeAgo.addLocale(vi);
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 0,
+      staleTime: 1000 * 30, // 30 seconds instead of 5 minutes
       retry: 1,
+      gcTime: 1000 * 60 * 10, // 10 minutes garbage collection time instead of 30
     },
   },
 });
@@ -39,8 +40,8 @@ const localStoragePersister = createSyncStoragePersister({
 persistQueryClient({
   queryClient,
   persister: localStoragePersister,
-  maxAge: 1000 * 60 * 5, // Optional: How long to keep persisted data (e.g., 24 hours)
-  // This should usually align with or be less than gcTime
+  maxAge: 1000 * 60 * 2, // Only persist for 2 minutes
+  buster: '1.0.1', // Updated version buster to clear old cached data
 });
 
 const stripePromise = loadStripe(

@@ -5,6 +5,7 @@ import { useGetProjectDetails } from '@/features/media-automation/projects/hooks
 import { useFetchPlatforms } from '@/features/media-automation/social-links/hooks/usePlatforms';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { useNumericParam } from '@/hooks/useNumericParam';
+import { autoPostKeys, projectKeys } from '@/lib/react-query/query-keys';
 import { Box, Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Form, Formik, FormikHelpers } from 'formik';
@@ -187,9 +188,9 @@ const EditAutoPostForm = () => {
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['projects', 'list'] });
+          queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
           queryClient.invalidateQueries({
-            queryKey: ['auto-post', 'details', postId],
+            queryKey: autoPostKeys.details(postId),
           });
         },
         onSettled: () => formikHelpers.setSubmitting(false),

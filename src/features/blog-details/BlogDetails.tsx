@@ -5,6 +5,7 @@ import { LikesDialog } from '@/components/like/LikesDialog';
 import { useUser } from '@/contexts/user';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { commentKeys } from '@/lib/react-query/query-keys';
 import type { Blog } from '@/types/blog';
 import { TargetType } from '@/utils/constants';
 import { Button, CircularProgress, IconButton, Tooltip } from '@mui/material';
@@ -16,7 +17,7 @@ import { BiComment } from 'react-icons/bi';
 import { FiTrash2 } from 'react-icons/fi';
 import { LuLink, LuPencil } from 'react-icons/lu';
 import { MdOutlineFlag } from 'react-icons/md';
-import { fetchBlogComments } from '../post/api/comment.api';
+import { fetchComments } from '../post/api/comment.api';
 import CommentSection, {
   CommentSectionRef,
 } from '../post/components/CommentSection';
@@ -272,8 +273,8 @@ const BlogDetails = () => {
     error: commentsError,
     refetch: refetchComments,
   } = useQuery({
-    queryKey: ['blogComments', blogId],
-    queryFn: () => fetchBlogComments(Number(blogId)),
+    queryKey: commentKeys.byTarget('BLOG', Number(blogId)),
+    queryFn: () => fetchComments(Number(blogId), 'BLOG'),
     enabled: !!blogId,
   });
 

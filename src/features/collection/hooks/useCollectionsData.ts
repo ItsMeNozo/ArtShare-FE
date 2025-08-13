@@ -1,3 +1,4 @@
+import { collectionKeys } from '@/lib/react-query/query-keys';
 import { Collection } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -14,8 +15,8 @@ export function useCollectionsData(
   const { enabled = true } = options;
 
   const queryKey = username
-    ? ['collections', 'public', username]
-    : ['collections', 'me'];
+    ? collectionKeys.public(username)
+    : collectionKeys.me();
 
   const queryFn = () =>
     username
