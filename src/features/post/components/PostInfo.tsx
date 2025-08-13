@@ -20,6 +20,7 @@ import { fetchCollectionsForDialog } from '../api/collection.api';
 import { createCollection } from '@/features/collection/api/collection.api';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { collectionKeys } from '@/lib/react-query/query-keys';
 import { TargetType } from '@/utils/constants';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'react-router-dom';
@@ -57,7 +58,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
     setLikeCount(postData.likeCount);
   }, [postData.isLikedByCurrentUser, postData.likeCount]);
 
-  const collectionsQueryKey = ['collections', 'list-dialog'];
+  const collectionsQueryKey = collectionKeys.listDialog();
   const {
     data: simpleCollections = [],
     isLoading: isLoadingCollections,
@@ -73,7 +74,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
       createCollection(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: collectionsQueryKey });
-      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: collectionKeys.all });
       handleCloseCreateDialog();
       handleOpenSaveDialog();
     },
@@ -154,11 +155,11 @@ const PostInfo = ({ postData }: PostInfoProps) => {
 
   return (
     <>
-      <div className="bg-white dark:bg-mountain-950 rounded-2xl overflow-none">
+      <div className="dark:bg-mountain-950 overflow-none rounded-2xl bg-white">
         <CardContent className="flex flex-col gap-2 p-0 px-4">
           {/* Title, description, date */}
           <div className="flex flex-col gap-2">
-            <div className="font-bold text-xl">{postData.title}</div>
+            <div className="text-xl font-bold">{postData.title}</div>
             <AnyShowMoreText
               lines={3}
               more="Show more"
@@ -167,10 +168,10 @@ const PostInfo = ({ postData }: PostInfoProps) => {
             >
               {postData.description || ''}
             </AnyShowMoreText>
-            <div className="text-gray-500 text-xs italic">
+            <div className="text-xs text-gray-500 italic">
               Posted{' '}
               {postData.createdAt &&
-                !isNaN(new Date(postData.createdAt).getTime()) ? (
+              !isNaN(new Date(postData.createdAt).getTime()) ? (
                 <ReactTimeAgo
                   className="capitalize"
                   date={new Date(postData.createdAt)}
@@ -187,13 +188,13 @@ const PostInfo = ({ postData }: PostInfoProps) => {
           {/* Categories */}
           <div className="flex flex-wrap gap-2">
             {postData.aiCreated && (
-              <div className="inline-flex items-center bg-gradient-to-r from-[#a855f7] via-[#6366f1] to-[#06b6d4] p-1 pr-3 rounded-sm text-white text-xs">
+              <div className="inline-flex items-center rounded-sm bg-gradient-to-r from-[#a855f7] via-[#6366f1] to-[#06b6d4] p-1 pr-3 text-xs text-white">
                 {postData.aiCreated && (
                   <div className="flex items-center">
                     <img
                       src="/logo_app_v_101.png"
                       alt="AI Generated"
-                      className="border border-white rounded-full w-5 h-5"
+                      className="h-5 w-5 rounded-full border border-white"
                     />
                     <span className="ml-2">Created by ArtNova</span>
                   </div>
@@ -203,7 +204,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
             {postData.categories?.map((cat) => (
               <div
                 key={cat.id}
-                className="flex items-center bg-mountain-50 dark:bg-mountain-800 px-2 py-1 rounded text-xs"
+                className="bg-mountain-50 dark:bg-mountain-800 flex items-center rounded px-2 py-1 text-xs"
               >
                 {cat.name}
               </div>
@@ -211,7 +212,7 @@ const PostInfo = ({ postData }: PostInfoProps) => {
           </div>
           <Divider className="border-0.5" />
           {/* Stats */}
-          <div className="flex gap-6 text-mountain-950">
+          <div className="text-mountain-950 flex gap-6">
             <div
               className={`text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm ${likeCount > 0 ? 'cursor-pointer hover:underline' : 'cursor-default'}`}
               onClick={handleOpenLikesDialog}
@@ -222,7 +223,13 @@ const PostInfo = ({ postData }: PostInfoProps) => {
                 {likeCount > 1 ? ' Likes' : ' Like'}
               </span>
             </div>
-            <div className="flex items-center gap-1 text-mountain-950 dark:text-mountain-100 text-sm">
+            <div className="text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm">
+              <p className="font-semibold">{postData.viewCount}</p>
+              <span className="text-mountain-600 dark:text-mountain-200">
+                {postData.viewCount > 1 ? ' Views' : ' View'}
+              </span>
+            </div>
+            <div className="text-mountain-950 dark:text-mountain-100 flex items-center gap-1 text-sm">
               <p className="font-semibold">{postData.commentCount}</p>
               <span className="text-mountain-600 dark:text-mountain-200">
                 {postData.commentCount > 1 ? ' Comments' : ' Comment'}
@@ -231,9 +238,9 @@ const PostInfo = ({ postData }: PostInfoProps) => {
           </div>
           <Divider className="border-0.5" />
           {/* Actions */}
-          <div className="flex justify-between w-full">
+          <div className="flex w-full justify-between">
             <Button
-              className="hover:bg-blue-50 hover:dark:bg-blue-900 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title={userLike ? 'Unlike' : 'Like'}
               onClick={handleLikeClick}
               disabled={isLiking || isFetchingLike}
@@ -245,21 +252,21 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               )}
             </Button>
             <Button
-              className="hover:bg-blue-50 hover:dark:bg-blue-900 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title="Comment"
               onClick={handleFocusCommentInput}
             >
               <MessageSquareText className="size-5" />
             </Button>
             <Button
-              className="hover:bg-blue-50 hover:dark:bg-blue-900 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title="Save"
               onClick={handleOpenSaveDialog}
             >
               <Bookmark className="size-5" />
             </Button>
             <Button
-              className="hover:bg-blue-50 hover:dark:bg-blue-900 p-2 border-0 rounded-lg w-10 min-w-0 h-10 text-blue-900 dark:text-blue-200"
+              className="h-10 w-10 min-w-0 rounded-lg border-0 p-2 text-blue-900 hover:bg-blue-50 dark:text-blue-200 hover:dark:bg-blue-900"
               title="Copy Link"
               onClick={(e) => handleCopyLink(e)}
             >

@@ -1,3 +1,4 @@
+import { userKeys } from '@/lib/react-query/query-keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { searchUsers } from '../api/searchUsers.api';
 import { usersToPhotos } from '../utils/transformUserToPhoto';
@@ -11,7 +12,7 @@ export const useSearchUsers = (params: UserSearchUsersParams) => {
   const { searchQuery, enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ['userSearch', searchQuery],
+    queryKey: userKeys.search(searchQuery),
 
     queryFn: async ({ pageParam = 1 }) => {
       const apiResponse = await searchUsers({

@@ -1,4 +1,5 @@
 import { fetchPostsByArtist } from '@/features/explore/api/get-post';
+import { postKeys } from '@/lib/react-query/query-keys';
 import { User } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
@@ -8,7 +9,7 @@ const PostMoreByArtist = ({ artist }: { artist: User }) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['posts', artist.username],
+    queryKey: postKeys.artistPosts(artist.username),
     retry: 2,
     queryFn: () => fetchPostsByArtist(artist.username, 1),
   });

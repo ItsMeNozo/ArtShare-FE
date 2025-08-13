@@ -1,7 +1,6 @@
 import { useUser } from '@/contexts/user';
 import { useGalleryPhotos } from '@/features/collection/hooks/useGalleryPhotos';
-import { useDeletePost } from '@/features/post/hooks/useDeletePost';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetUserPosts } from '../hooks/useGetUserPosts';
 import { UserPostGallery } from './UserPostGallery';
@@ -14,21 +13,28 @@ const UserPosts = () => {
     data: posts = [],
     isLoading: loadingPosts,
     error: fetchError,
+    isFetching,
   } = useGetUserPosts(username);
 
-  const { mutate: deletePost } = useDeletePost({
-    username: username,
-    onError: (errorMessage) => {
-      console.error(errorMessage);
-    },
-  });
+  // Debug logging to track post changes
+  useEffect(() => {
+    console.log(`[UserPosts] Posts count for ${username}:`, posts.length);
+    console.log(
+      `[UserPosts] Loading: ${loadingPosts}, Fetching: ${isFetching}`,
+    );
+  }, [posts.length, loadingPosts, isFetching, username]);
 
   const pages = useMemo(() => (posts ? [{ data: posts }] : []), [posts]);
-  const { photoPages, isProcessing, processingError } = useGalleryPhotos(pages, username);
+  const { photoPages, isProcessing, processingError } = useGalleryPhotos(
+    pages,
+    username,
+  );
   const allPhotosFlat = useMemo(() => photoPages.flat(), [photoPages]);
 
   const handlePostDeleted = (postId: number) => {
-    deletePost(postId);
+    // The actual deletion is handled by the useDeletePost hook in the components
+    // This callback is just for any additional UI updates if needed
+    console.log(`[UserPosts] Post ${postId} deleted successfully`);
   };
 
   if (!username) {

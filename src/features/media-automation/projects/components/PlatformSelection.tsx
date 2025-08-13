@@ -8,6 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ErrorMessage, useFormikContext } from 'formik';
+import { Book } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { FaFacebookSquare } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -17,7 +18,6 @@ import { FormPlatform, ProjectFormValues } from '../types';
 import { Platform } from '../types/platform';
 import fb_icon from '/fb_icon.svg';
 import ins_icon from '/ins_icon.svg';
-import { Book } from 'lucide-react';
 
 const name = 'platform';
 
@@ -26,7 +26,10 @@ type PlatformSelectionProps = {
   setShowGuide?: (show: boolean) => void;
 };
 
-const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelectionProps) => {
+const PlatformSelection = ({
+  isEditMode = false,
+  setShowGuide,
+}: PlatformSelectionProps) => {
   const { setFieldValue, getFieldMeta } = useFormikContext<ProjectFormValues>();
 
   const initialPlatform = getFieldMeta(name).initialValue as FormPlatform;
@@ -106,16 +109,16 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
   const facebookProfile =
     fbAccountInfo && fbAccountInfo.length > 0
       ? {
-        name: fbAccountInfo[0].name,
-        profilePicture:
-          fbAccountInfo[0].pictureUrl || 'https://i.pravatar.cc/150',
-      }
+          name: fbAccountInfo[0].name,
+          profilePicture:
+            fbAccountInfo[0].pictureUrl || 'https://i.pravatar.cc/150',
+        }
       : null;
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="relative flex flex-col justify-start items-center w-xl h-full">
-        <div className="flex justify-center items-center bg-indigo-50 p-1 rounded-full w-fit">
+    <div className="flex h-full flex-col">
+      <div className="relative flex h-full w-xl flex-col items-center justify-start">
+        <div className="flex w-fit items-center justify-center rounded-full bg-indigo-50 p-1">
           <Typography
             variant="body1"
             component="h1"
@@ -128,7 +131,7 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
             disabled={isEditMode}
             onChange={handlePlatformTypeChange}
             value={platformTypeToFetch || ''}
-            className="bg-white rounded-full font-medium text-lg"
+            className="rounded-full bg-white text-lg font-medium"
             sx={{
               '.MuiOutlinedInput-notchedOutline': { border: 0 },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: 0 },
@@ -148,7 +151,7 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
                       <img
                         src={ins_icon}
                         alt="Instagram"
-                        className="inline-block mr-2 w-6 h-6"
+                        className="mr-2 inline-block h-6 w-6"
                       />
                       {type.charAt(0) + type.slice(1).toLowerCase()}
                     </MenuItem>
@@ -159,7 +162,7 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
                   <img
                     src={fb_icon}
                     alt="Facebook"
-                    className="inline-block mr-2 w-6 h-6"
+                    className="mr-2 inline-block h-6 w-6"
                   />
                   {type.charAt(0) + type.slice(1).toLowerCase()}
                 </MenuItem>
@@ -170,33 +173,33 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
             {(errorMsg) => <InlineErrorMessage errorMsg={errorMsg} />}
           </ErrorMessage>
         </div>
-        <div className="flex flex-col justify-center items-center space-y-2 mt-4 w-full h-full">
-          <div className="flex justify-center w-full">
+        <div className="mt-4 flex h-full w-full flex-col items-center justify-center space-y-2">
+          <div className="flex w-full justify-center">
             {isLoading && (
-              <div className="group relative flex flex-col justify-center items-center p-4 w-xl h-42 text-center cursor-not-allowed">
+              <div className="group relative flex h-42 w-xl cursor-not-allowed flex-col items-center justify-center p-4 text-center">
                 <p>Loading platforms...</p>
               </div>
             )}
             {!isLoading && platformTypeToFetch === 'FACEBOOK' && (
               <>
                 {fetchedPlatforms.length > 0 ? (
-                  <div className="flex flex-col justify-center items-center space-y-2 w-full h-42">
+                  <div className="flex h-42 w-full flex-col items-center justify-center space-y-2">
                     <div className="flex flex-col items-center space-y-1">
                       <div className="flex flex-col items-center space-y-2">
                         <img
                           src={facebookProfile?.profilePicture}
-                          className="rounded-full size-20"
+                          className="size-20 rounded-full"
                           alt="Facebook Profile"
                         />
-                        <span className="font-medium text-sm">
+                        <span className="text-sm font-medium">
                           {facebookProfile?.name}
                         </span>
                       </div>
                     </div>
                     {selectedPlatform && (
-                      <div className="relative flex justify-between items-center gap-2 bg-white p-2 rounded-full w-full h-12 text-sm">
-                        <div className='flex'>
-                          <div className="flex items-center bg-gradient-to-r from-indigo-200 to-purple-200 px-4 border border-mountain-200 rounded-full rounded-r-none h-10 select-none">
+                      <div className="relative flex h-12 w-full items-center justify-between gap-2 rounded-full bg-white p-2 text-sm">
+                        <div className="flex">
+                          <div className="border-mountain-200 flex h-10 items-center rounded-full rounded-r-none border bg-gradient-to-r from-indigo-200 to-purple-200 px-4 select-none">
                             <p>Target Page</p>
                           </div>
                           <Select
@@ -205,12 +208,13 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
                               handlePlatformSelected(e.target.value)
                             }
                             disabled={isEditMode}
-                            className="flex px-4 border border-mountain-200 rounded-full rounded-l-none h-10"
+                            className="border-mountain-200 flex h-10 rounded-full rounded-l-none border px-4"
                             sx={{
                               '.MuiOutlinedInput-notchedOutline': { border: 0 },
-                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                border: 0,
-                              },
+                              '&.Mui-focused .MuiOutlinedInput-notchedOutline':
+                                {
+                                  border: 0,
+                                },
                               minWidth: '300px',
                             }}
                           >
@@ -219,17 +223,18 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
                                 key={platform.id}
                                 value={platform.id.toString()}
                               >
-                                <div className="flex items-center space-x-2 w-full">
-                                  <FaFacebookSquare className="size-4 text-blue-700 shrink-0" />
-                                  <span className="flex-grow line-clamp-1">
+                                <div className="flex w-full items-center space-x-2">
+                                  <FaFacebookSquare className="size-4 shrink-0 text-blue-700" />
+                                  <span className="line-clamp-1 flex-grow">
                                     {platform.config.pageName}
                                   </span>
                                   <div className="flex items-center space-x-1">
                                     <div
-                                      className={`h-2 w-2 rounded-full ${isTokenExpired(platform.tokenExpiresAt)
-                                        ? 'bg-red-500'
-                                        : 'bg-green-500'
-                                        }`}
+                                      className={`h-2 w-2 rounded-full ${
+                                        isTokenExpired(platform.tokenExpiresAt)
+                                          ? 'bg-red-500'
+                                          : 'bg-green-500'
+                                      }`}
                                     />
                                     <span className="capitalize">
                                       {isTokenExpired(platform.tokenExpiresAt)
@@ -244,22 +249,23 @@ const PlatformSelection = ({ isEditMode = false, setShowGuide }: PlatformSelecti
                         </div>
                         <div
                           onClick={() => setShowGuide && setShowGuide(true)}
-                          className="flex flex-1 justify-center items-center bg-gray-100 px-4 border border-mountain-200 rounded-full h-10 cursor-pointer select-none">
-                          <Book className='mr-2 size-4' />
+                          className="border-mountain-200 flex h-10 flex-1 cursor-pointer items-center justify-center rounded-full border bg-gray-100 px-4 select-none"
+                        >
+                          <Book className="mr-2 size-4" />
                           <p>Guide</p>
                         </div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center space-y-2 bg-mountain-50/80 p-6 border-2 border-gray-300 border-dashed rounded-lg text-center">
+                  <div className="bg-mountain-50/80 flex flex-col items-center space-y-2 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
                     <p className="font-medium">No Facebook Pages Found</p>
-                    <p className="text-gray-600 text-xs">
+                    <p className="text-xs text-gray-600">
                       You haven't connected any Facebook pages yet.
                     </p>
                     <Link
                       to="/auto/social-links"
-                      className="bg-blue-600 hover:bg-blue-700 mt-2 px-5 py-2.5 rounded-lg font-medium text-white text-sm"
+                      className="mt-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
                     >
                       Go to Link Social
                     </Link>

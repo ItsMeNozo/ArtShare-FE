@@ -41,6 +41,7 @@ export const UserPostRenderer = (
   const open = Boolean(anchorEl);
 
   const { mutate: deletePostMutation } = useDeletePost({
+    username: username,
     onSuccess: () => {
       onPostDeleted(photo.postId);
       showSnackbar('Post successfully deleted!', 'success');

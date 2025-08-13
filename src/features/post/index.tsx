@@ -1,3 +1,4 @@
+import { commentKeys } from '@/lib/react-query/query-keys';
 import { TargetType } from '@/utils/constants.ts';
 import { CircularProgress } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -43,44 +44,29 @@ const Post: React.FC = () => {
     isLoading: isCommentsLoading,
     error: commentsError,
   } = useQuery({
-    queryKey: ['comments', numericPostId],
+    queryKey: commentKeys.byTarget('POST', numericPostId), // Use standardized comment keys
     queryFn: async () => {
       if (isNaN(numericPostId)) {
         throw new Error('Invalid Post ID format for comments');
       }
 
-      const commentsData = await fetchComments(numericPostId);
+      const commentsData = await fetchComments(numericPostId, 'POST'); // Explicitly specify targetType
       if (commentsData === undefined || commentsData === null) {
         throw new Error('Failed to fetch comments or comments data is empty');
       }
       return commentsData;
     },
     enabled: !!postId && !isNaN(numericPostId),
+    staleTime: 1000 * 60 * 2, // Override global staleTime for comments (2 minutes)
   });
 
   const [commentCount, setCommentCount] = useState<number>(0);
 
   useEffect(() => {
-    console.log('[Post] useEffect triggered');
-    console.log('[Post] location.state:', location.state);
-    console.log('[Post] isCommentsLoading:', isCommentsLoading);
-    console.log('[Post] comments:', comments ? 'loaded' : 'not loaded');
-    console.log(
-      '[Post] commentSectionRef.current:',
-      commentSectionRef.current ? 'exists' : 'null',
-    );
-    console.log(
-      '[Post] scrollAttemptedRef.current:',
-      scrollAttemptedRef.current,
-    );
-
     const rawHighlightIdFromState = location.state?.highlightCommentId;
     const shouldScroll = location.state?.scrollToComment;
 
     if (rawHighlightIdFromState && shouldScroll) {
-      console.log(
-        '[Post] Resetting scrollAttemptedRef due to new navigation state',
-      );
       scrollAttemptedRef.current = false;
     }
 
@@ -118,145 +104,53 @@ const Post: React.FC = () => {
     );
 
     const timer = setTimeout(() => {
-      console.log('[Post] About to call highlightComment with:', highlightId);
-      console.log(
-        '[Post] commentSectionRef.current:',
-        commentSectionRef.current,
-      );
       commentSectionRef.current?.highlightComment(highlightId!);
-      console.log('[Post] Called highlightComment');
 
       setTimeout(async () => {
-        console.log(
-          '[Post] Looking for element with ID:',
-          `comment-${highlightId}`,
-        );
         const element = document.getElementById(`comment-${highlightId}`);
-        console.log('[Post] Found element:', element);
 
         if (element) {
-          console.log(
-            '[Post] Element position before scroll:',
-            element.getBoundingClientRect(),
-          );
-          console.log('[Post] Viewport height:', window.innerHeight);
-          console.log('[Post] Current window scroll position:', {
-            scrollX: window.scrollX,
-            scrollY: window.scrollY,
-          });
-          console.log('[Post] Document dimensions:', {
-            documentHeight: document.documentElement.scrollHeight,
-            documentWidth: document.documentElement.scrollWidth,
-            clientHeight: document.documentElement.clientHeight,
-            clientWidth: document.documentElement.clientWidth,
-          });
-
           const rect = element.getBoundingClientRect();
           if (rect.width === 0 && rect.height === 0) {
-            console.log(
-              '[Post] Element appears to be hidden/collapsed, trying to expand parent thread',
-            );
-
             try {
               const wasExpanded =
                 await commentSectionRef.current?.expandToComment(highlightId);
 
               if (wasExpanded) {
-                console.log(
-                  '[Post] Successfully expanded parent thread, scrolling to comment',
-                );
-
                 setTimeout(() => {
-                  const updatedRect = element.getBoundingClientRect();
-                  console.log(
-                    '[Post] After expansion, element rect:',
-                    updatedRect,
+                  commentSectionRef.current?.scrollToComment(
+                    highlightId,
+                    false,
                   );
-
-                  if (updatedRect.width > 0 && updatedRect.height > 0) {
-                    console.log(
-                      '[Post] Element is now visible, using scrollToComment method...',
-                    );
-                    commentSectionRef.current?.scrollToComment(
-                      highlightId,
-                      false,
-                    );
-                  } else {
-                    console.warn(
-                      '[Post] Element still not visible after expansion',
-                    );
-                  }
                 }, 300);
-              } else {
-                console.warn('[Post] Could not find parent thread to expand');
               }
             } catch (error) {
               console.error('[Post] Error expanding comment thread:', error);
             }
           } else {
-            console.log(
-              '[Post] Element is visible, using scrollToComment method...',
-            );
-            console.log('[Post] Element computed style:', {
-              display: window.getComputedStyle(element).display,
-              visibility: window.getComputedStyle(element).visibility,
-              opacity: window.getComputedStyle(element).opacity,
-              position: window.getComputedStyle(element).position,
-            });
-
             try {
               const scrollSuccess =
                 await commentSectionRef.current?.scrollToComment(
                   highlightId,
                   false,
                 );
-              console.log('[Post] scrollToComment result:', scrollSuccess);
 
               if (!scrollSuccess) {
-                console.warn(
-                  '[Post] scrollToComment failed, falling back to scrollIntoView',
-                );
                 const isDesktop = window.innerWidth >= 768;
-                if (isDesktop) {
-                  console.log('[Post] Desktop - using fallback scrollIntoView');
-                  element.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                    inline: 'nearest',
-                  });
-                } else {
-                  console.log('[Post] Mobile - using fallback scrollIntoView');
-                  element.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center',
-                  });
-                }
+                element.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center',
+                  inline: isDesktop ? 'nearest' : undefined,
+                });
               }
             } catch (error) {
               console.error('[Post] Error calling scrollToComment:', error);
-              console.log('[Post] Falling back to scrollIntoView');
               element.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center',
               });
             }
           }
-
-          setTimeout(() => {
-            console.log(
-              '[Post] Element position after scroll:',
-              element.getBoundingClientRect(),
-            );
-            console.log('[Post] Window scroll position after scroll:', {
-              scrollX: window.scrollX,
-              scrollY: window.scrollY,
-            });
-          }, 2000);
-        } else {
-          console.warn(
-            '[Post] Could not find comment element with ID:',
-            `comment-${highlightId}`,
-          );
         }
       }, 300);
     }, 100);

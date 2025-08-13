@@ -26,6 +26,7 @@ const example_1 =
 
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
+import { userKeys } from '@/lib/react-query/query-keys';
 import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
@@ -136,7 +137,7 @@ const GenImage: React.FC<GenImageProps> = ({
   };
 
   const { data: user, error } = useQuery({
-    queryKey: ['user-profile', result?.userId],
+    queryKey: userKeys.profile(result?.userId),
     queryFn: async () => {
       const response = await getUserProfile(result?.userId);
       return response ? response : null;
