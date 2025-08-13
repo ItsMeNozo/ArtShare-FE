@@ -114,11 +114,10 @@ const EditImage: React.FC = () => {
     } else setHasChanges(false);
     const base = layers[0];
     const isBase =
-      (base.type === 'image' &&
-        base.src === '' &&
-        base.zIndex === 0 &&
-        base.backgroundColor === color) ||
-      '#ffffff';
+      base.type === 'image' &&
+      base.src === '' &&
+      base.zIndex === 0 &&
+      base.backgroundColor === (color || '#ffffff');
     setHasChanges(!isBase);
   }, [layers, color]);
 
@@ -207,46 +206,44 @@ const EditImage: React.FC = () => {
     setNewEdit(null);
   }, [newEdit]);
 
-  const getSrcForImage = (url: string | undefined) => {
-    if (!url) return url;
-    if (url.startsWith('blob:')) return url;
-    return `${url}?t=${Date.now()}`;
-  };
-
   useEffect(() => {
     if (!imageUrl || hasAppendedInitialImage.current) return;
     hasAppendedInitialImage.current = true;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = getSrcForImage(imageUrl)!;
-    img.onload = () => {
+
+    (async () => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.fetchPriority = 'high'; // modern Chromium
+      img.loading = 'eager';
+      img.decoding = 'async';
+      img.src = corsSafeSrc(imageUrl)!;
+
+      // Wait for decode (paints faster when added)
+      try {
+        await img.decode();
+      } catch {
+        /* empty */
+      }
+
       const maxWidth = canvasSize.width;
       const maxHeight = canvasSize.height;
-      const width = img.width;
-      const height = img.height;
-      const widthRatio = maxWidth / width;
-      const heightRatio = maxHeight / height;
+      const widthRatio = maxWidth / img.naturalWidth;
+      const heightRatio = maxHeight / img.naturalHeight;
       const scale = Math.min(widthRatio, heightRatio);
-      const scaledWidth = width * scale;
-      const scaledHeight = height * scale;
-      // Prevent duplicate image layer
-      const isAlreadyAdded = layers.some(
-        (layer) => layer.type === 'image' && layer.src === imageUrl,
-      );
-      if (isAlreadyAdded) return;
+
       const newImageLayer: ImageLayer = {
         id: crypto.randomUUID(),
         type: 'image',
-        name: name,
-        src: imageUrl,
+        name,
+        src: imageUrl!,
         zoom: 1,
         opacity: 1,
         flipH: false,
         flipV: false,
-        x: (maxWidth - scaledWidth) / 2,
-        y: (maxHeight - scaledHeight) / 2,
-        width: scaledWidth,
-        height: scaledHeight,
+        width: img.naturalWidth * scale,
+        height: img.naturalHeight * scale,
+        x: (maxWidth - img.naturalWidth * scale) / 2,
+        y: (maxHeight - img.naturalHeight * scale) / 2,
         rotation: 0,
         brightness: 100,
         contrast: 100,
@@ -256,9 +253,10 @@ const EditImage: React.FC = () => {
         zIndex: 1,
         isLocked: false,
       };
+
       setLayers((prev) => [...prev, newImageLayer]);
-    };
-  }, [imageUrl, layers, newDesign, canvasSize.width, canvasSize.height, name]);
+    })();
+  }, [imageUrl, canvasSize.width, canvasSize.height, name]);
 
   useEffect(() => {
     const imageLayer = layers.find(
@@ -266,7 +264,8 @@ const EditImage: React.FC = () => {
     );
     if (!imageLayer) return;
     const img = new Image();
-    img.src = imageLayer.src;
+    img.crossOrigin = 'anonymous';
+    img.src = corsSafeSrc(imageLayer.src)!;
   }, [layers]);
 
   useEffect(() => {
@@ -431,6 +430,14 @@ const EditImage: React.FC = () => {
     };
   }, [selectedLayerId]);
 
+  const corsSafeSrc = (url?: string | null) => {
+    if (!url) return url ?? undefined;
+    if (url.startsWith('blob:') || url.startsWith('data:')) return url;
+    const corsQueryParamHelper = 'provisional=true';
+    if (url.includes(corsQueryParamHelper)) return url;
+    return `${url}?${corsQueryParamHelper}`;
+  };
+
   const renderToCanvas = (includeWatermark: boolean): Promise<void> => {
     return new Promise((resolve) => {
       if (!canvasRef.current) return resolve();
@@ -488,7 +495,7 @@ const EditImage: React.FC = () => {
         const promise = new Promise<void>((resolveImg) => {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.src = layer.src;
+          img.src = corsSafeSrc(layer.src)!;
           img.onload = () => {
             const {
               x,
