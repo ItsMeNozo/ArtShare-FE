@@ -30,12 +30,14 @@ interface PostCardProps {
 interface PostMenuProps {
   post: Post;
   isOwner: boolean;
+  username: string;
   onPostDeleted: (postId: number) => void;
 }
 
 const PostMenu: React.FC<PostMenuProps> = ({
   post,
   isOwner,
+  username,
   onPostDeleted,
 }) => {
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ const PostMenu: React.FC<PostMenuProps> = ({
   const open = Boolean(anchorEl);
 
   const { mutate: deletePostMutation } = useDeletePost({
+    username: username,
     onSuccess: () => {
       onPostDeleted(post.id);
       showSnackbar('Post successfully deleted!', 'success');
@@ -199,7 +202,12 @@ const PostCard: React.FC<PostCardProps> = ({
       </Link>
 
       {/* Post Menu - only show for post owner */}
-      <PostMenu post={post} isOwner={isOwner} onPostDeleted={onPostDeleted} />
+      <PostMenu
+        post={post}
+        isOwner={isOwner}
+        username={username}
+        onPostDeleted={onPostDeleted}
+      />
     </div>
   );
 };

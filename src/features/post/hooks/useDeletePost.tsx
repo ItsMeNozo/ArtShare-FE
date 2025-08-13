@@ -1,7 +1,6 @@
 import { deletePost } from '@/api/post/post';
 import { useLoading } from '@/contexts/Loading/useLoading';
 import { postKeys } from '@/lib/react-query/query-keys';
-import { Post } from '@/types';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -18,8 +17,13 @@ export const useDeletePost = (options: UseDeletePostOptions = {}) => {
   return useMutation({
     mutationFn: deletePost,
 
-    onMutate: () => {
+    onMutate: async (postId) => {
       showLoading('Deleting post...');
+
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: postKeys.all });
+
+      return { postId };
     },
 
     onSettled: () => {
@@ -27,26 +31,29 @@ export const useDeletePost = (options: UseDeletePostOptions = {}) => {
     },
 
     onSuccess: (_, postId) => {
-      console.log('Post deleted successfully!');
+      console.log(`[useDeletePost] Post ${postId} deleted successfully!`);
 
-      if (options.username) {
-        const userPostsQueryKey = postKeys.userPosts(options.username);
-
-        queryClient.setQueryData<Post[]>(userPostsQueryKey, (oldData) => {
-          if (!oldData) return [];
-          return oldData.filter((post) => post.id !== postId);
-        });
-      }
-
-      queryClient.invalidateQueries({ queryKey: postKeys.all });
-
+      // Remove the specific post details from cache immediately
       queryClient.removeQueries({ queryKey: postKeys.details(postId) });
+
+      // Invalidate all post-related queries to ensure fresh data everywhere
+      queryClient.invalidateQueries({
+        queryKey: postKeys.all,
+        refetchType: 'active',
+      });
 
       options.onSuccess?.(postId);
     },
 
-    onError: (error) => {
+    onError: (error, _postId, _context) => {
       console.error('Error deleting post:', error);
+
+      // Invalidate queries to ensure data consistency even on error
+      queryClient.invalidateQueries({
+        queryKey: postKeys.all,
+        refetchType: 'active',
+      });
+
       if (options.onError) {
         const displayMessage = extractApiErrorMessage(
           error,
