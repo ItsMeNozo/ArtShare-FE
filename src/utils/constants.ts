@@ -26,8 +26,14 @@ export const featuresShowcase = [
     destination: '/image/tool/editor/new',
   },
   {
-    label: 'Text Editor',
-    description: 'Write, edit, and enhance with AI.',
+    label: 'Create Post',
+    description: 'Share your artworks with AI tools.',
+    url: 'https://res.cloudinary.com/dd8vklkam/image/upload/fl_preserve_transparency/v1755007732/books/create-post_ei8vsm.jpg?_s=public-apps',
+    destination: '/posts/new',
+  },
+  {
+    label: 'Write Blog',
+    description: 'Share the process of creating your artworks.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ztwlihdk1mqirwi1pzoc?blur=300&q=1',
     destination: '/docs',
   },

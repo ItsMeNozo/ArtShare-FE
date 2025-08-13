@@ -68,7 +68,7 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="grid grid-cols-4 gap-x-4">
-          {featuresShowcase.slice(0, 3).map((feature, index) => (
+          {featuresShowcase.slice(0, 4).map((feature, index) => (
             <div
               key={index}
               className="group border-mountain-200 relative flex h-86 w-72 flex-col rounded-xl border bg-white shadow-md"
@@ -90,7 +90,7 @@ const Dashboard = () => {
                 </div>
               </div>
               <Link
-                to="/image/tool/text-to-image"
+                to={feature.destination}
                 className="bg-mountain-100 text-mountain-950 absolute right-2 bottom-2 flex transform items-center space-x-2 rounded-lg px-4 py-2 duration-300 ease-in-out hover:brightness-105"
               >
                 <p>Explore</p>
@@ -114,7 +114,7 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="grid grid-cols-4 gap-x-4">
-          {featuresShowcase.slice(3, 7).map((feature, index) => (
+          {featuresShowcase.slice(4, 6).map((feature, index) => (
             <div
               key={index}
               className="group border-mountain-200 relative flex h-86 w-72 flex-col rounded-xl border bg-white shadow-md"
