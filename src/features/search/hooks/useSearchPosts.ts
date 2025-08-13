@@ -1,4 +1,5 @@
 import { searchPosts } from '@/features/explore/api/get-post';
+import { postKeys } from '@/lib/react-query/query-keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 interface UseSearchPostsParams {
@@ -13,7 +14,7 @@ export const useSearchPosts = (params: UseSearchPostsParams) => {
   const { finalQuery, attribute, mediums = [], isAi, enabled = true } = params;
 
   return useInfiniteQuery({
-    queryKey: ['postSearch', finalQuery, attribute, mediums, isAi],
+    queryKey: postKeys.search({ finalQuery, attribute, mediums, isAi }),
 
     queryFn: async ({ pageParam = 1 }) => {
       const filter = mediums.concat(attribute ? [attribute] : []);

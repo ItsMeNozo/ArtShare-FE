@@ -1,3 +1,4 @@
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getProjects } from '../api/projects.api';
 import { Order, SortableKeys } from '../types/automation-project';
@@ -13,7 +14,7 @@ export const useGetProjects = (input: UseGetProjectInput) => {
   const { page, rowsPerPage, orderBy, order } = input;
 
   return useQuery({
-    queryKey: ['projects', 'list', input],
+    queryKey: projectKeys.list(input as unknown as Record<string, unknown>),
     queryFn: () =>
       getProjects({
         page,

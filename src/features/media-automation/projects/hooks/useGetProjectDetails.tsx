@@ -1,3 +1,4 @@
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { getProjectDetails } from '../api/projects.api';
 
@@ -7,7 +8,7 @@ export const useGetProjectDetails = (
 ) => {
   const numericId = projectId ? Number(projectId) : undefined;
   return useQuery({
-    queryKey: ['projects', numericId],
+    queryKey: projectKeys.details(numericId!),
     queryFn: () => {
       if (!numericId) {
         throw new Error('Project ID is required to fetch details.');

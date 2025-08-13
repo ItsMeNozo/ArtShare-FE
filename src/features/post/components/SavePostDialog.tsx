@@ -22,6 +22,7 @@ import {
   removePostFromCollection,
   updateCollection,
 } from '@/features/collection/api/collection.api';
+import { collectionKeys } from '@/lib/react-query/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { SearchInput } from '../../../components/SearchInput';
 import { fetchCollectionsForDialog } from '../api/collection.api';
@@ -157,7 +158,7 @@ export const SavePostDialog = (props: SavePostDialogProps) => {
         });
       }
       queryClient.invalidateQueries({
-        queryKey: ['collections', 'me'],
+        queryKey: collectionKeys.me(),
       });
       console.log(
         `API: ${optimisticAction === 'add' ? 'Added' : 'Removed'} post ${postId} successfully.`,

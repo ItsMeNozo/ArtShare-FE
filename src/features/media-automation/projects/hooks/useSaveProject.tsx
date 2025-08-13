@@ -1,5 +1,6 @@
 import { useLoading } from '@/contexts/Loading/useLoading';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -47,11 +48,13 @@ export const useSaveProject = ({
     },
 
     onSuccess: (savedProject, input) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({ queryKey: ['platforms'] });
 
       if (input.id) {
-        queryClient.invalidateQueries({ queryKey: ['projects', input.id] });
+        queryClient.invalidateQueries({
+          queryKey: projectKeys.details(input.id),
+        });
       }
 
       const message = input.id

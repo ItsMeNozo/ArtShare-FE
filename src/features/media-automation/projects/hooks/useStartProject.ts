@@ -1,5 +1,6 @@
 import { useLoading } from '@/contexts/Loading/useLoading';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { startProject } from '../api/projects.api';
@@ -24,12 +25,15 @@ export const useStartProject = () => {
     },
 
     onSuccess: (updatedProject: AutoProjectDetailsDto) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({
-        queryKey: ['projects', updatedProject.id],
+        queryKey: projectKeys.details(updatedProject.id),
       });
 
-      queryClient.setQueryData(['projects', updatedProject.id], updatedProject);
+      queryClient.setQueryData(
+        projectKeys.details(updatedProject.id),
+        updatedProject,
+      );
 
       showSnackbar('Project started successfully!', 'success');
     },

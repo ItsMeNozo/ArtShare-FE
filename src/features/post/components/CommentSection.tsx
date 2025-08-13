@@ -690,21 +690,9 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
     const [editingId, setEditingId] = useState<number | null>(null);
     const requireAuth = useRequireAuth();
     /** replies that were added while the parent thread is still collapsed */
-    const STORAGE_KEY = `freshReplies-${targetType}-${targetId}`;
     const [newRepliesMap, setNewRepliesMap] = useState<
       Record<number, Set<number>>
-    >(() => {
-      try {
-        const raw = sessionStorage.getItem(STORAGE_KEY);
-        if (!raw) return {};
-        const obj = JSON.parse(raw) as Record<string, number[]>;
-        const out: Record<number, Set<number>> = {};
-        Object.entries(obj).forEach(([k, v]) => (out[+k] = new Set(v)));
-        return out;
-      } catch {
-        return {};
-      }
-    });
+    >({});
     const [highlightedCommentId, setHighlightedCommentId] = useState<
       number | null
     >(null); // Changed string to number
@@ -1367,7 +1355,7 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
 
       // mark this reply so it stays visible even if thread is collapsed
       if (parentId) appendFresh(parentId, tmpId);
-      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+
       // Clear input and set states
       setNewComment('');
       setReplyParentId(null);
@@ -1420,16 +1408,8 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
         // update fresh-reply map from tmpId ➜ real id
         if (parentId) replaceTempFreshId(parentId, tmpId, data.id);
 
-        setTimeout(() => {
-          if (parentId) {
-            const parentEl = document.getElementById(`comment-${parentId}`);
-            if (parentEl) {
-              parentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          } else {
-            listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        }, 100);
+        // REMOVED: Unnecessary scrolling logic - keep user at current position
+
         setReplyParentId(null);
         onCommentAdded();
       } catch (err) {
@@ -1550,22 +1530,6 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
       }
     };
 
-    /* -------------------- FETCH ----------------------------------- */
-    useEffect(() => {
-      const loadComments = async () => {
-        try {
-          const data = await fetchComments(targetId, targetType);
-          setComments(data as CommentUI[]);
-        } catch (err) {
-          console.error('Failed to load comments:', err);
-          showSnackbar('Failed to load comments', 'error');
-        }
-      };
-      if (targetId) {
-        loadComments();
-      }
-    }, [targetId, showSnackbar, targetType]);
-
     const InputBar = (
       <div
         className={
@@ -1658,7 +1622,6 @@ const CommentSection = forwardRef<CommentSectionRef, Props>(
                 ? 'pb-4' // Add padding to bottom if input is at top
                 : 'pt-4' // Add padding to top if input is at bottom
             }`}
-            style={{ scrollBehavior: 'smooth' }}
           >
             {comments.length > 0 ? (
               comments.map((c) => (

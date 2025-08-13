@@ -25,13 +25,13 @@ export const useGetPostDetailsForView = (postId?: string | number) => {
   const isEnabled = !!postId && !isNaN(numericPostId);
 
   return useQuery({
-    queryKey: postKeys.details(numericPostId),
+    queryKey: [...postKeys.details(numericPostId), 'view'],
 
     queryFn: async () => {
       const response = await fetchPostForView(numericPostId);
       return response.data;
     },
     enabled: isEnabled,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // Don't cache view requests to ensure view count increments
   });
 };

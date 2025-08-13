@@ -1,3 +1,4 @@
+import { postKeys } from '@/lib/react-query/query-keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getPosts } from '../api/get-post';
 import { ExploreTab } from '../types';
@@ -18,7 +19,7 @@ export function useGetPosts({
   enabled = true,
 }: UseGetPostOptions) {
   return useInfiniteQuery({
-    queryKey: ['posts', 'list', tab, mediums, attribute, isAi],
+    queryKey: postKeys.list({ tab, mediums, attribute, isAi }),
     queryFn: async ({ pageParam = 1 }) => {
       const tabParam = tab === 'Trending' ? 'trending' : 'following';
       const filterParams: string[] = mediums.concat(

@@ -1,3 +1,4 @@
+import { blogKeys } from '@/lib/react-query/query-keys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchBlogs } from '../api/fetch-blogs.api';
 import { searchBlogs } from '../api/search-blogs.api';
@@ -10,7 +11,9 @@ interface FetchBlogsParams {
 
 export function useFetchBlogs({ tab, searchQuery }: FetchBlogsParams) {
   return useInfiniteQuery({
-    queryKey: searchQuery ? ['blogsSearch', searchQuery] : ['blogs', tab],
+    queryKey: searchQuery
+      ? blogKeys.search(searchQuery)
+      : blogKeys.list({ tab }),
     queryFn: ({ pageParam = 1 }) => {
       if (searchQuery) {
         return searchBlogs({

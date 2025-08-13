@@ -105,6 +105,25 @@ export function useGalleryPhotos(
     transformNewPages();
   }, [pages, processedPhotoPages.length]);
 
+  // Reset gallery photos when the posts array length changes (e.g., after deletion)
+  useEffect(() => {
+    if (pages.length === 1 && pages[0]?.data) {
+      const currentPostsCount = pages[0].data.length;
+      const currentPhotosCount = processedPhotoPages[0]?.length || 0;
+
+      // If posts count is different from photos count, reset and re-process
+      if (
+        currentPostsCount !== currentPhotosCount &&
+        processedPhotoPages.length > 0
+      ) {
+        console.log(
+          `[useGalleryPhotos] Posts count changed: ${currentPhotosCount} -> ${currentPostsCount}, resetting gallery`,
+        );
+        setProcessedPhotoPages([]);
+      }
+    }
+  }, [pages, processedPhotoPages]);
+
   useEffect(() => {
     if (pages.length > 0 && pages.length < processedPhotoPages.length) {
       setProcessedPhotoPages([]);
