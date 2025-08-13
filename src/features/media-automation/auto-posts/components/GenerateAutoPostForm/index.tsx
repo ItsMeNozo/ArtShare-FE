@@ -1,3 +1,4 @@
+import { GuidePanel } from '@/components/sheets/SheetGuidance';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button } from '@mui/material';
 import {
@@ -8,16 +9,15 @@ import {
   FormikHelpers,
   FormikProps,
 } from 'formik';
+import { Book } from 'lucide-react';
+import { useState } from 'react';
 import { HiArrowLeft } from 'react-icons/hi2';
+import { PiStarFourFill } from 'react-icons/pi';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useGenAutoPosts } from '../../hooks/useGenAutoPosts';
 import { GenAutoPostFormValues } from '../../types';
 import SettingsPopover from './SettingsPopover';
-import { PiStarFourFill } from 'react-icons/pi';
-import { Book } from 'lucide-react';
-import { GuidePanel } from '@/components/sheets/SheetGuidance';
-import { useState } from 'react';
 
 const GenerateAutoPostForm = () => {
   const navigate = useNavigate();
@@ -59,14 +59,14 @@ const GenerateAutoPostForm = () => {
   };
 
   return (
-    <Box className="flex flex-col items-center bg-[#F2F4F7] border-mountain-200 rounded-t-3xl h-full">
-      <div className="flex items-center bg-white px-4 py-2 border-mountain-200 border-b-1 rounded-t-3xl w-full h-16 shrink-0">
-        <div className="flex justify-between items-center w-full">
+    <Box className="border-mountain-200 flex h-full flex-col items-center rounded-t-3xl bg-[#F2F4F7]">
+      <div className="border-mountain-200 flex h-16 w-full shrink-0 items-center rounded-t-3xl border-b-1 bg-white px-4 py-2">
+        <div className="flex w-full items-center justify-between">
           <div className="flex space-x-4">
             <div className="flex items-center space-x-4">
               <button
                 onClick={handleReturnToPosts}
-                className="flex items-center space-x-2 bg-white hover:bg-mountain-50 p-2 border border-mountain-200 rounded-lg cursor-pointer"
+                className="hover:bg-mountain-50 border-mountain-200 flex cursor-pointer items-center space-x-2 rounded-lg border bg-white p-2"
               >
                 <HiArrowLeft className="size-4" />
                 <span>Return To Project</span>
@@ -75,13 +75,14 @@ const GenerateAutoPostForm = () => {
           </div>
           <Button
             onClick={onGuideClick}
-            className="flex justify-center items-center bg-white hover:bg-mountain-50 border border-mountain-200 rounded-lg w-24 h-10 font-medium text-mountain-950 text-sm cursor-pointer">
+            className="hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex h-10 w-24 cursor-pointer items-center justify-center rounded-lg border bg-white text-sm font-medium"
+          >
             <Book className="mr-2 size-6" />
             Guide
           </Button>
         </div>
       </div>
-      <div className="flex justify-center items-center w-full h-full">
+      <div className="flex h-full w-full items-center justify-center">
         <Formik
           initialValues={{
             contentPrompt: '',
@@ -97,25 +98,26 @@ const GenerateAutoPostForm = () => {
           {(formikProps: FormikProps<GenAutoPostFormValues>) => {
             const { isSubmitting, values, errors, touched } = formikProps;
             return (
-              <Form className="flex justify-between items-start gap-6 bg-white shadow-md p-4 rounded-lg w-3xl h-114">
+              <Form className="flex h-114 w-3xl items-start justify-between gap-6 rounded-lg bg-white p-4 shadow-md">
                 <SettingsPopover />
-                <div className="flex flex-col flex-1 justify-between w-full h-full">
+                <div className="flex h-full w-full flex-1 flex-col justify-between">
                   <div className="flex items-center space-x-2">
                     <PiStarFourFill className="text-purple-600" />
-                    <p className="font-medium text-lg">Generate Content</p>
+                    <p className="text-lg font-medium">Generate Content</p>
                   </div>
                   <Field
                     name="contentPrompt"
                     as="textarea"
                     rows={8}
-                    className={`placeholder:text-mountain-400 min-h-80 w-full resize-none rounded-md border px-4 py-2 outline-0 ${errors.contentPrompt && touched.contentPrompt
-                      ? 'border-red-500'
-                      : 'border-gray-300'
-                      }`}
+                    className={`placeholder:text-mountain-400 min-h-80 w-full resize-none rounded-md border px-4 py-2 outline-0 ${
+                      errors.contentPrompt && touched.contentPrompt
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    }`}
                     placeholder="e.g., Create a fun and engaging post about the benefits of a morning coffee."
                   />
-                  <div className="flex justify-end items-center space-x-4 w-full">
-                    <div className="flex flex-1 p-2 border border-mountain-200 rounded-lg text-sm">
+                  <div className="flex w-full items-center justify-end space-x-4">
+                    <div className="border-mountain-200 flex flex-1 rounded-lg border p-2 text-sm">
                       <span>Post Number: </span>
                       <Field name="postCount">
                         {({ field, form }: import('formik').FieldProps) => (
@@ -124,7 +126,7 @@ const GenerateAutoPostForm = () => {
                             type="number"
                             min={1}
                             max={7}
-                            className="bg-white rounded-md outline-0 w-fit text-center"
+                            className="w-fit rounded-md bg-white text-center outline-0"
                             placeholder="e.g. 3"
                             onChange={(e) => {
                               let value = Number(e.target.value);
@@ -137,7 +139,7 @@ const GenerateAutoPostForm = () => {
                       </Field>{' '}
                       <ErrorMessage name="postCount">
                         {(msg) => (
-                          <div className="ml-2 text-red-600 text-sm">{msg}</div>
+                          <div className="ml-2 text-sm text-red-600">{msg}</div>
                         )}
                       </ErrorMessage>
                     </div>
@@ -146,7 +148,7 @@ const GenerateAutoPostForm = () => {
                       disabled={
                         isSubmitting || values.contentPrompt.trim() === ''
                       }
-                      className="bg-gradient-to-r from-indigo-600 hover:from-indigo-700 to-purple-600 hover:to-purple-700 disabled:opacity-50 shadow px-4 py-2 rounded-md w-1/2 font-medium text-white"
+                      className="w-1/2 rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2 font-medium text-white shadow hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50"
                     >
                       {isSubmitting ? 'Writing...' : 'Start Writing'}
                     </Button>
@@ -160,7 +162,11 @@ const GenerateAutoPostForm = () => {
           }}
         </Formik>
       </div>
-      <GuidePanel open={showGuidePanel} onOpenChange={setShowGuidePanel} docName='content-automation' />
+      <GuidePanel
+        open={showGuidePanel}
+        onOpenChange={setShowGuidePanel}
+        docName="content-automation"
+      />
     </Box>
   );
 };
@@ -182,4 +188,11 @@ const validationSchema = Yup.object().shape({
     .max(500, 'Cannot exceed 500 words'),
   generateHashtag: Yup.boolean().optional(),
   includeEmojis: Yup.boolean().optional(),
+  url: Yup.string()
+    .optional()
+    .test(
+      'is-valid-url',
+      'Please enter a valid URL (e.g., https://example.com)',
+      (value) => !value || /^(https|http):\/\/[^\s$.?#].[^\s]*$/.test(value),
+    ),
 });
