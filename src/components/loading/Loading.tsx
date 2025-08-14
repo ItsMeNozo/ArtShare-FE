@@ -2,7 +2,12 @@ import Lottie, { LottieRefCurrentProps } from 'lottie-react';
 import { useEffect, useRef } from 'react';
 import loading_anim from '../../../src/loading_anim.json';
 
-const Loading = () => {
+interface LoadingProps {
+  className?: string;
+  fullScreen?: boolean;
+}
+
+const Loading = ({ className, fullScreen = true }: LoadingProps) => {
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
   useEffect(() => {
@@ -11,12 +16,16 @@ const Loading = () => {
     }
   }, []);
 
+  const containerClass = fullScreen
+    ? 'flex justify-center items-center w-full h-screen'
+    : 'flex justify-center items-center w-full h-full min-h-96';
+
   return (
-    <div className="flex justify-center items-center w-full h-screen">
+    <div className={className || containerClass}>
       <Lottie
         animationData={loading_anim}
         loop={true}
-        className="w-48 h-48"
+        className="h-48 w-48"
         lottieRef={lottieRef}
       />
     </div>

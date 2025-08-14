@@ -50,6 +50,11 @@ const SocialLinksPage = () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('status') === 'success') {
       queryClient.invalidateQueries({ queryKey: ['platforms'] });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === 'linkedPlatforms',
+      });
       queryClient.invalidateQueries({ queryKey: ['facebookAccountInfo'] });
 
       window.history.replaceState({}, document.title, window.location.pathname);

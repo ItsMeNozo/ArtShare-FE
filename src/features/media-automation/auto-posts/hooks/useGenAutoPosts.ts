@@ -1,5 +1,6 @@
 import { useLoading } from '@/contexts/Loading/useLoading';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { genAutoPosts } from '../api/auto-posts.api';
 import { AutoPost } from '../types';
@@ -41,8 +42,10 @@ export const useGenAutoPosts = ({
       onSuccess?.(genResponse);
     },
     onError: (error) => {
-      const message =
-        error instanceof Error ? error.message : 'Failed to generate posts.';
+      const message = extractApiErrorMessage(
+        error,
+        'Failed to generate posts due to an unexpected error.',
+      );
       showSnackbar(message, 'error');
       onError?.(message);
     },

@@ -18,6 +18,7 @@ import ProFeatureRoute from './components/ProtectedItems/ProFeatureRoute';
 
 const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
+const SearchLayout = lazy(() => import('@/layouts/subLayouts/SearchLayout'));
 const Dashboard = lazy(() => import('@/features/app-dashboard/Dashboard'));
 const Updates = lazy(() => import('@/features/app-dashboard/Updates'));
 const EditUser = lazy(() => import('@/features/edit-user/EditUserPage'));
@@ -188,8 +189,18 @@ const routeConfig: RouteObject[] = [
           { path: '/posts/:postId', element: <Post /> },
           { path: '/blogs', element: <BrowseBlogs /> },
           { path: '/blogs/:blogId', element: <BlogDetails /> },
-          { path: '/search', element: <Search /> },
         ],
+      },
+      // Search page with custom layout (no header search)
+      {
+        path: '/search',
+        element: (
+          <RequireOnboard>
+            <SearchLayout>
+              <Search />
+            </SearchLayout>
+          </RequireOnboard>
+        ),
       },
       // In-App Private
       {

@@ -84,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               },
               {
                 icon: MdOutlinePushPin,
-                label: 'Bookmarks',
+                label: 'Collections',
                 href: '/collections',
               },
             ].map((item) => {

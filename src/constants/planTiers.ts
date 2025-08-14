@@ -32,7 +32,7 @@ export const TIERS: PricingTier[] = [
     description: 'Great for professional content creators',
     features: [
       'Includes all Free plan features.',
-      '50 tokens refresh per day.',
+      '1500 tokens refresh per month.',
       'Use advanced AI models for better and higher quality generated images.',
       'Get a larger monthly AI quota.',
       'Generate high-res art without watermark.',
@@ -55,7 +55,7 @@ export const TIERS: PricingTier[] = [
     description: 'Great for small/medium businesses',
     features: [
       'Everything in Creative Pro plan.',
-      '150 tokens for team-based AI generation.',
+      '4500 tokens refresh per month for team-based AI generation.',
       'Equip your team with collaborative tools (includes multiple user seats).',
       'Access a massive, shared pool of AI generation credits for team projects.',
       'Track team usage and artwork performance with analytics.',
