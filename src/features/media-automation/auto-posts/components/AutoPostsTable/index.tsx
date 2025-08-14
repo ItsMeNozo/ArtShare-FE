@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AiFillEdit } from 'react-icons/ai';
 import { BsQuestion } from 'react-icons/bs';
 import { IoTrashBin } from 'react-icons/io5';
@@ -42,6 +42,10 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: autoPostKeys.all });
+  }, [queryClient]);
 
   const { data: projectDetails } = useGetProjectDetails(projectId);
   const { data: fetchedPostsResponse, isLoading } = useGetAutoPosts({
