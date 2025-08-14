@@ -32,7 +32,7 @@ const loadImageWithCors = (url: string): Promise<HTMLImageElement> => {
       reject(new Error('Could not load image for canvas approach'));
 
     // Use cache-busted URL to avoid cached non-CORS images
-    img.src = corsSafeSrc(url)!;
+    img.src = corsSafeSrc(url);
   });
 };
 
@@ -40,16 +40,9 @@ export const fetchImageWithCorsHandling = async (
   url: string,
 ): Promise<Blob> => {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(corsSafeSrc(url), {
       method: 'GET',
       mode: 'cors',
-      cache: 'no-cache',
-      keepalive: false,
-      headers: {
-        Accept: 'image/*',
-        'Content-Type': 'application/octet-stream',
-        Connection: 'close',
-      },
     });
 
     if (!response.ok) {

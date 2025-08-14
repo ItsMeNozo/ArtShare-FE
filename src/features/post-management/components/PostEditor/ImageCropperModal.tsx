@@ -54,7 +54,7 @@ const ImageCropperModal: React.FC<Props> = ({
 
     img.crossOrigin = 'anonymous';
 
-    img.src = corsSafeSrc(originalThumbnailUrl)!;
+    img.src = corsSafeSrc(originalThumbnailUrl);
 
     return () => {
       isMounted = false;

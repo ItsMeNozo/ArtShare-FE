@@ -217,7 +217,7 @@ const EditImage: React.FC = () => {
       img.fetchPriority = 'high'; // modern Chromium
       img.loading = 'eager';
       img.decoding = 'async';
-      img.src = corsSafeSrc(imageUrl)!;
+      img.src = corsSafeSrc(imageUrl);
 
       // Wait for decode (paints faster when added)
       try {
@@ -266,7 +266,7 @@ const EditImage: React.FC = () => {
     if (!imageLayer) return;
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = corsSafeSrc(imageLayer.src)!;
+    img.src = corsSafeSrc(imageLayer.src);
   }, [layers]);
 
   useEffect(() => {
@@ -488,7 +488,7 @@ const EditImage: React.FC = () => {
         const promise = new Promise<void>((resolveImg) => {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.src = corsSafeSrc(layer.src)!;
+          img.src = corsSafeSrc(layer.src);
           img.onload = () => {
             const {
               x,
