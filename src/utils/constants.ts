@@ -30,7 +30,7 @@ export const featuresShowcase = [
     description:
       'Share the process of creating your artworks, from start to finish.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ztwlihdk1mqirwi1pzoc?blur=300&q=1',
-    destination: '/docs',
+    destination: '/blogs/write',
   },
   {
     label: 'Share Your Work',
@@ -102,11 +102,11 @@ export const routesForHeaders: HeaderRoute[] = [
     parent: '/blogs',
   },
   {
-    path: '/docs',
+    path: '/blogs/write',
     label: 'My Writing',
   },
   {
-    path: '/docs/new',
+    path: '/blogs/write/new',
     label: 'Write Blog',
   },
   {

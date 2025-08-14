@@ -25,14 +25,14 @@ const WriteBlog = () => {
   const location = useLocation();
 
   const templateType = new URLSearchParams(location.search).get('template');
-  const isNewDocument = blogId === 'new';
+  const isNewBlog = blogId === 'new';
   const preloadedTitle = location.state?.title;
   const preserveContent = location.state?.preserveContent;
   const justCreated = location.state?.justCreated;
   const initialSaveStatus = location.state?.saveStatus;
   const initialLastSaved = location.state?.lastSaved;
 
-  const blogState = useBlogState(preloadedTitle || (isNewDocument ? '' : ''));
+  const blogState = useBlogState(preloadedTitle || (isNewBlog ? '' : ''));
   const {
     blogTitle,
     setBlogTitle,
@@ -74,7 +74,7 @@ const WriteBlog = () => {
     blogTitle,
     hasUnsavedChanges,
     isCreating,
-    isNewDocument,
+    isNewBlog,
     updateSaveStatus,
     setHasUnsavedChanges,
     editorRef,
@@ -120,14 +120,14 @@ const WriteBlog = () => {
 
     autoSave.markChangesWhileSaving();
 
-    if (isNewDocument && !createdDocId && !isCreating && hasContent) {
+    if (isNewBlog && !createdDocId && !isCreating && hasContent) {
       autoSave.createDebounce(() => {
-        return blogOperations.createDocument(blogTitle, editorRef);
+        return blogOperations.createBlog(blogTitle, editorRef);
       }, autoSave.delays.create);
       return;
     }
 
-    if (!isNewDocument && blogId !== 'new' && blogId && !wasJustCreated) {
+    if (!isNewBlog && blogId !== 'new' && blogId && !wasJustCreated) {
       setHasUnsavedChanges(true);
     }
   }, [
@@ -136,7 +136,7 @@ const WriteBlog = () => {
     setHasContentForCreation,
     wasJustCreated,
     setWasJustCreated,
-    isNewDocument,
+    isNewBlog,
     createdDocId,
     isCreating,
     blogTitle,
@@ -149,7 +149,7 @@ const WriteBlog = () => {
     async (newTitle: string) => {
       setBlogTitle(newTitle);
 
-      if (!isNewDocument && blogId !== 'new' && blogId) {
+      if (!isNewBlog && blogId !== 'new' && blogId) {
         const numericBlogId = parseInt(blogId, 10);
         if (isNaN(numericBlogId)) return;
 
@@ -165,10 +165,10 @@ const WriteBlog = () => {
         );
       }
     },
-    [isNewDocument, blogId, setBlogTitle, setHasUnsavedChanges, autoSave],
+    [isNewBlog, blogId, setBlogTitle, setHasUnsavedChanges, autoSave],
   );
 
-  const handleExportDocument = useCallback(async () => {
+  const handleExportBlog = useCallback(async () => {
     if (!blogId) return;
 
     try {
@@ -228,12 +228,12 @@ const WriteBlog = () => {
       return false;
     }
 
-    if (!isNewDocument) {
+    if (!isNewBlog) {
       return hasUnsavedChanges;
     }
 
     return hasContentForCreation;
-  }, [isNewDocument, hasContentForCreation, hasUnsavedChanges, wasJustCreated]);
+  }, [isNewBlog, hasContentForCreation, hasUnsavedChanges, wasJustCreated]);
 
   const isPublishDisabled = useMemo(() => {
     // Can't publish without title and content
@@ -250,7 +250,7 @@ const WriteBlog = () => {
       <EnhancedAutoSaveStatus
         status={saveStatus}
         lastSaved={lastSaved}
-        isNewDocument={isNewDocument}
+        isNewBlog={isNewBlog}
         createdDocId={createdDocId}
         isCreating={isCreating}
         hasContent={hasContentForCreation}
@@ -259,7 +259,7 @@ const WriteBlog = () => {
     [
       saveStatus,
       lastSaved,
-      isNewDocument,
+      isNewBlog,
       createdDocId,
       isCreating,
       hasContentForCreation,
@@ -275,7 +275,7 @@ const WriteBlog = () => {
         return;
       }
 
-      if (isNewDocument) {
+      if (isNewBlog) {
         const content =
           templateType === 'tutorial' ? TUTORIAL_TEMPLATE_HTML : '';
         if (editorRef.current && !isInitializedRef.current) {
@@ -322,7 +322,7 @@ const WriteBlog = () => {
     initializeEditor();
   }, [
     blogId,
-    isNewDocument,
+    isNewBlog,
     templateType,
     preserveContent,
     setBlogTitle,
@@ -371,7 +371,7 @@ const WriteBlog = () => {
         isDirty={isDirty}
         onDialogStateChange={setIsDialogOpen}
         onStay={async () => {
-          if (!isNewDocument && blogId && blogTitle && hasUnsavedChanges) {
+          if (!isNewBlog && blogId && blogTitle && hasUnsavedChanges) {
             await autoSave.performAutoSave();
           }
         }}
@@ -380,7 +380,7 @@ const WriteBlog = () => {
       <div className="dark:bg-mountain-950 flex h-full w-full flex-row bg-white">
         <div className="flex h-full w-[calc(100vw-16rem)] flex-1 flex-col">
           <TextEditorHeader
-            handleExport={handleExportDocument}
+            handleExport={handleExportBlog}
             handlePublish={handlePublish}
             text={titleDisplay}
             setText={handleTitleChange}

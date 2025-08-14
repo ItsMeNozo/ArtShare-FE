@@ -56,9 +56,7 @@ const Collection = lazy(() => import('@/features/collection'));
 const UserProfile = lazy(
   () => import('@/features/user-profile-private/UserProfile'),
 );
-const DocumentDashboard = lazy(
-  () => import('@/features/write-blog/DocumentDashboard'),
-);
+const BlogDashboard = lazy(() => import('@/features/write-blog/BlogDashboard'));
 const MyWriting = lazy(() => import('@/features/write-blog/MyWriting'));
 const ArtGeneration = lazy(() => import('@/features/gen-art/ArtGenAI'));
 const ImageEditor = lazy(() => import('@/features/edit-image/EditImage'));
@@ -168,7 +166,7 @@ const routeConfig: RouteObject[] = [
           </RequireOnboard>
         ),
         children: [
-          { path: '/docs/:blogId', element: <MyWriting /> },
+          { path: '/blogs/write/:blogId', element: <MyWriting /> },
           { path: '/image/tool/editor', element: <ImageEditor /> },
           { path: '/image/tool/text-to-image', element: <ArtGeneration /> },
           { path: '/image/tool/editor/new', element: <BrowseImage /> },
@@ -209,7 +207,7 @@ const routeConfig: RouteObject[] = [
           { path: '/post/:postId/edit', element: <EditPostPage /> },
           { path: '/posts/new', element: <UploadPostPage /> },
           { path: '/collections', element: <Collection /> },
-          { path: '/docs', element: <DocumentDashboard /> },
+          { path: '/blogs/write', element: <BlogDashboard /> },
           { path: '/app-subscription', element: <UserSubscription /> },
           { path: '/u/:username', element: <UserProfile /> },
         ],
