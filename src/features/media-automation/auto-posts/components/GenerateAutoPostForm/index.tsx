@@ -98,7 +98,7 @@ const GenerateAutoPostForm = () => {
           {(formikProps: FormikProps<GenAutoPostFormValues>) => {
             const { isSubmitting, values, errors, touched } = formikProps;
             return (
-              <Form className="flex h-114 w-3xl items-start justify-between gap-6 rounded-lg bg-white p-4 shadow-md">
+              <Form className="flex h-118 w-3xl items-start justify-between gap-6 rounded-lg bg-white p-4 shadow-md">
                 <SettingsPopover />
                 <div className="flex h-full w-full flex-1 flex-col justify-between">
                   <div className="flex items-center space-x-2">
