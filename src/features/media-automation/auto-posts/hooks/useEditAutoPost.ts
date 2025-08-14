@@ -1,6 +1,7 @@
 import { useLoading } from '@/contexts/Loading/useLoading';
 import { useUploadPostMedias } from '@/features/post-management/hooks/useUploadPostMedias';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { editAutoPost } from '../api/auto-posts.api';
@@ -66,6 +67,7 @@ export const useEditAutoPost = ({
           queryKey: autoPostKeys.details(input.id),
         });
       }
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
 
       const message = input.id
         ? 'Post updated successfully!'
