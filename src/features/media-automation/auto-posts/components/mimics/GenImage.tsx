@@ -21,6 +21,7 @@ const example_1 =
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
 import DeleteButton from '@/features/gen-art/components/DeleteConfirmation';
+import { getImageDimensions } from '@/utils/image';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -59,6 +60,7 @@ const GenImage: React.FC<GenImageProps> = ({
   const [open, setOpen] = useState(false);
   const [openDiaLog, setOpenDiaLog] = useState(false);
   const navigate = useNavigate();
+  const [width, height] = getImageDimensions(result.aspectRatio);
 
   const handlePrev = () => {
     setCurrentIndex(
@@ -125,14 +127,7 @@ const GenImage: React.FC<GenImageProps> = ({
   const handleNavigateToEdit = () => {
     const imageUrl = result.imageUrls[index];
     const aspectRatio = result.aspectRatio;
-    const [width, height] =
-      aspectRatio === 'square'
-        ? [1024, 1024]
-        : aspectRatio === 'landscape'
-          ? [1280, 720]
-          : aspectRatio === 'portrait'
-            ? [720, 1280]
-            : [1024, 1024];
+
     navigate('/image/tool/editor', {
       state: {
         imageUrl,
@@ -468,7 +463,9 @@ const GenImage: React.FC<GenImageProps> = ({
                 <div className="flex w-1/3 flex-col space-y-2">
                   <p className="w-full font-medium">Image Size</p>
                   <div className="flex items-center">
-                    <p className="text-mountain-600 capitalize">1024x1024</p>
+                    <p className="text-mountain-600 capitalize">
+                      {width}x{height}
+                    </p>
                   </div>
                 </div>
               </div>

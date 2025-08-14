@@ -1,3 +1,8 @@
+export const IMAGE_DIMENSIONS = {
+  SQUARE: [1024, 1024],
+  LANDSCAPE: [1280, 720],
+  PORTRAIT: [720, 1280],
+};
 export enum MEDIA_TYPE {
   IMAGE = 'image',
   VIDEO = 'video',

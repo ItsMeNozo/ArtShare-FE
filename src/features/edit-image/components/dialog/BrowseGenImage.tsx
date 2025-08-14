@@ -26,6 +26,7 @@ const example_1 =
 
 //Icons
 import DeleteButton from '@/features/gen-art/components/DeleteConfirmation';
+import { getImageDimensions } from '@/utils/image';
 import { Button, Tooltip } from '@mui/material';
 import { BiEdit } from 'react-icons/bi';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
@@ -46,6 +47,7 @@ interface GenImageProps {
 const AnyShowMoreText: ElementType = ShowMoreText as unknown as ElementType;
 
 const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
+  const [imgWidth, imgHeight] = getImageDimensions(result.aspectRatio);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [openDiaLog, setOpenDiaLog] = useState(false);
@@ -90,14 +92,8 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
   const handleNavigateToEdit = () => {
     const imageUrl = result.imageUrls[index];
     const aspectRatio = result.aspectRatio;
-    const [width, height] =
-      aspectRatio === 'square'
-        ? [1024, 1024]
-        : aspectRatio === 'landscape'
-          ? [1280, 720]
-          : aspectRatio === 'portrait'
-            ? [720, 1280]
-            : [1024, 1024];
+    const [width, height] = getImageDimensions(aspectRatio);
+
     navigate('/image/tool/editor', {
       state: {
         imageUrl,
@@ -349,7 +345,9 @@ const GenImage: React.FC<GenImageProps> = ({ index, result, otherImages }) => {
                 <div className="flex w-1/3 flex-col space-y-2">
                   <p className="w-full font-medium">Image Size</p>
                   <div className="flex items-center">
-                    <p className="text-mountain-600 capitalize">1024x1024</p>
+                    <p className="text-mountain-600 capitalize">
+                      {imgWidth}x{imgHeight}
+                    </p>
                   </div>
                 </div>
               </div>
