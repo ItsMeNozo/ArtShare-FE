@@ -54,9 +54,11 @@ const EditAutoPostForm = () => {
   };
 
   const handleNavigateToProject = (dirty: boolean) => {
-    handleNavigation(dirty, () =>
-      navigate(`/auto/projects/${projectId}/details`),
-    );
+    const targetPath = `/auto/projects/${projectId}/details`;
+
+    handleNavigation(dirty, () => {
+      navigate(targetPath);
+    });
   };
 
   const handleAddPost = (dirty: boolean) => {
