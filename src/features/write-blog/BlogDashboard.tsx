@@ -68,7 +68,7 @@ const LoadingSpinner = () => (
   <div className="loading-spinner-container">
     <div className="loading-spinner"></div>
     <span className="ml-2 text-gray-700 dark:text-gray-300">
-      Loading documents...
+      Loading blogs...
     </span>
   </div>
 );
@@ -220,7 +220,7 @@ const EmptyState = React.memo(
           <IoBookOutline className="h-full w-full" />
         </div>
         <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">
-          No documents found
+          No blogs found
         </h3>
         <p className="mb-6 text-gray-500 dark:text-gray-400">{message}</p>
         <button
@@ -228,7 +228,7 @@ const EmptyState = React.memo(
           className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
         >
           <MdOutlineAdd className="mr-2 h-4 w-4" />
-          Create Document
+          Create Blog
         </button>
       </div>
     </div>
@@ -237,7 +237,7 @@ const EmptyState = React.memo(
 
 EmptyState.displayName = 'EmptyState';
 
-const DocumentDashboard = () => {
+const BlogDashboard = () => {
   const [order, setOrder] = useState<BlogSortOrder>('latest');
   const [userBlogs, setUserBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -260,7 +260,7 @@ const DocumentDashboard = () => {
     useDeleteBlog({
       onSuccess: (blogId) => {
         setUserBlogs((prev) => prev.filter((blog) => blog.id !== blogId));
-        showSnackbar('Document deleted successfully', 'success', undefined, {
+        showSnackbar('Blog deleted successfully', 'success', undefined, {
           vertical: 'top',
           horizontal: 'center',
         });
@@ -278,17 +278,17 @@ const DocumentDashboard = () => {
         setOrder(event.target.value as BlogSortOrder);
       },
 
-      handleCreateBlankDocument: () => navigate('/docs/new'),
+      handleCreateBlankBlog: () => navigate('/blogs/write/new'),
 
-      handleCreateTutorialDocument: () =>
-        navigate('/docs/new?template=tutorial'),
+      handleCreateTutorialBlog: () =>
+        navigate('/blogs/write/new?template=tutorial'),
 
-      handleDocumentClick: (blogId: number, title: string) => {
+      handleBlogClick: (blogId: number, title: string) => {
         if (menuState.anchorEl && menuState.currentBlogId === blogId) {
           setMenuState({ anchorEl: null, currentBlogId: null });
           return;
         }
-        navigate(`/docs/${blogId}`, { state: { title } });
+        navigate(`/blogs/write/${blogId}`, { state: { title } });
       },
 
       handleMenuClick: (
@@ -326,9 +326,9 @@ const DocumentDashboard = () => {
         const blog = userBlogs.find((b) => b.id === blogId);
         setMenuState({ anchorEl: null, currentBlogId: null });
         if (blog) {
-          navigate(`/docs/${blogId}`, { state: { title: blog.title } });
+          navigate(`/blogs/write/${blogId}`, { state: { title: blog.title } });
         } else {
-          navigate(`/docs/${blogId}`);
+          navigate(`/blogs/write/${blogId}`);
         }
       },
 
@@ -357,17 +357,17 @@ const DocumentDashboard = () => {
 
   const memoizedValues = useMemo(
     () => ({
-      documentCountText: `${userBlogs.length} ${userBlogs.length === 1 ? 'document' : 'documents'}`,
+      documentCountText: `${userBlogs.length} ${userBlogs.length === 1 ? 'blog' : 'blogs'}`,
       emptyStateMessage:
         order === 'latest'
-          ? 'Get started by creating your first document.'
-          : 'No documents found for the selected criteria.',
+          ? 'Get started by creating your first blog.'
+          : 'No blogs found for the selected criteria.',
     }),
     [userBlogs.length, order],
   );
 
   useEffect(() => {
-    const fetchUserDocuments = async () => {
+    const fetchUserBlogs = async () => {
       if (!user?.username) {
         setIsLoading(false);
         return;
@@ -388,15 +388,15 @@ const DocumentDashboard = () => {
         setUserBlogs(blogs);
         setError(null);
       } catch (err) {
-        console.error('Error fetching user documents:', err);
-        setError('Failed to load documents');
+        console.error('Error fetching user blogs:', err);
+        setError('Failed to load blogs');
         setUserBlogs([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchUserDocuments();
+    fetchUserBlogs();
   }, [user?.username, order]);
 
   const renderContent = () => {
@@ -411,7 +411,7 @@ const DocumentDashboard = () => {
       return (
         <EmptyState
           message={memoizedValues.emptyStateMessage}
-          onCreateDocument={handlers.handleCreateBlankDocument}
+          onCreateDocument={handlers.handleCreateBlankBlog}
         />
       );
 
@@ -419,7 +419,7 @@ const DocumentDashboard = () => {
       <BlogItem
         key={blog.id}
         blog={blog}
-        onDocumentClick={handlers.handleDocumentClick}
+        onDocumentClick={handlers.handleBlogClick}
         onMenuClick={handlers.handleMenuClick}
         onContextMenu={handlers.handleContextMenu}
         menuState={menuState}
@@ -433,13 +433,13 @@ const DocumentDashboard = () => {
         <div className="flex h-full w-fit flex-col items-center justify-center space-y-2 p-4">
           <div className="flex h-full space-x-4">
             <TemplateCard
-              title="Blank Document"
+              title="Blank Blog"
               description="Start typing to create"
               icon={
                 <MdOutlineAdd className="size-10 text-gray-800 dark:text-gray-200" />
               }
-              onClick={handlers.handleCreateBlankDocument}
-              ariaLabel="Create Blank Document"
+              onClick={handlers.handleCreateBlankBlog}
+              ariaLabel="Create Blank Blog"
             />
             <TemplateCard
               title="Tutorial Template"
@@ -447,8 +447,8 @@ const DocumentDashboard = () => {
               icon={
                 <IoBookOutline className="size-10 text-gray-800 dark:text-gray-200" />
               }
-              onClick={handlers.handleCreateTutorialDocument}
-              ariaLabel="Create Tutorial Document"
+              onClick={handlers.handleCreateTutorialBlog}
+              ariaLabel="Create Tutorial Blog"
             />
           </div>
         </div>
@@ -797,4 +797,4 @@ const DocumentDashboard = () => {
   );
 };
 
-export default DocumentDashboard;
+export default BlogDashboard;

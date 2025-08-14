@@ -97,42 +97,42 @@ const BlogItem: React.FC<BlogItemProps> = ({
   return (
     <div
       key={blogId}
-      className="group relative flex space-x-4 bg-white dark:bg-mountain-900 p-4 border border-mountain-200 hover:border-indigo-400 dark:border-mountain-700 dark:hover:border-indigo-500 rounded-lg w-full transition-colors duration-200"
+      className="group dark:bg-mountain-900 border-mountain-200 dark:border-mountain-700 relative flex w-full space-x-4 rounded-lg border bg-white p-4 transition-colors duration-200 hover:border-indigo-400 dark:hover:border-indigo-500"
     >
       <div
         onClick={handleCardClick}
-        className="flex bg-black dark:bg-mountain-800 rounded-lg w-64 h-48 overflow-hidden cursor-pointer shrink-0"
+        className="dark:bg-mountain-800 flex h-48 w-64 shrink-0 cursor-pointer overflow-hidden rounded-lg bg-black"
       >
         <img
           src={thumbnail}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
           alt={title}
         />
       </div>
       <div className="flex w-full">
-        <div className="flex flex-col justify-between space-y-2 w-full">
-          <div className="flex justify-between w-full">
-            <div className="flex items-center space-x-2 font-thin text-mountain-600 dark:text-mountain-400 capitalize">
+        <div className="flex w-full flex-col justify-between space-y-2">
+          <div className="flex w-full justify-between">
+            <div className="text-mountain-600 dark:text-mountain-400 flex items-center space-x-2 font-thin capitalize">
               <p>{category.trim() ? category : 'Uncategorized'}</p>
               <span>•</span>
               <p>{timeReading}</p>
             </div>
           </div>
           <p
-            className="font-medium text-gray-900 hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-100 text-lg line-clamp-1 duration-300 ease-in-out cursor-pointer"
+            className="line-clamp-1 cursor-pointer text-lg font-medium text-gray-900 duration-300 ease-in-out hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400"
             onClick={handleCardClick}
           >
             {title}
           </p>
-          <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+          <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
             {getPlainTextPreview(content)}
           </p>
-          <div className="flex justify-between w-full">
+          <div className="flex w-full justify-between">
             <div className="flex items-center space-x-2">
               {author.avatar && !avatarError ? (
                 <img
                   src={author.avatar}
-                  className="border border-gray-200 dark:border-mountain-700 rounded-full w-12 h-12"
+                  className="dark:border-mountain-700 h-12 w-12 rounded-full border border-gray-200"
                   alt={author.username}
                   onError={handleAvatarError}
                 />
@@ -144,11 +144,11 @@ const BlogItem: React.FC<BlogItemProps> = ({
                   colors={['#84bfc3', '#ff9b62', '#d96153']}
                 />
               )}
-              <p className="font-medium text-gray-900 dark:text-gray-100 text-sm">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {author.username}
               </p>
               <span className="text-gray-500 dark:text-gray-500">•</span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {createdAt && !isNaN(new Date(createdAt).getTime()) ? (
                   <ReactTimeAgo
                     className="capitalize"
@@ -162,10 +162,10 @@ const BlogItem: React.FC<BlogItemProps> = ({
                 )}
               </span>
             </div>
-            <div className="flex items-center w-fit">
+            <div className="flex w-fit items-center">
               <Tooltip title="Like">
                 <Button
-                  className="h-full font-normal text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500"
+                  className="text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500 h-full font-normal"
                   disabled
                 >
                   <AiOutlineLike className="mr-1 size-4" />
@@ -174,7 +174,7 @@ const BlogItem: React.FC<BlogItemProps> = ({
               </Tooltip>
               <Tooltip title="Comment">
                 <Button
-                  className="h-full font-normal text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500"
+                  className="text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500 h-full font-normal"
                   disabled
                 >
                   <BiComment className="mr-1 size-4" />
@@ -236,7 +236,7 @@ const BlogMenu: React.FC<BlogMenuProps> = ({
   };
 
   const handleEdit = () => {
-    navigate(`/docs/${blog.id}`);
+    navigate(`/blogs/write/${blog.id}`);
     handleCloseMenu();
   };
 
@@ -265,7 +265,7 @@ const BlogMenu: React.FC<BlogMenuProps> = ({
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
         size="small"
-        className="bg-white/80 hover:bg-white dark:bg-mountain-800/80 dark:hover:bg-mountain-700 opacity-0 group-hover:opacity-100 p-1.5 rounded-full text-gray-600 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-400 transition-all duration-200"
+        className="dark:bg-mountain-800/80 dark:hover:bg-mountain-700 rounded-full bg-white/80 p-1.5 text-gray-600 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-white hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
         sx={{
           position: 'absolute',
           top: 8,

@@ -15,7 +15,7 @@ interface UseAutoSaveProps {
   blogTitle: string;
   hasUnsavedChanges: boolean;
   isCreating: boolean;
-  isNewDocument: boolean;
+  isNewBlog: boolean;
   updateSaveStatus: (status: SaveStatus, saved?: Date) => void;
   setHasUnsavedChanges: (value: boolean) => void;
   editorRef: React.RefObject<EditorHandle>;
@@ -131,7 +131,7 @@ export const useAutoSave = ({
         parseInt(blogId, 10),
         {
           content,
-          title: blogTitle?.trim() || 'Untitled Document',
+          title: blogTitle?.trim() || 'Untitled Blog',
           isPublished: isPublished,
           pictures: images.map((img) => img.src),
         },
@@ -227,7 +227,7 @@ export const useAutoSave = ({
           await updateExistingBlog(
             numericBlogId,
             {
-              title: titleToSave.trim() || 'Untitled Document',
+              title: titleToSave.trim() || 'Untitled Blog',
               isPublished: isPublished,
               pictures: images.map((img) => img.src),
             },
@@ -282,7 +282,7 @@ export const useAutoSave = ({
             JSON.stringify({
               blogId: parseInt(blogId, 10),
               content: finalContent,
-              title: finalTitle?.trim() || 'Untitled Document',
+              title: finalTitle?.trim() || 'Untitled Blog',
             }),
           );
         }

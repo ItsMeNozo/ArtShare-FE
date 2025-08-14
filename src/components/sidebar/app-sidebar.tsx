@@ -137,11 +137,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                 label: 'Create Post',
                 href: '/posts/new',
               },
-              { icon: HiOutlineNewspaper, label: 'Write Blog', href: '/docs' },
+              {
+                icon: HiOutlineNewspaper,
+                label: 'Write Blog',
+                href: '/blogs/write',
+              },
             ].map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href === '/docs' && pathname.startsWith('/docs'));
+                (item.href === '/blogs/write' &&
+                  pathname.startsWith('/blogs/write'));
               return (
                 <Tooltip
                   title={item.label}
@@ -194,7 +199,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             ].map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href === '/docs' && pathname.startsWith('/docs'));
+                (item.href === '/blogs/write' &&
+                  pathname.startsWith('/blogs/write'));
               return (
                 <Tooltip
                   title={item.label}

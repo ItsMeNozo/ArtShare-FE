@@ -50,9 +50,9 @@ export const useBlogOperations = ({
     [showSnackbar, navigate, setIsApiLoading],
   );
 
-  const createDocument = useCallback(
+  const createBlog = useCallback(
     async (blogTitle: string, editorRef: React.RefObject<EditorHandle>) => {
-      console.log('🚀 createDocument function called with:', {
+      console.log('🚀 createBlog function called with:', {
         blogTitle,
         editorContent:
           editorRef.current?.getContent()?.substring(0, 100) + '...',
@@ -64,7 +64,7 @@ export const useBlogOperations = ({
 
       try {
         const payload: CreateBlogPayload = {
-          title: blogTitle?.trim() || 'Untitled Document',
+          title: blogTitle?.trim() || 'Untitled Blog',
           isPublished: false,
           content: editorRef.current?.getContent() || '',
         };
@@ -85,11 +85,11 @@ export const useBlogOperations = ({
         setHasUnsavedChanges(false);
         updateSaveStatus('saved', lastSavedTime);
 
-        console.log('🧭 About to navigate to:', `/docs/${newBlog.id}`);
+        console.log('🧭 About to navigate to:', `/blogs/write/${newBlog.id}`);
 
         // --- THE FIX IS APPLIED HERE ---
-        navigate(`/docs/${newBlog.id}`, {
-          replace: true, // Replaces /docs/new in the browser history
+        navigate(`/blogs/write/${newBlog.id}`, {
+          replace: true, // Replaces /blogs/write/new in the browser history
           state: {
             preserveContent: true,
             title: blogTitle,
@@ -104,12 +104,12 @@ export const useBlogOperations = ({
 
         console.log('✅ Navigation call completed');
       } catch (error) {
-        console.error('❌ Error in createDocument:', error);
-        handleApiError(error, 'Failed to create document', false);
+        console.error('❌ Error in createBlog:', error);
+        handleApiError(error, 'Failed to create blog', false);
         updateSaveStatus('error');
       } finally {
         console.log(
-          '🏁 createDocument finally block - setting isCreating to false',
+          '🏁 createBlog finally block - setting isCreating to false',
         );
         setIsCreating(false);
       }
@@ -137,7 +137,7 @@ export const useBlogOperations = ({
       const numericBlogId = parseInt(blogId, 10);
 
       const payload: UpdateBlogPayload = {
-        title: title?.trim() || 'Untitled Document',
+        title: title?.trim() || 'Untitled Blog',
         isPublished: true, // Note: This might need to be dynamic if you have a separate publish button
         pictures: images.map((img) => img.src),
         content,
@@ -156,5 +156,5 @@ export const useBlogOperations = ({
     [updateSaveStatus, setHasUnsavedChanges, handleApiError],
   );
 
-  return { handleApiError, createDocument, saveBlog };
+  return { handleApiError, createBlog, saveBlog };
 };

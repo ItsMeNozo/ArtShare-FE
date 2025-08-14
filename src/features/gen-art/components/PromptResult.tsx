@@ -2,22 +2,9 @@
 import React, { useState } from 'react';
 
 //Icons
-import { FiDownload, FiTrash2 } from 'react-icons/fi';
+import { FiDownload } from 'react-icons/fi';
 
 //Components
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { truncateText } from '@/utils/text';
 import {
@@ -51,7 +38,6 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   );
   const [openDownload, setOpenDownload] = useState<boolean>(false);
   const [openDownloadSingle, setOpenDownloadSingle] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -227,44 +213,6 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
                 </Button>
               </Tooltip>
             </div>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Tooltip title="Delete" placement="bottom" arrow>
-                  <Button
-                    className="bg-mountain-100 flex w-4"
-                    hidden={useToShare || false}
-                  >
-                    <FiTrash2 className="size-5 text-red-900" />
-                  </Button>
-                </Tooltip>
-              </PopoverTrigger>
-              <PopoverContent className="dark:bg-mountain-900 border-mountain-100 dark:border-mountain-700 mt-2 mr-6 w-48 p-2">
-                <div className="flex flex-col space-y-2">
-                  <p className="text-sm">Are you sure to delete?</p>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button className="bg-mountain-100">
-                        <FiTrash2 className="mr-2 size-5" />
-                        <p className="font-normal">Delete All</p>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent
-                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
-                      hideCloseButton
-                    >
-                      <DialogHeader>
-                        <DialogDescription className="flex items-center justify-center space-x-4">
-                          <CircularProgress size={32} thickness={4} />
-                          <DialogTitle className="text-center text-base font-normal">
-                            Deleting These Images
-                          </DialogTitle>
-                        </DialogDescription>
-                      </DialogHeader>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </PopoverContent>
-            </Popover>
           </div>
         )}
       </div>
