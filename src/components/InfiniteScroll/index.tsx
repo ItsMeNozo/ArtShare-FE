@@ -40,7 +40,7 @@ export const InfiniteScroll = ({
 
   // Handle the initial full-page loading state
   if (isLoading && data.length === 0) {
-    return <Loading />;
+    return <Loading fullScreen={false} />;
   }
 
   // Handle a critical error on the initial load

@@ -83,7 +83,7 @@ export const AttributeSelector: React.FC<AttributeSelectorProps> = ({
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              maxHeight: 'min(300px, 40vh)',
+              maxHeight: 'min(500px, 60vh)',
               height: 'auto',
             }}
           >
