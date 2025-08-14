@@ -99,11 +99,11 @@ const PostImagesEditor = ({
               alt={`Post image preview`}
               className="h-full w-full rounded-md object-cover"
             />
-            {image.status === 'existing' && (
+            {/* {image.status === 'existing' && (
               <span className="absolute top-3 left-3 rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white">
-                Saved
+                ArtNova
               </span>
-            )}
+            )} */}
             {/* <div className="hidden top-2 right-2 absolute group-hover:flex bg-white p-2 rounded-full cursor-pointer">
               <Edit className="size-4" />
             </div> */}
