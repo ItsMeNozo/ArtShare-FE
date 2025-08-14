@@ -1,9 +1,8 @@
 import { useSnackbar } from '@/hooks/useSnackbar';
-import React, { useEffect, useState } from 'react';
-
 import { MEDIA_TYPE } from '@/utils/constants';
 import { fetchImageFileFromUrl } from '@/utils/fetch-media.utils';
 import { FormikHelpers } from 'formik';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PostForm from '../components/PostForm';
 import { useCreatePost } from '../hooks/useCreatePost';
@@ -38,26 +37,34 @@ const UploadPostPage: React.FC = () => {
     },
   });
 
+  const clearNavigationState = useCallback(() => {
+    navigate(location.pathname, {
+      replace: true,
+      state: {},
+    });
+  }, [location.pathname, navigate]);
+
+  const validateSubmission = (_values: PostFormValues): string | null => {
+    if (postMedias.length === 0)
+      return 'At least one image or video is required.';
+    if (!thumbnail || !originalThumbnail) return 'Thumbnail is required.';
+    if (hasArtNovaImages && !promptId)
+      return 'something went wrong, please try again.';
+    return null;
+  };
+
   const handleSubmitForCreate = async (
     values: PostFormValues,
     formikActions: FormikHelpers<PostFormValues>,
   ) => {
-    if (postMedias.length === 0) {
-      showSnackbar('At least one image or video is required.', 'error');
-      formikActions.setSubmitting(false);
-      return;
-    }
-    if (!thumbnail || !originalThumbnail) {
-      showSnackbar('Thumbnail is required.', 'error');
-      formikActions.setSubmitting(false);
-      return;
-    }
-
-    if (hasArtNovaImages && !promptId) {
-      showSnackbar('something went wrong, please try again.', 'error');
-      console.error(
-        'AI generated images are selected but no prompt ID is provided.',
-      );
+    const validationError = validateSubmission(values);
+    if (validationError) {
+      showSnackbar(validationError, 'error');
+      if (validationError.includes('something went wrong')) {
+        console.error(
+          'AI generated images are selected but no prompt ID is provided.',
+        );
+      }
       formikActions.setSubmitting(false);
       return;
     }
@@ -66,15 +73,13 @@ const UploadPostPage: React.FC = () => {
       {
         values,
         postMedias,
-        thumbnail,
-        originalThumbnail,
+        thumbnail: thumbnail!,
+        originalThumbnail: originalThumbnail!,
         promptId,
         hasArtNovaImages,
       },
       {
-        onSettled: () => {
-          formikActions.setSubmitting(false);
-        },
+        onSettled: () => formikActions.setSubmitting(false),
       },
     );
   };
@@ -82,69 +87,57 @@ const UploadPostPage: React.FC = () => {
   useEffect(() => {
     if (!fromEditorImage) return;
 
-    const editedImage = {
+    const editedImage: PostMedia = {
       type: MEDIA_TYPE.IMAGE,
       url: URL.createObjectURL(fromEditorImage),
       file: fromEditorImage,
     };
-    setPostMedias([editedImage]);
 
+    setPostMedias([editedImage]);
     setThumbnail(editedImage);
     setOriginalThumbnail(editedImage);
-
-    // clear all navigation state out of history
-    navigate(location.pathname, {
-      replace: true, // swap current entry instead of pushing
-      state: {}, // or `state: null`
-    });
-  }, [location.pathname, navigate, fromEditorImage]);
+    clearNavigationState();
+  }, [fromEditorImage, clearNavigationState]);
 
   useEffect(() => {
     if (!selectedPrompt) return;
 
-    const fetchFilesFromUrls = async () => {
+    const processPromptImages = async () => {
       try {
-        const aiImageMedias = selectedPrompt.imageUrls.map((url) => ({
+        const placeholderMedias = selectedPrompt.imageUrls.map((url) => ({
           type: MEDIA_TYPE.IMAGE,
-          url: url,
-          file: new File([], 'temp_image.png', { type: 'image/png' }), // Placeholder file
+          url,
+          file: new File([], 'temp_image.png', { type: 'image/png' }),
         }));
-        setPostMedias(aiImageMedias);
 
-        // update medias file in the background
-        const updatePostMediasFileAsync = async () => {
-          const aiImageMediasWithRealFile = await Promise.all(
-            aiImageMedias.map(async (media) => {
-              const file = await fetchImageFileFromUrl(media.url);
-              return { ...media, file };
-            }),
-          );
-          setPostMedias(aiImageMediasWithRealFile);
+        setPostMedias(placeholderMedias);
+        setHasArtNovaImages(true);
 
-          const thumbnail = {
-            file: aiImageMediasWithRealFile[0].file,
-            type: MEDIA_TYPE.IMAGE,
-            url: aiImageMediasWithRealFile[0].url,
-          };
-          setThumbnail(thumbnail);
-          setOriginalThumbnail(thumbnail);
-          setPromptId(selectedPrompt.id);
-        };
-        updatePostMediasFileAsync();
+        const realMedias = await Promise.all(
+          selectedPrompt.imageUrls.map(async (url) => {
+            const file = await fetchImageFileFromUrl(url);
+            return {
+              type: MEDIA_TYPE.IMAGE,
+              url,
+              file,
+            };
+          }),
+        );
+
+        setPostMedias(realMedias);
+        const firstMedia = realMedias[0];
+        setThumbnail(firstMedia);
+        setOriginalThumbnail(firstMedia);
+        setPromptId(selectedPrompt.id);
       } catch (err) {
-        console.error('Error fetching images from S3', err);
+        console.error('Error processing AI images:', err);
+        showSnackbar('Failed to load AI generated images', 'error');
       }
     };
 
-    fetchFilesFromUrls();
-    setHasArtNovaImages(true);
-
-    // clear prompt out of history
-    navigate(location.pathname, {
-      replace: true, // swap current entry instead of pushing
-      state: {}, // or `state: null`
-    });
-  }, [location.pathname, navigate, selectedPrompt]);
+    processPromptImages();
+    clearNavigationState();
+  }, [selectedPrompt, clearNavigationState, showSnackbar]);
 
   return (
     <PostForm
