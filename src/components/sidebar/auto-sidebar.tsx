@@ -5,18 +5,16 @@ import { Link, useLocation } from 'react-router-dom';
 import app_logo from '/logo_app_v_101.png';
 
 //Icons
-import { ChevronRight, Home } from 'lucide-react';
+import { Home } from 'lucide-react';
+import { FiExternalLink } from 'react-icons/fi';
 import { GoSidebarExpand } from 'react-icons/go';
 import { IoDocumentTextOutline, IoReorderThreeOutline } from 'react-icons/io5';
-import {
-  MdAutoMode,
-  MdOutlineManageAccounts,
-} from 'react-icons/md';
+import { MdAutoMode, MdOutlineManageAccounts } from 'react-icons/md';
 
 // import UserPlan from "./subscription";
 import { Tooltip } from '@mui/material';
-import { PiVideo } from 'react-icons/pi';
 import { LuMessageCircleCode } from 'react-icons/lu';
+import { PiVideo } from 'react-icons/pi';
 
 type SidebarProps = {
   expand: boolean;
@@ -33,11 +31,11 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
     >
       <div className="flex flex-col">
         {/* Sidebar Header */}
-        <div className="flex justify-between items-center px-4 h-16">
+        <div className="flex h-16 items-center justify-between px-4">
           <div
             className={`flex items-center overflow-hidden transition-all duration-500 ease-in-out ${expand ? 'w-auto opacity-100' : 'opacity-0'}`}
           >
-            <img src={app_logo} className="flex mr-2 rounded-sm w-7 h-7" />
+            <img src={app_logo} className="mr-2 flex h-7 w-7 rounded-sm" />
             <p className="font-medium text-gray-800 dark:text-gray-100">
               AutoShare
             </p>
@@ -58,15 +56,15 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
         <div
           className={`text-mountain-800 flex h-[calc(100vh)] flex-col space-y-6 overflow-x-hidden px-2 dark:text-gray-300`}
         >
-          <div className="flex flex-col justify-between items-start space-y-1 w-full">
+          <div className="flex w-full flex-col items-start justify-between space-y-1">
             {[
               {
                 icon: Home,
                 label: 'Return To Artshare',
                 href: '/dashboard',
-              }
+              },
             ].map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href;
               return (
                 <Tooltip
                   title={item.label}
@@ -77,10 +75,10 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group justify-between text-[15px] hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 border border-mountain-200 text-mountain-900`}
+                    className={`group hover:bg-mountain-50 border-mountain-200 text-mountain-900 flex h-10 w-full cursor-pointer items-center justify-between rounded-md border px-3.5 text-[15px]`}
                   >
-                    <div className='flex items-center'>
-                      <item.icon className="flex-shrink-0 size-5" />
+                    <div className="flex items-center">
+                      <item.icon className="size-5 flex-shrink-0" />
                       <div
                         className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                       >
@@ -96,7 +94,7 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               );
             })}
           </div>
-          <div className="flex flex-col justify-between items-start space-y-1 w-full">
+          <div className="flex w-full flex-col items-start justify-between space-y-1">
             {[
               {
                 icon: MdOutlineManageAccounts,
@@ -109,7 +107,7 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 href: '/auto/projects',
               },
             ].map((item) => {
-              const isActive = pathname === item.href
+              const isActive = pathname === item.href;
               return (
                 <Tooltip
                   title={item.label}
@@ -120,19 +118,20 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 >
                   <Link
                     to={item.href}
-                    className={`group justify-between text-[15px] hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 ${isActive ? 'text-white' : 'text-mountain-900'
-                      } `}
+                    className={`group hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center justify-between rounded-md px-3.5 text-[15px] ${
+                      isActive ? 'text-white' : 'text-mountain-900'
+                    } `}
                     style={
                       isActive
                         ? {
-                          backgroundImage:
-                            'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
-                        }
+                            backgroundImage:
+                              'linear-gradient(to right, #a855f7, #6366f1, #3b82f6, #06b6d4)',
+                          }
                         : undefined
                     }
                   >
-                    <div className='flex items-center'>
-                      <item.icon className="flex-shrink-0 size-5" />
+                    <div className="flex items-center">
+                      <item.icon className="size-5 flex-shrink-0" />
                       <div
                         className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                       >
@@ -148,7 +147,7 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               );
             })}
           </div>
-          <div className="flex flex-col justify-between items-start space-y-1 w-full">
+          <div className="flex w-full flex-col items-start justify-between space-y-1">
             {[
               {
                 icon: LuMessageCircleCode,
@@ -164,8 +163,9 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                 icon: PiVideo,
                 label: 'App Tutorials',
                 href: 'https://www.youtube.com/@artshareofficial',
-              }
+              },
             ].map((item, key) => {
+              const isExternalLink = key !== 0; // Documentation and App Tutorials are external links
               return (
                 <Tooltip
                   title={item.label}
@@ -177,10 +177,10 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                   <Link
                     to={item.href}
                     target={key === 0 ? '_self' : '_blank'}
-                    className={`group justify-between text-[15px] hover:bg-mountain-50 flex h-10 w-full cursor-pointer items-center rounded-md px-3.5 text-mountain-900 `}
+                    className={`group hover:bg-mountain-50 text-mountain-900 flex h-10 w-full cursor-pointer items-center justify-between rounded-md px-3.5 text-[15px]`}
                   >
-                    <div className='flex items-center'>
-                      <item.icon className="flex-shrink-0 size-5" />
+                    <div className="flex items-center">
+                      <item.icon className="size-5 flex-shrink-0" />
                       <div
                         className={`origin-left overflow-hidden transition-all duration-500 ${expand ? 'ml-2 w-auto' : 'w-0'}`}
                       >
@@ -191,7 +191,7 @@ const AutoSidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
                         </p>
                       </div>
                     </div>
-                    {key !== 0 && <ChevronRight className='size-4' />}
+                    {isExternalLink && <FiExternalLink className="size-4" />}
                   </Link>
                 </Tooltip>
               );

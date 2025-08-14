@@ -1,5 +1,6 @@
 import { useLoading } from '@/contexts/Loading/useLoading';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { projectKeys } from '@/lib/react-query/query-keys';
 import { extractApiErrorMessage } from '@/utils/error.util';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { genAutoPosts } from '../api/auto-posts.api';
@@ -33,8 +34,15 @@ export const useGenAutoPosts = ({
       hideLoading();
       onSettled?.();
     },
-    onSuccess: (genResponse) => {
+    onSuccess: (genResponse, input) => {
       queryClient.invalidateQueries({ queryKey: autoPostKeys.lists() });
+      // Also invalidate project details to refresh the postCount
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.details(input.autoProjectId),
+      });
+      // Invalidate all project lists to ensure any project listings show updated counts
+      queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+
       showSnackbar(
         `Generated ${genResponse.length} posts successfully!`,
         'success',
