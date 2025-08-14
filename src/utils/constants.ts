@@ -3,6 +3,25 @@ export enum MEDIA_TYPE {
   VIDEO = 'video',
 }
 
+// Z-index constants for consistent layering
+export const Z_INDEX = {
+  // Dialog layers
+  DIALOG_OVERLAY: 1300,
+  DIALOG_CONTENT: 1400,
+  DIALOG_DELETE_OVERLAY: 1500,
+
+  // Header and navigation
+  HEADER: 50,
+
+  // Notifications and overlays
+  NOTIFICATION_PORTAL: 9999,
+
+  // Other common layers
+  TOOLTIP: 1000,
+  MODAL: 1200,
+  DROPDOWN: 100,
+} as const;
+
 export const dashboardBG =
   'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/p5bnmcs6t71k6dbywnim?blur=300&q=1';
 
@@ -26,17 +45,17 @@ export const featuresShowcase = [
     destination: '/image/tool/editor/new',
   },
   {
+    label: 'Share Your Art',
+    description: 'Upload and showcase your artwork to the community.',
+    url: 'https://res.cloudinary.com/dqxtf297o/image/upload/v1755144896/artshare-asset/dashboard-feat-example/image-asset_oayynj.png',
+    destination: '/posts/new',
+  },
+  {
     label: 'Write Blog',
     description:
       'Share the process of creating your artworks, from start to finish.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ztwlihdk1mqirwi1pzoc?blur=300&q=1',
-    destination: '/docs',
-  },
-  {
-    label: 'Share Your Work',
-    description: 'Share your artworks with AI tools.',
-    url: 'https://res.cloudinary.com/dqxtf297o/image/upload/v1755144896/artshare-asset/dashboard-feat-example/image-asset_oayynj.png',
-    destination: '/posts/new',
+    destination: '/blogs/write',
   },
   {
     label: 'Connect Social Account',
@@ -68,6 +87,7 @@ export interface HeaderRoute {
   path: string;
   label: string;
   parent?: string;
+  hideBackButton?: boolean;
 }
 
 export const routesForHeaders: HeaderRoute[] = [
@@ -101,11 +121,11 @@ export const routesForHeaders: HeaderRoute[] = [
     parent: '/blogs',
   },
   {
-    path: '/docs',
+    path: '/blogs/write',
     label: 'My Writing',
   },
   {
-    path: '/docs/new',
+    path: '/blogs/write/new',
     label: 'Write Blog',
   },
   {
@@ -136,6 +156,7 @@ export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/auto/social-links',
     label: 'Link Socials',
+    hideBackButton: true,
   },
   {
     path: '/auto/scheduling',

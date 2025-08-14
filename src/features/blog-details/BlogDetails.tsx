@@ -431,7 +431,7 @@ const BlogDetails = () => {
               </Button>
               {user && (
                 <Button
-                  onClick={() => navigate('/docs/new')}
+                  onClick={() => navigate('/blogs/write/new')}
                   variant="outlined"
                   className="w-full"
                 >
@@ -618,7 +618,7 @@ const BlogDetails = () => {
           <>
             <Tooltip title="Edit" arrow>
               <IconButton
-                onClick={() => navigate(`/docs/${blog.id}`)}
+                onClick={() => navigate(`/blogs/write/${blog.id}`)}
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-50 p-2 font-medium text-purple-600 shadow-md transition-all duration-200 hover:cursor-pointer hover:bg-purple-100 hover:text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-800/40 dark:hover:text-purple-300"
               >
                 <LuPencil className="size-4" />
@@ -722,7 +722,7 @@ const BlogDetails = () => {
                     the editor to make it public.
                   </p>
                   <Button
-                    onClick={() => navigate(`/docs/${blog.id}`)}
+                    onClick={() => navigate(`/blogs/write/${blog.id}`)}
                     className="mt-3 bg-yellow-600 text-sm text-white hover:bg-yellow-700"
                   >
                     Continue Editing

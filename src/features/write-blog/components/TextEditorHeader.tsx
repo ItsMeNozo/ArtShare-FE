@@ -59,19 +59,19 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
     const { blogId } = useParams<{ blogId: string }>();
     const [isFocused, setIsFocused] = useState(false);
 
-    const isNewDocument = blogId === 'new';
+    const isNewBlog = blogId === 'new';
 
     // Determine what to display in the input
     const displayValue = useMemo(() => {
       if (isFocused) {
         return text; // When focused, show actual text (empty if no title)
       }
-      return text || 'Untitled Document'; // When not focused, show "Untitled Document" if empty
+      return text || 'Untitled Blog'; // When not focused, show "Untitled Blog" if empty
     }, [text, isFocused]);
 
     const dynamicWidth = useMemo(() => {
       const { base, max, charMultiplier, baseCharCount } = TITLE_WIDTH_CONFIG;
-      const textToMeasure = text || 'Untitled Document'; // Use fallback for width calculation
+      const textToMeasure = text || 'Untitled Blog'; // Use fallback for width calculation
       return Math.min(
         base +
           Math.max(0, (textToMeasure.length - baseCharCount) * charMultiplier),
@@ -80,7 +80,7 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
     }, [text]);
 
     const handlePreview = () => {
-      if (blogId && !isNewDocument) {
+      if (blogId && !isNewBlog) {
         navigate(`/blogs/${blogId}`);
       }
     };
@@ -103,12 +103,12 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
     };
 
     const getShareDisableReason = () => {
-      if (!isPublished) return 'Document must be published first to share';
+      if (!isPublished) return 'Blog must be published first to share';
       return '';
     };
 
     const getPublishDisableReason = () => {
-      if (isPublished) return 'Document is already published';
+      if (isPublished) return 'Blog is already published';
       if (isTitleEmpty && !hasContent) {
         return 'Add a title and content to publish';
       }
@@ -126,7 +126,7 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
         {/* Left Section */}
         <div className="flex flex-shrink-0 items-center gap-4">
           <Link
-            to="/docs"
+            to="/blogs/write"
             className="hover:bg-mountain-50 dark:hover:bg-mountain-700 flex items-center justify-center rounded-lg p-2 transition-colors"
           >
             <FaArrowLeftLong className="text-mountain-600 dark:text-mountain-300 size-5" />
@@ -154,7 +154,7 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
                 ? 'text-gray-500 dark:text-gray-400'
                 : 'text-gray-900 dark:text-gray-100'
             }`}
-            placeholder="Name Your Document Here..."
+            placeholder="Name Your Blog Here..."
             disabled={isTitleLoading}
           />
           {saveStatus && <div className="flex-shrink-0">{saveStatus}</div>}
@@ -163,16 +163,14 @@ const TextEditorHeader = memo<TextEditorHeaderProps>(
         {/* Right Section */}
         <div className="flex flex-shrink-0 items-center gap-2">
           <Tooltip
-            title={
-              isNewDocument ? 'Save document first to preview' : 'Preview blog'
-            }
+            title={isNewBlog ? 'Save blog first to preview' : 'Preview blog'}
           >
             <div>
               <Button
                 onClick={handlePreview}
                 variant="outline"
                 size="icon"
-                disabled={isNewDocument}
+                disabled={isNewBlog}
                 className={`dark:bg-mountain-700/80 dark:hover:bg-mountain-600/90 dark:border-mountain-600 border-gray-300 bg-white/60 hover:bg-white/90 ${COMMON_BUTTON_CLASSES.iconButton}`}
               >
                 <FaEye className="h-4 w-4 text-gray-600 dark:text-gray-300" />

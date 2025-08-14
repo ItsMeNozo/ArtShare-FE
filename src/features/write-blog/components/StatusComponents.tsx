@@ -22,7 +22,7 @@ const StatusIndicator = ({
 interface EnhancedAutoSaveStatusProps {
   status: SaveStatus;
   lastSaved?: Date;
-  isNewDocument: boolean;
+  isNewBlog: boolean;
   createdDocId: number | null;
   isCreating: boolean;
   hasContent: boolean;
@@ -32,17 +32,17 @@ export const EnhancedAutoSaveStatus = React.memo(
   ({
     status,
     lastSaved,
-    isNewDocument,
+    isNewBlog,
     createdDocId,
     isCreating,
     hasContent,
   }: EnhancedAutoSaveStatusProps) => {
-    if (isNewDocument && !createdDocId) {
+    if (isNewBlog && !createdDocId) {
       if (isCreating) {
         return (
           <div className="flex items-center space-x-2 text-sm text-blue-600 dark:text-blue-400">
             <LoadingSpinner />
-            <span>Creating document...</span>
+            <span>Creating blog...</span>
           </div>
         );
       }
@@ -51,7 +51,7 @@ export const EnhancedAutoSaveStatus = React.memo(
         return (
           <StatusIndicator
             className="text-gray-500 dark:text-gray-400"
-            text="Start typing to create document"
+            text="Start typing to create blog"
           />
         );
       }

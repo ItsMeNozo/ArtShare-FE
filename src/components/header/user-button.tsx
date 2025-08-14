@@ -7,6 +7,7 @@ import {
 import TokenPopover from '@/features/gen-art/components/TokenPopover';
 import { formatDaysAgo } from '@/lib/utils';
 import { User } from '@/types';
+import { Z_INDEX } from '@/utils/constants';
 import { Button } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -65,7 +66,11 @@ const NotificationPortal = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999]" onClick={onClose}>
+    <div
+      className="fixed inset-0"
+      style={{ zIndex: Z_INDEX.NOTIFICATION_PORTAL }}
+      onClick={onClose}
+    >
       <div
         className="absolute"
         style={{

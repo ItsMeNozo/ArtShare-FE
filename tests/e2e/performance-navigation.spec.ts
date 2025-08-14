@@ -185,8 +185,8 @@ const PRODUCTION_ROUTES: RouteGroup[] = [
   },
   {
     name: 'Content Creation',
-    description: 'Post and document creation tools',
-    routes: ['/posts/new', '/docs'],
+    description: 'Post and blog creation tools',
+    routes: ['/posts/new', '/blogs/write'],
   },
   {
     name: 'Creative Tools',
