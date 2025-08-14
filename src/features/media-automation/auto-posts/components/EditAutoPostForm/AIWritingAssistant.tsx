@@ -141,7 +141,7 @@ const AIWritingAssistant: React.FC = () => {
                               onClick={() => handleResultClick(prompt)}
                               className="group border-mountain-200 cursor-pointer rounded-lg border bg-white p-3 transition-all hover:border-indigo-400 hover:shadow-md"
                             >
-                              <p className="text-mountain-700 text-sm">
+                              <p className="text-mountain-700 max-w-full text-sm break-all whitespace-pre-line">
                                 {prompt}
                               </p>
                             </div>
