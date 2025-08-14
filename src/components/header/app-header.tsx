@@ -1,7 +1,7 @@
 import { useSearch } from '@/contexts/SearchProvider';
 import { useUser } from '@/contexts/user/useUser';
-import { HeaderRoute, routesForHeaders } from '@/utils/constants';
-import React, { useRef, useState } from 'react';
+import { HeaderRoute, routesForHeaders, Z_INDEX } from '@/utils/constants';
+import React, { useMemo, useRef, useState } from 'react';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { FiSearch } from 'react-icons/fi';
 import { TiDeleteOutline } from 'react-icons/ti';
@@ -73,12 +73,16 @@ const Header: React.FC = () => {
   const { setQuery } = useSearch();
   const navigate = useNavigate();
 
-  const matchedRoute = findMatchedRoute(location.pathname);
+  const matchedRoute = useMemo(
+    () => findMatchedRoute(location.pathname),
+    [location.pathname],
+  );
   const hasBack = breadcrumbs.length > 1 && !matchedRoute?.hideBackButton;
 
   return (
     <nav
-      className={`dark:bg-mountain-950 dark:border-b-mountain-700 sticky top-0 z-50 flex h-16 w-full items-center justify-between py-4 pr-4`}
+      className={`dark:bg-mountain-950 dark:border-b-mountain-700 sticky top-0 flex h-16 w-full items-center justify-between py-4 pr-4`}
+      style={{ zIndex: Z_INDEX.HEADER }}
     >
       <div className="flex h-full items-center">
         <div className="flex items-center space-x-2">

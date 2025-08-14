@@ -3,6 +3,25 @@ export enum MEDIA_TYPE {
   VIDEO = 'video',
 }
 
+// Z-index constants for consistent layering
+export const Z_INDEX = {
+  // Dialog layers
+  DIALOG_OVERLAY: 1300,
+  DIALOG_CONTENT: 1400,
+  DIALOG_DELETE_OVERLAY: 1500,
+
+  // Header and navigation
+  HEADER: 50,
+
+  // Notifications and overlays
+  NOTIFICATION_PORTAL: 9999,
+
+  // Other common layers
+  TOOLTIP: 1000,
+  MODAL: 1200,
+  DROPDOWN: 100,
+} as const;
+
 export const dashboardBG =
   'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/p5bnmcs6t71k6dbywnim?blur=300&q=1';
 

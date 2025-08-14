@@ -22,6 +22,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+//Constants
+import { Z_INDEX } from '@/utils/constants';
+
 //Assets
 const example_1 =
   'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/Models-Mock/Model-1/dzu0q9a2zxvtu3w1r29a';
@@ -216,7 +219,7 @@ const GenImage: React.FC<GenImageProps> = ({
                       </Button>
                     </DialogTrigger>
                     <DialogContent
-                      className="z-[1500] flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
+                      className={`z-[${Z_INDEX.DIALOG_DELETE_OVERLAY}] flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]`}
                       hideCloseButton
                     >
                       <DialogHeader>
@@ -317,8 +320,10 @@ const GenImage: React.FC<GenImageProps> = ({
         </div>
       </DialogTrigger>
       <DialogPortal>
-        <DialogOverlay className="z-[1300]" />
-        <DialogContent className="z-[1400] min-w-7xl rounded-xl border-0 p-0">
+        <DialogOverlay className={`z-[${Z_INDEX.DIALOG_OVERLAY}]`} />
+        <DialogContent
+          className={`z-[${Z_INDEX.DIALOG_CONTENT}] min-w-7xl rounded-xl border-0 p-0`}
+        >
           <DialogHeader hidden>
             <DialogTitle>Image Preview</DialogTitle>
             <DialogDescription>Image Description</DialogDescription>
