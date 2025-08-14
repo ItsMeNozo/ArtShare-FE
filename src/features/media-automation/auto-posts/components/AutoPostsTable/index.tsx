@@ -52,6 +52,7 @@ const AutoPostsTable = ({ canEdit }: { canEdit: boolean }) => {
   });
 
   const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
+    projectId: projectId,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
       queryClient.invalidateQueries({ queryKey: autoPostKeys.all });

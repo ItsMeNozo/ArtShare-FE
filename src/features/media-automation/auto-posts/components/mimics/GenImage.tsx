@@ -21,6 +21,7 @@ const example_1 =
 //Icons
 import { getUserProfile } from '@/api/authentication/auth';
 import DeleteButton from '@/features/gen-art/components/DeleteConfirmation';
+import { getImageDimensions } from '@/utils/image';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -40,6 +41,7 @@ interface GenImageProps {
   otherImages: string[];
   useToShare?: boolean | null;
   handleShareThis: (urls: string[]) => void;
+  onClose?: () => void;
   // onDelete?: (resultId: number, imgId: number) => void;
 }
 
@@ -51,12 +53,14 @@ const GenImage: React.FC<GenImageProps> = ({
   otherImages,
   useToShare,
   handleShareThis,
+  onClose,
 }) => {
   const [deleteImage, setDeleteImage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [openDiaLog, setOpenDiaLog] = useState(false);
   const navigate = useNavigate();
+  const [width, height] = getImageDimensions(result.aspectRatio);
 
   const handlePrev = () => {
     setCurrentIndex(
@@ -123,14 +127,7 @@ const GenImage: React.FC<GenImageProps> = ({
   const handleNavigateToEdit = () => {
     const imageUrl = result.imageUrls[index];
     const aspectRatio = result.aspectRatio;
-    const [width, height] =
-      aspectRatio === 'square'
-        ? [1024, 1024]
-        : aspectRatio === 'landscape'
-          ? [1280, 720]
-          : aspectRatio === 'portrait'
-            ? [720, 1280]
-            : [1024, 1024];
+
     navigate('/image/tool/editor', {
       state: {
         imageUrl,
@@ -239,6 +236,7 @@ const GenImage: React.FC<GenImageProps> = ({
                     onClick={(e) => {
                       e.stopPropagation();
                       handleShareThis([result.imageUrls[index]]);
+                      onClose?.();
                     }}
                     className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                   >
@@ -376,8 +374,8 @@ const GenImage: React.FC<GenImageProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex h-full w-[35%] flex-col justify-between">
-            <div>
+          <div className="flex h-full w-[35%] flex-col">
+            <div className="flex-1">
               <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -465,10 +463,45 @@ const GenImage: React.FC<GenImageProps> = ({
                 <div className="flex w-1/3 flex-col space-y-2">
                   <p className="w-full font-medium">Image Size</p>
                   <div className="flex items-center">
-                    <p className="text-mountain-600 capitalize">1024x1024</p>
+                    <p className="text-mountain-600 capitalize">
+                      {width}x{height}
+                    </p>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Action Buttons - Fixed at bottom */}
+            <div className="p-4">
+              {useToShare ? (
+                <div
+                  onClick={() => {
+                    handleShareThis([otherImages[currentIndex]]);
+                    onClose?.();
+                  }}
+                  className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-blue-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-blue-200/80"
+                >
+                  <Check className="mr-2 size-4" />
+                  <p>Choose This Image</p>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div
+                    onClick={handleNavigateToEdit}
+                    className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
+                  >
+                    <FaRegPenToSquare className="mr-2 size-4" />
+                    <p>Edit Image</p>
+                  </div>
+                  <div
+                    onClick={handleDownload}
+                    className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-green-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-green-200/80"
+                  >
+                    <FiDownload className="mr-2 size-4" />
+                    <p>Download</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

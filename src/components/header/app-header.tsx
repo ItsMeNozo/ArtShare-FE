@@ -65,16 +65,50 @@ function useBreadcrumbs(currentUsername?: string) {
     [params],
   );
 
-  return useMemo(() => {
+  const breadcrumbs = useMemo(() => {
     if (!matchedRoute) return [];
     return buildBreadcrumbTrail(matchedRoute, safeParams, currentUsername);
   }, [matchedRoute, safeParams, currentUsername]);
+
+  const parentPath = useMemo(() => {
+    if (breadcrumbs.length < 2 || !matchedRoute?.parent) return null;
+
+    // Get the current path and extract the actual values
+    const currentPath = location.pathname;
+    let parentRoute = matchedRoute.parent;
+
+    console.log('Current path:', currentPath);
+    console.log('Original parent route:', parentRoute);
+    console.log('Available params:', safeParams);
+
+    // For automation routes, manually extract the project ID from the current path
+    const projectIdMatch = currentPath.match(/\/auto\/projects\/(\d+)/);
+    if (projectIdMatch && parentRoute.includes(':id')) {
+      const projectId = projectIdMatch[1];
+      parentRoute = parentRoute.replace(':id', projectId);
+      console.log('Replaced :id with', projectId);
+    }
+
+    // Replace other parameters
+    Object.entries(safeParams).forEach(([key, value]) => {
+      const paramPattern = `:${key}`;
+      if (parentRoute.includes(paramPattern)) {
+        console.log(`Replacing ${paramPattern} with ${value}`);
+        parentRoute = parentRoute.replace(paramPattern, value);
+      }
+    });
+
+    console.log('Final parent route:', parentRoute);
+    return parentRoute;
+  }, [breadcrumbs, matchedRoute, safeParams, location.pathname]);
+
+  return { breadcrumbs, parentPath };
 }
 
 const Header: React.FC = () => {
   const { user, loading } = useUser();
   const location = useLocation();
-  const breadcrumbs = useBreadcrumbs(user?.username);
+  const { breadcrumbs, parentPath } = useBreadcrumbs(user?.username);
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,6 +121,14 @@ const Header: React.FC = () => {
   );
   const hasBack = breadcrumbs.length > 1 && !matchedRoute?.hideBackButton;
 
+  const handleBackClick = () => {
+    if (parentPath) {
+      navigate(parentPath);
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
     <nav
       className={`dark:bg-mountain-950 dark:border-b-mountain-700 sticky top-0 flex h-16 w-full items-center justify-between py-4 pr-4`}
@@ -97,7 +139,7 @@ const Header: React.FC = () => {
           {hasBack && (
             <div className="flex space-x-2 rounded-full bg-white">
               <Button
-                onClick={() => navigate(-1)}
+                onClick={handleBackClick}
                 className="hover:bg-mountain-100 border-mountain-100 text-mountain-950 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-1 bg-white"
               >
                 <FaArrowLeft />
