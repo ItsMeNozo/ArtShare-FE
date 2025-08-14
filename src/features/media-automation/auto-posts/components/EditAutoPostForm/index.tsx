@@ -208,6 +208,7 @@ const EditAutoPostForm = () => {
   } = useConfirmationDialog<number>();
 
   const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
+    projectId: projectId,
     onSuccess: () => {
       closeDialog();
       const currentIndex = postList.findIndex((p) => p.id === postIdToDelete);
