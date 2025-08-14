@@ -3,7 +3,7 @@ import ConfirmationDialog from '@/components/ConfirmationDialog';
 import { useConfirmationDialog } from '@/hooks/useConfirmationDialog';
 import { projectKeys } from '@/lib/react-query/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   FaCalendarCheck,
   FaCalendarTimes,
@@ -29,6 +29,10 @@ const ProjectsPage = () => {
   } = useConfirmationDialog<readonly number[]>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+  }, [queryClient]);
 
   const [order, setOrder] = useState<Order>('desc');
   const [orderBy, setOrderBy] = useState<SortableKeys>('nextPostAt');
