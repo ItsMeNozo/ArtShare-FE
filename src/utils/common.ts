@@ -24,3 +24,10 @@ export const formatCount = (count: number | undefined): string => {
   const millions = count / 1000000;
   return (Math.floor(millions * 10) / 10).toString().replace(/\.0$/, '') + 'M';
 };
+
+export const corsSafeSrc = (url: string) => {
+  if (url.startsWith('blob:') || url.startsWith('data:')) return url;
+  const corsQueryParamHelper = 'provisional=true';
+  if (url.includes(corsQueryParamHelper)) return url;
+  return `${url}?${corsQueryParamHelper}`;
+};

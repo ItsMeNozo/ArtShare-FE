@@ -23,6 +23,7 @@ import { IoIosColorFilter } from 'react-icons/io';
 import { MdFlipToFront } from 'react-icons/md';
 
 //Hooks
+import { corsSafeSrc } from '@/utils/common';
 import { useImageStyleHandlers } from './hooks/useImageStyleHandlers';
 import { useLayerTransformHandlers } from './hooks/useLayerTransformHandlers';
 import { useShapeStyleHandlers } from './hooks/useShapeStyleHandlers';
@@ -216,7 +217,7 @@ const EditImage: React.FC = () => {
       img.fetchPriority = 'high'; // modern Chromium
       img.loading = 'eager';
       img.decoding = 'async';
-      img.src = corsSafeSrc(imageUrl)!;
+      img.src = corsSafeSrc(imageUrl);
 
       // Wait for decode (paints faster when added)
       try {
@@ -265,7 +266,7 @@ const EditImage: React.FC = () => {
     if (!imageLayer) return;
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = corsSafeSrc(imageLayer.src)!;
+    img.src = corsSafeSrc(imageLayer.src);
   }, [layers]);
 
   useEffect(() => {
@@ -430,14 +431,6 @@ const EditImage: React.FC = () => {
     };
   }, [selectedLayerId]);
 
-  const corsSafeSrc = (url?: string | null) => {
-    if (!url) return url ?? undefined;
-    if (url.startsWith('blob:') || url.startsWith('data:')) return url;
-    const corsQueryParamHelper = 'provisional=true';
-    if (url.includes(corsQueryParamHelper)) return url;
-    return `${url}?${corsQueryParamHelper}`;
-  };
-
   const renderToCanvas = (includeWatermark: boolean): Promise<void> => {
     return new Promise((resolve) => {
       if (!canvasRef.current) return resolve();
@@ -495,7 +488,7 @@ const EditImage: React.FC = () => {
         const promise = new Promise<void>((resolveImg) => {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.src = corsSafeSrc(layer.src)!;
+          img.src = corsSafeSrc(layer.src);
           img.onload = () => {
             const {
               x,

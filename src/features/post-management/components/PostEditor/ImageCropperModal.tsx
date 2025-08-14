@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ThumbnailMeta } from '@/features/post-management/types/crop-meta.type';
+import { corsSafeSrc } from '@/utils/common';
 import getCroppedImg from '@/utils/cropImage';
 import {
   Dialog,
@@ -43,7 +44,6 @@ const ImageCropperModal: React.FC<Props> = ({
     img.onload = () => {
       // Only update state if the component is still mounted
       if (isMounted) {
-        console.log('Image loaded successfully');
         setLoadedImage(img);
       }
     };
@@ -54,7 +54,7 @@ const ImageCropperModal: React.FC<Props> = ({
 
     img.crossOrigin = 'anonymous';
 
-    img.src = originalThumbnailUrl;
+    img.src = corsSafeSrc(originalThumbnailUrl);
 
     return () => {
       isMounted = false;
