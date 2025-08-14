@@ -18,7 +18,7 @@ import ProFeatureRoute from './components/ProtectedItems/ProFeatureRoute';
 
 const AuthenLayout = lazy(() => import('@/layouts/subLayouts/AuthenLayout'));
 const InAppLayout = lazy(() => import('@/layouts/subLayouts/InAppLayout'));
-const SearchLayout = lazy(() => import('@/layouts/subLayouts/SearchLayout'));
+// const SearchLayout = lazy(() => import('@/layouts/subLayouts/SearchLayout'));
 const Dashboard = lazy(() => import('@/features/app-dashboard/Dashboard'));
 const Updates = lazy(() => import('@/features/app-dashboard/Updates'));
 const EditUser = lazy(() => import('@/features/edit-user/EditUserPage'));
@@ -109,12 +109,12 @@ const routeConfig: RouteObject[] = [
       </RootLayout>
     ),
     errorElement: (
-      <div className="flex min-h-[200px] items-center justify-center">
+      <div className="flex justify-center items-center min-h-[200px]">
         <div className="text-center">
           <p>Something went wrong. Please refresh the page.</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-2 rounded bg-blue-500 px-4 py-2 text-white"
+            className="bg-blue-500 mt-2 px-4 py-2 rounded text-white"
           >
             Refresh
           </button>
@@ -197,6 +197,7 @@ const routeConfig: RouteObject[] = [
         ),
         children: [
           { path: '/dashboard', element: <Dashboard /> },
+          { path: '/search', element: <Search /> },
           { path: '/dashboard/updates', element: <Updates /> },
           { path: '/explore', element: <Explore /> },
           { path: '/posts/:postId', element: <Post /> },
@@ -205,16 +206,15 @@ const routeConfig: RouteObject[] = [
         ],
       },
       // Search page with custom layout (no header search)
-      {
-        path: '/search',
-        element: (
-          <RequireOnboard>
-            <SearchLayout>
-              <Search />
-            </SearchLayout>
-          </RequireOnboard>
-        ),
-      },
+      // {
+      //   path: '/search',
+      //   element: (
+      //     <RequireOnboard>
+      //       <SearchLayout>
+      //       </SearchLayout>
+      //     </RequireOnboard>
+      //   ),
+      // },
       // In-App Private
       {
         element: (

@@ -37,17 +37,17 @@ const Search = () => {
   };
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-mountain-100 dark:bg-mountain-950 dark:border-mountain-800 flex h-fit w-full flex-col items-center justify-end space-y-2 space-x-4 border-b-1 bg-white pt-8">
-        <p className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-medium text-transparent">
+    <div className="flex flex-col h-screen overflow-y-auto custom-scrollbar">
+      <div className="flex flex-col justify-end items-center space-x-4 space-y-2 bg-white dark:bg-mountain-950 pt-8 border-mountain-100 dark:border-mountain-800 border-b-1 rounded-t-3xl w-full h-fit">
+        <p className="inline-block bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 font-medium text-transparent text-3xl">
           Seek
         </p>
-        <div className="mb-6 flex items-center justify-center">
-          <div className="bg-mountain-50 dark:bg-mountain-900 focus-within:text-mountain-950 dark:focus-within:text-mountain-50 relative flex h-14 w-168 items-center rounded-2xl text-neutral-700 dark:text-neutral-300">
-            <FiSearch className="absolute left-2 h-5 w-5" />
+        <div className="flex justify-center items-center mb-6">
+          <div className="relative flex items-center dark:bg-mountain-900 rounded-2xl w-168 h-14 text-neutral-700 focus-within:text-mountain-950 dark:focus-within:text-mountain-50 dark:text-neutral-300">
+            <FiSearch className="left-2 absolute w-5 h-5" />
             <Input
               ref={inputRef}
-              className="placeholder:text-mountain-400 h-full w-full rounded-2xl border-none bg-transparent pr-8 pl-8 shadow-inner focus-visible:ring-0 focus-visible:ring-offset-0 md:text-lg"
+              className="bg-mountain-50 shadow-inner pr-8 pl-8 border-none rounded-2xl focus-visible:ring-0 focus-visible:ring-offset-0 w-full h-full placeholder:text-mountain-400 md:text-lg"
               placeholder="Search"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
@@ -75,7 +75,7 @@ const Search = () => {
           </div>
         </div>
       </div>
-      <Box className="z-50 mt-2 flex justify-center shadow-2xl">
+      <Box className="z-50 flex justify-center mt-2 border-mountain-200 border-b-1">
         <Tabs
           value={tab}
           onChange={handleChangeTab}
@@ -85,13 +85,13 @@ const Search = () => {
               fontSize: '1.1rem',
               fontWeight: 400,
             },
+            backgroundColor: '#F2F4F7'
           }}
         >
           <Tab label="Posts" value="posts" {...a11yProps('posts')} />
           <Tab label="Users" value="users" {...a11yProps('users')} />
         </Tabs>
       </Box>
-
       <TabPanel value={tab} index={'posts'}>
         <PostSearchResults finalQuery={tab === 'posts' ? finalQuery : null} />
       </TabPanel>
