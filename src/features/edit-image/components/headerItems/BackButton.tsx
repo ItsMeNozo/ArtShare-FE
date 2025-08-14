@@ -39,7 +39,7 @@ const BackButton: React.FC<BackButtonProps> = ({ hasChanges }) => {
           <IoHome className="text-mountain-600 size-5" />
         </div>
         <div className="flex items-center space-x-2">
-          <span className="flex font-medium">Home</span>
+          <span className="flex font-medium">Dashboard</span>
         </div>
       </button>
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>

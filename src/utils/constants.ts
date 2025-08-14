@@ -93,7 +93,7 @@ export interface HeaderRoute {
 export const routesForHeaders: HeaderRoute[] = [
   {
     path: '/dashboard',
-    label: 'Home Page',
+    label: 'Dashboard',
   },
   {
     path: '/dashboard/updates',
