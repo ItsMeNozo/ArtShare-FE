@@ -37,7 +37,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
   content,
   dateCreated,
   timeReading,
-  category,
+  // category,
   thumbnail,
   likeCount,
   commentCount,
@@ -68,21 +68,21 @@ const BlogCard: React.FC<BlogCardProps> = ({
       onClick={handleCardClick}
     >
       {/* Reduced height thumbnail container */}
-      <div className="dark:bg-mountain-800 relative h-40 w-full overflow-hidden bg-gray-100">
+      <div className="relative bg-gray-100 dark:bg-mountain-800 w-full h-40 overflow-hidden">
         <img
           src={thumbnail}
           alt={title}
-          className="h-full w-full object-cover"
+          className="w-full h-full object-cover"
         />
       </div>
 
       {/* Content container with reduced padding */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-col flex-1 p-4">
         {/* Header section with reduced margin */}
-        <div className="mb-1.5 flex items-start justify-between">
-          <div className="text-mountain-600 dark:text-mountain-400 flex items-center space-x-2 text-sm">
-            <p className="capitalize">{category}</p>
-            <span>•</span>
+        <div className="flex justify-between items-start mb-1.5">
+          <div className="flex items-center space-x-2 text-mountain-600 dark:text-mountain-400 text-sm">
+            {/* <p className="capitalize">{category}</p>
+            <span>•</span> */}
             <p>{timeReading}</p>
           </div>
           <div
@@ -92,7 +92,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
             <Tooltip title={copied ? 'Link copied!' : 'Copy link'} arrow>
               <IconButton
                 onClick={handleCopyLink}
-                className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 transition-colors"
+                className="text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500 transition-colors"
                 size="small"
               >
                 <LuLink className="size-4" />
@@ -102,24 +102,24 @@ const BlogCard: React.FC<BlogCardProps> = ({
         </div>
 
         {/* Title - reduced height */}
-        <h3 className="mb-1.5 line-clamp-2 min-h-[3rem] text-lg font-medium text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400">
+        <h3 className="mb-1.5 min-h-[3rem] font-medium text-gray-900 hover:text-indigo-600 dark:hover:text-indigo-400 dark:text-gray-100 text-lg line-clamp-2">
           {title}
         </h3>
 
         {/* Content preview - reduced to 2 lines */}
-        <p className="mb-3 line-clamp-2 flex-1 text-sm text-gray-600 dark:text-gray-400">
+        <p className="flex-1 mb-3 text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
           {content}
         </p>
 
         {/* Footer section - always at bottom with reduced spacing */}
         <div className="mt-auto">
           {/* Author info with reduced margin */}
-          <div className="mb-2 flex items-center space-x-2">
+          <div className="flex items-center space-x-2 mb-2">
             {author.avatar ? (
               <img
                 src={author.avatar}
                 alt={author.username}
-                className="dark:border-mountain-700 h-7 w-7 rounded-full border border-gray-200"
+                className="border border-gray-200 dark:border-mountain-700 rounded-full w-7 h-7"
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
@@ -130,11 +130,11 @@ const BlogCard: React.FC<BlogCardProps> = ({
                 colors={['#84bfc3', '#fff5d6', '#ffb870', '#d96153', '#000511']}
               />
             )}
-            <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
+            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
               {author.username}
             </p>
             <span className="text-gray-500 dark:text-gray-500">•</span>
-            <span className="truncate text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400 text-xs truncate">
               {dateCreated && !isNaN(new Date(dateCreated).getTime()) ? (
                 <ReactTimeAgo
                   className="capitalize"
@@ -151,18 +151,18 @@ const BlogCard: React.FC<BlogCardProps> = ({
 
           {/* Actions */}
           <div
-            className="flex items-center justify-between"
+            className="flex justify-between items-center"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center space-x-1">
               <Tooltip title="Like">
-                <Button className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 min-w-0 p-1">
+                <Button className="p-1 min-w-0 text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500">
                   <AiOutlineLike className="mr-1 size-4" />
                   <span className="text-sm">{likeCount}</span>
                 </Button>
               </Tooltip>
               <Tooltip title="Comment">
-                <Button className="text-mountain-400 dark:text-mountain-500 hover:text-mountain-950 dark:hover:text-mountain-100 min-w-0 p-1">
+                <Button className="p-1 min-w-0 text-mountain-400 hover:text-mountain-950 dark:hover:text-mountain-100 dark:text-mountain-500">
                   <BiComment className="mr-1 size-4" />
                   <span className="text-sm">{commentCount}</span>
                 </Button>
