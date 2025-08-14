@@ -16,24 +16,29 @@ export const usePromptHistory = () => {
   const [initialScrollDone, setInitialScrollDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const isInFilterRange = (createdAt: string): boolean => {
-    const createdDate = new Date(createdAt);
-    const now = new Date();
-    switch (historyFilter) {
-      case HistoryFilter.LAST7DAYS: {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(now.getDate() - 6);
-        return createdDate >= sevenDaysAgo && createdDate <= now;
+  // Filter and reverse
+  const filtered = useMemo(() => {
+    const isInFilterRange = (createdAt: string): boolean => {
+      const createdDate = new Date(createdAt);
+      const now = new Date();
+      switch (historyFilter) {
+        case HistoryFilter.LAST7DAYS: {
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(now.getDate() - 6);
+          return createdDate >= sevenDaysAgo && createdDate <= now;
+        }
+        case HistoryFilter.LAST30DAYS: {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(now.getDate() - 29);
+          return createdDate >= thirtyDaysAgo && createdDate <= now;
+        }
+        default:
+          return true;
       }
-      case HistoryFilter.LAST30DAYS: {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(now.getDate() - 29);
-        return createdDate >= thirtyDaysAgo && createdDate <= now;
-      }
-      default:
-        return true;
-    }
-  };
+    };
+
+    return promptResultList.filter((r) => isInFilterRange(r.createdAt));
+  }, [promptResultList, historyFilter]);
 
   // Fetch history on mount
   useEffect(() => {
@@ -57,12 +62,6 @@ export const usePromptHistory = () => {
     setLoadedCount(PAGE_SIZE);
     setInitialScrollDone(false);
   }, [historyFilter, promptResultList]);
-
-  // Filter and reverse
-  const filtered = useMemo(
-    () => promptResultList.filter((r) => isInFilterRange(r.createdAt)),
-    [promptResultList, historyFilter],
-  );
   const reversed = useMemo(() => filtered.slice().reverse(), [filtered]);
 
   // Compute slice
@@ -94,5 +93,6 @@ export const usePromptHistory = () => {
     loading,
     historyFilter,
     setHistoryFilter,
+    totalFilteredCount: filtered.length,
   };
 };
