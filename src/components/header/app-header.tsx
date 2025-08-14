@@ -53,14 +53,22 @@ function buildBreadcrumbTrail(
 function useBreadcrumbs(currentUsername?: string) {
   const location = useLocation();
   const params = useParams();
-  const matchedRoute = findMatchedRoute(location.pathname);
-  if (!matchedRoute) return [];
 
-  const safeParams: Record<string, string> = Object.fromEntries(
-    Object.entries(params).map(([k, v]) => [k, v ?? '']),
+  const matchedRoute = useMemo(
+    () => findMatchedRoute(location.pathname),
+    [location.pathname],
   );
 
-  return buildBreadcrumbTrail(matchedRoute, safeParams, currentUsername);
+  const safeParams = useMemo(
+    () =>
+      Object.fromEntries(Object.entries(params).map(([k, v]) => [k, v ?? ''])),
+    [params],
+  );
+
+  return useMemo(() => {
+    if (!matchedRoute) return [];
+    return buildBreadcrumbTrail(matchedRoute, safeParams, currentUsername);
+  }, [matchedRoute, safeParams, currentUsername]);
 }
 
 const Header: React.FC = () => {
