@@ -430,7 +430,6 @@ const GenImage: React.FC<GenImageProps> = ({
                     </div>
                     <div className="flex">
                       <Button
-                        className="h-9 min-w-9 rounded"
                         title="Download"
                         onClick={handleQuickDownloadFromModal}
                       >
@@ -509,7 +508,9 @@ const GenImage: React.FC<GenImageProps> = ({
                   </div>
                 </div>
               </div>
-              <div className="p-2">
+
+              {/* Action Button - Fixed at bottom */}
+              <div className="p-4">
                 <div
                   onClick={() => {
                     const copyResult = {

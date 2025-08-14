@@ -379,8 +379,8 @@ const GenImage: React.FC<GenImageProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex h-full w-[35%] flex-col justify-between">
-            <div>
+          <div className="flex h-full w-[35%] flex-col">
+            <div className="flex-1">
               <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center space-x-2">
@@ -472,6 +472,39 @@ const GenImage: React.FC<GenImageProps> = ({
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Action Buttons - Fixed at bottom */}
+            <div className="p-4">
+              {useToShare ? (
+                <div
+                  onClick={() => {
+                    handleShareThis([otherImages[currentIndex]]);
+                    onClose?.();
+                  }}
+                  className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-blue-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-blue-200/80"
+                >
+                  <Check className="mr-2 size-4" />
+                  <p>Choose This Image</p>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div
+                    onClick={handleNavigateToEdit}
+                    className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
+                  >
+                    <FaRegPenToSquare className="mr-2 size-4" />
+                    <p>Edit Image</p>
+                  </div>
+                  <div
+                    onClick={handleDownload}
+                    className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-green-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-green-200/80"
+                  >
+                    <FiDownload className="mr-2 size-4" />
+                    <p>Download</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
