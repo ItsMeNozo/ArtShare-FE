@@ -61,6 +61,8 @@ interface PanelProps {
   setCamera: (value: CameraOption) => void;
   style: StyleOption;
   setStyle: (value: StyleOption) => void;
+  prefImage: File | null;
+  setPrefImage: (value: File | null) => void;
 }
 
 interface UsedModel {
