@@ -323,10 +323,8 @@ const GenImage: React.FC<GenImageProps> = ({
         </div>
       </DialogTrigger>
       <DialogPortal>
-        <DialogOverlay className={`z-[${Z_INDEX.DIALOG_OVERLAY}]`} />
-        <DialogContent
-          className={`z-[${Z_INDEX.DIALOG_CONTENT}] min-w-7xl rounded-xl border-0 p-0`}
-        >
+        <DialogOverlay className={`z-[1600]`} />
+        <DialogContent className={`z-[1700] min-w-7xl rounded-xl border-0 p-0`}>
           <DialogHeader hidden>
             <DialogTitle>Image Preview</DialogTitle>
             <DialogDescription>Image Description</DialogDescription>
@@ -431,22 +429,13 @@ const GenImage: React.FC<GenImageProps> = ({
                       <p className="font-medium">{user?.fullName}</p>
                     </div>
                     <div className="flex">
-                      <div className="flex items-center">
-                        <Button
-                          className="rounded-r-none min-w-9 h-9"
-                          title="Download"
-                          onClick={handleQuickDownloadFromModal}
-                        >
-                          <FiDownload className="size-5" />
-                        </Button>
-                        <Button
-                          className="flex justify-center items-center p-0 border-gray-300 border-l rounded-l-none w-9 min-w-6 h-9"
-                          title="Download with options"
-                          onClick={() => setOpenDownload?.(true)}
-                        >
-                          <FaCaretDown />
-                        </Button>
-                      </div>
+                      <Button
+                        className="h-9 min-w-9 rounded"
+                        title="Download"
+                        onClick={handleQuickDownloadFromModal}
+                      >
+                        <FiDownload className="size-5" />
+                      </Button>
                       <DeleteButton open={open} setOpen={setOpen} />
                     </div>
                   </div>
