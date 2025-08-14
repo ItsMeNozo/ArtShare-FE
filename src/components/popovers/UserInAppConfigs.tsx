@@ -5,13 +5,7 @@ import { useState } from 'react';
 import { useUser } from '@/contexts/user';
 
 // Icons
-import { useTheme } from '@/hooks/useTheme';
-import {
-  MdDarkMode,
-  MdLightMode,
-  MdMailOutline,
-  MdMoreVert,
-} from 'react-icons/md';
+import { MdMailOutline, MdMoreVert } from 'react-icons/md';
 // Components
 import {
   Popover,
@@ -31,7 +25,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const UserInAppConfigs = () => {
   const { user, loading, logout } = useUser();
   const [open, setOpen] = useState(false);
-  const { toggleTheme } = useTheme();
+  // const { toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -182,7 +176,7 @@ const UserInAppConfigs = () => {
         )}
 
         {/* Theme Toggle */}
-        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
+        {/* <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
           <span className="text-sm">Theme</span>
           <div className="flex space-x-2">
             <Button onClick={toggleTheme}>
@@ -192,7 +186,7 @@ const UserInAppConfigs = () => {
               <MdDarkMode className="size-5" />
             </Button>
           </div>
-        </div>
+        </div> */}
 
         {/* <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" /> */}
 
@@ -216,7 +210,7 @@ const UserInAppConfigs = () => {
         </div> */}
         {/* Show these options only if the user is not logged in */}
         <>
-          <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
+          {/* <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" /> */}
           <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2">
             <p className="text-sm">Help Center</p>
           </div>
