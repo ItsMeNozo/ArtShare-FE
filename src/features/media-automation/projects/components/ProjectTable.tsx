@@ -28,44 +28,6 @@ import {
   SortableKeys,
 } from '../types/automation-project';
 
-const headCells: readonly HeadCell[] = [
-  {
-    id: 'title',
-    numeric: false,
-    disablePadding: true,
-    label: 'Project Name',
-    isSortable: true,
-  },
-  {
-    id: 'platform',
-    numeric: true,
-    disablePadding: false,
-    label: 'Platform',
-    isSortable: false,
-  },
-  {
-    id: 'postCount',
-    numeric: true,
-    disablePadding: false,
-    label: 'Post Number',
-    isSortable: true,
-  },
-  {
-    id: 'status',
-    numeric: true,
-    disablePadding: false,
-    label: 'Status',
-    isSortable: true,
-  },
-  {
-    id: 'nextPostAt',
-    numeric: true,
-    disablePadding: false,
-    label: 'Next Post Time',
-    isSortable: true,
-  },
-];
-
 function ProjectTableHead(props: EnhancedTableProps) {
   const {
     onSelectAllClick,
@@ -151,21 +113,21 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
             ),
         },
       ]}
-      className="flex justify-between items-center px-4 py-2 border-mountain-100 border-b-2 rounded-t-3xl"
+      className="border-mountain-100 flex items-center justify-between rounded-t-3xl border-b-2 px-4 py-2"
     >
-      <span className='font-medium'>Post Automation Table</span>
+      <span className="font-medium">Post Automation Table</span>
       <div className="flex items-center gap-4">
         <FormControlLabel
           control={<Switch checked={dense} onChange={handleChangeDense} />}
           label="Dense padding"
         />
-        {numSelected > 0 &&
+        {numSelected > 0 && (
           <Tooltip title="Delete Selected">
             <IconButton onClick={onDelete}>
               <IoTrashBin />
             </IconButton>
           </Tooltip>
-        }
+        )}
       </div>
     </Toolbar>
   );
@@ -281,16 +243,16 @@ export default function ProjectTable({
   };
 
   return (
-    <div className="flex bg-white border border-mountain-200 rounded-3xl w-full h-[calc(100vh-14rem)]">
-      <div className="flex flex-col justify-between w-full">
-        <div className="flex flex-col flex-grow overflow-hidden">
+    <div className="border-mountain-200 flex h-[calc(100vh-14rem)] w-full rounded-3xl border bg-white">
+      <div className="flex w-full flex-col justify-between">
+        <div className="flex flex-grow flex-col overflow-hidden">
           <EnhancedTableToolbar
             numSelected={selected.length}
             dense={dense}
             handleChangeDense={handleChangeDense}
             onDelete={() => onDelete(selected)}
           />
-          <TableContainer className="flex-grow custom-scrollbar">
+          <TableContainer className="custom-scrollbar flex-grow">
             {isLoading && (
               <Box
                 sx={{
@@ -372,7 +334,7 @@ export default function ProjectTable({
                         <TableCell align="right">
                           <div className="flex flex-wrap justify-end gap-2">
                             {
-                              <div className="bg-indigo-100 px-2 py-1 rounded">
+                              <div className="rounded bg-indigo-100 px-2 py-1">
                                 {formatToTitleCase(row.platform.name)}
                               </div>
                             }
@@ -380,7 +342,7 @@ export default function ProjectTable({
                         </TableCell>
                         <TableCell align="right">{row.postCount}</TableCell>
                         <TableCell align="right">
-                          <span className="flex justify-end items-center gap-2 text-sm">
+                          <span className="flex items-center justify-end gap-2 text-sm">
                             <span
                               className={`h-2 w-2 rounded-full ${getStatusColor(
                                 row.status,
@@ -402,7 +364,7 @@ export default function ProjectTable({
                         >
                           <Tooltip title="Edit">
                             <Button
-                              className="bg-indigo-50 border-1 border-mountain-200 font-normal"
+                              className="border-mountain-200 border-1 bg-indigo-50 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/auto/projects/${row.id}/edit`);
@@ -414,7 +376,7 @@ export default function ProjectTable({
                           <Tooltip title="Delete">
                             <Button
                               color="error"
-                              className="bg-red-50 border-1 border-mountain-200 font-normal"
+                              className="border-mountain-200 border-1 bg-red-50 font-normal"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onDelete([row.id]);
@@ -440,9 +402,47 @@ export default function ProjectTable({
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          className="flex-shrink-0 border-mountain-100 border-t-2 overflow-hidden"
+          className="border-mountain-100 flex-shrink-0 overflow-hidden border-t-2"
         />
       </div>
     </div>
   );
 }
+
+const headCells: readonly HeadCell[] = [
+  {
+    id: 'title',
+    numeric: false,
+    disablePadding: true,
+    label: 'Project Name',
+    isSortable: true,
+  },
+  {
+    id: 'platform',
+    numeric: true,
+    disablePadding: false,
+    label: 'Platform',
+    isSortable: false,
+  },
+  {
+    id: 'postCount',
+    numeric: true,
+    disablePadding: false,
+    label: 'Post Number',
+    isSortable: true,
+  },
+  {
+    id: 'status',
+    numeric: true,
+    disablePadding: false,
+    label: 'Status',
+    isSortable: true,
+  },
+  {
+    id: 'nextPostAt',
+    numeric: true,
+    disablePadding: false,
+    label: 'Next Post Time',
+    isSortable: true,
+  },
+];

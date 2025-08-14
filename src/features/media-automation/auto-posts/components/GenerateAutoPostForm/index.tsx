@@ -1,4 +1,5 @@
 import { GuidePanel } from '@/components/sheets/SheetGuidance';
+import { useGetProjectDetails } from '@/features/media-automation/projects/hooks/useGetProjectDetails';
 import { useNumericParam } from '@/hooks/useNumericParam';
 import { Box, Button } from '@mui/material';
 import {
@@ -36,6 +37,8 @@ const GenerateAutoPostForm = () => {
       console.error('Error generating posts:', error);
     },
   });
+
+  const { data: projectDetails } = useGetProjectDetails(projectId);
 
   const handleSubmit = (
     values: GenAutoPostFormValues,
@@ -132,6 +135,12 @@ const GenerateAutoPostForm = () => {
                               let value = Number(e.target.value);
                               if (value < 1) value = 1;
                               if (value > 7) value = 7;
+
+                              const remainingPosts =
+                                7 - projectDetails!.postCount;
+                              if (value > remainingPosts) {
+                                value = remainingPosts;
+                              }
                               form.setFieldValue('postCount', value);
                             }}
                           />
