@@ -23,7 +23,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import BoringAvatar from 'boring-avatars';
 
 import { Skeleton } from '@/components/ui/skeleton';
-import { Switch } from '@/components/ui/switch';
 import { Button } from '@mui/material';
 import { FaRegCircleUser } from 'react-icons/fa6';
 import { LuSettings } from 'react-icons/lu';
@@ -35,8 +34,6 @@ const UserInAppConfigs = () => {
   const [open, setOpen] = useState(false);
   const { toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [matureContent, setMatureContent] = useState(false);
-  const [aiContent, setAiContent] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -198,10 +195,10 @@ const UserInAppConfigs = () => {
           </div>
         </div>
 
-        <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
+        {/* <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" /> */}
 
         {/* Content Settings */}
-        <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
+        {/* <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex h-full w-full items-center justify-between p-3 py-2">
           <span className="text-sm">Mature Content</span>
           <Switch
             checked={matureContent}
@@ -217,7 +214,7 @@ const UserInAppConfigs = () => {
             onCheckedChange={setAiContent}
             className="hover:cursor-pointer"
           />
-        </div>
+        </div> */}
         {/* Show these options only if the user is not logged in */}
         <>
           <hr className="border-mountain-100 dark:border-mountain-800 my-2 border-t-1" />
