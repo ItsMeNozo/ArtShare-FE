@@ -44,7 +44,6 @@ const ImageCropperModal: React.FC<Props> = ({
     img.onload = () => {
       // Only update state if the component is still mounted
       if (isMounted) {
-        console.log('Image loaded successfully');
         setLoadedImage(img);
       }
     };

@@ -1,3 +1,5 @@
+import { corsSafeSrc } from './common';
+
 const createCanvasFromImage = (img: HTMLImageElement): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
@@ -20,11 +22,6 @@ const createCanvasFromImage = (img: HTMLImageElement): Promise<Blob> => {
   });
 };
 
-const addCacheBuster = (url: string): string => {
-  const separator = url.includes('?') ? '&' : '?';
-  return `${url}${separator}_cb=${Date.now()}`;
-};
-
 const loadImageWithCors = (url: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -35,7 +32,7 @@ const loadImageWithCors = (url: string): Promise<HTMLImageElement> => {
       reject(new Error('Could not load image for canvas approach'));
 
     // Use cache-busted URL to avoid cached non-CORS images
-    img.src = addCacheBuster(url);
+    img.src = corsSafeSrc(url)!;
   });
 };
 
