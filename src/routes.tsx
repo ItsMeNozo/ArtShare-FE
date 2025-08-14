@@ -108,6 +108,19 @@ const routeConfig: RouteObject[] = [
         <Outlet />
       </RootLayout>
     ),
+    errorElement: (
+      <div className="flex min-h-[200px] items-center justify-center">
+        <div className="text-center">
+          <p>Something went wrong. Please refresh the page.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 rounded bg-blue-500 px-4 py-2 text-white"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+    ),
     children: [
       // Landing
       // { index: true, element: <LandingPage /> },
