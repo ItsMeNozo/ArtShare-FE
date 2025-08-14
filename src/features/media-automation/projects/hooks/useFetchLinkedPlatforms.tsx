@@ -16,7 +16,7 @@ export const useFetchLinkedPlatforms = ({
       fetchLinkedPlatforms({
         platformName: platformName ?? undefined,
       }),
-    staleTime: 1000 * 60 * 3, // 5 minutes
+    staleTime: 1000 * 60 * 1, // 1 minute
     enabled: !!platformName,
   });
 };

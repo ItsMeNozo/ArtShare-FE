@@ -77,16 +77,41 @@ export const MediumSelector: React.FC<MediumSelectorProps> = ({
       placement={placement}
       transition
       className="mt-4"
+      modifiers={[
+        {
+          name: 'flip',
+          enabled: true,
+          options: {
+            altBoundary: true,
+            rootBoundary: 'viewport',
+            padding: 8,
+          },
+        },
+        {
+          name: 'preventOverflow',
+          enabled: true,
+          options: {
+            altAxis: true,
+            altBoundary: true,
+            tether: true,
+            rootBoundary: 'viewport',
+            padding: 8,
+          },
+        },
+      ]}
     >
       {({ TransitionProps }) => (
         <Fade {...TransitionProps} timeout={350}>
           <Paper
-            className={cn(
-              'custom-scrollbar max-h-[400px] w-72 overflow-y-auto rounded-lg',
-              className,
-            )}
+            className={cn('w-72 rounded-lg', className)}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              maxHeight: 'min(500px, 60vh)',
+              height: 'auto',
+            }}
           >
-            <div className="dark:bg-mountain-950 dark:border-mountain-800 sticky top-0 w-full bg-white p-4 shadow-lg">
+            <div className="dark:bg-mountain-950 dark:border-mountain-800 dark:border-mountain-700 w-full flex-shrink-0 border-b border-gray-200 bg-white p-4 shadow-lg">
               <div className="bg-mountain-50 dark:bg-mountain-900 text-mountain-500 dark:text-mountain-400 relative flex h-10 items-center rounded-2xl">
                 <FiSearch className="absolute left-2 h-5 w-5" />
                 <Input
@@ -105,7 +130,7 @@ export const MediumSelector: React.FC<MediumSelectorProps> = ({
               </div>
             </div>
 
-            <div className="px-4">
+            <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-4">
               {renderPropItemForPopper(
                 {
                   id: 99,
@@ -136,7 +161,7 @@ export const MediumSelector: React.FC<MediumSelectorProps> = ({
                 })}
             </div>
 
-            <div className="dark:bg-mountain-950 dark:border-mountain-800 sticky bottom-0 flex items-center justify-between gap-2 bg-white p-4 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
+            <div className="dark:bg-mountain-950 dark:border-mountain-800 dark:border-mountain-700 flex flex-shrink-0 items-center justify-between gap-2 border-t border-gray-200 bg-white p-4 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)]">
               {/* Clear All Button - Conditionally Rendered on the left */}
               <div>
                 {/* Wrapper to push Clear All to the left */}

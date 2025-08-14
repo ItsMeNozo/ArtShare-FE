@@ -9,6 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import React, { useState } from 'react';
+import { HiArrowLeft } from 'react-icons/hi2';
 import { IoHome } from 'react-icons/io5';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -21,7 +22,42 @@ const BackButton: React.FC<BackButtonProps> = ({ hasChanges }) => {
   const location = useLocation();
   const [showConfirm, setShowConfirm] = useState(false);
   const isNewEditorPage = location.pathname === '/image/tool/editor/new';
+  const isEditorPage = location.pathname === '/image/tool/editor';
   const shouldConfirmBeforeLeave = hasChanges && !isNewEditorPage;
+
+  const getDestination = () => {
+    if (isEditorPage) {
+      return '/image/tool/editor/new';
+    }
+    return '/explore';
+  };
+
+  const getButtonContent = () => {
+    if (isEditorPage) {
+      return (
+        <>
+          <div className="hover:bg-mountain-100 mr-2 flex items-center justify-center rounded-lg">
+            <HiArrowLeft className="text-mountain-600 size-5" />
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="flex font-medium">Back</span>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <div className="hover:bg-mountain-100 mr-2 flex items-center justify-center rounded-lg">
+          <IoHome className="text-mountain-600 size-5" />
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="flex font-medium">Dashboard</span>
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
       <button
@@ -30,17 +66,12 @@ const BackButton: React.FC<BackButtonProps> = ({ hasChanges }) => {
             e.preventDefault();
             setShowConfirm(true);
           } else {
-            navigate('/explore');
+            navigate(getDestination());
           }
         }}
         className="bg-mountain-50 hover:bg-mountain-100/80 border-mountain-100 flex h-10 items-center rounded-lg border px-4"
       >
-        <div className="hover:bg-mountain-100 mr-2 flex items-center justify-center rounded-lg">
-          <IoHome className="text-mountain-600 size-5" />
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="flex font-medium">Home</span>
-        </div>
+        {getButtonContent()}
       </button>
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
         <AlertDialogContent>
@@ -55,7 +86,7 @@ const BackButton: React.FC<BackButtonProps> = ({ hasChanges }) => {
             <AlertDialogAction
               onClick={() => {
                 setShowConfirm(false);
-                navigate('/explore');
+                navigate(getDestination());
               }}
             >
               Leave Anyway

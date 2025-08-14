@@ -48,7 +48,7 @@ const AIHeader = ({ onGuideClick }: AIHeaderProps) => {
           <div className="hover:bg-mountain-100 mr-2 flex items-center justify-center rounded-lg">
             <IoHome className="text-mountain-600 size-5" />
           </div>
-          <span className="flex font-medium">Home</span>
+          <span className="flex font-medium">Dashboard</span>
         </Link>
         <div className="border-mountain-200 flex items-center space-x-4 border-r-1 px-4">
           <Dialog open={open} onOpenChange={handleOpenModal}>
