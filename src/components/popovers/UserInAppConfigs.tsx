@@ -25,7 +25,6 @@ import BoringAvatar from 'boring-avatars';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@mui/material';
 import { FaRegCircleUser } from 'react-icons/fa6';
-import { LuSettings } from 'react-icons/lu';
 import { TbChessQueen } from 'react-icons/tb';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -167,10 +166,10 @@ const UserInAppConfigs = () => {
               <MdMailOutline className="" />
               <p className="text-sm">Messages</p>
             </div>
-            <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2 hover:cursor-pointer">
+            {/* <div className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex w-full items-center space-x-2 p-3 py-2 hover:cursor-pointer">
               <LuSettings className="text-mountain-600" />
               <p className="text-sm">Settings</p>
-            </div>
+            </div> */}
             <Link
               to={'/app-subscription'}
               className="hover:bg-mountain-50 dark:hover:bg-mountain-800 flex items-center space-x-2 p-3"
