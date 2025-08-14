@@ -1,10 +1,3 @@
-//Core
-import React, { useEffect, useState } from 'react';
-
-//Icons
-import { FiDownload, FiTrash2 } from 'react-icons/fi';
-
-//Components
 import {
   Dialog,
   DialogContent,
@@ -18,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
 import { truncateText } from '@/utils/text';
 import {
   Button,
@@ -28,6 +22,8 @@ import {
 } from '@mui/material';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
+import React, { useEffect, useState } from 'react';
+import { FiDownload, FiTrash2 } from 'react-icons/fi';
 import BrowseGenImage from './BrowseGenImage';
 
 interface promptResultProps {
@@ -42,111 +38,61 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
+    if (!open) return;
 
-    if (open) {
-      timeout = setTimeout(() => {
-        // onDelete?.(result?.id!); // Trigger delete --> RESOVLE THIS
-        setOpen(false); // Close dialog after delete
-      }, 2000);
-    }
+    const timeout = setTimeout(() => {
+      // onDelete?.(result?.id!); // RESOVLE THIS
+      setOpen(false);
+    }, 2000);
 
     return () => clearTimeout(timeout);
   }, [open]);
 
-  const fetchImageWithCorsHandling = async (url: string): Promise<Blob> => {
-    try {
-      // Try direct fetch first
-      const response = await fetch(url, {
-        mode: 'cors',
-        credentials: 'omit',
-        headers: {
-          Accept: 'image/*',
-        },
-      });
+  const downloadSingle = async (url: string) => {
+    const blob = await fetchImageWithCorsHandling(url);
+    saveAs(blob, 'image-1.jpg');
+  };
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+  const downloadMultiple = async (urls: string[]) => {
+    const zip = new JSZip();
 
-      return await response.blob();
-    } catch (error) {
-      console.warn('Direct fetch failed, trying canvas approach:', error);
+    await Promise.all(
+      urls.map(async (url, index) => {
+        try {
+          const blob = await fetchImageWithCorsHandling(url);
+          zip.file(`image-${index + 1}.jpg`, blob);
+        } catch (error) {
+          console.error(`Failed to download image ${index + 1}:`, error);
+        }
+      }),
+    );
 
-      // Fallback to canvas approach for CORS issues
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-
-          if (!ctx) {
-            reject(new Error('Could not get canvas context'));
-            return;
-          }
-
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-
-          canvas.toBlob((blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Canvas to blob conversion failed'));
-            }
-          }, 'image/png');
-        };
-
-        img.onerror = () => {
-          reject(new Error('Could not load image for canvas approach'));
-        };
-
-        img.src = url;
-      });
-    }
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    saveAs(zipBlob, 'images.zip');
   };
 
   const handleDownloadAll = async () => {
     try {
-      const imageCount = result!.imageUrls.length;
+      const { imageUrls } = result;
 
-      // If only one image, download it directly without zip
-      if (imageCount === 1) {
-        const blob = await fetchImageWithCorsHandling(result!.imageUrls[0]);
-        saveAs(blob, 'image-1.jpg');
-        return;
+      if (imageUrls.length === 1) {
+        await downloadSingle(imageUrls[0]);
+      } else {
+        await downloadMultiple(imageUrls);
       }
-
-      // Multiple images - create zip
-      const zip = new JSZip();
-      await Promise.all(
-        result!.imageUrls.map(async (url, index) => {
-          try {
-            const blob = await fetchImageWithCorsHandling(url);
-            zip.file(`image-${index + 1}.jpg`, blob);
-          } catch (error) {
-            console.error(`Failed to download image ${index + 1}:`, error);
-            // Continue with other images even if one fails
-          }
-        }),
-      );
-
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      saveAs(zipBlob, 'images.zip');
     } catch (error) {
       console.error('Download failed:', error);
 
-      // Fallback: open images in new tabs for manual download
-      result!.imageUrls.forEach((url, index) => {
+      result.imageUrls.forEach((url, index) => {
         setTimeout(() => {
           window.open(url, '_blank');
-        }, index * 100); // Stagger to avoid popup blocking
+        }, index * 100);
       });
     }
   };
+
+  const isGenerating = result.generating;
+  const hasMultipleImages = result.imageUrls.length > 1;
 
   return (
     <div className="flex w-full flex-col space-y-2">
@@ -155,19 +101,15 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({
           <span className="mr-2 font-sans font-medium">Prompt</span>
           {truncateText(result.userPrompt, 60)}
         </p>
-        {!result.generating && (
+        {!isGenerating && !useToEdit && (
           <div className="flex items-center space-x-2">
             <div className="flex flex-col items-end">
               <Tooltip title="Download" placement="bottom" arrow>
-                <Button
-                  className="bg-mountain-100"
-                  onClick={handleDownloadAll}
-                  hidden={useToEdit || false}
-                >
+                <Button className="bg-mountain-100" onClick={handleDownloadAll}>
                   <FiDownload className="size-5" />
                 </Button>
               </Tooltip>
-              {result.imageUrls.length > 1 && (
+              {hasMultipleImages && (
                 <span className="mt-1 text-xs text-gray-500 select-none">
                   images.zip
                 </span>
@@ -176,10 +118,7 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Tooltip title="Delete" placement="bottom" arrow>
-                  <Button
-                    className="bg-mountain-100 flex w-4"
-                    hidden={useToEdit || false}
-                  >
+                  <Button className="bg-mountain-100 flex w-4">
                     <FiTrash2 className="size-5 text-red-900" />
                   </Button>
                 </Tooltip>
@@ -217,7 +156,7 @@ const BrowsePromptResult: React.FC<promptResultProps> = ({
       <ImageList cols={4} gap={8} sx={{ width: '100%', minHeight: '268px' }}>
         {result.imageUrls.map((__, index) => (
           <ImageListItem key={index} className="flex h-full object-cover">
-            {result.generating ? (
+            {isGenerating ? (
               <div className="bg-mountain-100 relative flex h-full items-center justify-center rounded-[8px]">
                 <CircularProgress size={64} thickness={4} />
                 <p className="absolute text-xs font-medium text-gray-700">
