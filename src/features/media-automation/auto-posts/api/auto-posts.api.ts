@@ -60,3 +60,8 @@ export const editAutoPost = async (
 export const deleteAutoPost = async (autoPostId: number): Promise<void> => {
   await api.delete(`/auto-post/${autoPostId}`);
 };
+
+export const editWithAi = async (seedPrompt: string): Promise<string> => {
+  const response = await api.post('/auto-post/edit-content', { seedPrompt });
+  return response.data;
+};
