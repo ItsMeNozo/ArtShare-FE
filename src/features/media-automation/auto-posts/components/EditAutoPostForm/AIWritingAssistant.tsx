@@ -80,7 +80,7 @@ const AIWritingAssistant: React.FC = () => {
   };
 
   return (
-    <div className="relative flex h-[calc(100vh-8rem)] w-full flex-col">
+    <div className="relative flex h-[calc(100vh-8rem)] min-h-0 w-full flex-1 flex-col">
       {/* Messages */}
       <div className="custom-scrollbar relative flex h-full w-full flex-col items-center overflow-y-auto">
         <div
@@ -127,7 +127,9 @@ const AIWritingAssistant: React.FC = () => {
                         : 'bg-mountain-100'
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <p className="break-all whitespace-pre-wrap">
+                      {message.content}
+                    </p>
 
                     {message.role === 'ASSISTANT' &&
                       message.generatedPrompts && (

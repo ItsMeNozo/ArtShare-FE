@@ -60,7 +60,7 @@ const ArtGenAI = () => {
   const [lighting, setLighting] = useState<LightingOption>(lightingOptions[0]);
   const [camera, setCamera] = useState<CameraOption>(cameraOptions[0]);
   const [numberOfImages, setNumberOfImages] = useState<number>(1);
-
+  const [prefImage, setPrefImage] = useState<File | null>(null);
   // Subscription
   const queryClient = useQueryClient();
   const { data: subscriptionInfo } = useSubscriptionInfo();
@@ -129,7 +129,10 @@ const ArtGenAI = () => {
         aspectRatio: aspectRatio.value,
         lighting: lighting.value,
         camera: camera.value,
+        seedImage: prefImage ?? undefined,
       });
+
+      setPrefImage(null);
 
       setDisplayedResults((prev) =>
         prev.map((r) => (r.id === placeholder.id ? newPromptResult : r)),
@@ -193,6 +196,8 @@ const ArtGenAI = () => {
           setCamera={setCamera}
           style={style}
           setStyle={setStyle}
+          prefImage={prefImage}
+          setPrefImage={setPrefImage}
         />
       </div>
       <div className="flex h-full w-full flex-col">

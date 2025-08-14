@@ -20,6 +20,7 @@ import { RiShareBoxFill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import DownloadModal from './DownloadModal';
 import GenImage from './GenImage';
+import { FaCaretDown } from 'react-icons/fa';
 
 interface promptResultProps {
   result: PromptResult;
@@ -174,8 +175,8 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
   };
 
   return (
-    <div className="flex w-full flex-col space-y-2">
-      <div className="flex w-full items-center justify-between space-x-2">
+    <div className="flex flex-col space-y-2 w-full">
+      <div className="flex justify-between items-center space-x-2 w-full">
         <p className="line-clamp-1">
           <span className="mr-2 font-sans font-medium">Prompt</span>
           {truncateText(result.userPrompt, 120)}
@@ -196,7 +197,7 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
             <div className="flex items-center">
               <Tooltip title="Download" placement="bottom" arrow>
                 <Button
-                  className="bg-mountain-100 h-9 min-w-9 rounded-r-none"
+                  className="bg-mountain-100 rounded-r-none min-w-9 h-9"
                   onClick={handleQuickDownload}
                   hidden={useToShare || false}
                 >
@@ -205,11 +206,11 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
               </Tooltip>
               <Tooltip title="Download with options" placement="bottom" arrow>
                 <Button
-                  className="bg-mountain-100 flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
+                  className="flex justify-center items-center bg-mountain-100 p-0 border-gray-300 border-l rounded-l-none w-9 min-w-6 h-9"
                   onClick={() => setOpenDownload(true)}
                   hidden={useToShare || false}
                 >
-                  ▼
+                  <FaCaretDown />
                 </Button>
               </Tooltip>
             </div>
@@ -220,9 +221,9 @@ const PromptResult: React.FC<promptResultProps> = ({ result, useToShare }) => {
         {result.imageUrls.map((__, index) => (
           <ImageListItem key={index} sx={{ height: 'auto' }}>
             {result.generating ? (
-              <div className="bg-mountain-100 relative flex aspect-square w-full items-center justify-center rounded-[8px]">
+              <div className="relative flex justify-center items-center bg-mountain-100 rounded-[8px] w-full aspect-square">
                 <CircularProgress size={64} thickness={4} />
-                <p className="absolute text-xs font-medium text-gray-700">
+                <p className="absolute font-medium text-gray-700 text-xs">
                   Loading
                 </p>
               </div>

@@ -6,6 +6,7 @@ import app_logo from '/logo_app_v_101.png';
 
 //Icons
 import { Home } from 'lucide-react';
+import { FiExternalLink } from 'react-icons/fi';
 import { GoSidebarExpand } from 'react-icons/go';
 import { HiOutlineNewspaper } from 'react-icons/hi2';
 import { IoDocumentTextOutline, IoReorderThreeOutline } from 'react-icons/io5';
@@ -314,6 +315,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               },
             ].map((item, key) => {
               const isActive = pathname === item.href;
+              const isExternalLink = key !== 0; // Documentation and App Tutorials are external links
               return (
                 <Tooltip
                   title={item.label}
@@ -347,7 +349,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         </p>
                       </div>
                     </div>
-                    {/* {key !== 0 && <ChevronRight className="size-4" />} */}
+                    {isExternalLink && <FiExternalLink className="size-4" />}
                   </Link>
                 </Tooltip>
               );

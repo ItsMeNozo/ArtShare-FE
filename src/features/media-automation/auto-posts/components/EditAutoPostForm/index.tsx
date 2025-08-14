@@ -54,9 +54,11 @@ const EditAutoPostForm = () => {
   };
 
   const handleNavigateToProject = (dirty: boolean) => {
-    handleNavigation(dirty, () =>
-      navigate(`/auto/projects/${projectId}/details`),
-    );
+    const targetPath = `/auto/projects/${projectId}/details`;
+
+    handleNavigation(dirty, () => {
+      navigate(targetPath);
+    });
   };
 
   const handleAddPost = (dirty: boolean) => {
@@ -206,6 +208,7 @@ const EditAutoPostForm = () => {
   } = useConfirmationDialog<number>();
 
   const { mutate: deletePost, isPending: isDeleting } = useDeleteAutoPost({
+    projectId: projectId,
     onSuccess: () => {
       closeDialog();
       const currentIndex = postList.findIndex((p) => p.id === postIdToDelete);
@@ -351,26 +354,38 @@ const EditAutoPostForm = () => {
                   <Typography className="border-mountain-200 flex items-center justify-between space-x-2 border-b-1 py-2 text-indigo-900">
                     <span>🖊️ Post Content</span>
                     <div className="flex space-x-2">
-                      <div
+                      <button
+                        type="button"
                         onClick={() => setTool('aiwriting')}
-                        className="group flex w-fit cursor-pointer justify-center rounded-lg p-[2px]"
+                        className="group flex w-fit cursor-pointer justify-center rounded-lg p-[2px] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
                         style={{
                           background:
                             'linear-gradient(to right, #3b82f6, #6366f1, #a855f7, #ec4899)',
                           color: 'white',
                         }}
                       >
-                        <div className="group-hover:bg-mountain-50 text-mountain-950 flex h-full w-full items-center justify-center rounded-md bg-white p-1.5 select-none">
+                        <div
+                          className={`group-hover:bg-mountain-50 text-mountain-950 flex h-full w-full items-center justify-center rounded-md p-1.5 select-none ${
+                            tool === 'aiwriting'
+                              ? 'bg-white shadow-sm'
+                              : 'bg-white/90'
+                          }`}
+                        >
                           AI Writing Assistant
                         </div>
-                      </div>
-                      <div
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setTool('preview')}
-                        className="hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex h-full w-fit cursor-pointer items-center justify-center space-x-2 rounded-md border bg-white p-1.5 select-none"
+                        className={`hover:bg-mountain-50 border-mountain-200 text-mountain-950 flex h-full w-fit cursor-pointer items-center justify-center space-x-2 rounded-md border p-1.5 select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+                          tool === 'preview'
+                            ? 'border-indigo-300 shadow-sm'
+                            : 'bg-white'
+                        }`}
                       >
                         <Eye className="size-4" />
                         <span>Preview</span>
-                      </div>
+                      </button>
                     </div>
                   </Typography>
                   <PostContentEditor

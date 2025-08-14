@@ -13,6 +13,7 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { IoImageOutline } from 'react-icons/io5';
 
 //Assets
+import { UploadIcon, X } from 'lucide-react';
 import AspectRatioOptions from './AspectRatio';
 import CameraOptions from './CameraOptions';
 import LightingOptions from './LightingOptions';
@@ -31,6 +32,8 @@ const SettingsPanel: React.FC<PanelProps> = ({
   setCamera,
   style,
   setStyle,
+  prefImage,
+  setPrefImage,
 }) => {
   const handleParentToggle = (
     _event: React.SyntheticEvent,
@@ -126,6 +129,85 @@ const SettingsPanel: React.FC<PanelProps> = ({
                 <p className="text-mountain-600 text-sm">Camera</p>
                 <CameraOptions selectedCamera={camera} onChange={setCamera} />
               </div>
+            </AccordionDetails>
+          </Accordion>
+          <Accordion className="shadow-none" defaultExpanded>
+            <AccordionSummary
+              expandIcon={<IoIosArrowDown />}
+              aria-controls="advance-settings-content"
+              id="advance-settings-header"
+            >
+              <Typography component="span" className="font-medium">
+                Image Preference
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {(() => {
+                const fileInputRef = React.useRef<HTMLInputElement>(null);
+                const previewUrl = prefImage
+                  ? URL.createObjectURL(prefImage)
+                  : null;
+
+                const handleFileChange = (file?: File) => {
+                  if (file && file.type.startsWith('image/')) {
+                    setPrefImage(file);
+                  } else {
+                    alert('Please select an image file');
+                  }
+                };
+
+                const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+                  e.preventDefault();
+                  handleFileChange(e.dataTransfer.files?.[0]);
+                };
+
+                const handleRemoveFile = () => {
+                  setPrefImage(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                };
+
+                return (
+                  <div className="w-full">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={(e) => handleFileChange(e.target.files?.[0])}
+                      className="hidden"
+                    />
+                    {prefImage && previewUrl ? (
+                      <div className="border-mountain-300 relative h-48 w-full overflow-hidden rounded-lg border">
+                        <img
+                          src={previewUrl}
+                          alt="Selected"
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRemoveFile}
+                          className="absolute top-2 right-2 z-50 rounded-full bg-white p-1 shadow hover:bg-gray-100"
+                        >
+                          <X className="size-4 text-red-500" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={handleDrop}
+                        className="bg-mountain-50 flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-500 transition hover:border-gray-400 hover:text-gray-700"
+                      >
+                        <UploadIcon className="mb-2 size-6" />
+                        <span className="text-sm">Drag your image here</span>
+                        <span>or</span>
+                        <span className="text-sm font-bold">
+                          Click to upload
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </AccordionDetails>
           </Accordion>
           <Accordion className="shadow-none" defaultExpanded>

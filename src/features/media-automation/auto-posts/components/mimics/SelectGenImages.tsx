@@ -6,20 +6,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import React from 'react';
+import React, { useState } from 'react';
 import { IoSparkles } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import BrowseGenHistory from './BrowseGenHistory';
 
-interface SelectAiImagesPanelProps {
+interface SelectGenImagesProps {
   children: React.ReactNode;
 }
 
-const SelectAiImagesPanel: React.FC<SelectAiImagesPanelProps> = ({
-  children,
-}) => {
+const SelectGenImages: React.FC<SelectGenImagesProps> = ({ children }) => {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         hideCloseButton
@@ -42,10 +42,10 @@ const SelectAiImagesPanel: React.FC<SelectAiImagesPanelProps> = ({
             <p>Generated with ArtNova</p>
           </Link>
         </div>
-        <BrowseGenHistory />
+        <BrowseGenHistory onClose={() => setOpen(false)} />
         <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
-export default SelectAiImagesPanel;
+export default SelectGenImages;

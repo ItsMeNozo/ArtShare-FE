@@ -18,8 +18,7 @@ export const commentKeys = {
 };
 
 export const subscriptionKeys = {
-  all: ['subscription'] as const,
-  info: ['subscription', 'info'] as const,
+  info: ['subscriptionInfo'] as const,
 };
 
 export const collectionKeys = {

@@ -33,10 +33,12 @@ const example_1 =
 import { getUserProfile } from '@/api/authentication/auth';
 import { userKeys } from '@/lib/react-query/query-keys';
 import { fetchImageWithCorsHandling } from '@/utils/cors-handling';
+import { getImageDimensions } from '@/utils/image';
 import { Button, CircularProgress, Tooltip } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { saveAs } from 'file-saver';
 import { Check } from 'lucide-react';
+import { FaCaretDown } from 'react-icons/fa';
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -72,6 +74,7 @@ const GenImage: React.FC<GenImageProps> = ({
   const [open, setOpen] = useState(false);
   const [openDiaLog, setOpenDiaLog] = useState(false);
   const navigate = useNavigate();
+  const [width, height] = getImageDimensions(result.aspectRatio);
 
   const handlePrev = () => {
     setCurrentIndex(
@@ -92,14 +95,7 @@ const GenImage: React.FC<GenImageProps> = ({
   const handleNavigateToEdit = () => {
     const imageUrl = result.imageUrls[index];
     const aspectRatio = result.aspectRatio;
-    const [width, height] =
-      aspectRatio === 'square'
-        ? [1024, 1024]
-        : aspectRatio === 'landscape'
-          ? [1280, 720]
-          : aspectRatio === 'portrait'
-            ? [720, 1280]
-            : [1024, 1024];
+
     navigate('/image/tool/editor', {
       state: {
         imageUrl,
@@ -268,7 +264,7 @@ const GenImage: React.FC<GenImageProps> = ({
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-l-full bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-l-sm bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                     title="Download"
                   >
                     <FiDownload className="text-mountain-600 pointer-events-none size-4" />
@@ -284,10 +280,12 @@ const GenImage: React.FC<GenImageProps> = ({
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    className="z-50 flex h-6 w-4 transform items-center justify-center rounded-r-full border-l border-gray-300 bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
+                    className="z-50 flex h-6 w-6 transform items-center justify-center rounded-r-sm border-l border-gray-300 bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                     title="Download with options"
                   >
-                    <span className="text-mountain-600 text-xs">▼</span>
+                    <span className="text-mountain-600 text-xs">
+                      <FaCaretDown />
+                    </span>
                   </div>
                 </div>
                 <div className="absolute right-2 bottom-2 flex space-x-2">
@@ -320,10 +318,8 @@ const GenImage: React.FC<GenImageProps> = ({
         </div>
       </DialogTrigger>
       <DialogPortal>
-        <DialogOverlay className={`z-[${Z_INDEX.DIALOG_OVERLAY}]`} />
-        <DialogContent
-          className={`z-[${Z_INDEX.DIALOG_CONTENT}] min-w-7xl rounded-xl border-0 p-0`}
-        >
+        <DialogOverlay className={`z-[1600]`} />
+        <DialogContent className={`z-[1700] min-w-7xl rounded-xl border-0 p-0`}>
           <DialogHeader hidden>
             <DialogTitle>Image Preview</DialogTitle>
             <DialogDescription>Image Description</DialogDescription>
@@ -411,8 +407,8 @@ const GenImage: React.FC<GenImageProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex h-full w-[35%] flex-col justify-between">
-              <div>
+            <div className="flex h-full w-[35%] flex-col">
+              <div className="flex-1">
                 <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
                   <div className="flex w-full items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -429,22 +425,12 @@ const GenImage: React.FC<GenImageProps> = ({
                       <p className="font-medium">{user?.fullName}</p>
                     </div>
                     <div className="flex">
-                      <div className="flex items-center">
-                        <Button
-                          className="h-9 min-w-9 rounded-r-none"
-                          title="Download"
-                          onClick={handleQuickDownloadFromModal}
-                        >
-                          <FiDownload className="size-5" />
-                        </Button>
-                        <Button
-                          className="flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
-                          title="Download with options"
-                          onClick={() => setOpenDownload?.(true)}
-                        >
-                          ▼
-                        </Button>
-                      </div>
+                      <Button
+                        title="Download"
+                        onClick={handleQuickDownloadFromModal}
+                      >
+                        <FiDownload className="size-5" />
+                      </Button>
                       <DeleteButton open={open} setOpen={setOpen} />
                     </div>
                   </div>
@@ -513,12 +499,16 @@ const GenImage: React.FC<GenImageProps> = ({
                   <div className="flex w-1/3 flex-col space-y-2">
                     <p className="w-full font-medium">Image Size</p>
                     <div className="flex items-center">
-                      <p className="text-mountain-600 capitalize">1024x1024</p>
+                      <p className="text-mountain-600 capitalize">
+                        {width}x{height}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="p-2">
+
+              {/* Action Button - Fixed at bottom */}
+              <div className="p-4">
                 <div
                   onClick={() => {
                     const copyResult = {
