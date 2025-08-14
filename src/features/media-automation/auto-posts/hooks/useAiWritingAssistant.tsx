@@ -55,13 +55,10 @@ export function useAiWritingAssistant(): UseChatReturn {
       try {
         const finalPrompt = `${prompt}\n\nCurrent content:\n${currentContent}`;
         const data = await editWithAi(finalPrompt);
-        console.log('data chat', data);
-
-        const conversationId = nanoid();
 
         // Store conversation ID for subsequent messages
         if (!conversationIdRef.current) {
-          conversationIdRef.current = conversationId;
+          conversationIdRef.current = nanoid();
         }
 
         // Add assistant message
