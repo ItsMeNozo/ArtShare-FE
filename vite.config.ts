@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => {
 
   const env = loadEnv(currentMode, process.cwd(), '');
 
-  // DRY: Generate define object programmatically
   const defineEnv = ENV_VARS.reduce(
     (acc, key) => {
       acc[`import.meta.env.${key}`] = JSON.stringify(env[key]);
@@ -44,12 +43,37 @@ export default defineConfig(({ mode }) => {
         'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
         'Cross-Origin-Embedder-Policy': isDev ? 'unsafe-none' : 'require-corp',
       },
+      proxy: {
+        '^/cloudfront/.*': {
+          target: 'https://d947ql2abwvv8.cloudfront.net',
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/cloudfront/, ''),
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+          configure: (proxy, _options) => {
+            proxy.on('error', (err, _req, _res) => {
+              console.log('CloudFront proxy error:', err);
+            });
+            proxy.on('proxyReq', (proxyReq, req, _res) => {
+              console.log('Proxying CloudFront request:', req.method, req.url);
+              proxyReq.setHeader('User-Agent', 'Vite-Proxy/1.0');
+              proxyReq.setHeader('Accept', 'image/*,*/*');
+            });
+            proxy.on('proxyRes', (proxyRes, req, _res) => {
+              proxyRes.headers['access-control-allow-origin'] = '*';
+              proxyRes.headers['access-control-allow-credentials'] = 'false';
+              console.log('CloudFront response:', proxyRes.statusCode, req.url);
+            });
+          },
+        },
+      },
     },
 
-    plugins: [
-      react(), // Fast Refresh enabled by default
-      tailwindcss(),
-    ],
+    plugins: [react(), tailwindcss()],
 
     resolve: {
       alias: {
@@ -57,7 +81,6 @@ export default defineConfig(({ mode }) => {
       },
     },
 
-    // Performance optimizations
     build: {
       target: 'esnext',
       minify: 'esbuild',
@@ -78,7 +101,6 @@ export default defineConfig(({ mode }) => {
       exclude: ['@vite/client', '@vite/env'],
     },
 
-    // Performance: Enable gzip compression
     esbuild: {
       drop: isDev ? [] : ['console', 'debugger'],
     },
