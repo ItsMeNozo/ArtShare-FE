@@ -23,6 +23,7 @@ import { IoIosColorFilter } from 'react-icons/io';
 import { MdFlipToFront } from 'react-icons/md';
 
 //Hooks
+import { corsSafeSrc } from '@/utils/common';
 import { useImageStyleHandlers } from './hooks/useImageStyleHandlers';
 import { useLayerTransformHandlers } from './hooks/useLayerTransformHandlers';
 import { useShapeStyleHandlers } from './hooks/useShapeStyleHandlers';
@@ -429,14 +430,6 @@ const EditImage: React.FC = () => {
       window.removeEventListener('wheel', handleWheel);
     };
   }, [selectedLayerId]);
-
-  const corsSafeSrc = (url?: string | null) => {
-    if (!url) return url ?? undefined;
-    if (url.startsWith('blob:') || url.startsWith('data:')) return url;
-    const corsQueryParamHelper = 'provisional=true';
-    if (url.includes(corsQueryParamHelper)) return url;
-    return `${url}?${corsQueryParamHelper}`;
-  };
 
   const renderToCanvas = (includeWatermark: boolean): Promise<void> => {
     return new Promise((resolve) => {
