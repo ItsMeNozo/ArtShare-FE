@@ -50,6 +50,11 @@ export const useSaveProject = ({
     onSuccess: (savedProject, input) => {
       queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({ queryKey: ['platforms'] });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === 'linkedPlatforms',
+      });
 
       if (input.id) {
         queryClient.invalidateQueries({

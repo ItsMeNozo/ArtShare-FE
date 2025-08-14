@@ -19,6 +19,11 @@ export const useDisconnectPlatform = () => {
 
     onMutate: async (platformIdToDelete) => {
       await queryClient.cancelQueries({ queryKey: ['platforms'] });
+      await queryClient.cancelQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === 'linkedPlatforms',
+      });
 
       const previousPlatforms = queryClient.getQueryData<Platform[]>([
         'platforms',
@@ -46,6 +51,11 @@ export const useDisconnectPlatform = () => {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['platforms'] });
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === 'linkedPlatforms',
+      });
     },
   });
 };
