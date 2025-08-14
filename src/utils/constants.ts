@@ -182,7 +182,7 @@ export const routesForHeaders: HeaderRoute[] = [
   },
   {
     path: '/auto/projects/:id/details',
-    label: 'Details',
+    label: 'Manage Posts',
     parent: '/auto/projects',
   },
   {
