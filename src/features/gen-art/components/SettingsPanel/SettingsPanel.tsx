@@ -13,11 +13,11 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { IoImageOutline } from 'react-icons/io5';
 
 //Assets
+import { UploadIcon, X } from 'lucide-react';
 import AspectRatioOptions from './AspectRatio';
 import CameraOptions from './CameraOptions';
 import LightingOptions from './LightingOptions';
 import StyleOptions from './StyleOptions';
-import { UploadIcon, X } from 'lucide-react';
 
 const SettingsPanel: React.FC<PanelProps> = ({
   isExpanded,
@@ -52,7 +52,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
   };
 
   return (
-    <div className="flex flex-col w-72 h-full shrink-0">
+    <div className="flex h-full w-72 shrink-0 flex-col">
       <div
         aria-controls="generation-options-content"
         id="generation-options-header"
@@ -77,10 +77,11 @@ const SettingsPanel: React.FC<PanelProps> = ({
             timeout: 200,
           },
         }}
-        className={`flex ${isExpanded ? '' : 'hidden'} border-mountain-300 custom-scrollbar z-10 m-0 w-72 flex-col rounded-xl rounded-t-none border bg-white shadow-md ${isExpanded ? 'max-h-[calc(100vh)]' : 'h-fit'
-          } overflow-y-auto`}
+        className={`flex ${isExpanded ? '' : 'hidden'} border-mountain-300 custom-scrollbar z-10 m-0 w-72 flex-col rounded-xl rounded-t-none border bg-white shadow-md ${
+          isExpanded ? 'max-h-[calc(100vh)]' : 'h-fit'
+        } overflow-y-auto`}
       >
-        <AccordionDetails className="flex flex-col flex-1 p-0 min-h-0 overflow-y-auto">
+        <AccordionDetails className="flex min-h-0 flex-1 flex-col overflow-y-auto p-0">
           {/* Nested Accordions */}
           <Accordion className="shadow-none" defaultExpanded>
             <AccordionSummary
@@ -117,14 +118,14 @@ const SettingsPanel: React.FC<PanelProps> = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails className="flex flex-col space-y-1">
-              <div className="flex flex-col space-y-1 w-full">
+              <div className="flex w-full flex-col space-y-1">
                 <p className="text-mountain-600 text-sm">Lighting</p>
                 <LightingOptions
                   selectedLighting={lighting}
                   onChange={setLighting}
                 />
               </div>
-              <div className="flex flex-col space-y-1 w-full">
+              <div className="flex w-full flex-col space-y-1">
                 <p className="text-mountain-600 text-sm">Camera</p>
                 <CameraOptions selectedCamera={camera} onChange={setCamera} />
               </div>
@@ -143,13 +144,15 @@ const SettingsPanel: React.FC<PanelProps> = ({
             <AccordionDetails>
               {(() => {
                 const fileInputRef = React.useRef<HTMLInputElement>(null);
-                const previewUrl = prefImage ? URL.createObjectURL(prefImage) : null;
+                const previewUrl = prefImage
+                  ? URL.createObjectURL(prefImage)
+                  : null;
 
                 const handleFileChange = (file?: File) => {
-                  if (file && file.type.startsWith("image/")) {
+                  if (file && file.type.startsWith('image/')) {
                     setPrefImage(file);
                   } else {
-                    alert("Please select an image file");
+                    alert('Please select an image file');
                   }
                 };
 
@@ -160,7 +163,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
 
                 const handleRemoveFile = () => {
                   setPrefImage(null);
-                  if (fileInputRef.current) fileInputRef.current.value = "";
+                  if (fileInputRef.current) fileInputRef.current.value = '';
                 };
 
                 return (
@@ -173,16 +176,16 @@ const SettingsPanel: React.FC<PanelProps> = ({
                       className="hidden"
                     />
                     {prefImage && previewUrl ? (
-                      <div className="relative border border-mountain-300 rounded-lg w-full h-48 overflow-hidden">
+                      <div className="border-mountain-300 relative h-48 w-full overflow-hidden rounded-lg border">
                         <img
                           src={previewUrl}
                           alt="Selected"
-                          className="w-full h-full object-cover"
+                          className="h-full w-full object-cover"
                         />
                         <button
                           type="button"
                           onClick={handleRemoveFile}
-                          className="top-2 right-2 z-50 absolute bg-white hover:bg-gray-100 shadow p-1 rounded-full"
+                          className="absolute top-2 right-2 z-50 rounded-full bg-white p-1 shadow hover:bg-gray-100"
                         >
                           <X className="size-4 text-red-500" />
                         </button>
@@ -192,12 +195,14 @@ const SettingsPanel: React.FC<PanelProps> = ({
                         onClick={() => fileInputRef.current?.click()}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={handleDrop}
-                        className="flex flex-col justify-center items-center bg-mountain-50 border-2 border-gray-300 hover:border-gray-400 border-dashed rounded-lg w-full h-48 text-gray-500 hover:text-gray-700 transition cursor-pointer"
+                        className="bg-mountain-50 flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-500 transition hover:border-gray-400 hover:text-gray-700"
                       >
                         <UploadIcon className="mb-2 size-6" />
                         <span className="text-sm">Drag your image here</span>
                         <span>or</span>
-                        <span className="font-bold text-sm">Click to upload</span>
+                        <span className="text-sm font-bold">
+                          Click to upload
+                        </span>
                       </div>
                     )}
                   </div>
@@ -219,7 +224,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
               <div className="flex flex-col space-y-1">
                 <p className="text-mountain-600 text-sm">Number of Images</p>
                 <ToggleButtonGroup
-                  className="flex justify-between gap-2 m-1.5"
+                  className="m-1.5 flex justify-between gap-2"
                   size="large"
                   value={numberOfImages}
                   exclusive
@@ -227,7 +232,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                 >
                   <ToggleButton
                     value={1}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
@@ -246,7 +251,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                   </ToggleButton>
                   <ToggleButton
                     value={2}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
@@ -265,7 +270,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                   </ToggleButton>
                   <ToggleButton
                     value={3}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
@@ -284,7 +289,7 @@ const SettingsPanel: React.FC<PanelProps> = ({
                   </ToggleButton>
                   <ToggleButton
                     value={4}
-                    className="-m-0.5 px-4 py-2 border-0 rounded-full w-1/4 normal-case transition duration-300 ease-in-out transform"
+                    className="-m-0.5 w-1/4 transform rounded-full border-0 px-4 py-2 normal-case transition duration-300 ease-in-out"
                     sx={{
                       backgroundColor: '#e0e0e0',
                       '&.Mui-selected': {
