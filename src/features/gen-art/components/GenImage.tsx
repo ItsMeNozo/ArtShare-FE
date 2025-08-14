@@ -16,6 +16,8 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogOverlay,
+  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
@@ -214,7 +216,7 @@ const GenImage: React.FC<GenImageProps> = ({
                       </Button>
                     </DialogTrigger>
                     <DialogContent
-                      className="flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
+                      className="z-[1500] flex h-fit cursor-not-allowed justify-center sm:max-w-[320px]"
                       hideCloseButton
                     >
                       <DialogHeader>
@@ -236,7 +238,11 @@ const GenImage: React.FC<GenImageProps> = ({
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleNavigateToUpload(result);
+                      const singleImageResult = {
+                        ...result,
+                        imageUrls: [result.imageUrls[index]],
+                      };
+                      handleNavigateToUpload(singleImageResult);
                     }}
                     className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                   >
@@ -310,217 +316,222 @@ const GenImage: React.FC<GenImageProps> = ({
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent className="min-w-7xl rounded-xl border-0 p-0">
-        <DialogHeader hidden>
-          <DialogTitle>Image Preview</DialogTitle>
-          <DialogDescription>Image Description</DialogDescription>
-        </DialogHeader>
-        <div className="relative flex h-[680px]">
-          <div className="bg-mountain-100 relative h-[680px] w-[65%] overflow-hidden rounded-l-xl">
-            {/* Image Slider */}
-            <div className="flex h-full w-full items-center justify-center">
-              <div
-                className="flex h-full transition-transform duration-500 ease-in-out"
-                style={{
-                  transform: `translateX(-${currentIndex * 100}%)`,
-                  width: `${otherImages.length * 100}%`,
-                }}
-              >
-                {otherImages.map((_img, index) => (
-                  <div
-                    key={index}
-                    className="flex h-full w-full flex-shrink-0 items-center justify-center"
-                  >
-                    <img
-                      src={_img}
-                      alt={`Preview ${index}`}
-                      className="max-h-[680px] max-w-full object-contain"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className={`${otherImages.length === 1 ? 'hidden' : 'flex'}`}>
-              {/* Left Arrow */}
-              <div
-                onClick={handlePrev}
-                className="hover:bg-mountain-50 absolute top-1/2 left-4 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white duration-300 ease-in-out hover:scale-105"
-              >
-                <FaChevronLeft />
-              </div>
-              {/* Right Arrow */}
-              <div
-                onClick={handleNext}
-                className={`hover:bg-mountain-50 absolute top-1/2 right-4 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white duration-300 ease-in-out hover:scale-105`}
-              >
-                <FaChevronRight />
-              </div>
-              {/* Gallery Navigating */}
-              <div
-                onClick={handleNext}
-                className="absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 transform cursor-pointer items-center justify-center space-x-2 rounded-full duration-300 ease-in-out"
-              >
-                <div className={`flex gap-2`}>
-                  {otherImages.map((_, index) => {
-                    let navIndex;
-                    switch (index) {
-                      case 0:
-                        navIndex = 3; // last image
-                        break;
-                      case 1:
-                        navIndex = 0; // first
-                        break;
-                      case 2:
-                        navIndex = 1; // second
-                        break;
-                      case 3:
-                        navIndex = 2; // third
-                        break;
-                      default:
-                        navIndex = index;
-                    }
-                    return (
-                      <div
-                        key={index}
-                        className={`h-2 w-8 rounded-lg hover:bg-white hover:opacity-100 ${
-                          currentIndex === index
-                            ? 'bg-white opacity-100'
-                            : 'bg-mountain-200 opacity-50'
-                        }`}
-                        onClick={() => handleNav(navIndex)}
+      <DialogPortal>
+        <DialogOverlay className="z-[1300]" />
+        <DialogContent className="z-[1400] min-w-7xl rounded-xl border-0 p-0">
+          <DialogHeader hidden>
+            <DialogTitle>Image Preview</DialogTitle>
+            <DialogDescription>Image Description</DialogDescription>
+          </DialogHeader>
+          <div className="relative flex h-[680px]">
+            <div className="bg-mountain-100 relative h-[680px] w-[65%] overflow-hidden rounded-l-xl">
+              {/* Image Slider */}
+              <div className="flex h-full w-full items-center justify-center">
+                <div
+                  className="flex h-full transition-transform duration-500 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentIndex * 100}%)`,
+                    width: `${otherImages.length * 100}%`,
+                  }}
+                >
+                  {otherImages.map((_img, index) => (
+                    <div
+                      key={index}
+                      className="flex h-full w-full flex-shrink-0 items-center justify-center"
+                    >
+                      <img
+                        src={_img}
+                        alt={`Preview ${index}`}
+                        className="max-h-[680px] max-w-full object-contain"
+                        onContextMenu={(e) => e.preventDefault()}
                       />
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex h-full w-[35%] flex-col justify-between">
-            <div>
-              <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
-                <div className="flex w-full items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="size-12">
-                      <AvatarImage
-                        src={
-                          user?.profilePictureUrl ||
-                          'https://github.com/shadcn.png'
-                        }
-                        alt="@shadcn"
-                      />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <p className="font-medium">{user?.fullName}</p>
-                  </div>
-                  <div className="flex">
-                    <div className="flex items-center">
-                      <Button
-                        className="h-9 min-w-9 rounded-r-none"
-                        title="Download"
-                        onClick={handleQuickDownloadFromModal}
-                      >
-                        <FiDownload className="size-5" />
-                      </Button>
-                      <Button
-                        className="flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
-                        title="Download with options"
-                        onClick={() => setOpenDownload?.(true)}
-                      >
-                        ▼
-                      </Button>
                     </div>
-                    <DeleteButton open={open} setOpen={setOpen} />
-                  </div>
+                  ))}
                 </div>
               </div>
-              <div className="border-mountain-100 flex h-1/2 w-full flex-col space-y-2 border-b px-4 py-2">
-                <div className="flex w-full items-center justify-between">
-                  <p className="font-medium">Prompt</p>
-                  <Button title="Copy" className="bg-mountain-100">
-                    <IoCopyOutline className="size-5" />
-                  </Button>
+              <div
+                className={`${otherImages.length === 1 ? 'hidden' : 'flex'}`}
+              >
+                {/* Left Arrow */}
+                <div
+                  onClick={handlePrev}
+                  className="hover:bg-mountain-50 absolute top-1/2 left-4 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white duration-300 ease-in-out hover:scale-105"
+                >
+                  <FaChevronLeft />
                 </div>
-                <div className="custom-scrollbar flex h-40 w-full overflow-y-auto">
-                  <AnyShowMoreText
-                    lines={3}
-                    more="Show more"
-                    less="Show less"
-                    className="flex w-full text-sm break-words"
-                    anchorClass="cursor-pointer hover:text-indigo-400 block py-2 underline text-sm"
-                    expanded={false}
-                    truncatedEndingComponent={'... '}
-                  >
-                    {result.userPrompt.replace(/\n/g, ' ')}
-                  </AnyShowMoreText>
+                {/* Right Arrow */}
+                <div
+                  onClick={handleNext}
+                  className={`hover:bg-mountain-50 absolute top-1/2 right-4 z-50 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white duration-300 ease-in-out hover:scale-105`}
+                >
+                  <FaChevronRight />
                 </div>
-              </div>
-              <div className="flex w-full p-4">
-                <div className="flex w-1/3 flex-col space-y-2">
-                  <p className="font-medium">Style</p>
-                  <div className="flex items-center space-x-2">
-                    <img src={example_1} className="h-5 w-5 rounded-xs" />
-                    <p className="text-mountain-600 line-clamp-1 capitalize">
-                      {result.style}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex w-1/3 flex-col space-y-2">
-                  <p className="font-medium">Aspect Ratio</p>
-                  <div className="flex items-center space-x-2">
-                    <IoIosSquareOutline className="size-5" />
-                    <p className="text-mountain-600">
-                      {result.aspectRatio.charAt(0).toUpperCase() +
-                        result.aspectRatio.slice(1).toLowerCase()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex w-full px-4">
-                <div className="flex w-1/3 flex-col space-y-2">
-                  <div className="flex w-full items-center justify-between">
-                    <p className="font-medium">Lighting</p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="text-mountain-600 capitalize">
-                      {result.lighting}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex w-1/3 flex-col space-y-2">
-                  <p className="font-medium">Camera</p>
-                  <div className="text flex">
-                    <p className="text-mountain-600 capitalize">
-                      {result.camera}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex w-1/3 flex-col space-y-2">
-                  <p className="w-full font-medium">Image Size</p>
-                  <div className="flex items-center">
-                    <p className="text-mountain-600 capitalize">1024x1024</p>
+                {/* Gallery Navigating */}
+                <div
+                  onClick={handleNext}
+                  className="absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 transform cursor-pointer items-center justify-center space-x-2 rounded-full duration-300 ease-in-out"
+                >
+                  <div className={`flex gap-2`}>
+                    {otherImages.map((_, index) => {
+                      let navIndex;
+                      switch (index) {
+                        case 0:
+                          navIndex = 3; // last image
+                          break;
+                        case 1:
+                          navIndex = 0; // first
+                          break;
+                        case 2:
+                          navIndex = 1; // second
+                          break;
+                        case 3:
+                          navIndex = 2; // third
+                          break;
+                        default:
+                          navIndex = index;
+                      }
+                      return (
+                        <div
+                          key={index}
+                          className={`h-2 w-8 rounded-lg hover:bg-white hover:opacity-100 ${
+                            currentIndex === index
+                              ? 'bg-white opacity-100'
+                              : 'bg-mountain-200 opacity-50'
+                          }`}
+                          onClick={() => handleNav(navIndex)}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               </div>
             </div>
-            <div className="p-2">
-              <div
-                onClick={() => {
-                  const copyResult = {
-                    ...result,
-                    imageUrls: [result.imageUrls[currentIndex]],
-                  };
-                  handleNavigateToUpload(copyResult);
-                }}
-                className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
-              >
-                <RiFolderUploadLine className="mr-2 size-5" />
-                <p>Post This Image</p>
+            <div className="flex h-full w-[35%] flex-col justify-between">
+              <div>
+                <div className="border-mountain-100 flex h-28 w-full items-end justify-between border-b p-4">
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="size-12">
+                        <AvatarImage
+                          src={
+                            user?.profilePictureUrl ||
+                            'https://github.com/shadcn.png'
+                          }
+                          alt="@shadcn"
+                        />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <p className="font-medium">{user?.fullName}</p>
+                    </div>
+                    <div className="flex">
+                      <div className="flex items-center">
+                        <Button
+                          className="h-9 min-w-9 rounded-r-none"
+                          title="Download"
+                          onClick={handleQuickDownloadFromModal}
+                        >
+                          <FiDownload className="size-5" />
+                        </Button>
+                        <Button
+                          className="flex h-9 w-6 min-w-6 items-center justify-center rounded-l-none border-l border-gray-300 p-0"
+                          title="Download with options"
+                          onClick={() => setOpenDownload?.(true)}
+                        >
+                          ▼
+                        </Button>
+                      </div>
+                      <DeleteButton open={open} setOpen={setOpen} />
+                    </div>
+                  </div>
+                </div>
+                <div className="border-mountain-100 flex h-1/2 w-full flex-col space-y-2 border-b px-4 py-2">
+                  <div className="flex w-full items-center justify-between">
+                    <p className="font-medium">Prompt</p>
+                    <Button title="Copy" className="bg-mountain-100">
+                      <IoCopyOutline className="size-5" />
+                    </Button>
+                  </div>
+                  <div className="custom-scrollbar flex h-40 w-full overflow-y-auto">
+                    <AnyShowMoreText
+                      lines={3}
+                      more="Show more"
+                      less="Show less"
+                      className="flex w-full text-sm break-words"
+                      anchorClass="cursor-pointer hover:text-indigo-400 block py-2 underline text-sm"
+                      expanded={false}
+                      truncatedEndingComponent={'... '}
+                    >
+                      {result.userPrompt.replace(/\n/g, ' ')}
+                    </AnyShowMoreText>
+                  </div>
+                </div>
+                <div className="flex w-full p-4">
+                  <div className="flex w-1/3 flex-col space-y-2">
+                    <p className="font-medium">Style</p>
+                    <div className="flex items-center space-x-2">
+                      <img src={example_1} className="h-5 w-5 rounded-xs" />
+                      <p className="text-mountain-600 line-clamp-1 capitalize">
+                        {result.style}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex w-1/3 flex-col space-y-2">
+                    <p className="font-medium">Aspect Ratio</p>
+                    <div className="flex items-center space-x-2">
+                      <IoIosSquareOutline className="size-5" />
+                      <p className="text-mountain-600">
+                        {result.aspectRatio.charAt(0).toUpperCase() +
+                          result.aspectRatio.slice(1).toLowerCase()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex w-full px-4">
+                  <div className="flex w-1/3 flex-col space-y-2">
+                    <div className="flex w-full items-center justify-between">
+                      <p className="font-medium">Lighting</p>
+                    </div>
+                    <div className="flex items-center">
+                      <p className="text-mountain-600 capitalize">
+                        {result.lighting}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex w-1/3 flex-col space-y-2">
+                    <p className="font-medium">Camera</p>
+                    <div className="text flex">
+                      <p className="text-mountain-600 capitalize">
+                        {result.camera}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex w-1/3 flex-col space-y-2">
+                    <p className="w-full font-medium">Image Size</p>
+                    <div className="flex items-center">
+                      <p className="text-mountain-600 capitalize">1024x1024</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-2">
+                <div
+                  onClick={() => {
+                    const copyResult = {
+                      ...result,
+                      imageUrls: [result.imageUrls[currentIndex]],
+                    };
+                    handleNavigateToUpload(copyResult);
+                  }}
+                  className="border-mountain-300 flex h-12 w-full transform items-center justify-center rounded-lg border bg-indigo-100 font-normal shadow-sm duration-300 ease-in-out select-none hover:cursor-pointer hover:bg-indigo-200/80"
+                >
+                  <RiFolderUploadLine className="mr-2 size-5" />
+                  <p>Post This Image</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   );
 };
