@@ -26,17 +26,17 @@ export const featuresShowcase = [
     destination: '/image/tool/editor/new',
   },
   {
+    label: 'Share Your Art',
+    description: 'Upload and showcase your artwork to the community.',
+    url: 'https://res.cloudinary.com/dqxtf297o/image/upload/v1755144896/artshare-asset/dashboard-feat-example/image-asset_oayynj.png',
+    destination: '/posts/new',
+  },
+  {
     label: 'Write Blog',
     description:
       'Share the process of creating your artworks, from start to finish.',
     url: 'https://res.cloudinary.com/dqxtf297o/image/upload/f_auto,q_auto/v1/artshare-asset/dashboard-feat-example/ztwlihdk1mqirwi1pzoc?blur=300&q=1',
     destination: '/blogs/write',
-  },
-  {
-    label: 'Share Your Work',
-    description: 'Share your artworks with AI tools.',
-    url: 'https://res.cloudinary.com/dqxtf297o/image/upload/v1755144896/artshare-asset/dashboard-feat-example/image-asset_oayynj.png',
-    destination: '/posts/new',
   },
   {
     label: 'Connect Social Account',
