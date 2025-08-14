@@ -1,6 +1,6 @@
 import { useFocusContext } from '@/contexts/focus/useFocusText';
 import { Post } from '@/types';
-import { Button, CardContent, Divider } from '@mui/material';
+import { Button, CardContent, Divider, Tooltip } from '@mui/material';
 import { Bookmark, MessageSquareText, Share2 } from 'lucide-react';
 import { ElementType, useEffect, useState } from 'react';
 import ShowMoreText from 'react-show-more-text';
@@ -159,12 +159,15 @@ const PostInfo = ({ postData }: PostInfoProps) => {
         <CardContent className="flex flex-col gap-2 p-0 px-4">
           {/* Title, description, date */}
           <div className="flex flex-col gap-2">
-            <div className="text-xl font-bold">{postData.title}</div>
+            <Tooltip title={postData.title} placement="top" arrow>
+              <div className="truncate text-xl font-bold">{postData.title}</div>
+            </Tooltip>
             <AnyShowMoreText
               lines={3}
               more="Show more"
               less="Show less"
               anchorClass="text-blue-600 hover:underline cursor-pointer text-sm"
+              className="break-words hyphens-auto"
             >
               {postData.description || ''}
             </AnyShowMoreText>
@@ -202,12 +205,11 @@ const PostInfo = ({ postData }: PostInfoProps) => {
               </div>
             )}
             {postData.categories?.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-mountain-50 dark:bg-mountain-800 flex items-center rounded px-2 py-1 text-xs"
-              >
-                {cat.name}
-              </div>
+              <Tooltip key={cat.id} title={cat.name} placement="top" arrow>
+                <div className="bg-mountain-50 dark:bg-mountain-800 flex max-w-[150px] items-center rounded px-2 py-1 text-xs">
+                  <span className="truncate">{cat.name}</span>
+                </div>
+              </Tooltip>
             ))}
           </div>
           <Divider className="border-0.5" />
