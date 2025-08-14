@@ -39,11 +39,13 @@ import GenImage from './GenImage';
 interface promptResultProps {
   result: PromptResult;
   useToShare?: boolean | null;
+  onClose?: () => void;
 }
 
 const PromptResultForAutoPost: React.FC<promptResultProps> = ({
   result,
   useToShare,
+  onClose,
 }) => {
   const [open, setOpen] = useState(false);
   const { showSnackbar } = useSnackbar();
@@ -109,6 +111,9 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
       url,
     }));
     setFieldValue('images', [...currentImages, ...newImages]);
+
+    // Close the dialog after sharing
+    onClose?.();
   };
 
   return (
@@ -198,6 +203,7 @@ const PromptResultForAutoPost: React.FC<promptResultProps> = ({
                 index={index}
                 useToShare={useToShare}
                 handleShareThis={handleShareThese}
+                onClose={onClose}
                 // onDelete={onDeleteSingle!}
               />
             )}

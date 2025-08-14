@@ -40,6 +40,7 @@ interface GenImageProps {
   otherImages: string[];
   useToShare?: boolean | null;
   handleShareThis: (urls: string[]) => void;
+  onClose?: () => void;
   // onDelete?: (resultId: number, imgId: number) => void;
 }
 
@@ -51,6 +52,7 @@ const GenImage: React.FC<GenImageProps> = ({
   otherImages,
   useToShare,
   handleShareThis,
+  onClose,
 }) => {
   const [deleteImage, setDeleteImage] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -239,6 +241,7 @@ const GenImage: React.FC<GenImageProps> = ({
                     onClick={(e) => {
                       e.stopPropagation();
                       handleShareThis([result.imageUrls[index]]);
+                      onClose?.();
                     }}
                     className="hover:bg-mountain-50 z-50 flex h-6 w-28 transform items-center justify-center rounded-md bg-white opacity-0 duration-300 ease-in-out group-hover:opacity-100 hover:cursor-pointer"
                   >

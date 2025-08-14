@@ -4,7 +4,11 @@ import { CircularProgress } from '@mui/material';
 import { Clock, Sparkles } from 'lucide-react';
 import PromptResultForAutoPost from './PromptResultForAutoPost';
 
-const BrowseGenHistory = () => {
+interface BrowseGenHistoryProps {
+  onClose?: () => void;
+}
+
+const BrowseGenHistory: React.FC<BrowseGenHistoryProps> = ({ onClose }) => {
   const {
     scrollRef,
     displayedResults,
@@ -70,6 +74,7 @@ const BrowseGenHistory = () => {
                   key={index}
                   result={result}
                   useToShare={true}
+                  onClose={onClose}
                 />
               ))}
           </div>
