@@ -148,6 +148,7 @@ export interface AutoProjectDetailsDto {
     tokenExpiresAt: Date | null;
     status: PlatformStatus;
   };
+  postCount: number;
 }
 
 export interface ProjectSummaryStats {
