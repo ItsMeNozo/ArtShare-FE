@@ -68,6 +68,9 @@ jobs:
         echo "🧹 Cleanup: ✅"
       if: always()
     
+    - name: Vercel Speed Insights (Production)
+      run: npx playwright test --project=speed-insights
+    
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
